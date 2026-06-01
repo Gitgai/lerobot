@@ -27,6 +27,7 @@ Videos copied locally:
 - [LIBERO Results](docs/libero_results.md)
 - [Robot Hardware Plan](docs/robot_hardware_plan.md)
 - [Leader/Follower Workflow](docs/leader_follower_workflow.md)
+- [Full Project Chat History](docs/full_chat_history.md)
 
 ## Main Goal
 
@@ -41,4 +42,3 @@ The recommended path is:
 5. Train ACT first.
 6. Evaluate ACT on the real robot.
 7. Try SmolVLA fine-tuning after the hardware and dataset are stable.
-
