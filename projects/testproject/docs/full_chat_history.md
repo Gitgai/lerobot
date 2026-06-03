@@ -785,11 +785,16 @@ Important docs:
 
 ```text
 README.md
+bin/so101
+config/so101.json
+scripts/so101_runner.py
 docs/brev_l4_setup.md
+docs/numbered_project_progress.md
 docs/leader_follower_workflow.md
 docs/libero_results.md
 docs/robot_hardware_plan.md
 docs/simulator_evaluation.md
+docs/so101_commands.md
 docs/full_chat_history.md
 setup_smolvla_vlabench_brev.sh
 ```
@@ -815,51 +820,345 @@ Leader calibration completed.
 Follower motor setup completed.
 Follower calibration completed.
 Leader/follower teleoperation connected and ran at about 60 Hz.
-Some follower joint communication/overload issues still need careful mechanical and wiring checks.
+Laptop camera recording works.
+Five local SO-101 demonstration episodes were recorded.
+All five episodes replayed successfully on the follower arm.
 ```
 
-## 26. Recommended Next Steps
+## 26. SO-101 Runner Workflow
 
-Immediate hardware next step:
+To avoid repeatedly copying long LeRobot commands, we created a project CLI:
 
 ```text
-Run a controlled 60-second leader/follower test.
-Move one joint at a time.
-Write down which joints behave correctly and which do not.
+scripts/so101_runner.py
+bin/so101
+config/so101.json
 ```
 
-If all joints behave well:
+The wrapper stores the important local settings:
 
 ```text
-Add camera.
-Test camera display.
-Record 5 very simple episodes.
-Replay one episode.
+Leader port: /dev/ttyACM0
+Follower port: /dev/ttyACM1
+Leader id: my_so101_leader
+Follower id: my_so101_follower
+Dataset root: /data/lerobot_datasets/so101_pick_test
+Dataset repo id: local/so101_pick_test
+Camera: opencv index 0, 640x480, 30 FPS
 ```
 
-If a joint fails:
+Important commands:
+
+```bash
+./bin/so101 status
+./bin/so101 positions
+./bin/so101 teleop
+./bin/so101 teleop --no-max-relative-target
+./bin/so101 record --episodes 5 --delete --no-max-relative-target
+./bin/so101 replay 0
+./bin/so101 logs
+./bin/so101 tail-log
+```
+
+The runner writes command logs to:
 
 ```text
-Stop.
-Power cycle.
-Reseat cables.
-Check the failing motor ID.
-Redo calibration only if the mechanical movement is correct.
+logs/so101/
 ```
 
-Do not train yet.
+It was also improved so `positions` handles partial read failures cleanly. Instead of a raw traceback, it reports whether the leader or follower read failed and gives next checks.
+
+## 27. Safety Limiter Discussion
+
+The normal teleoperation command uses:
+
+```bash
+--robot.max_relative_target=5
+```
+
+This tells LeRobot to clamp large sudden target jumps. It is a software safety limiter. When the leader and follower poses differ a lot, LeRobot prevents a big instant movement and prints clamp warnings.
+
+We tested both modes:
+
+```bash
+./bin/so101 teleop
+./bin/so101 teleop --no-max-relative-target
+```
+
+With the limiter enabled, the robot is safer but clamp warnings can appear when the arm poses differ.
+
+With the limiter removed, the follower follows the recorded/leader targets more directly, but sudden large differences can be riskier. We used it only after the arms were physically aligned and the position check looked good.
+
+## 28. Arm Position Checks
+
+We repeatedly used:
+
+```bash
+./bin/so101 positions
+```
+
+This compares the leader and follower joint readings:
+
+```text
+shoulder_pan
+shoulder_lift
+elbow_flex
+wrist_flex
+wrist_roll
+gripper
+```
+
+Good aligned result after the no-limiter teleop test:
+
+```text
+shoulder_pan   GOOD
+shoulder_lift  GOOD
+elbow_flex     GOOD
+wrist_flex     GOOD
+wrist_roll     GOOD
+gripper        GOOD
+```
+
+After replaying all episodes, most joints were still good, but wrist_roll and later gripper differed from the leader's current physical pose. We decided to leave that for later because replay only drives the follower; the leader is not involved during replay, so leader/follower mismatch after replay does not automatically mean replay failed.
+
+## 29. Camera Recording Setup
+
+The laptop camera was tested with LeRobot using:
+
+```bash
+--robot.cameras="{ front: {type: opencv, index_or_path: 0, width: 640, height: 480, fps: 30}}"
+--display_data=true
+```
+
+At first, display failed because `rerun-sdk` was missing:
+
+```text
+ImportError: 'rerun-sdk' is required but not installed.
+```
+
+The fix was:
+
+```bash
+cd /data/projects/lerobot
+pip install -e ".[viz]"
+```
+
+After that, Rerun opened and showed:
+
+```text
+Camera image stream
+Observation joint positions
+Action joint positions
+Timeline
+```
+
+The camera confirmed that laptop camera recording works.
+
+## 30. Five Episode Dataset Recording
+
+We recorded a fresh five-episode dataset with:
+
+```bash
+./bin/so101 record --episodes 5 --delete --no-max-relative-target
+```
+
+The first recording was stopped and deleted because we wanted a clean run. The fresh run completed successfully:
+
+```text
+Episodes: 5
+Frames: 8948
+FPS: 30
+Size: 123 MB
+Return code: 0
+```
+
+Dataset location:
+
+```text
+/data/lerobot_datasets/so101_pick_test
+```
+
+Important dataset files:
+
+```text
+data/chunk-000/file-000.parquet
+meta/episodes/chunk-000/file-000.parquet
+meta/info.json
+meta/stats.json
+meta/tasks.parquet
+videos/observation.images.front/chunk-000/file-000.mp4
+```
+
+The combined camera video was split into easier-to-watch episode files:
+
+```text
+/data/downloads/so101_pick_test_episodes/episode_0.mp4
+/data/downloads/so101_pick_test_episodes/episode_1.mp4
+/data/downloads/so101_pick_test_episodes/episode_2.mp4
+/data/downloads/so101_pick_test_episodes/episode_3.mp4
+/data/downloads/so101_pick_test_episodes/episode_4.mp4
+```
+
+Episode timing from metadata:
+
+```text
+episode 0: 0.000000s   to 59.700000s
+episode 1: 59.700000s  to 119.433333s
+episode 2: 119.433333s to 179.133333s
+episode 3: 179.133333s to 238.733333s
+episode 4: 238.733333s to 298.266667s
+```
+
+## 31. Replay Of Episodes 0-4
+
+We replayed all five episodes:
+
+```bash
+./bin/so101 replay 0
+./bin/so101 replay 1
+./bin/so101 replay 2
+./bin/so101 replay 3
+./bin/so101 replay 4
+```
+
+All five replay commands completed cleanly:
+
+```text
+Follower connected.
+Episode replayed.
+Follower disconnected.
+No software crash.
+No overload error.
+No connection failure.
+```
+
+Replay logs:
+
+```text
+logs/so101/20260603_162654_replay_ep0.log
+logs/so101/20260603_162810_replay_ep1.log
+logs/so101/20260603_162926_replay_ep2.log
+logs/so101/20260603_163041_replay_ep3.log
+logs/so101/20260603_163203_replay_ep4.log
+```
+
+This proved the basic loop:
+
+```text
+teleoperate -> record dataset -> save video/data -> replay follower motion
+```
+
+## 32. Episode Video Review
+
+We generated contact sheets from the five episode videos:
+
+```text
+/data/downloads/so101_pick_test_review/episode_0_contact.jpg
+/data/downloads/so101_pick_test_review/episode_1_contact.jpg
+/data/downloads/so101_pick_test_review/episode_2_contact.jpg
+/data/downloads/so101_pick_test_review/episode_3_contact.jpg
+/data/downloads/so101_pick_test_review/episode_4_contact.jpg
+```
+
+The review found:
+
+```text
+Good:
+- Robot arm is visible.
+- Object is visible in many frames.
+- Target box is visible.
+- The five episodes recorded correctly.
+
+Needs improvement:
+- Human hands/body appear in multiple episodes.
+- Object and target are not always the center of the camera view.
+- Workspace has some visual clutter.
+- Laptop camera side angle is usable for testing but not ideal for final training.
+```
+
+Conclusion:
+
+```text
+This dataset is good as a smoke test.
+It should not be treated as the final training dataset yet.
+```
+
+## 33. Public Data And Models Instead Of 50 Episodes
+
+The user asked whether we can avoid recording 50 local episodes by using LeRobot/Hugging Face data.
+
+The answer:
+
+```text
+Yes, public SO-101 datasets and pretrained SO-101 policies can help.
+No, they do not fully replace local data unless the task, camera angle, object, target, and robot setup match closely.
+```
+
+Examples discussed:
+
+```text
+Public datasets:
+- aswinkumar99/LeRobot-SO101-Pick-Place
+- edge-inference/smolvla-so101-pick-orange-data
+
+Pretrained/published policy examples:
+- edge-inference/smolvla-so101-pick-orange
+- SO-101 ACT/SmolVLA pick-place variants on Hugging Face
+```
+
+Best current plan:
+
+```text
+Use our 5 episodes to verify the pipeline.
+Record 5-10 cleaner local episodes with a better camera view.
+Then try a pretrained or fine-tuned SO-101 model path.
+Only collect 30-50 episodes if the small-data/pretrained route fails.
+```
+
+The important practical point:
+
+```text
+For a reliable real-arm policy, at least some local data is still needed because our camera, table, object, lighting, and arm mechanics are unique.
+```
+
+## 34. Recommended Next Steps
+
+Immediate next step:
+
+```text
+Record another small clean dataset, around 5-10 episodes.
+```
+
+Before recording:
+
+```text
+Move the camera closer or angle it toward the object, gripper, and target.
+Keep human hands/body out of the view after recording starts.
+Keep object and target in fixed positions.
+Clean visual clutter from the table.
+Make each episode a complete task attempt.
+```
+
+Then:
+
+```text
+Split videos into per-episode clips.
+Review contact sheets.
+Replay at least one or two episodes.
+Compare quality against the first smoke-test dataset.
+```
 
 Training should start only after:
 
 ```text
-Teleoperation is smooth.
-Both arms reconnect reliably.
-Calibration is repeatable.
-Camera view is stable.
-Short replay works.
+Teleoperation remains smooth.
+Camera view is stable and task-focused.
+Recorded episodes are clean.
+Replay works.
+Dataset has enough good examples or is combined with a suitable public/pretrained model.
 ```
 
-## 27. Short Glossary
+## 35. Short Glossary
 
 ```text
 Policy:
@@ -891,5 +1190,13 @@ The process of teaching LeRobot each joint's range and center.
 
 Teleoperation:
 Controlling the follower arm using the leader arm.
-```
 
+Dataset:
+The saved camera observations, robot states, actions, timestamps, and task labels from demonstrations.
+
+Replay:
+Sending saved dataset actions back to the follower arm to verify that the recorded motion can be reproduced.
+
+Rerun:
+The visualization app used by LeRobot to show camera frames, robot observations, and action/state plots.
+```
