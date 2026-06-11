@@ -1158,7 +1158,82 @@ Replay works.
 Dataset has enough good examples or is combined with a suitable public/pretrained model.
 ```
 
-## 35. Short Glossary
+## 35. Pi05 On L4 Remote-Brain Plan
+
+The user decided they may not want to continue with ACT and asked how to proceed with a pretrained Pi05 model on an L4 GPU.
+
+We documented a new plan:
+
+```text
+docs/pi05_l4_remote_plan.md
+```
+
+The core idea:
+
+```text
+local laptop = SO-101 body controller
+Brev L4 GPU  = Pi05 model brain
+```
+
+The control loop would be:
+
+```text
+1. Laptop reads camera image.
+2. Laptop reads SO-101 joint state.
+3. Laptop sends image + state + task text to the L4 server.
+4. L4 runs Pi05.
+5. L4 sends back a chunk of future actions.
+6. Laptop checks safety limits.
+7. Laptop sends safe actions to the follower arm.
+```
+
+Important safety decision:
+
+```text
+The L4 should not directly control the motor bus.
+The local laptop must remain the final safety gate.
+```
+
+Candidate Pi05 models already inspected:
+
+```text
+zz4321/so101_pi05
+nuffnuff/pi05-so101-finetuned_1
+aswinkumar99/LeRobot-SO101-Pi05-universal-all_bs32_s20000
+felixmayor/pi05_so101_orange_cube
+```
+
+Best first candidate:
+
+```text
+zz4321/so101_pi05
+```
+
+Reason:
+
+```text
+LeRobot Pi05 format
+SO-101 dataset
+state shape 6
+action shape 6
+```
+
+Main blocker:
+
+```text
+our setup currently has one front camera
+the strongest pretrained Pi05 candidates expect two or three cameras
+```
+
+Recommended next technical step:
+
+```text
+Add an inspect-policy command to the SO-101 runner.
+Use it to compare policy camera/state/action requirements with our real setup.
+Then load/test Pi05 on L4 without moving the robot.
+```
+
+## 36. Short Glossary
 
 ```text
 Policy:

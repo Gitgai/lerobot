@@ -1,0 +1,20 @@
+{
+  "lerobot_dir": "/data/projects/lerobot",
+  "conda_env": "/data/conda-envs/lerobot",
+  "leader_port": "/dev/ttyACM0",
+  "follower_port": "/dev/ttyACM1",
+  "leader_serial": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14029688-if00",
+  "follower_serial": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114209-if00",
+  "leader_id": "my_so101_leader",
+  "follower_id": "my_so101_follower",
+  "dataset_repo_id": "local/so101_pick_test",
+  "dataset_root": "/data/lerobot_datasets/so101_pick_test",
+  "camera_name": "front",
+  "camera_index": 0,
+  "camera_width": 640,
+  "camera_height": 480,
+  "camera_fps": 30,
+  "default_max_relative_target": 5,
+  "task": "Pick up the object and place it in the target area",
+  "log_dir": "logs/so101"
+}
