@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>C270 Live View</title>
+  <style>
+    :root {
+      --bg: #101418;
+      --panel: #182028;
+      --text: #eef3f7;
+      --muted: #9eb2c1;
+      --ok: #86efac;
+      --warn: #fcd34d;
+      --accent: #7dd3fc;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #223242 0%, var(--bg) 55%);
+      color: var(--text);
+      font-family: system-ui, sans-serif;
+      padding: 24px;
+    }
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      gap: 16px;
+    }
+    .panel {
+      background: rgba(24, 32, 40, 0.95);
+      border: 1px solid rgba(125, 211, 252, 0.15);
+      border-radius: 16px;
+      padding: 18px;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 1.4rem;
+    }
+    p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    .row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    button, select {
+      border: 1px solid rgba(255,255,255,0.15);
+      background: #0f151b;
+      color: var(--text);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font: inherit;
+    }
+    button { cursor: pointer; }
+    .status { color: var(--muted); }
+    .ok { color: var(--ok); }
+    .warn { color: var(--warn); }
+    video {
+      width: 100%;
+      max-width: 100%;
+      border-radius: 14px;
+      background: #000;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="panel">
+      <h1>Logitech C270 Live View</h1>
+      <p>This uses your browser's camera permission on localhost. It tries to pick the Logitech C270 first.</p>
+    </section>
+    <section class="panel row">
+      <button id="start">Start Live View</button>
+      <select id="devices"></select>
+      <button id="switch">Switch Camera</button>
+      <span id="status" class="status">waiting</span>
+    </section>
+    <section class="panel">
+      <video id="video" autoplay playsinline muted></video>
+    </section>
+  </div>
+  <script>
+    const startBtn = document.getElementById("start");
+    const switchBtn = document.getElementById("switch");
+    const devicesSel = document.getElementById("devices");
+    const statusEl = document.getElementById("status");
+    const video = document.getElementById("video");
+    let currentStream = null;
+
+    function setStatus(text, cls = "status") {
+      statusEl.textContent = text;
+      statusEl.className = cls;
+    }
+
+    async function listDevices() {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const cameras = devices.filter(d => d.kind === "videoinput");
+      devicesSel.innerHTML = "";
+      for (const cam of cameras) {
+        const opt = document.createElement("option");
+        opt.value = cam.deviceId;
+        opt.textContent = cam.label || `Camera ${devicesSel.length + 1}`;
+        devicesSel.appendChild(opt);
+      }
+      const preferred = cameras.find(c => /c270|logitech/i.test(c.label || ""));
+      if (preferred) {
+        devicesSel.value = preferred.deviceId;
+      }
+    }
+
+    async function startStream(deviceId = null) {
+      if (currentStream) {
+        currentStream.getTracks().forEach(track => track.stop());
+      }
+      setStatus("requesting camera...", "status");
+      const constraints = {
+        video: deviceId
+          ? { deviceId: { exact: deviceId }, width: { ideal: 1280 }, height: { ideal: 720 } }
+          : { width: { ideal: 1280 }, height: { ideal: 720 } },
+        audio: false
+      };
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      currentStream = stream;
+      video.srcObject = stream;
+      await listDevices();
+      const track = stream.getVideoTracks()[0];
+      const label = track ? track.label : "camera connected";
+      setStatus(label, "ok");
+    }
+
+    startBtn.addEventListener("click", async () => {
+      try {
+        await startStream();
+      } catch (err) {
+        setStatus(String(err), "warn");
+      }
+    });
+
+    switchBtn.addEventListener("click", async () => {
+      try {
+        if (!devicesSel.value) {
+          await listDevices();
+        }
+        await startStream(devicesSel.value);
+      } catch (err) {
+        setStatus(String(err), "warn");
+      }
+    });
+
+    navigator.mediaDevices?.addEventListener?.("devicechange", async () => {
+      try {
+        await listDevices();
+      } catch (_err) {
+      }
+    });
+  </script>
+</body>
+</html>

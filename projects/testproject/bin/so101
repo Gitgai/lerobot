@@ -3,11 +3,15 @@ set -euo pipefail
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-if [[ -f "$HOME/miniforge3/etc/profile.d/conda.sh" ]]; then
+# New-machine env is a uv venv (START_HERE.md §6), not conda. Prefer the venv; fall back to conda.
+if [[ -f "$PROJECT_ROOT/.venv/bin/activate" ]]; then
+  # shellcheck disable=SC1091
+  source "$PROJECT_ROOT/.venv/bin/activate"
+elif [[ -f "$HOME/miniforge3/etc/profile.d/conda.sh" ]]; then
   # shellcheck disable=SC1091
   source "$HOME/miniforge3/etc/profile.d/conda.sh"
+  conda activate /data/conda-envs/lerobot
 fi
 
-conda activate /data/conda-envs/lerobot
 cd "$PROJECT_ROOT"
 python scripts/so101_runner.py "$@"

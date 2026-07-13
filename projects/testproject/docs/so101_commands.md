@@ -219,6 +219,140 @@ ls -l /dev/ttyACM*
 ls -l /dev/serial/by-id/
 ```
 
+## 6. 3-Camera Pi05 Real-Arm Tests
+
+Saved 3-camera Pi05 videos live here:
+
+```text
+/data/downloads/so101_pi05_3cam_tests
+```
+
+Repeatable test procedure:
+
+```text
+docs/pi05_pick_orange_repeatable_protocol.md
+```
+
+Fast day-to-day workflow:
+
+```text
+docs/pi05_fast_test_workflow.md
+```
+
+Live session checklist:
+
+```text
+docs/pi05_session_checklist.md
+```
+
+Current camera layout:
+
+```text
+Top   = Logitech C270 direct OpenCV / LeRobot camera
+Front = laptop camera
+Wrist = Raspberry Pi wrist camera proxy
+```
+
+Current camera truth:
+
+```text
+Top:
+  Use /dev/v4l/by-id/usb-046d_C270_HD_WEBCAM_FC7A6780-video-index0.
+  Use fourcc MJPG.
+  Use warmup_s=3.
+  Do not judge the C270 from a single immediate frame; the first cold frame can be black.
+  LeRobot OpenCVCamera works after warmup and returns real non-black frames.
+
+Front:
+  Direct laptop OpenCV camera works.
+
+Wrist:
+  Use http://127.0.0.1:8092/frame
+  This is now a live rpicam-vid proxy, not the old PiSnap latest-JPG scan.
+  PiSnap/PiPics services must be paused while the live wrist stream owns the Pi camera.
+```
+
+Before running a new grasp test:
+
+```text
+1. Place the orange slightly inside the gripper closing path.
+2. Keep it centered in front of the arm.
+3. Make sure the C270 is not owned by the browser proxy if using direct LeRobot camera mode.
+4. Make sure the wrist proxy is running.
+5. Start the L40S only when ready to test.
+```
+
+Best current prompt:
+
+```text
+grasp the orange
+```
+
+Latest best comparison command:
+
+```bash
+/data/conda-envs/lerobot/bin/python scripts/pi05_guarded_real_action_test.py \
+  --server-address=127.0.0.1:8080 \
+  --task='grasp the orange' \
+  --timeout-s=300 \
+  --skip-policy-setup \
+  --camera-fill-mode=top-front-wrist \
+  --wrist-camera-url='http://127.0.0.1:8092/frame' \
+  --max-step-deg=4 \
+  --gripper-max-step=4 \
+  --robot-max-relative-target=5 \
+  --steps=15 \
+  --settle-s=0.5 \
+  --record-fps=10 \
+  --record-video='/data/downloads/so101_pi05_3cam_tests/so101_pi05_3cam_grasp_orange_15steps_manual_rerun.mp4' \
+  --i-understand-this-moves-robot
+```
+
+If the model is not already loaded on the L40S, remove:
+
+```text
+--skip-policy-setup
+```
+
+What we learned from recent tests:
+
+```text
+move the gripper to the orange and close the gripper
+-> better approach behavior
+
+grasp the orange
+-> stronger grasp intent and more gripper closure
+```
+
+Loose-guard Pi05 test:
+
+```bash
+/data/conda-envs/lerobot/bin/python scripts/pi05_guarded_real_action_test.py \
+  --server-address=127.0.0.1:8080 \
+  --task='grasp the orange' \
+  --timeout-s=300 \
+  --skip-policy-setup \
+  --camera-fill-mode=top-front-wrist \
+  --wrist-camera-url='http://127.0.0.1:8092/frame' \
+  --max-step-deg=15 \
+  --gripper-max-step=20 \
+  --robot-max-relative-target=5 \
+  --steps=15 \
+  --settle-s=0.5 \
+  --record-fps=10 \
+  --record-video='/data/downloads/so101_pi05_3cam_tests/so101_pi05_3cam_grasp_orange_15steps_loose_guard.mp4' \
+  --i-understand-this-moves-robot
+```
+
+Why this is "loose-guard":
+
+```text
+Pi05 action is followed much more directly
+joint jump clamp is much larger
+gripper clamp is much larger
+LeRobot still keeps one hard safety boundary
+```
+
 ## 6. Teleoperate Without Timer
 
 Use this for normal leader-to-follower testing. It runs until you press `Ctrl+C`.
@@ -417,3 +551,58 @@ action shape
 expected camera names
 compatibility with our current SO-101 config
 ```
+
+## 15. Pi05 Guarded One-Step Test
+
+This uses the L40S Pi05 server through the local SSH tunnel.
+
+Default command is observation-only. It prints what Pi05 wants to do, then prints the tiny clamped action that would be sent, but it does not move the arm.
+
+```bash
+cd /home/prakash-gaikwad/PrakashProjects/testproject
+
+/data/conda-envs/lerobot/bin/python scripts/pi05_guarded_real_action_test.py \
+  --server-address=127.0.0.1:8080 \
+  --task="pick up the object" \
+  --timeout-s=300
+```
+
+Only use this after the observation-only command looks sane. This sends one tiny clamped action step to the follower:
+
+```bash
+cd /home/prakash-gaikwad/PrakashProjects/testproject
+
+/data/conda-envs/lerobot/bin/python scripts/pi05_guarded_real_action_test.py \
+  --server-address=127.0.0.1:8080 \
+  --task="pick up the object" \
+  --timeout-s=300 \
+  --max-step-deg=1 \
+  --gripper-max-step=1 \
+  --move-one-step \
+  --i-understand-this-moves-robot
+```
+
+If wrist roll is still suspicious, add:
+
+```bash
+--disable-motor wrist_roll
+```
+
+For more visible movement, do not remove all safety limits. Raise the guarded limits instead:
+
+```bash
+cd /home/prakash-gaikwad/PrakashProjects/testproject
+
+/data/conda-envs/lerobot/bin/python scripts/pi05_guarded_real_action_test.py \
+  --server-address=127.0.0.1:8080 \
+  --task="pick up the orange" \
+  --timeout-s=300 \
+  --max-step-deg=4 \
+  --gripper-max-step=4 \
+  --robot-max-relative-target=4 \
+  --steps=5 \
+  --settle-s=0.8 \
+  --i-understand-this-moves-robot
+```
+
+The guarded script refuses `--robot-max-relative-target` above `5`.

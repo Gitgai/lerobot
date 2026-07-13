@@ -1233,7 +1233,521 @@ Use it to compare policy camera/state/action requirements with our real setup.
 Then load/test Pi05 on L4 without moving the robot.
 ```
 
-## 36. Short Glossary
+## 36. Pi05 L40S Offline And Remote Tests
+
+After deciding to try pretrained Pi05 instead of ACT first, we moved from the L4 idea to a larger L40S GPU because Pi05 is heavier and benefits from more VRAM.
+
+The plan became:
+
+```text
+local laptop:
+  owns the SO-101 follower arm
+  owns the cameras
+  reads robot state
+  sends observations to GPU
+  receives actions
+  sends actions to the real arm
+
+Brev L40S:
+  loads Pi05
+  runs model inference
+  returns action chunks
+```
+
+We discussed that this is not the same as the GPU directly controlling the robot. The robot remains physically connected to the local laptop, so the laptop remains the final controller.
+
+We tested the Pi05 model loading path on the GPU first without moving the arm. This was called an "offline inference test":
+
+```text
+offline = no real robot movement
+inference = model receives fake/test observations and produces actions
+```
+
+The point was to prove:
+
+```text
+model can download
+model can load on CUDA
+model can receive correctly shaped observations
+model can return an action
+```
+
+We also clarified that LeRobot async inference normally uses a network protocol:
+
+```text
+laptop robot client
+  -> sends camera/state/task over gRPC
+
+GPU policy server
+  -> runs Pi05
+  -> returns action chunk
+
+laptop robot client
+  -> queues actions
+  -> sends one action at a time to SO-101
+```
+
+The important lesson:
+
+```text
+Pi05 does not usually produce just one action.
+It produces a chunk of future actions.
+The robot client normally executes those actions over time.
+```
+
+## 37. Pi05 Model Candidates And Camera Requirements
+
+We inspected several SO-101 Pi05-style Hugging Face models:
+
+```text
+zz4321/so101_pi05
+nuffnuff/pi05-so101-finetuned_1
+aswinkumar99/LeRobot-SO101-Pi05-universal-all_bs32_s20000
+felixmayor/pi05_so101_orange_cube
+```
+
+The main candidate remained:
+
+```text
+zz4321/so101_pi05
+```
+
+Reason:
+
+```text
+LeRobot Pi05 format
+SO-101 style state/action
+6D state
+6D action
+expected camera inputs include top/front/wrist style views
+```
+
+We learned that the biggest compatibility issue was not just the model. It was the camera setup:
+
+```text
+pretrained Pi05 expects multiple camera views
+our first setup had only one laptop camera
+```
+
+So the project moved toward a real three-camera setup:
+
+```text
+top   = Logitech C270
+front = laptop camera
+wrist = Raspberry Pi Zero 2W camera
+```
+
+## 38. SO-101 Real-Arm Pi05 Testing
+
+We created and used a custom real-arm Pi05 runner:
+
+```text
+scripts/pi05_guarded_real_action_test.py
+```
+
+This script was used to:
+
+```text
+read local SO-101 follower state
+read camera frames
+send observation to Pi05 server
+receive Pi05 action output
+optionally limit large action jumps
+move the real follower arm
+record videos for analysis
+```
+
+Early tests used safety guards because Pi05 sometimes produced very large target changes.
+
+Example issue:
+
+```text
+current wrist_roll: about -173 degrees
+Pi05 requested:      about   -1 degree
+difference:          about 171 degrees
+```
+
+That is why we added temporary step limits such as:
+
+```text
+--max-step-deg
+--gripper-max-step
+--robot-max-relative-target
+```
+
+But we later agreed that these are not the final solution.
+
+The user made the project goal clear:
+
+```text
+We want a real working robot.
+We want correct solutions, not band-aid behavior.
+If Pi05 is wrong, the right long-term fix may be fine-tuning or official async behavior, not hiding the issue forever with clamps.
+```
+
+## 39. Guarded, Loose-Guard, And Raw Pi05 Tests
+
+We compared different ways of letting Pi05 move the arm:
+
+```text
+guarded:
+  small step limits
+  safer
+  movement can be too small
+
+loose-guard:
+  larger step limits
+  more faithful to Pi05
+  still has some protection
+
+raw:
+  sends Pi05 output much more directly
+  most faithful
+  highest physical risk
+```
+
+The user wanted to understand whether our guards were preventing success. We tried shorter raw or less-restricted tests carefully.
+
+The conclusion:
+
+```text
+the connection path works
+the arm moves from Pi05 actions
+the cameras affect behavior
+but the arm has not yet achieved a reliable orange grasp
+```
+
+We discussed that simply adding more steps is not enough if the model interpretation or camera geometry is wrong.
+
+In plain words:
+
+```text
+More time only helps if the robot is already moving in the correct direction.
+If Pi05 is confused by the scene, more steps can repeat the wrong behavior.
+```
+
+## 40. Video Analysis Of Pick-Orange Attempts
+
+Several Pi05 videos were recorded under:
+
+```text
+/data/downloads/so101_pi05_3cam_tests
+```
+
+Observed behavior:
+
+```text
+the arm moved meaningfully
+the gripper often approached the orange area
+the gripper sometimes aligned better than earlier tests
+the orange usually stayed on the table
+the robot did not complete a stable grasp and lift
+```
+
+Interpretation:
+
+```text
+Pi05 is not completely random.
+It appears to understand there is an object region.
+But it is not precise enough yet for a reliable grasp in our physical setup.
+```
+
+Likely causes discussed:
+
+```text
+camera views differ from training setup
+front camera was too wide or not focused on the task
+wrist camera latency was high in the old setup
+top camera sometimes had stale frames
+the model may need fine-tuning on our exact robot/table/cameras/object
+```
+
+## 41. Decision: Correct Path Instead Of Bandaids
+
+The user rejected a "band-aid" approach and said the real goal is a working robot.
+
+We created a plan:
+
+```text
+docs/real_so101_working_robot_plan.md
+```
+
+Main philosophy:
+
+```text
+1. First prove the observation/action pipeline is correct.
+2. Use official LeRobot async inference if compatible.
+3. If pretrained Pi05 is still wrong, collect data and fine-tune.
+4. Do not rely on permanent hand-written action hacks as the final solution.
+```
+
+We also created:
+
+```text
+docs/pi05_official_async_test_plan.md
+```
+
+Purpose:
+
+```text
+inspect whether official LeRobot async inference works with:
+  SO-101 follower
+  Pi05
+  our top/front/wrist camera setup
+  our local laptop + remote GPU layout
+```
+
+Important LeRobot behavior:
+
+```text
+Pi05 generates action chunks.
+Official async inference queues those chunks.
+The robot client executes actions one at a time while requesting the next chunk before the queue is empty.
+```
+
+This matters because our custom runner started as a debugging tool, not a perfect copy of official async behavior.
+
+## 42. Raspberry Pi Wrist Camera Work
+
+The user connected a Raspberry Pi Zero 2W camera to the SO-101 wrist.
+
+We set up SSH access to the Pi:
+
+```text
+raspi@192.168.1.10
+raspi@192.168.194.203
+```
+
+The user wanted to avoid modifying the existing PiSnap/PiPics project.
+
+We documented the plan:
+
+```text
+docs/raspberry_pi_lerobot_camera_plan.md
+```
+
+Original PiSnap/PiPics behavior:
+
+```text
+Pi camera
+  -> rpicam-still
+  -> saves JPG files into /home/raspi/timelapse
+  -> pipics FastAPI server serves saved images
+```
+
+This is fine for timelapse, but bad for robot control because Pi05 needs fresh live frames.
+
+We found the exact latency issue:
+
+```text
+old wrist proxy scanned thousands of JPG files
+each /frame request could take several seconds
+the wrist image could be stale
+```
+
+The correct fix:
+
+```text
+pause PiSnap/PiPics services during robot tests
+run rpicam-vid as a live stream
+keep one persistent local proxy connected
+serve the latest frame from memory
+```
+
+Current working wrist path:
+
+```text
+Raspberry Pi camera
+  -> rpicam-vid on tcp://192.168.1.10:8892
+  -> tools/pi_wrist_proxy.py
+  -> http://127.0.0.1:8092/frame
+```
+
+Current wrist status during the latest check:
+
+```text
+wrist frame age: about 0.05 to 0.08 seconds
+```
+
+PiSnap/PiPics status during robot testing:
+
+```text
+timelapse.service paused
+pipics.service paused
+rpicam-vid owns the Pi camera
+```
+
+This does not modify the PiSnap code or delete any PiSnap files.
+
+## 43. Logitech C270 Top Camera Work
+
+The user connected a Logitech C270 USB camera and assigned it as the top camera.
+
+Direct OpenCV and ffmpeg tests from the C270 returned black frames:
+
+```text
+every pixel looked like [2, 2, 2]
+```
+
+Meaning:
+
+```text
+the camera device opened
+but the frame content was effectively black
+```
+
+However, the browser camera stack displayed a good C270 image.
+
+So we created/used:
+
+```text
+tools/top_camera_proxy.py
+```
+
+Working top-camera path:
+
+```text
+Chrome browser page
+  -> reads Logitech C270
+  -> uploads JPEG frames to local proxy
+  -> http://127.0.0.1:8094/frame
+```
+
+The local page:
+
+```text
+http://127.0.0.1:8094/
+```
+
+Important condition:
+
+```text
+The browser tab must stay open and actively proxying.
+The server status must show a fresh frame age.
+```
+
+Good status example:
+
+```text
+top frame age: less than 1 or 2 seconds
+```
+
+Latest successful top check:
+
+```text
+top frame age: about 0.23 seconds
+top image clearly showed the arm and orange
+```
+
+Later, after time passed, the top status became stale again:
+
+```text
+last_capture_age_seconds increased to more than 100 seconds
+```
+
+So we stopped before moving the arm because Pi05 should not run on stale top frames.
+
+## 44. Current Camera Roles And Links
+
+Current intended camera roles:
+
+```text
+Top:
+  Logitech C270 through browser proxy
+  http://127.0.0.1:8094/frame
+
+Front:
+  laptop camera through OpenCV
+  useful only if aimed at the task area
+
+Wrist:
+  Raspberry Pi live rpicam stream
+  http://127.0.0.1:8092/frame
+```
+
+Current supporting files:
+
+```text
+config/so101.json
+tools/top_camera_proxy.py
+tools/pi_wrist_proxy.py
+docs/raspberry_pi_lerobot_camera_plan.md
+docs/so101_commands.md
+docs/pi05_official_async_test_plan.md
+docs/real_so101_working_robot_plan.md
+```
+
+The latest camera readiness result:
+
+```text
+wrist camera: good and live
+top camera: good only when browser proxy is fresh
+front camera: works but needs better aiming for the task
+```
+
+## 45. Latest Attempt To Run Pi05 Test
+
+The user asked to go ahead and show the result.
+
+Before moving the arm, we checked:
+
+```text
+SO-101 follower status
+top camera status
+wrist camera status
+local Pi05 server/tunnel status
+```
+
+Results:
+
+```text
+follower arm:
+  connected and usable
+
+wrist camera:
+  live and fresh
+
+top camera:
+  not fresh at that moment
+  browser page showed video but proxy status age was increasing
+
+Pi05 server:
+  127.0.0.1:8080 was closed
+
+Brev/L40S:
+  direct SSH to 18.117.172.98 timed out
+  brev refresh said the user was logged out and required browser login
+```
+
+Decision:
+
+```text
+Do not move the arm until:
+  1. Brev login / Pi05 server is active
+  2. top camera frame age is fresh
+  3. wrist camera remains fresh
+  4. follower is connected
+```
+
+Reason:
+
+```text
+Moving the real arm with stale camera input or no active Pi05 server would be a bad test.
+It could produce misleading results or unsafe motion.
+```
+
+Immediate next steps:
+
+```text
+1. Run brev refresh locally and complete browser login.
+2. Start or reconnect the Pi05 policy server/tunnel on 127.0.0.1:8080.
+3. Refresh http://127.0.0.1:8094/ and make sure C270 is actively proxying.
+4. Confirm top frame age is under 1-2 seconds.
+5. Confirm wrist frame age is under 1 second.
+6. Run the next Pi05 pick-orange test only after those checks pass.
+```
+
+## 46. Short Glossary
 
 ```text
 Policy:

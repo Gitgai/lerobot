@@ -31,6 +31,18 @@ def load_config() -> dict[str, Any]:
     return cfg
 
 
+def resolve_port(cfg: dict[str, Any], kind: str) -> str:
+    serial_key = f"{kind}_serial"
+    port_key = f"{kind}_port"
+    serial_path = Path(cfg[serial_key])
+    if serial_path.exists():
+        try:
+            return str(serial_path.resolve())
+        except OSError:
+            return str(serial_path)
+    return str(cfg[port_key])
+
+
 def camera_config(cfg: dict[str, Any]) -> str:
     return (
         "{ "
@@ -108,7 +120,7 @@ def run(cmd: list[str], cfg: dict[str, Any], name: str, log: bool = True) -> Non
 def base_robot_args(cfg: dict[str, Any], max_relative_target: float | None) -> list[str]:
     args = [
         "--robot.type=so101_follower",
-        f"--robot.port={cfg['follower_port']}",
+        f"--robot.port={resolve_port(cfg, 'follower')}",
         f"--robot.id={cfg['follower_id']}",
         "--robot.disable_torque_on_disconnect=false",
     ]
@@ -120,7 +132,7 @@ def base_robot_args(cfg: dict[str, Any], max_relative_target: float | None) -> l
 def base_teleop_args(cfg: dict[str, Any]) -> list[str]:
     return [
         "--teleop.type=so101_leader",
-        f"--teleop.port={cfg['leader_port']}",
+        f"--teleop.port={resolve_port(cfg, 'leader')}",
         f"--teleop.id={cfg['leader_id']}",
     ]
 
@@ -164,7 +176,7 @@ def replay(args: argparse.Namespace, cfg: dict[str, Any]) -> None:
     cmd = [
         "lerobot-replay",
         "--robot.type=so101_follower",
-        f"--robot.port={cfg['follower_port']}",
+        f"--robot.port={resolve_port(cfg, 'follower')}",
         f"--robot.id={cfg['follower_id']}",
         "--robot.disable_torque_on_disconnect=false",
         f"--dataset.repo_id={cfg['dataset_repo_id']}",
@@ -179,7 +191,7 @@ def calibrate_follower(args: argparse.Namespace, cfg: dict[str, Any]) -> None:
         [
             "lerobot-calibrate",
             "--robot.type=so101_follower",
-            f"--robot.port={cfg['follower_port']}",
+            f"--robot.port={resolve_port(cfg, 'follower')}",
             f"--robot.id={cfg['follower_id']}",
         ],
         cfg,
@@ -193,7 +205,7 @@ def calibrate_leader(args: argparse.Namespace, cfg: dict[str, Any]) -> None:
         [
             "lerobot-calibrate",
             "--teleop.type=so101_leader",
-            f"--teleop.port={cfg['leader_port']}",
+            f"--teleop.port={resolve_port(cfg, 'leader')}",
             f"--teleop.id={cfg['leader_id']}",
         ],
         cfg,
@@ -233,8 +245,12 @@ def status(_: argparse.Namespace, cfg: dict[str, Any]) -> None:
     print(f"Conda env:       {cfg['conda_env']} ({exists_label(cfg['conda_env'])})")
     print(f"lerobot command: {command_label('lerobot-teleoperate')}")
     print()
+    leader_port = resolve_port(cfg, "leader")
+    follower_port = resolve_port(cfg, "follower")
     print(f"Leader port:     {cfg['leader_port']} ({exists_label(cfg['leader_port'])})")
+    print(f"Leader active:   {leader_port} ({exists_label(leader_port)})")
     print(f"Follower port:   {cfg['follower_port']} ({exists_label(cfg['follower_port'])})")
+    print(f"Follower active: {follower_port} ({exists_label(follower_port)})")
     print(f"Leader serial:   {cfg['leader_serial']} ({exists_label(cfg['leader_serial'])})")
     print(f"Follower serial: {cfg['follower_serial']} ({exists_label(cfg['follower_serial'])})")
     print()
@@ -243,6 +259,17 @@ def status(_: argparse.Namespace, cfg: dict[str, Any]) -> None:
     print()
     print(f"Dataset:         {cfg['dataset_root']} ({exists_label(cfg['dataset_root'])})")
     print(f"Logs:            {cfg['log_dir']} ({exists_label(cfg['log_dir'])})")
+    print()
+    leader_serial_exists = Path(cfg["leader_serial"]).exists()
+    follower_serial_exists = Path(cfg["follower_serial"]).exists()
+    follower_ready = Path(follower_port).exists() and follower_serial_exists
+    leader_ready = Path(leader_port).exists() and leader_serial_exists
+
+    if follower_ready and not leader_ready:
+        print("Follower-only note: follower is available even though leader is missing.")
+        print("This is enough for Pi05 inference on the real arm.")
+    elif follower_ready and leader_ready:
+        print("Both leader and follower appear available.")
 
 
 def logs(args: argparse.Namespace, cfg: dict[str, Any]) -> None:
@@ -447,10 +474,12 @@ def positions(_: argparse.Namespace, cfg: dict[str, Any]) -> None:
     from lerobot.teleoperators.so_leader.so_leader import SOLeader
 
     motors = ["shoulder_pan", "shoulder_lift", "elbow_flex", "wrist_flex", "wrist_roll", "gripper"]
-    leader = SOLeader(SOLeaderTeleopConfig(port=cfg["leader_port"], id=cfg["leader_id"]))
+    leader_port = resolve_port(cfg, "leader")
+    follower_port = resolve_port(cfg, "follower")
+    leader = SOLeader(SOLeaderTeleopConfig(port=leader_port, id=cfg["leader_id"]))
     follower = SOFollower(
         SOFollowerRobotConfig(
-            port=cfg["follower_port"],
+            port=follower_port,
             id=cfg["follower_id"],
             disable_torque_on_disconnect=False,
         )
@@ -462,9 +491,9 @@ def positions(_: argparse.Namespace, cfg: dict[str, Any]) -> None:
     try:
         leader.connect()
         leader_action = leader.get_action()
-        print(f"Leader read: OK ({cfg['leader_port']})")
+        print(f"Leader read: OK ({leader_port})")
     except Exception as exc:
-        print(f"Leader read: FAILED ({cfg['leader_port']})")
+        print(f"Leader read: FAILED ({leader_port})")
         print(f"{type(exc).__name__}: {exc}")
     finally:
         try:
@@ -475,15 +504,25 @@ def positions(_: argparse.Namespace, cfg: dict[str, Any]) -> None:
     try:
         follower.connect()
         follower_obs = follower.get_observation()
-        print(f"Follower read: OK ({cfg['follower_port']})")
+        print(f"Follower read: OK ({follower_port})")
     except Exception as exc:
-        print(f"Follower read: FAILED ({cfg['follower_port']})")
+        print(f"Follower read: FAILED ({follower_port})")
         print(f"{type(exc).__name__}: {exc}")
     finally:
         try:
             follower.disconnect()
         except Exception:
             pass
+
+    if leader_action is None and follower_obs is not None:
+        print("\nFollower-only positions")
+        print("motor              follower")
+        print("-" * 36)
+        for motor in motors:
+            follower_pos = float(follower_obs[f"{motor}.pos"])
+            print(f"{motor:<18} {follower_pos:>10.2f}")
+        print("\nLeader arm is missing, but follower-only Pi05 inference can still proceed.")
+        return
 
     if leader_action is None or follower_obs is None:
         print("\nPosition comparison skipped because one side did not respond.")
