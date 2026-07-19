@@ -108,43 +108,47 @@ We tested official LeRobot only, without custom scripts:
 .venv/bin/python -m lerobot.scripts.lerobot_find_cameras opencv
 ```
 
-Result:
+Current camera result:
 
 ```text
-Official camera finder works.
-It detected OpenCV Camera @ /dev/video4.
+top   = /dev/video0, Logitech C270, RGB, 640x480
+front = /dev/video2, Acer RGB camera, 640x480
+wrist source = tcp://192.168.1.17:8554, Raspberry Pi CSI camera MJPEG stream
+wrist policy camera target = /dev/video6 after v4l2loopback exposes it as Video Capture
 ```
 
-We also tested official robot client with an unreachable policy server so the robot could not receive actions:
+Do not use `/dev/video4` as a normal policy camera. It is the Acer IR greyscale stream.
+
+We also tested official robot client with camera/robot configs.
 
 ```text
 .venv/bin/python -m lerobot.async_inference.robot_client ...
 ```
 
-Result:
+Current result:
 
 ```text
-Official robot_client parsed the SO-101 config.
-OpenCVCamera(/dev/video4) connected.
-my_so101_follower SOFollower connected.
-Robot connected and ready.
-Policy server connection failed intentionally because server_address was 127.0.0.1:1.
-No robot motion occurred.
+OpenCVCamera(/dev/video0) connected as top.
+OpenCVCamera(/dev/video2) connected as front.
+Direct OpenCVCamera(tcp://192.168.1.17:8554) fails in official robot_client because OpenCV returns frames but rejects width/height/FPS set validation.
+/dev/video6 currently exists but reports Video Output only, so OpenCV cannot read it as a camera yet.
+No Pi05 evaluation should be run until the wrist camera path is fixed.
 ```
 
-This means official LeRobot works for the available robot and camera path.
+This means the official top/front camera path works, but the intended official 3-camera path is still blocked by wrist camera plumbing.
 
 ## Current Non-Code Blockers
 
-The remaining blockers are hardware/device availability, not custom-code problems:
+The remaining camera requirement is operational:
 
 ```text
-/dev/video2 was busy by Chrome.
-The Logitech top camera was not visible at that moment.
-The user will fix the cameras.
+The Raspberry Pi timelapse service must be stopped while using the Pi camera as wrist.
+The Pi MJPEG stream must be listening on tcp://192.168.1.17:8554.
+/dev/video6 must report Video Capture, not only Video Output.
+OpenCV must be able to read /dev/video6 before it is used as the official wrist camera.
 ```
 
-We will not work around these by writing custom code. We will wait for the cameras to be fixed, then use official LeRobot commands.
+We will not work around these by writing custom code. We will use official LeRobot camera configuration.
 
 ## Official Test Path Going Forward
 
@@ -161,9 +165,27 @@ cd /home/gaikwad-prakash/PrakashProjects/lerobot/lerobot/projects/testproject
 Expected:
 
 ```text
-front camera visible
-top camera visible
-any direct USB cameras visible as OpenCV cameras
+top camera visible as /dev/video0
+front camera visible as /dev/video2
+wrist camera readable as /dev/video6
+```
+
+Start the Pi wrist stream:
+
+```bash
+ssh raspi@192.168.1.17 \
+  'sudo systemctl stop timelapse.service; \
+   nohup rpicam-vid --codec mjpeg --width 640 --height 480 --framerate 30 \
+     --timeout 0 --nopreview --listen --flush \
+     --output tcp://0.0.0.0:8554 >/tmp/pi_cam_stream.log 2>&1 &'
+```
+
+Official LeRobot camera mapping:
+
+```text
+top   -> /dev/video0
+front -> /dev/video2
+wrist -> /dev/video6
 ```
 
 ### 2. Check Robot Client Without Actions
@@ -197,9 +219,7 @@ On the robot laptop:
   --robot.type=so101_follower \
   --robot.port=/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114209-if00 \
   --robot.id=my_so101_follower \
-  --robot.disable_torque_on_disconnect=false \
-  --robot.max_relative_target=12 \
-  --robot.cameras='{ front: {type: opencv, index_or_path: "/dev/videoX", width: 640, height: 480, fps: 30} }' \
+  --robot.cameras='{ top: {type: opencv, index_or_path: "/dev/video0", width: 640, height: 480, fps: 30}, front: {type: opencv, index_or_path: "/dev/video2", width: 640, height: 480, fps: 30}, wrist: {type: opencv, index_or_path: "/dev/video6", width: 640, height: 480, fps: 30} }' \
   --policy_type=pi05 \
   --pretrained_name_or_path=/path/to/pi05/checkpoint \
   --actions_per_chunk=50 \
@@ -212,7 +232,7 @@ On the robot laptop:
   --aggregate_fn_name=weighted_average
 ```
 
-Replace `/dev/videoX` and the checkpoint path with the real values after camera and model setup are confirmed.
+Replace the checkpoint path with the real value after model setup is confirmed.
 
 ## Permission Rule For Future Customization
 

@@ -88,9 +88,18 @@ follower port: usually /dev/ttyACM1
 Cameras:
 
 ```text
-top   = Logitech C270
-front = laptop camera
-wrist = Raspberry Pi camera
+top   = /dev/video0, Logitech C270 RGB camera
+front = /dev/video2, Acer RGB camera
+wrist = normal /dev/videoX capture camera
+```
+
+Current wrist options:
+
+```text
+preferred: small USB UVC wrist camera that appears as /dev/videoX
+fallback: /dev/video6 only after it reports Video Capture and OpenCV can read it
+not accepted: current ESP32 serial/JTAG device
+not accepted: direct Raspberry Pi TCP stream if official LeRobot rejects it
 ```
 
 Policy:
@@ -100,6 +109,30 @@ policy type: pi05
 model: zz4321/so101_pi05
 task: grasp the orange
 ```
+
+## 3.1 Three-Camera Gate
+
+The official Pi05 pick-orange evaluation requires:
+
+```text
+top image
+front image
+wrist image
+SO-101 state
+task text
+```
+
+Do not run top/front-only as a Pi05 success/failure test.
+
+Reason:
+
+```text
+The current failure is close-range gripper/orange alignment, close, and lift.
+The wrist camera is the camera most likely to show that close-range geometry.
+Removing wrist would make the test weaker and could lead us to the wrong diagnosis.
+```
+
+Non-three-camera runs are allowed only as camera/infrastructure checks, not as Pi05 evaluation evidence.
 
 ## 4. Inspection Step A: Check Pi05 Expected Features
 
@@ -356,24 +389,29 @@ The wrist camera is different because it comes from the Raspberry Pi.
 Current wrist source:
 
 ```text
-http://127.0.0.1:8092/frame
+tcp://192.168.1.17:8554
 ```
 
-That endpoint is a single JPEG frame endpoint.
+That endpoint is a continuous MJPEG TCP stream from `rpicam-vid`.
 
-Official LeRobot OpenCV camera may prefer a real camera device or continuous stream.
-
-So we must test whether OpenCV can read the wrist camera source in the exact same way the official robot client will read it.
-
-If not, we need one of these fixes:
+Current official async result:
 
 ```text
-make the Pi camera available as an MJPEG stream
-make a local proxy that OpenCV can read continuously
-create a small custom LeRobot camera adapter
+OpenCV can read a frame from tcp://192.168.1.17:8554 in a plain manual test.
+Official robot_client cannot use that direct TCP source today because robot cameras must specify width, height, and fps, and LeRobot's OpenCVCamera validation fails when OpenCV reports set(width/height/fps)=False for the TCP stream.
 ```
 
-This is not a policy problem. It is camera plumbing.
+Current intended fix:
+
+```text
+OpenCVCamera("/dev/video0") OK as top.
+OpenCVCamera("/dev/video2") OK as front.
+Make /dev/video6 readable as Video Capture.
+Feed the Pi MJPEG stream into /dev/video6.
+Use OpenCVCamera("/dev/video6") as wrist.
+```
+
+The Pi `timelapse.service` must stay stopped while the wrist stream is active because it otherwise takes exclusive control of the CSI camera.
 
 ### 12.3 Exact Feature Name Report
 
@@ -512,12 +550,13 @@ stop the L40S if no more tests are ready
 The next implementation work should be:
 
 ```text
-1. write feature inspection script or extend existing one
-2. write true 3-camera dry-run observation builder
-3. test whether official OpenCV camera can read wrist camera source
-4. create artifact folder convention
-5. then start L40S and run official async dry run
-6. only after dry run succeeds, run real-arm async motion
+1. make wrist camera available as a normal /dev/videoX capture camera
+2. save top/front/wrist camera precheck images
+3. verify official robot_client can connect all three cameras
+4. start RunPod policy_server only after local camera gate passes
+5. run one official async three-camera test with official defaults
+6. save manifest, logs, and external video
+7. update docs/pi05_active_work_tracker.md with evidence and outcome
 ```
 
 This avoids wasting GPU time and keeps the test evidence clean.
