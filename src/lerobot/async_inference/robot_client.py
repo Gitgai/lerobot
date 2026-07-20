@@ -78,6 +78,7 @@ from .helpers import (
     map_robot_keys_to_lerobot_features,
     visualize_action_queue_size,
 )
+from .trace_recorder import AsyncClientTraceRecorder
 
 
 class RobotClient:
@@ -92,10 +93,13 @@ class RobotClient:
         """
         # Store configuration
         self.config = config
+        self.trace_recorder = AsyncClientTraceRecorder(config.trace_dir) if config.trace_dir else None
         self.robot = make_robot_from_config(config.robot)
         self.robot.connect()
 
         lerobot_features = map_robot_keys_to_lerobot_features(self.robot)
+        if self.trace_recorder is not None:
+            self.trace_recorder.record_manifest(config, self.robot, lerobot_features)
 
         # Use environment variable if server_address is not provided in config
         self.server_address = config.server_address
@@ -180,6 +184,10 @@ class RobotClient:
         self.channel.close()
         self.logger.debug("Client stopped, channel closed")
 
+        if self.trace_recorder is not None:
+            self.trace_recorder.close()
+            self.logger.info(f"Async trace saved to {self.trace_recorder.trace_dir}")
+
     def send_observation(
         self,
         obs: TimedObservation,
@@ -219,6 +227,12 @@ class RobotClient:
             queue_size = self.action_queue.qsize()
             timestamps = sorted([action.get_timestep() for action in self.action_queue.queue])
         self.logger.debug(f"Queue size: {queue_size}, Queue contents: {timestamps}")
+        return queue_size, timestamps
+
+    def _action_queue_snapshot(self):
+        with self.action_queue_lock:
+            queue_size = self.action_queue.qsize()
+            timestamps = sorted([action.get_timestep() for action in self.action_queue.queue])
         return queue_size, timestamps
 
     def _aggregate_action_queues(
@@ -303,6 +317,11 @@ class RobotClient:
 
                 self.action_chunk_size = max(self.action_chunk_size, len(timed_actions))
 
+                if self.trace_recorder is not None:
+                    with self.latest_action_lock:
+                        trace_latest_action = self.latest_action
+                    trace_old_size, trace_old_timesteps = self._action_queue_snapshot()
+
                 # Calculate network latency if we have matching observations
                 if len(timed_actions) > 0 and verbose:
                     with self.latest_action_lock:
@@ -333,6 +352,22 @@ class RobotClient:
                 start_time = time.perf_counter()
                 self._aggregate_action_queues(timed_actions, self.config.aggregate_fn)
                 queue_update_time = time.perf_counter() - start_time
+
+                if self.trace_recorder is not None:
+                    trace_new_size, trace_new_timesteps = self._action_queue_snapshot()
+                    self.trace_recorder.record_action_chunk(
+                        timed_actions,
+                        action_names=list(self.robot.action_features),
+                        receive_time=receive_time,
+                        deserialize_time_s=deserialize_time,
+                        queue_update_time_s=queue_update_time,
+                        latest_action=trace_latest_action,
+                        old_queue_size=trace_old_size,
+                        old_queue_timesteps=trace_old_timesteps,
+                        new_queue_size=trace_new_size,
+                        new_queue_timesteps=trace_new_timesteps,
+                        aggregate_fn_name=self.config.aggregate_fn_name,
+                    )
 
                 self.must_go.set()  # after receiving actions, next empty queue triggers must-go processing!
 
@@ -378,11 +413,21 @@ class RobotClient:
             timed_action = self.action_queue.get_nowait()
         get_end = time.perf_counter() - get_start
 
-        _performed_action = self.robot.send_action(
-            self._action_tensor_to_action_dict(timed_action.get_action())
-        )
+        requested_action = self._action_tensor_to_action_dict(timed_action.get_action())
+        _performed_action = self.robot.send_action(requested_action)
         with self.latest_action_lock:
             self.latest_action = timed_action.get_timestep()
+
+        if self.trace_recorder is not None:
+            with self.action_queue_lock:
+                current_queue_size = self.action_queue.qsize()
+            self.trace_recorder.record_executed_action(
+                timed_action,
+                requested_action=requested_action,
+                performed_action=_performed_action,
+                queue_size_after_pop=current_queue_size,
+                pop_time_s=get_end,
+            )
 
         if verbose:
             with self.action_queue_lock:
@@ -428,6 +473,13 @@ class RobotClient:
             with self.action_queue_lock:
                 observation.must_go = self.must_go.is_set() and self.action_queue.empty()
                 current_queue_size = self.action_queue.qsize()
+
+            if self.trace_recorder is not None:
+                self.trace_recorder.record_observation(
+                    observation,
+                    latest_action=latest_action,
+                    queue_size=current_queue_size,
+                )
 
             _ = self.send_observation(observation)
 

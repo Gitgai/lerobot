@@ -8,7 +8,7 @@ This document describes the exact diagnostic instrumentation we may need for the
 local robot_client -> RunPod policy_server
 ```
 
-This is a plan only. It is not approval to change code.
+This began as a plan only. On 2026-07-19, the user approved read-only trace instrumentation.
 
 The user rule remains:
 
@@ -16,6 +16,13 @@ The user rule remains:
 Do not create or modify scripts/code until Codex explains why and the user approves.
 Use official LeRobot as-is first.
 If instrumentation is needed, make it read-only and behavior-neutral.
+```
+
+Approval status:
+
+```text
+Approved on 2026-07-19 for one diagnostic purpose:
+record what official robot_client sends to Pi05, what Pi05 returns, and what robot_client executes.
 ```
 
 ## 1. Why Instrumentation May Be Needed
@@ -638,7 +645,41 @@ or CLI flags if we choose to extend config:
 Environment variable is less invasive to CLI config.
 CLI flag is easier to discover.
 
-Do not implement either until approved.
+Implementation status on 2026-07-19:
+
+```text
+Implemented as an opt-in robot_client flag:
+  --trace_dir=<local artifact trace folder>
+
+Default:
+  trace_dir=None
+
+Default behavior:
+  unchanged when --trace_dir is not passed
+```
+
+Implemented client-side trace files:
+
+```text
+manifest.json
+events.jsonl
+observations.jsonl
+action_chunks.jsonl
+executed_actions.jsonl
+images/<camera>/*.jpg
+```
+
+Why client-side first:
+
+```text
+The laptop robot_client sees the raw top/front/wrist images before sending them.
+It receives the Pi05 action chunks from the RunPod policy_server.
+It chooses and sends the actual action dict to robot.send_action().
+It receives the action actually performed by the SO-101 robot class.
+```
+
+Server-side model-internal trace is still not added.
+Add it later only if the client trace cannot answer the failure question.
 
 ## 9. Verification For Instrumentation
 

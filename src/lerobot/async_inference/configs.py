@@ -148,6 +148,15 @@ class RobotClientConfig:
         default=False, metadata={"help": "Visualize the action queue size"}
     )
 
+    # Read-only diagnostics. Disabled by default so normal async behavior is unchanged.
+    trace_dir: str | None = field(
+        default=None,
+        metadata={
+            "help": "Optional directory where robot_client saves a read-only trace of observations, "
+            "received action chunks, executed actions, and timestamps.",
+        },
+    )
+
     @property
     def environment_dt(self) -> float:
         """Environment time step, in seconds"""
@@ -200,4 +209,5 @@ class RobotClientConfig:
             "task": self.task,
             "debug_visualize_queue_size": self.debug_visualize_queue_size,
             "aggregate_fn_name": self.aggregate_fn_name,
+            "trace_dir": self.trace_dir,
         }

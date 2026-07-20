@@ -152,14 +152,14 @@ Do P3 only when evidence says it is the right fix.
 Current priority order:
 
 ```text
-P0. Enforce the three-camera gate: top, front, and wrist are required.
-P0. Fix wrist camera for official 3-camera LeRobot.
-P0. Save fresh top/front/wrist precheck images.
-P1. Run one clean official async 3-camera test with official defaults.
-P1. Save manifest, logs, external video, and outcome label.
+P0. Keep the official three-camera gate: top, front, and wrist are required.
+P0. Fix the current Raspberry Pi wrist camera hardware timeout.
+P0. After the Pi camera self-test passes, restore the wrist bridge: Raspberry Pi camera -> /dev/video6.
+P1. Label the latest official 3-camera run outcome from external video or direct observation.
+P1. If no video exists, repeat one official 3-camera run with external recording.
 P1. Review official logs for model load, inference, queue, timing, and errors.
-P2. If failure remains unexplained, ask approval for read-only async tracing.
-P2. If approved, run one instrumented trace test.
+P2. Read-only async tracing is approved and implemented behind --trace_dir.
+P2. Run one official 3-camera instrumented trace test.
 P2. Compare trace against the 49 training episodes.
 P3. Only then decide whether to collect close-range correction episodes or fine-tune more.
 ```
