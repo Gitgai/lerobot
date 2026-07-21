@@ -1,6 +1,6 @@
 # Pi05 Work Prioritization
 
-Last updated: 2026-07-19
+Last updated: 2026-07-21
 
 This document defines how we decide what to work on first for the SO-101 Pi05 orange-pick project.
 
@@ -153,15 +153,12 @@ Current priority order:
 
 ```text
 P0. Keep the official three-camera gate: top, front, and wrist are required.
-P0. Fix the current Raspberry Pi wrist camera hardware timeout.
-P0. After the Pi camera self-test passes, restore the wrist bridge: Raspberry Pi camera -> /dev/video6.
-P1. Label the latest official 3-camera run outcome from external video or direct observation.
-P1. If no video exists, repeat one official 3-camera run with external recording.
-P1. Review official logs for model load, inference, queue, timing, and errors.
-P2. Read-only async tracing is approved and implemented behind --trace_dir.
-P2. Run one official 3-camera instrumented trace test.
-P2. Compare trace against the 49 training episodes.
-P3. Only then decide whether to collect close-range correction episodes or fine-tune more.
+P1. Official async 3-camera run, video review, log review, and trace run are complete for the current failure.
+P2. The 49-episode training dataset has been reviewed for full grasp-pick-move windows.
+P2. Offline focused-dataset builder was approved, created, and validated.
+P3. Option A fine-tune is complete: original 49 episodes plus focused grasp-pick-move windows once.
+P1. Next: evaluate the new Option A checkpoint through official 3-camera async with read-only trace.
+P3. Record new correction episodes only if the focused dataset is weak or focused-window training still fails.
 ```
 
 ## 4. What Always Comes Before Fine-Tuning
@@ -172,7 +169,7 @@ Before fine-tuning more, we need evidence for at least one of:
 
 ```text
 Pi05 did not command close/lift even with good camera inputs.
-Training data lacks close-range align-close-lift examples.
+Training data lacks complete align-close-lift-move-place examples.
 Training data camera views differ from deployment camera views.
 Gripper close timing in training data does not match the needed behavior.
 The current checkpoint is clearly undertrained and infrastructure is already proven good.
@@ -304,6 +301,10 @@ Did it lift/move the orange?
 | Trace shows no gripper close | P3 after evidence | Collect close-range correction demos or fine-tune |
 | Trace shows close command but robot does not close | P1/P2 hardware | Inspect gripper execution and robot state |
 | Trace shows good grasp/lift once | P2 reliability | Repeat controlled runs and measure success rate |
+| Dataset review finds 35+ good grasp-pick-move windows | P2 | Build focused dataset from existing approved windows before recording more demos |
+| Dataset review finds fewer than 20 good grasp-pick-move windows | P3 data collection | Record new focused correction episodes |
+| Option A fine-tune completes | P1 | Evaluate new checkpoint on real arm with official async, three cameras, trace, and video |
+| Option A still reaches but does not lift/move | P2 | Compare new Pi05 action chunks to the previous traced failure before recording new episodes |
 
 ## 9. Work-In-Progress Limit
 
@@ -366,8 +367,8 @@ Next action:
 Do not do these now:
 
 ```text
-Do not fine-tune more yet.
-Do not record correction demos yet.
+Do not start the long expert fine-tune before the 200-step smoke train passes.
+Do not record correction demos yet; use approved existing windows first.
 Do not change APQ-style behavior manually.
 Do not add robot.max_relative_target unless user approves.
 Do not remove official defaults silently.
@@ -383,16 +384,14 @@ These can become valid later, but only when evidence makes them the smallest cor
 Current next work:
 
 ```text
-Fix the wrist camera as a normal official LeRobot-readable camera.
-Preferred path: a small USB UVC camera that appears as /dev/videoX.
-Fallback path: fix /dev/video6 so it reports Video Capture and OpenCV can read it.
+Evaluate the new Option A checkpoint on the real arm through official LeRobot async:
+  /workspace/outputs/pi05_orange49_plus_grasp_focus_expert/checkpoints/003000/pretrained_model
 ```
 
 Then:
 
 ```text
-Run the official async 3-camera test.
-Save evidence.
-Update tracker.
-Only then decide whether instrumentation, new data, or fine-tuning is the priority.
+Analyze the read-only trace and external video.
+If it improves, repeat for reliability.
+If it still reaches without grasp/lift, compare new Pi05 outputs to the previous traced failure.
 ```
