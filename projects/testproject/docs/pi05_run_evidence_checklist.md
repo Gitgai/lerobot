@@ -1,6 +1,6 @@
 # Pi05 Official Async Run Evidence Checklist
 
-Date: 2026-07-18
+Date: 2026-07-23
 
 Use this checklist for every serious Pi05 real-arm test.
 
@@ -79,7 +79,7 @@ pretrained_model folder is complete
 Current known complete checkpoint:
 
 ```text
-/workspace/outputs/pi05_base_to_orange49_expert/checkpoints/005000/pretrained_model
+/workspace/outputs/pi05_orange49_plus_grasp_focus_bs4_from003000_restart_012000/checkpoints/012000/pretrained_model
 ```
 
 Do not use incomplete checkpoint folders.
@@ -162,6 +162,7 @@ Check:
 SO-101 follower serial port exists
 arm connects through official LeRobot robot class
 robot starts from agreed pose
+gripper starts from agreed open state
 table area is clear
 orange is in agreed start position
 user is physically near emergency power
@@ -171,6 +172,35 @@ Current follower port:
 
 ```text
 /dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114209-if00
+```
+
+### 2.5.1 Current 012000 Start-State Gate
+
+The two complete 012000 traces showed reach/contact but no pick/lift.
+
+Important evidence:
+
+```text
+trace 230756 first gripper state: 28.64
+trace 233341 first gripper state: 21.19
+focus-window training start gripper state mean: 50.27
+focus-window training start gripper state p10-p90: 41.91-55.84
+```
+
+Before the next 012000 physical evaluation:
+
+```text
+open the gripper visibly
+save the first observed robot state
+confirm gripper state is closer to 40-55 than 20-30
+do not run if the gripper starts closed-ish unless the purpose is specifically to test closed-start behavior
+```
+
+Reason:
+
+```text
+trace 233341 strongly closed at the beginning, then opened before/while reaching the orange.
+Starting closed-ish may contribute to wrong close/open timing.
 ```
 
 ### 2.6 Official Defaults
@@ -252,6 +282,9 @@ official_async:
 environment:
   orange_position:
   robot_start_pose:
+  robot_start_state:
+  gripper_start_state:
+  gripper_start_visibly_open: yes/no
   lighting:
   camera_notes:
 
@@ -281,11 +314,10 @@ For a Level 3 instrumented run, also save:
 
 ```text
 trace/observations.jsonl
-trace/server_observations.jsonl
-trace/policy_observation_features.jsonl
 trace/action_chunks.jsonl
-trace/queue_events.jsonl
 trace/executed_actions.jsonl
+trace/events.jsonl
+trace/manifest.json
 images/obs_*_top.jpg
 images/obs_*_front.jpg
 images/obs_*_wrist.jpg

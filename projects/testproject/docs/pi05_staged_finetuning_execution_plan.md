@@ -1,6 +1,6 @@
 # Pi05 Staged Fine-Tuning Execution Plan
 
-Last updated: 2026-07-22
+Last updated: 2026-07-23
 
 This document is the active fine-tuning plan for the SO-101 orange pick task.
 
@@ -20,12 +20,14 @@ move orange to another place
 
 The current evidence says the 3000-step focused checkpoint learned reach/contact better than reliable grasp/lift/move.
 
+The later 012000 checkpoint was tested twice on the real arm. It still did not
+pick/lift the orange.
+
 The next goal is:
 
 ```text
-train the focused dataset longer
-compare the new checkpoint offline against recorded demonstrations
-only then run official LeRobot real-arm evaluation
+compare the 012000 checkpoint offline against successful focus-window demonstrations
+then decide whether to train more, correct deployment/start state, or collect new correction episodes
 ```
 
 ## 2. Evidence Behind This Plan
@@ -342,7 +344,7 @@ the user approves cleanup
 
 ## 6. Current Run Status Rule
 
-### Latest RunPod Check: 2026-07-22
+### Historical RunPod Check: 2026-07-22
 
 Fresh RunPod endpoint:
 
@@ -390,7 +392,7 @@ Required conclusion:
 ```text
 Do not use 006000 for offline comparison or real-arm evaluation.
 Do not resume from 006000.
-Restart from the complete 003000 checkpoint after storage cleanup.
+Historical note: this was superseded by a later successful restarted 012000 run.
 ```
 
 Storage pressure found:
@@ -478,6 +480,38 @@ old direct endpoint example:
 
 If direct SSH says `Connection refused`, get the new direct TCP SSH line from RunPod before making decisions.
 
+### Current 012000 Status: 2026-07-23
+
+Complete checkpoint:
+
+```text
+/workspace/outputs/pi05_orange49_plus_grasp_focus_bs4_from003000_restart_012000/checkpoints/012000/pretrained_model
+```
+
+Real-arm evidence:
+
+```text
+official_async_3cam_012000_trace_20260722_230756:
+  reach/contact: yes
+  strong close <=25: 0 frames
+  pick/lift: no
+
+official_async_3cam_012000_trace_20260722_233341:
+  reach/contact: yes
+  strong close <=25: 85 frames
+  strong close timing: timesteps 0-84, before correct grasp
+  final near-orange gripper: open
+  pick/lift: no
+```
+
+Current conclusion:
+
+```text
+Do not treat 012000 as solved.
+Do not repeat the same ordinary physical test as the next step.
+Run offline comparison on successful focus-window frames first.
+```
+
 ## 7. Monitoring Commands
 
 Use the current RunPod SSH endpoint from the Connect tab.
@@ -515,11 +549,11 @@ Checkpoint size command:
 du -sh /workspace/outputs/pi05_orange49_plus_grasp_focus_bs4_from003000_restart_012000/checkpoints/* 2>/dev/null
 ```
 
-## 8. Offline Comparison Before Real Robot
+## 8. Offline Comparison Before More Real-Robot Testing
 
-Do not run the real arm immediately after training finishes.
+Do not run another ordinary real-arm test immediately.
 
-First compare the new checkpoint against recorded demonstration frames.
+First compare the 012000 checkpoint against recorded demonstration frames.
 
 Minimum comparison:
 
@@ -527,7 +561,7 @@ Minimum comparison:
 old checkpoint:
   /workspace/outputs/pi05_orange49_plus_grasp_focus_expert/checkpoints/003000/pretrained_model
 
-new checkpoint:
+current checkpoint:
   /workspace/outputs/pi05_orange49_plus_grasp_focus_bs4_from003000_restart_012000/checkpoints/012000/pretrained_model
 ```
 
@@ -556,7 +590,7 @@ examples where recorded lift starts but Pi05 predicts hover
 Evidence target:
 
 ```text
-The new checkpoint should reduce missed close/lift cases compared with 003000.
+The 012000 checkpoint should reduce missed close/lift cases compared with 003000.
 ```
 
 If it does not improve offline:
@@ -568,7 +602,8 @@ inspect training mix, action normalization, gripper labels, and visual/state ali
 
 ## 9. Real-Arm Evaluation Gate
 
-Only after offline comparison improves:
+Only after offline comparison improves, or after explicit user approval for a
+start-state diagnostic run:
 
 ```text
 start official LeRobot policy_server from the new checkpoint
@@ -578,6 +613,8 @@ use official defaults
 do not set robot.max_relative_target unless user approves
 enable read-only trace
 record external video if possible
+start with gripper visibly open
+confirm first observed gripper state is close to the training open range, ideally 40-55
 ```
 
 Required real-arm evidence:

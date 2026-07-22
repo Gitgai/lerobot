@@ -1,5 +1,7 @@
 # Pi05 Official LeRobot Async Test Plan
 
+Last updated: 2026-07-23
+
 This document is the plan to test Pi05 using LeRobot's official async inference flow with the real SO-101 follower arm.
 
 The goal is to stop relying on our custom first-action runner and test Pi05 closer to the way LeRobot expects action-chunking policies to run.
@@ -106,8 +108,9 @@ Policy:
 
 ```text
 policy type: pi05
-model: zz4321/so101_pi05
-task: grasp the orange
+current checkpoint:
+  /workspace/outputs/pi05_orange49_plus_grasp_focus_bs4_from003000_restart_012000/checkpoints/012000/pretrained_model
+task: pick up the orange and move it to another place
 ```
 
 ## 3.1 Three-Camera Gate
@@ -202,7 +205,7 @@ Expected success:
 
 ```text
 policy server accepts pi05
-policy server loads zz4321/so101_pi05
+policy server loads the selected Pi05 checkpoint
 local observation is accepted
 action chunk comes back
 chunk shape is valid
@@ -312,9 +315,9 @@ record success/failure videos
 If official async still cannot grasp:
 
 ```text
-record demonstrations on our exact setup
-fine-tune Pi05 or another compatible policy
-evaluate again
+analyze trace input/output first
+compare against training/focus windows
+do not immediately record new demos unless evidence says existing data is insufficient
 ```
 
 ## 10. Success Criteria
@@ -342,19 +345,40 @@ orange is grasped and lifted
 
 A near miss is useful information, but it is not task success.
 
-## 11. Immediate Next Work
+## 11. Current 012000 Status
 
-Next implementation steps:
+The official async path has now been tested with the 012000 checkpoint.
 
 ```text
-1. inspect zz4321/so101_pi05 feature names
-2. inspect local SO-101 observation keys and camera names
-3. build official async dry-run client config
-4. run dry run without motor movement
-5. if dry run works, run short official async motion test
+complete trace:
+  official_async_3cam_012000_trace_20260722_230756
+  37 observations, 29 Pi05 chunks, 422 executed actions
+  strong close <=25 count: 0
+  result: reach/contact, no pick/lift
+
+complete trace:
+  official_async_3cam_012000_trace_20260722_233341
+  21 observations, 16 Pi05 chunks, 220 executed actions
+  strong close <=25 count: 85
+  strong close happened early, timesteps 0-84
+  final near-orange window was open
+  result: reach/contact, no pick/lift
 ```
 
-This is the correct bridge from our debug scripts to a proper LeRobot Pi05 real-arm setup.
+Current conclusion:
+
+```text
+Official async execution works.
+The remaining failure is close timing and grasp geometry, not basic LeRobot connectivity.
+```
+
+Current next work:
+
+```text
+1. offline-compare 012000 on successful focus-window frames
+2. if another real-arm test is needed, control start state first
+3. keep official defaults and read-only trace enabled
+```
 
 ## 12. Missing Practical Details We Must Handle
 
@@ -550,13 +574,13 @@ stop the L40S if no more tests are ready
 The next implementation work should be:
 
 ```text
-1. make wrist camera available as a normal /dev/videoX capture camera
-2. save top/front/wrist camera precheck images
-3. verify official robot_client can connect all three cameras
-4. start RunPod policy_server only after local camera gate passes
-5. run one official async three-camera test with official defaults
-6. save manifest, logs, and external video
+1. run offline 012000 comparison on successful focus-window frames
+2. if offline comparison is good, prepare a start-state-controlled real-arm run
+3. open the gripper visibly before the run
+4. confirm first observed gripper state is near the training open range
+5. run official async three-camera test with official defaults
+6. save manifest, logs, trace, and optional external video
 7. update docs/pi05_active_work_tracker.md with evidence and outcome
 ```
 
-This avoids wasting GPU time and keeps the test evidence clean.
+This avoids repeating a low-evidence physical run and keeps the test evidence clean.

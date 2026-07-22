@@ -1,592 +1,632 @@
 # SO-101 Pi05 Agent Handoff
 
-Last updated: 2026-06-25
+Last updated: 2026-07-23
 
-This document is for the next agent working on Prakash's SO-101 robot project. It summarizes what has been built, what has been tested, what is known from evidence, and what should happen next.
+This document is the fast handoff for the next agent. It summarizes the
+current SO-101 Pi05 orange-pick project state, the evidence we have, the rules
+the user wants followed, and the next concrete work.
 
-## 1. Project Goal
+## 1. Current Goal
 
-The real goal is:
-
-```text
-Make the real SO-101 follower arm reliably pick up an orange using cameras and a learned policy.
-```
-
-This is not just a simulator project anymore. The user has a real SO-101 follower arm, a leader arm, multiple cameras, and access to cloud GPUs.
-
-The desired final path is:
+Make the real SO-101 follower arm reliably:
 
 ```text
-real cameras + real SO-101 state
-        -> policy
-        -> SO-101 actions
-        -> successful grasp and lift of orange
+see orange -> reach orange -> center gripper -> close -> lift -> move orange
 ```
 
-The user does not want band-aid control tricks as the final answer. Temporary safety guards are acceptable for investigation, but the correct long-term solution should be model/data based.
+The project is now evidence-driven. Do not guess at fixes. Use traces,
+training data, logs, and controlled tests to decide what to do next.
 
-## 2. Local Project Location
+## 2. User Rules
 
-Main project folder:
+Follow these rules unless the user explicitly changes them:
 
 ```text
-/home/prakash-gaikwad/PrakashProjects/testproject
+Use official LeRobot execution first.
+Use official LeRobot defaults unless the user approves a change.
+Use the three intended cameras for valid Pi05 evaluation: top, front, wrist.
+Do not create or edit robot execution scripts unless official LeRobot lacks the needed feature, and explain/ask first.
+Read-only trace instrumentation is allowed because it does not change robot behavior.
+Do not put videos, images, traces, datasets, checkpoints, or generated artifacts in git.
+Commit/push only from the parent LeRobot repo.
 ```
 
-Important files:
+The user cares about clear evidence. When explaining anything, separate:
 
 ```text
-config/so101.json
-scripts/so101_runner.py
-scripts/pi05_guarded_real_action_test.py
-scripts/pi05_faithful_chunk_test.py
-docs/so101_commands.md
-docs/pi05_official_async_test_plan.md
-docs/real_so101_working_robot_plan.md
-docs/raspberry_pi_lerobot_camera_plan.md
-docs/full_chat_history.md
+measured fact
+interpretation
+what would prove or disprove it
 ```
 
-Launcher:
+## 3. Repo And Source Control
+
+Active repo:
+
+```text
+/home/gaikwad-prakash/PrakashProjects/lerobot/lerobot
+remote: https://github.com/Gitgai/lerobot.git
+```
+
+Project folder:
+
+```text
+/home/gaikwad-prakash/PrakashProjects/lerobot/lerobot/projects/testproject
+```
+
+Important source-control fact:
+
+```text
+projects/testproject used to be a nested git repo.
+That nested .git metadata was moved to a backup on 2026-07-19.
+Now projects/testproject is a normal folder inside the parent LeRobot repo.
+```
+
+Backup path for the old nested git metadata:
+
+```text
+/home/gaikwad-prakash/PrakashProjects/lerobot/git_metadata_backups/testproject_dotgit_20260719_133929
+```
+
+Always commit from:
 
 ```bash
-./bin/so101
+cd /home/gaikwad-prakash/PrakashProjects/lerobot/lerobot
+git status
+git add projects/testproject/...
+git commit -m "..."
+git push origin main
 ```
 
-LeRobot local environment:
+Details are in:
 
 ```text
-/data/conda-envs/lerobot
+projects/testproject/docs/repo_source_control_policy.md
 ```
 
-LeRobot repo:
+## 4. Local Python Environment
+
+Local project venv:
 
 ```text
-/data/projects/lerobot
+/home/gaikwad-prakash/PrakashProjects/lerobot/lerobot/projects/testproject/.venv
 ```
 
-## 3. Current Hardware Setup
+Expected LeRobot import path:
+
+```text
+/home/gaikwad-prakash/PrakashProjects/lerobot/lerobot/src/lerobot/__init__.py
+```
+
+Verify:
+
+```bash
+cd /home/gaikwad-prakash/PrakashProjects/lerobot/lerobot
+projects/testproject/.venv/bin/python -c "import lerobot; print(lerobot.__file__)"
+```
+
+This matters because the venv previously imported an old checkout from:
+
+```text
+/data/projects/lerobot/src
+```
+
+That was fixed.
+
+## 5. Hardware
 
 Robot:
 
 ```text
-SO-101 follower arm connected to local laptop
-Leader arm exists and has been used for teleoperation/recording
-Pi05 real-arm inference only needs the follower arm
+SO-101 follower arm
+SO-101 leader arm for teleoperation/recording
 ```
 
-Known follower serial path:
+Known follower serial port:
 
 ```text
 /dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114209-if00
 ```
 
-Config currently maps:
-
-```json
-"follower_serial": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114209-if00"
-```
-
-Follower ID:
+Expected robot id:
 
 ```text
 my_so101_follower
 ```
 
-Leader ID:
+Known camera mapping for official Pi05 runs:
 
 ```text
-my_so101_leader
+top   -> /dev/video0  Logitech top camera
+front -> /dev/video2  Acer RGB front camera
+wrist -> /dev/video6  Raspberry Pi camera bridged through v4l2loopback
 ```
 
-## 4. Camera Setup
-
-The current intended three-camera setup is:
+Do not use:
 
 ```text
-top camera   = Logitech C270 USB camera
-front camera = laptop integrated camera
-wrist camera = Raspberry Pi Zero 2W camera on SO-101 wrist
+/dev/video4 as a normal policy camera
 ```
 
-Current camera config in `config/so101.json`:
-
-```json
-"top_camera_index": "/dev/v4l/by-id/usb-046d_C270_HD_WEBCAM_FC7A6780-video-index0",
-"top_camera_fourcc": "MJPG",
-"top_camera_warmup_s": 3,
-"top_camera_url": "http://127.0.0.1:8094/frame",
-
-"front_camera_index": "/dev/v4l/by-id/usb-CKFNF16U42542009AA90_Integrated_Webcam_FHD_200901010001-video-index0",
-"front_camera_warmup_s": 3,
-
-"wrist_camera_url": "http://127.0.0.1:8092/frame"
-```
-
-The Logitech C270 had a direct-capture black-frame issue when grabbed too early. The browser/proxy path worked better:
+Reason:
 
 ```text
-http://127.0.0.1:8094/
-http://127.0.0.1:8094/frame
+/dev/video4 was identified as the Acer IR greyscale camera, not the normal RGB camera.
 ```
 
-The Raspberry Pi wrist stream used a live camera path, proxied locally:
+The Raspberry Pi wrist camera is reachable at:
 
 ```text
-http://127.0.0.1:8092/frame
+ssh raspi@192.168.1.17
 ```
 
-Use the front laptop camera's default/auto exposure first. That is the preferred default because it is simpler and survives fewer assumptions about the room lighting.
+The Pi camera may fail with:
 
-If the front view is washed out, then use manual exposure as a troubleshooting fix. One useful manual setting from earlier testing was:
+```text
+failed to acquire camera ... Pipeline handler in use by another process
+```
+
+That means another process on the Raspberry Pi is holding the camera. Stop the
+conflicting Pi camera process/service before starting the wrist stream.
+
+## 6. Official Execution Path
+
+Use this mental model:
+
+```text
+top/front/wrist cameras
+        +
+SO-101 joint state
+        +
+task text
+        |
+        v
+laptop official robot_client
+        |
+        | observation sent over network
+        v
+RunPod official policy_server + Pi05
+        |
+        | action chunk returned
+        v
+laptop official robot_client
+        |
+        | robot.send_action(...)
+        v
+SO-101 follower arm moves
+```
+
+Official async behavior is queue-based:
+
+```text
+robot_client sends an observation
+policy_server returns an action chunk
+robot_client queues and executes actions at fps
+when queue becomes low, robot_client sends another observation
+overlapping actions are aggregated by LeRobot
+```
+
+Current intended task text:
+
+```text
+pick up the orange and move it to another place
+```
+
+Current official/default control facts from latest runs:
+
+```text
+actions_per_chunk: 50
+chunk_size_threshold: 0.5
+aggregate_fn_name: weighted_average
+fps: 30
+robot.max_relative_target: None
+```
+
+Do not silently change these values.
+
+## 7. RunPod
+
+RunPod pods migrate often, so host/port must be re-read from the RunPod UI each
+time. Do not assume the last SSH endpoint is still current.
+
+Recent endpoints seen in chat included:
+
+```text
+root@213.192.2.83 -p 40161
+root@213.192.2.107 -p 40109
+root@213.192.2.67 -p 40066
+```
+
+Treat these as history only. Verify the current active pod before connecting.
+
+SSH key commonly used:
+
+```text
+~/.ssh/runpod_ed25519
+```
+
+Example connection shape:
 
 ```bash
-v4l2-ctl -d /dev/v4l/by-id/usb-CKFNF16U42542009AA90_Integrated_Webcam_FHD_200901010001-video-index0 \
-  --set-ctrl=auto_exposure=1 \
-  --set-ctrl=exposure_time_absolute=700 \
-  --set-ctrl=gain=1 \
-  --set-ctrl=backlight_compensation=0
+ssh -i ~/.ssh/runpod_ed25519 -p <PORT> root@<RUNPOD_IP>
 ```
 
-Before Pi05 tests, always verify camera images manually. Do not spend GPU time until all three camera views are good.
+Never write the user's Hugging Face token into docs, scripts, or git.
 
-If manual exposure was used and the user wants to return to the camera default behavior, switch auto exposure back on:
+## 8. Models And Checkpoints
 
-```bash
-v4l2-ctl -d /dev/v4l/by-id/usb-CKFNF16U42542009AA90_Integrated_Webcam_FHD_200901010001-video-index0 \
-  --set-ctrl=auto_exposure=3
-```
-
-## 5. Pi05 Model Tested
-
-Main model tested:
+Original reference from another user:
 
 ```text
 zz4321/so101_pi05
-```
-
-Hugging Face model page:
-
-```text
-https://huggingface.co/zz4321/so101_pi05
-```
-
-Important model facts:
-
-```text
-policy type: pi05
 base model: lerobot/pi05_base
-training dataset shown on model page: zz4321/so101_cube
-model size: about 4B params
+trained for SO-101 cube
 ```
 
-Local cached config:
+Our project moved to orange-pick fine-tuning.
+
+Complete checkpoint kept from earlier orange training:
 
 ```text
-/home/prakash-gaikwad/.cache/huggingface/hub/models--zz4321--so101_pi05/snapshots/dbd6d5754bbf78318808aea1706ff23beeb8b663/config.json
+/workspace/outputs/pi05_base_to_orange49_expert/checkpoints/005000/pretrained_model
 ```
 
-Expected features from config:
+Complete Option A focused checkpoint:
 
 ```text
-observation.state shape: [6]
-observation.images.top shape: [3, 480, 640]
-observation.images.front shape: [3, 480, 640]
-observation.images.wrist shape: [3, 480, 640]
-action shape: [6]
-chunk_size: 50
-n_action_steps: 50
+/workspace/outputs/pi05_orange49_plus_grasp_focus_expert/checkpoints/003000/pretrained_model
 ```
 
-This matches the SO-101 follower action/state dimension and the intended three-camera names.
-
-## 6. Remote GPU Setup
-
-The user has used NVIDIA Brev L40S instances to run Pi05. L40S works for loading/running Pi05 inference but is expensive.
-
-Policy server command used on L40S:
-
-```bash
-source /home/ubuntu/miniforge3/etc/profile.d/conda.sh
-conda activate pi05
-cd /home/ubuntu/lerobot
-
-nohup env TORCHDYNAMO_DISABLE=1 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True \
-  python -m lerobot.async_inference.policy_server \
-  --host=0.0.0.0 \
-  --port=8080 \
-  --fps=30 \
-  --inference_latency=0.033 \
-  --obs_queue_timeout=5 \
-  > logs/pi05_policy_server_8080.log 2>&1 < /dev/null &
-```
-
-Local SSH tunnel example:
-
-```bash
-ssh -f \
-  -o ExitOnForwardFailure=yes \
-  -o ServerAliveInterval=15 \
-  -o ServerAliveCountMax=3 \
-  -N \
-  -L 8080:127.0.0.1:8080 \
-  <BREV_INSTANCE_NAME>
-```
-
-The server can run out of memory if multiple policy setups/load attempts accumulate in one process. If behavior gets strange or OOM appears, restart the policy server cleanly before the next test.
-
-## 7. Important Tests Already Done
-
-### 7.1 Guarded 15-step Pi05 tests
-
-Script:
+Current staged checkpoint to analyze/test:
 
 ```text
-scripts/pi05_guarded_real_action_test.py
+/workspace/outputs/pi05_orange49_plus_grasp_focus_bs4_from003000_restart_012000/checkpoints/012000/pretrained_model
 ```
 
-Behavior:
+Do not use this incomplete checkpoint:
 
 ```text
-ask Pi05 for a chunk
-use mostly the first action
-apply safety limits/clamps
-repeat
+/workspace/outputs/pi05_orange49_plus_grasp_focus_bs4_from003000_012000/checkpoints/006000
 ```
 
-These tests proved:
+Why not:
 
 ```text
-local laptop can send observations to L40S
-L40S can return Pi05 actions
-SO-101 can move from returned actions
+It was created during a failed save with "Disk quota exceeded".
+It is missing the complete model/training-state files.
 ```
 
-But they did not produce a successful orange grasp.
+## 9. Datasets
 
-### 7.2 Faithful Pi05 chunk test
-
-Script:
+Original useful dataset:
 
 ```text
-scripts/pi05_faithful_chunk_test.py
+49 SO-101 orange episodes
 ```
 
-Purpose:
+Focused grasp/pick/move dataset:
 
 ```text
-ask Pi05 once
-receive one 50-action chunk
-execute action[0], action[1], action[2] from the same chunk
-do not apply outer clamps
+/data/lerobot_datasets/so101_orange_49_grasp_pick_move_focus
+40 episodes
+10,988 frames
 ```
 
-Result:
+Option A mixed training dataset:
 
 ```text
-FAITHFUL_CHUNK_TEST_OK
-chunk actions executed: 3
-outer clamp: none
-robot max_relative_target: none
+/data/lerobot_datasets/so101_orange_49_plus_grasp_pick_move_focus
+89 episodes
+40,712 frames
 ```
 
-Files:
+Option A means:
 
 ```text
-Video:
-/data/downloads/3cam tests/so101_pi05_faithful_chunk_3actions_20260624_132259.mp4
-
-Action log:
-/data/downloads/3cam tests/so101_pi05_faithful_chunk_3actions_20260624_132259.actions.csv
+original 49 full episodes
++
+40 verified focused grasp/pick/move windows once
 ```
 
-Important evidence from the action log:
+RunPod copy:
 
 ```text
-before wrist_roll: -116.35
-Pi05 action 0:      -6.63
-after wrist_roll:   -7.43
+/workspace/lerobot_datasets/so101_orange_49_plus_grasp_pick_move_focus
 ```
 
-This is about a 109 degree wrist-roll change.
-
-Action 0 delta from before:
+Local package:
 
 ```text
-shoulder_pan:    +1.10 deg
-shoulder_lift:   +6.74 deg
-elbow_flex:     -22.82 deg
-wrist_flex:      -6.20 deg
-wrist_roll:    +109.73 deg
-gripper:         +1.37 deg
+/data/downloads/so101_orange_49_plus_grasp_pick_move_focus.tar.gz
 ```
 
-Actual after minus before:
+Do not commit datasets/packages/artifacts to git.
+
+## 10. Latest Real-Arm Evidence
+
+The 012000 checkpoint was tested twice with official LeRobot async execution,
+three cameras, official defaults, and read-only trace.
+
+Trace 1:
 
 ```text
-shoulder_pan:    +0.62 deg
-shoulder_lift:   +4.31 deg
-elbow_flex:     -20.04 deg
-wrist_flex:      -4.13 deg
-wrist_roll:    +108.92 deg
-gripper:         +0.54 deg
+projects/testproject/artifacts/traces/official_async_3cam_012000_trace_20260722_230756
+37 observations
+29 Pi05 chunks
+422 executed actions
+robot.max_relative_target: null
+```
+
+Key result:
+
+```text
+reached/contacted orange
+no pick/lift
+strong close <=25: 0 executed frames
+final 100 gripper range: 32.56 to 47.48
 ```
 
 Interpretation:
 
 ```text
-The robot accepted the raw Pi05 action.
-Pi05 mostly commanded wrist/arm reorientation.
-It did not command a clear reach-close-lift orange grasp trajectory.
+Pi05 did not command a strong close during this run.
+The gripper got near/contacted the orange, but the orange was offset instead of centered between fingers.
 ```
 
-This is the strongest evidence so far.
-
-## 8. Current Root-Cause Understanding
-
-Known facts:
+Trace 2:
 
 ```text
-Robot connection works.
-Camera capture works when prechecked.
-Remote Pi05 inference works.
-Action feature shape matches the robot.
-Faithful chunk execution works for at least the first 3 raw actions.
-The orange is not picked.
-The raw Pi05 chunk starts with major wrist reorientation, not a useful grasp.
+projects/testproject/artifacts/traces/official_async_3cam_012000_trace_20260722_233341
+21 observations
+16 Pi05 chunks
+220 executed actions
+robot.max_relative_target: null
 ```
 
-Most likely cause:
+Key result:
 
 ```text
-The pretrained zz4321/so101_pi05 checkpoint is not adapted to this exact real setup.
+reached/contacted orange
+no pick/lift
+strong close <=25: 85 executed frames
+strong close happened early: timesteps 0-84
+final 100 gripper range: 54.33 to 58.88
 ```
 
-Why:
+Interpretation:
 
 ```text
-The checkpoint is associated with zz4321/so101_cube, not this user's orange-pick setup.
-The camera layout, scene, object, lighting, start pose, and wrist view differ from training.
-The model's raw actions do not produce a grasp trajectory in our scene.
+Pi05 can command close, but in this run it closed too early and later opened near the orange.
 ```
 
-Do not overclaim:
+Current evidence-backed conclusion:
 
 ```text
-We do not know Pi05's internal intent.
-We do know the actions it produced and the motion that happened.
+The problem is not a basic camera connection failure.
+The problem is not a robot.max_relative_target clamp.
+The problem is not LeRobot obviously rewriting a close command into an open command.
+The unresolved failure is conditional grasp timing/geometry:
+  orange centered between fingers -> close strongly -> keep closed -> lift/move
 ```
 
-## 9. What Not To Repeat
-
-Avoid spending more L40S time on:
+Detailed report:
 
 ```text
-random 15-step prompt tweaks
-more guarded first-action tests
-long raw uncontrolled runs
-changing many variables at once
+projects/testproject/docs/pi05_012000_trace_vs_training_analysis_20260723.md
 ```
 
-Those have already consumed time and did not solve the task.
+## 11. Training Data Evidence
 
-Avoid saying:
+The Option A mix has many close examples, especially in focused windows.
+
+Measured gripper distribution:
 
 ```text
-"It just needs more steps"
+Original 49 full episodes:
+  29,724 frames
+  strong close <=25: 5,660 frames, 19.04%
+  near close <=35: 10,728 frames, 36.09%
+  open >=45: 11,809 frames, 39.73%
+
+Focused 40 windows:
+  10,988 frames
+  strong close <=25: 4,449 frames, 40.49%
+  near close <=35: 6,832 frames, 62.18%
+  open >=45: 2,506 frames, 22.81%
+
+Full Option A mix:
+  40,712 frames
+  strong close <=25: 10,109 frames, 24.83%
+  near close <=35: 17,560 frames, 43.13%
+  open >=45: 14,315 frames, 35.16%
 ```
 
-The faithful chunk test showed the first raw actions were not a clean grasp approach.
+Gripper direction:
 
-## 10. Correct Next Technical Direction
+```text
+higher gripper value = more open
+lower gripper value = more closed
+```
 
-There are two valid next paths.
+Successful reviewed training windows show:
 
-### Option A: Validate pretrained checkpoint on an easier/training-like setup
+```text
+orange in gripper mouth
+gripper closes
+orange lifts
+orange moves away
+```
+
+That is why the next question is not "do we have any grasp frames?" We do.
+The next question is:
+
+```text
+Does checkpoint 012000 reproduce the correct action when shown those successful frames?
+```
+
+## 12. Current Highest Priority
+
+Do not repeat another ordinary physical 012000 run yet.
+
+Next priority:
+
+```text
+Run offline 012000 checkpoint comparison on successful focus-window frames.
+```
 
 Purpose:
 
 ```text
-Check whether zz4321/so101_pi05 can do the kind of task it was trained for.
+If 012000 fails on known-good training/focus frames, the issue is model/training.
+If 012000 succeeds on known-good training/focus frames, the live failure is more likely deployment mismatch:
+  start gripper state
+  camera geometry
+  orange placement
+  timing/latency
 ```
 
-Use:
+Detailed plan:
 
 ```text
-cube-like object instead of orange
-scene closer to the dataset
-camera layout stable
-start pose closer to the apparent model distribution
+projects/testproject/docs/pi05_012000_offline_comparison_plan.md
 ```
 
-This tells us whether the checkpoint is usable at all.
-
-### Option B: Correct solution for the real goal
-
-Purpose:
+Expected output folder:
 
 ```text
-Make the real robot pick the orange in this user's setup.
+projects/testproject/artifacts/offline_compare_012000_focus_YYYYMMDD/
 ```
 
-Do:
+Do not commit generated outputs unless the user explicitly asks.
 
-```text
-record successful orange-pick demonstrations
-fine-tune Pi05 or another suitable policy on those demos
-evaluate the fine-tuned model
-```
+## 13. Next-Agent Work Plan
 
-Recommended dataset sizes:
-
-```text
-5 episodes: pipeline smoke test only
-20 successful episodes: first fine-tune test
-50 successful episodes: better first real attempt
-100+ successful episodes: more reliable behavior
-```
-
-Each successful episode should include:
-
-```text
-start with visible orange
-open gripper
-move to orange
-align gripper
-close gripper around orange
-lift orange slightly
-end after clear success
-```
-
-## 11. Recommended Immediate Next Step
-
-Do not start cloud GPU first.
-
-First, locally:
-
-```text
-1. Check follower arm status.
-2. Check leader arm status if recording demonstrations.
-3. Check top/front/wrist camera images.
-4. Fix exposure/lighting if needed.
-5. Record 5 clean orange-pick episodes by teleoperation.
-6. Replay those episodes.
-```
-
-Only after local demonstrations look good:
-
-```text
-start cheaper training GPU
-copy/upload dataset
-fine-tune
-evaluate
-stop GPU immediately
-```
-
-## 12. Useful Local Commands
-
-From project root:
+Step 1: verify local repo and import path.
 
 ```bash
-cd /home/prakash-gaikwad/PrakashProjects/testproject
+cd /home/gaikwad-prakash/PrakashProjects/lerobot/lerobot
+git status --short --untracked-files=all
+projects/testproject/.venv/bin/python -c "import lerobot; print(lerobot.__file__)"
 ```
 
-Status:
-
-```bash
-./bin/so101 status
-```
-
-Positions:
-
-```bash
-./bin/so101 positions
-```
-
-Teleoperate:
-
-```bash
-./bin/so101 teleop
-```
-
-Record 5 fresh episodes:
-
-```bash
-./bin/so101 record --episodes 5 --delete
-```
-
-Replay:
-
-```bash
-./bin/so101 replay 0
-```
-
-Inspect model:
-
-```bash
-./bin/so101 inspect-policy zz4321/so101_pi05
-```
-
-## 13. User Preferences
-
-The user wants:
+Step 2: verify current RunPod endpoint from the UI or user message.
 
 ```text
-clear explanation
-real evidence
-no vague guessing
-correct solutions over band-aids
-execution help, not just commands
-cost awareness because L40S is expensive
+RunPod IP/port changes after migration.
+Do not assume an old endpoint works.
 ```
 
-When explaining uncertainty, separate:
+Step 3: verify 012000 checkpoint exists on RunPod.
+
+```bash
+ssh -i ~/.ssh/runpod_ed25519 -p <PORT> root@<RUNPOD_IP> \
+  'ls -lh /workspace/outputs/pi05_orange49_plus_grasp_focus_bs4_from003000_restart_012000/checkpoints/012000/pretrained_model'
+```
+
+Step 4: run the offline comparison from the plan.
 
 ```text
-facts we measured
-likely interpretation
-what test would prove/disprove it
+Compare 003000 vs 012000 on selected successful focus-window frames.
+Save predictions, comparison CSV, failure examples, and notes under artifacts/.
 ```
 
-The user dislikes repeating random tests. Keep experiments purposeful and documented.
-
-## 14. Cost Guidance
-
-The user asked about cheaper GPUs than Brev L40S.
-
-For Pi05 fine-tuning, likely better options:
+If a new diagnostic script is needed:
 
 ```text
-RunPod A100 80GB
-Vast.ai A100 80GB
+It must be offline-only.
+It must not move the robot.
+It should be explained to the user before creating it if it adds source code.
 ```
 
-Avoid assuming 24GB GPUs are enough for Pi05 fine-tuning.
-
-Suggested strategy:
+Step 5: decide from evidence.
 
 ```text
-record and verify data locally first
-rent GPU only for training
-stop GPU immediately after training/evaluation
+Case A: 012000 misses close/lift on training frames
+  -> do not run real arm again yet
+  -> inspect training depth, gripper/action normalization, frame timing, and dataset balance
+
+Case B: 012000 predicts close/lift correctly on training frames
+  -> next physical test should control start state and camera geometry
+  -> use official LeRobot, three cameras, official defaults, trace_dir enabled
+
+Case C: offline results are mixed
+  -> identify exactly which frame types fail:
+     before-close, centered-close, held-close, lift/move
+  -> use that to choose more training vs correction data
 ```
 
-## 15. Final Summary For Next Agent
+## 14. Next Physical Run Gate
 
-The system pipeline works, but the pretrained checkpoint does not currently solve the real orange-pick task.
+Only run another real-arm evaluation after the offline comparison or explicit
+user approval.
 
-The most important evidence is the faithful chunk test:
+Before the next physical 012000 run:
 
 ```text
-Pi05 returned a valid 50-action chunk.
-The robot executed raw actions from that chunk.
-The first actions mostly reoriented wrist/arm.
-They did not approach, grasp, and lift the orange.
+top/front/wrist cameras connected and visually checked
+arm starts in normal original-episode start pose
+gripper is visibly open
+first observed gripper state is closer to 40-55, not 20-30
+task text unchanged
+official LeRobot async execution
+robot.max_relative_target remains None
+read-only trace enabled
+external video is still useful as human-visible outcome evidence
 ```
 
-The correct next serious step is not more prompt/clamp tuning. It is:
+Why external video is still useful:
 
 ```text
-collect successful demonstrations on the exact real setup
-fine-tune/evaluate a policy on that data
+Trace tells what Pi05 saw and commanded.
+External video tells whether the physical orange actually moved/lifted.
+Use both when possible.
 ```
+
+## 15. Important Docs To Read First
+
+Read in this order:
+
+```text
+projects/testproject/docs/pi05_active_work_tracker.md
+projects/testproject/docs/pi05_012000_trace_vs_training_analysis_20260723.md
+projects/testproject/docs/pi05_012000_offline_comparison_plan.md
+projects/testproject/docs/pi05_work_prioritization.md
+projects/testproject/docs/pi05_run_evidence_checklist.md
+projects/testproject/docs/official_lerobot_only_workflow.md
+projects/testproject/docs/repo_source_control_policy.md
+```
+
+Older docs are historical and may contain stale paths or older strategy.
+Prefer the active tracker and this handoff.
+
+## 16. Do Not Do These Next
+
+Do not:
+
+```text
+repeat ordinary real-arm 012000 tests without new evidence/control
+change camera mapping silently
+change task text silently
+set robot.max_relative_target silently
+change actions_per_chunk or chunk_size_threshold silently
+use /dev/video4 as wrist/front RGB
+use the incomplete 006000 checkpoint
+push videos/images/traces/checkpoints/datasets to git
+recommend more episodes before proving the existing focused windows are insufficient
+```
+
+## 17. Current Short Summary
+
+Where we are:
+
+```text
+The official LeRobot 3-camera path works.
+The 012000 checkpoint exists and was tested twice.
+Both runs reached/contacted the orange but did not pick/lift it.
+One run did not close strongly near the orange.
+One run closed strongly too early, then opened near the orange.
+Training data contains many verified close/lift examples.
+The next evidence step is offline 012000-vs-training-frame comparison.
+```
+
+The next agent should start there.

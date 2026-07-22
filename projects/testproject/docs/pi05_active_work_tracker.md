@@ -1,6 +1,6 @@
 # Pi05 Active Work Tracker
 
-Last updated: 2026-07-22
+Last updated: 2026-07-23
 
 This is the active tracker for the SO-101 Pi05 orange-pick work.
 
@@ -21,7 +21,7 @@ This is different from the older progress documents. Older docs explain history.
 Main objective:
 
 ```text
-Finish a staged Pi05 fine-tune, compare the new checkpoint offline, and only then run the real arm again.
+Explain the 012000 real-arm grasp failure with trace-vs-training evidence, then decide the next evidence run.
 ```
 
 Current execution rule:
@@ -52,13 +52,18 @@ SO-101 follower serial port is known.
 Pi05 checkpoint 005000/pretrained_model is the complete base orange checkpoint we are keeping.
 Pi05 Option A focused checkpoint 003000/pretrained_model is complete on RunPod and is the starting point for staged fine-tuning.
 Pi05 batch-size probes on RTX 3090 passed for batch_size=2 and batch_size=4.
-The staged batch_size=4 run from 003000 to 012000 was launched on RunPod, reached step 6000, then failed while saving because of disk quota.
+An earlier staged batch_size=4 run from 003000 toward 012000 reached step 6000, then failed while saving because of disk quota.
+The restarted staged batch_size=4 run produced a complete 012000 checkpoint.
 Old base checkpoints 001000-004000 were deleted after user approval, freeing workspace usage from about 91 GB to about 48 GB.
 Official async path previously moved the real arm with top/front camera setup.
 Official async path connected top/front/wrist cameras together on 2026-07-19.
 Official async path generated Pi05 action chunks with robot.max_relative_target=None.
 Read-only trace instrumentation is approved and implemented.
 Official async 3-camera trace run official_async_3cam_trace_20260720_010244 captured camera frames, robot state, Pi05 action chunks, executed actions, timestamps, and task text.
+The staged batch_size=4 012000 checkpoint exists on RunPod and was tested twice through official 3-camera async execution.
+Official 012000 trace official_async_3cam_012000_trace_20260722_230756 captured 37 observations, 29 Pi05 chunks, and 422 executed actions.
+Official 012000 trace official_async_3cam_012000_trace_20260722_233341 captured 21 observations, 16 Pi05 chunks, and 220 executed actions.
+Trace-vs-training analysis artifacts were generated under projects/testproject/artifacts/trace_vs_training_analysis_20260723.
 ```
 
 ### Blocked
@@ -70,7 +75,8 @@ No current P0 hardware/software blocker is known for another official 3-camera a
 Current evidence gap:
 
 ```text
-We need to restart staged fine-tuning from the complete focused `003000/pretrained_model` checkpoint.
+We need an offline 012000 checkpoint comparison on successful focus-window frames.
+We also need to control the physical start gripper state before the next real-arm run.
 ```
 
 ### Not Proven Yet
@@ -82,9 +88,11 @@ We now have a validated focused grasp/pick/move dataset built from 40 approved n
 We now have a validated Option A training dataset: original 49 full episodes plus the 40 focused windows once.
 We now have a completed 3000-step Option A fine-tuned checkpoint on RunPod.
 The 3000-step batch_size=1 checkpoint is likely undertrained relative to the 40,712-frame dataset.
-The staged 12000-step batch_size=4 checkpoint does not exist yet.
-The partial `006000` folder exists but is incomplete and unusable.
-We do not yet know whether the staged checkpoint improves real-arm grasp/lift/move success.
+The staged 12000-step batch_size=4 checkpoint exists and has been tested on the real arm.
+The partial `006000` folder from the failed earlier run exists but is incomplete and unusable.
+The 012000 real-arm tests improved/changed gripper behavior but did not produce a reliable pick/lift.
+We do not yet know whether 012000 predicts correct close/lift actions when shown successful training/focus frames offline.
+We do not yet know whether a controlled open-gripper start state fixes the early-close/open timing seen in trace 233341.
 ```
 
 ## 3. Single Source Of Truth Docs
@@ -94,6 +102,9 @@ Use these documents together:
 ```text
 docs/pi05_active_work_tracker.md
   Current tasks, blockers, evidence, and next actions.
+
+docs/so101_pi05_agent_handoff.md
+  Fast handoff for the next agent: current rules, evidence, paths, and next work.
 
 docs/pi05_work_prioritization.md
   How to decide priority and what not to do yet.
@@ -124,6 +135,12 @@ docs/official_lerobot_only_workflow.md
 
 docs/pi05_official_async_test_plan.md
   Official async testing plan.
+
+docs/pi05_012000_trace_vs_training_analysis_20260723.md
+  Evidence report for the two complete 012000 real-arm traces and training-window comparison.
+
+docs/pi05_012000_offline_comparison_plan.md
+  Next evidence plan: compare 012000 against successful focus-window frames before another ordinary physical run.
 ```
 
 ## 4. Active Task Board
@@ -163,37 +180,39 @@ P3 = later improvement
 | T12 | P2 | done | Build and validate Option A training dataset | Original 49 + focused windows once, LeRobotDataset load passes | Dataset and package tarball created |
 | T13 | P1 | done | Upload Option A dataset to RunPod | Current RunPod direct TCP SSH host/port works and dataset extracts under `/workspace/lerobot_datasets` | Uploaded to active pod at `213.192.2.83:40161` using `~/.ssh/runpod_ed25519` |
 | T14 | P1 | done | Fine-tune Option A | Smoke train passes, then expert train writes checkpoints | 3000-step expert run completed; checkpoint `003000/pretrained_model` exists |
-| T15 | P1 | todo | Run staged longer Option A fine-tune | RTX 3090 batch_size=4 train reaches checkpoint `012000/pretrained_model` | Restart from complete `003000/pretrained_model` into fresh output folder after confirming no duplicate process |
-| T16 | P1 | todo | Offline-compare staged checkpoint against 003000 | Same focus frames show improved close/lift predictions and fewer missed strong-close cases | Run comparison only after a complete staged checkpoint exists |
-| T17 | P1 | todo | Evaluate staged checkpoint on real arm | Official 3-camera async run with trace, logs, and physical outcome | Only start after offline comparison improves |
-| T18 | P1 | todo | Analyze staged real-arm evaluation | Trace shows camera frames, Pi05 action chunks, executed actions, state, timing, and task text | Compare against previous reach-without-grasp trace |
+| T15 | P1 | done | Run staged longer Option A fine-tune | RTX 3090 batch_size=4 train reaches checkpoint `012000/pretrained_model` | Complete checkpoint exists at `012000/pretrained_model` |
+| T16 | P1 | todo | Offline-compare staged checkpoint against training/focus frames | Same successful focus frames show correct close/lift predictions | Run comparison when RunPod/checkpoint endpoint is accessible |
+| T17 | P1 | done | Evaluate staged checkpoint on real arm | Official 3-camera async run with trace, logs, and physical outcome | Two complete 012000 traces were captured |
+| T18 | P1 | done | Analyze staged real-arm evaluation | Trace shows camera frames, Pi05 action chunks, executed actions, state, timing, and task text | See `docs/pi05_012000_trace_vs_training_analysis_20260723.md` |
+| T19 | P1 | todo | Run start-state-controlled official evaluation | First observed gripper state is in/near training open range, then official 3-camera async trace | Do only after offline compare or explicit user approval |
+| T20 | P2 | todo | Decide correction-data strategy | Evidence separates undertrained checkpoint from deployment/start/camera mismatch | Choose more training, new correction episodes, or start/camera correction based on T16/T19 |
 
 ## 5. Current Highest Priority
 
 Current highest priority:
 
 ```text
-Restart the staged 12000-step batch_size=4 fine-tune from the complete focused 003000 checkpoint.
+Run offline 012000 checkpoint comparison on successful focus-window frames.
 ```
 
 Why:
 
 ```text
-The official traced run proved the software path, cameras, policy server, and action execution are working.
-The trace showed Pi05 had clear 3-camera visual input and LeRobot sent the same actions Pi05 requested.
-The Option A dataset was built and validated from original 49 full episodes plus the 40 focused windows once.
-The 003000 run used only 3000 effective samples, about 0.074 epoch on the 40,712-frame dataset.
-Batch_size=4 fits the RTX 3090, so the next evidence step is a longer staged checkpoint before another real-arm run.
-The staged run reached 6000 steps but failed while writing the checkpoint because the RunPod volume quota was exceeded.
+The 012000 checkpoint has now been tested twice on the real arm.
+Both official 3-camera traces show reach/near-contact but no pick/lift.
+Trace 230756 shows no strong close near the orange.
+Trace 233341 shows strong close early, then open gripper near the orange.
+The focused training windows contain many successful close/lift examples, so the next question is whether 012000 predicts those examples correctly offline.
 ```
 
 Acceptance criteria:
 
 ```text
-Current RunPod endpoint is known.
-Partial `006000` checkpoint is marked unusable.
-At least the complete `005000` base checkpoint and complete focused `003000` checkpoint are kept.
-Restarted run writes a complete checkpoint before offline comparison.
+RunPod endpoint is accessible.
+012000 checkpoint path is accessible.
+Offline comparison CSV/summary is saved.
+Comparison covers selected successful focus frames around center-close-lift.
+Result says whether 012000 reproduces the training close/lift actions or not.
 ```
 
 ## 6. Current Known Commands And Paths
@@ -696,8 +715,66 @@ The remaining question is not training infrastructure anymore; it is real-arm be
 Follow-up:
 
 ```text
-Restart staged batch_size=4 fine-tuning from the complete focused 003000 checkpoint.
-Run offline comparison before any real-arm evaluation.
+Superseded on 2026-07-23:
+  staged 012000 checkpoint exists and has been evaluated twice on the real arm.
+  current next action is offline 012000 comparison on successful focus-window frames.
+```
+
+### 2026-07-23 012000 Trace-Vs-Training Analysis
+
+Decision:
+
+```text
+Do not repeat the same ordinary 012000 real-arm run as the next step.
+Run offline 012000 comparison on successful focus-window frames first.
+Control physical start gripper state before the next real-arm evaluation.
+```
+
+Evidence:
+
+```text
+Analysis report:
+  docs/pi05_012000_trace_vs_training_analysis_20260723.md
+
+Generated artifacts:
+  projects/testproject/artifacts/trace_vs_training_analysis_20260723/
+
+Trace 230756:
+  observations: 37
+  Pi05 chunks: 29
+  executed actions: 422
+  strong close <=25 count: 0
+  final 100 gripper range: 32.56-47.48
+  outcome: reach/contact, no pick/lift
+
+Trace 233341:
+  observations: 21
+  Pi05 chunks: 16
+  executed actions: 220
+  strong close <=25 count: 85
+  strong close timing: timesteps 0-84
+  final 100 gripper range: 54.33-58.88
+  outcome: reach/contact, no pick/lift
+
+Training focus windows:
+  10,988 frames
+  strong close action <=25: 4,449 frames, 40.49%
+  near close action <=35: 6,832 frames, 62.18%
+```
+
+Reason:
+
+```text
+The failure is not basic camera connection, task text, action clamp, or LeRobot execution.
+The failure is close timing and grasp geometry.
+The next question is whether 012000 can imitate successful close/lift frames offline.
+```
+
+Follow-up:
+
+```text
+Run T16 offline comparison when RunPod/checkpoint endpoint is accessible.
+Then decide whether to run T19 start-state-controlled official evaluation.
 ```
 
 ### 2026-07-21 RunPod Upload Blocked By Stale Endpoint

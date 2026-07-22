@@ -1,6 +1,6 @@
 # Pi05 Work Prioritization
 
-Last updated: 2026-07-22
+Last updated: 2026-07-23
 
 This document defines how we decide what to work on first for the SO-101 Pi05 orange-pick project.
 
@@ -157,10 +157,11 @@ P1. Official async 3-camera run, video review, log review, and trace run are com
 P2. The 49-episode training dataset has been reviewed for full grasp-pick-move windows.
 P2. Offline focused-dataset builder was approved, created, and validated.
 P3. Option A 003000 fine-tune is complete: original 49 episodes plus focused grasp-pick-move windows once.
-P1. Next: restart the staged batch_size=4 fine-tune to 012000 after confirming no duplicate training process.
-P1. Then: offline-compare the staged checkpoint against 003000 before real-arm evaluation.
-P1. Then: evaluate the staged checkpoint through official 3-camera async with read-only trace only if offline comparison improves.
-P3. Record new correction episodes only if the focused dataset is weak or focused-window training still fails.
+P1. Option A staged 012000 checkpoint is complete and has been tested twice on the real arm.
+P1. Next: offline-compare 012000 on successful focus-window frames.
+P1. Then: run a start-state-controlled official 3-camera trace only if needed and approved.
+P2. Then: decide whether the issue is undertraining, start-state/camera deployment mismatch, or missing correction data.
+P3. Record new correction episodes only if the evidence says existing focused windows are still insufficient.
 ```
 
 ## 4. What Always Comes Before Fine-Tuning
@@ -175,6 +176,7 @@ Training data lacks complete align-close-lift-move-place examples.
 Training data camera views differ from deployment camera views.
 Gripper close timing in training data does not match the needed behavior.
 The current checkpoint is clearly undertrained and infrastructure is already proven good.
+The current checkpoint fails to reproduce successful training/focus frames in offline comparison.
 ```
 
 Fine-tuning should not be prioritized if:
@@ -381,21 +383,38 @@ Do not use the connected ESP32 serial/JTAG device as a camera.
 
 These can become valid later, but only when evidence makes them the smallest correct next step.
 
-## 12. Current Next Work
+## 12. Current 012000 Evidence Rule
 
-Current next work:
+The 012000 checkpoint has already been tested twice through official LeRobot
+async execution.
 
 ```text
-Restart staged batch_size=4 fine-tuning from the complete focused checkpoint:
-  /workspace/outputs/pi05_orange49_plus_grasp_focus_expert/checkpoints/003000/pretrained_model
+trace 230756:
+  reached/contacted orange
+  strong close <=25 count: 0
+  final 100 actions stayed partial/open-ish, gripper 32.56-47.48
+  no pick/lift
 
-Write the new staged output to:
-  /workspace/outputs/pi05_orange49_plus_grasp_focus_bs4_from003000_restart_012000
+trace 233341:
+  reached/contacted orange
+  strong close <=25 count: 85
+  strong close happened at timesteps 0-84
+  final near-orange window was open, gripper 54.33-58.88
+  no pick/lift
 ```
 
-Then:
+Priority rule:
 
 ```text
-Offline-compare the staged checkpoint against the old focused 003000 checkpoint.
-Only if offline comparison improves, run official LeRobot async real-arm evaluation with three cameras and read-only trace.
+Do not repeat the same ordinary 012000 real-arm run again as the next step.
+First run offline 012000 comparison on successful focus-window frames.
+Then control the real-arm start state before any next physical evaluation.
+```
+
+Reason:
+
+```text
+The current failure is not basic reach, camera connection, LeRobot execution, or action clamp.
+The current failure is close timing and grasp geometry.
+Repeating the same setup is lower evidence value than checking whether 012000 can imitate successful close/lift frames offline.
 ```
