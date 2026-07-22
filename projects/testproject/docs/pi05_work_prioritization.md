@@ -1,6 +1,6 @@
 # Pi05 Work Prioritization
 
-Last updated: 2026-07-21
+Last updated: 2026-07-22
 
 This document defines how we decide what to work on first for the SO-101 Pi05 orange-pick project.
 
@@ -156,8 +156,10 @@ P0. Keep the official three-camera gate: top, front, and wrist are required.
 P1. Official async 3-camera run, video review, log review, and trace run are complete for the current failure.
 P2. The 49-episode training dataset has been reviewed for full grasp-pick-move windows.
 P2. Offline focused-dataset builder was approved, created, and validated.
-P3. Option A fine-tune is complete: original 49 episodes plus focused grasp-pick-move windows once.
-P1. Next: evaluate the new Option A checkpoint through official 3-camera async with read-only trace.
+P3. Option A 003000 fine-tune is complete: original 49 episodes plus focused grasp-pick-move windows once.
+P1. Next: restart the staged batch_size=4 fine-tune to 012000 after confirming no duplicate training process.
+P1. Then: offline-compare the staged checkpoint against 003000 before real-arm evaluation.
+P1. Then: evaluate the staged checkpoint through official 3-camera async with read-only trace only if offline comparison improves.
 P3. Record new correction episodes only if the focused dataset is weak or focused-window training still fails.
 ```
 
@@ -384,14 +386,16 @@ These can become valid later, but only when evidence makes them the smallest cor
 Current next work:
 
 ```text
-Evaluate the new Option A checkpoint on the real arm through official LeRobot async:
+Restart staged batch_size=4 fine-tuning from the complete focused checkpoint:
   /workspace/outputs/pi05_orange49_plus_grasp_focus_expert/checkpoints/003000/pretrained_model
+
+Write the new staged output to:
+  /workspace/outputs/pi05_orange49_plus_grasp_focus_bs4_from003000_restart_012000
 ```
 
 Then:
 
 ```text
-Analyze the read-only trace and external video.
-If it improves, repeat for reliability.
-If it still reaches without grasp/lift, compare new Pi05 outputs to the previous traced failure.
+Offline-compare the staged checkpoint against the old focused 003000 checkpoint.
+Only if offline comparison improves, run official LeRobot async real-arm evaluation with three cameras and read-only trace.
 ```

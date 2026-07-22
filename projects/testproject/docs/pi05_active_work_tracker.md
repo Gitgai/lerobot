@@ -1,6 +1,6 @@
 # Pi05 Active Work Tracker
 
-Last updated: 2026-07-21
+Last updated: 2026-07-22
 
 This is the active tracker for the SO-101 Pi05 orange-pick work.
 
@@ -21,7 +21,7 @@ This is different from the older progress documents. Older docs explain history.
 Main objective:
 
 ```text
-Make an evidence-based decision about why Pi05 reaches/touches the orange but does not reliably grasp/lift it.
+Finish a staged Pi05 fine-tune, compare the new checkpoint offline, and only then run the real arm again.
 ```
 
 Current execution rule:
@@ -49,8 +49,11 @@ Top camera /dev/video0 reads normally.
 Front camera /dev/video2 reads normally.
 Wrist camera /dev/video6 reads through the Raspberry Pi -> ffmpeg -> v4l2loopback bridge.
 SO-101 follower serial port is known.
-Pi05 checkpoint 005000/pretrained_model is the current complete checkpoint.
-Pi05 Option A focused checkpoint 003000/pretrained_model is complete on RunPod and ready for real-arm evaluation.
+Pi05 checkpoint 005000/pretrained_model is the complete base orange checkpoint we are keeping.
+Pi05 Option A focused checkpoint 003000/pretrained_model is complete on RunPod and is the starting point for staged fine-tuning.
+Pi05 batch-size probes on RTX 3090 passed for batch_size=2 and batch_size=4.
+The staged batch_size=4 run from 003000 to 012000 was launched on RunPod, reached step 6000, then failed while saving because of disk quota.
+Old base checkpoints 001000-004000 were deleted after user approval, freeing workspace usage from about 91 GB to about 48 GB.
 Official async path previously moved the real arm with top/front camera setup.
 Official async path connected top/front/wrist cameras together on 2026-07-19.
 Official async path generated Pi05 action chunks with robot.max_relative_target=None.
@@ -67,8 +70,7 @@ No current P0 hardware/software blocker is known for another official 3-camera a
 Current evidence gap:
 
 ```text
-We need one official 3-camera async real-arm evaluation using the new Option A focused checkpoint.
-The run should use official defaults, read-only trace enabled, and external video if possible.
+We need to restart staged fine-tuning from the complete focused `003000/pretrained_model` checkpoint.
 ```
 
 ### Not Proven Yet
@@ -79,7 +81,10 @@ We now know the existing 49-episode dataset contains many good full grasp-pick-m
 We now have a validated focused grasp/pick/move dataset built from 40 approved non-holdout windows.
 We now have a validated Option A training dataset: original 49 full episodes plus the 40 focused windows once.
 We now have a completed 3000-step Option A fine-tuned checkpoint on RunPod.
-We do not yet know whether the Option A checkpoint improves real-arm grasp/lift/move success.
+The 3000-step batch_size=1 checkpoint is likely undertrained relative to the 40,712-frame dataset.
+The staged 12000-step batch_size=4 checkpoint does not exist yet.
+The partial `006000` folder exists but is incomplete and unusable.
+We do not yet know whether the staged checkpoint improves real-arm grasp/lift/move success.
 ```
 
 ## 3. Single Source Of Truth Docs
@@ -107,6 +112,9 @@ docs/pi05_async_trace_instrumentation_plan.md
 
 docs/pi05_grasp_focus_dataset_plan.md
   Plan for mining verified grasp/pick/move windows from the existing 49 episodes before recording more.
+
+docs/pi05_staged_finetuning_execution_plan.md
+  Current staged fine-tuning plan, checkpoint save policy, RunPod cleanup evidence, and restart gates.
 
 docs/pi05_run_evidence_checklist.md
   Checklist for each real-arm run.
@@ -155,15 +163,17 @@ P3 = later improvement
 | T12 | P2 | done | Build and validate Option A training dataset | Original 49 + focused windows once, LeRobotDataset load passes | Dataset and package tarball created |
 | T13 | P1 | done | Upload Option A dataset to RunPod | Current RunPod direct TCP SSH host/port works and dataset extracts under `/workspace/lerobot_datasets` | Uploaded to active pod at `213.192.2.83:40161` using `~/.ssh/runpod_ed25519` |
 | T14 | P1 | done | Fine-tune Option A | Smoke train passes, then expert train writes checkpoints | 3000-step expert run completed; checkpoint `003000/pretrained_model` exists |
-| T15 | P1 | todo | Evaluate Option A checkpoint on real arm | Official 3-camera async run with trace, logs, and physical outcome | Start policy_server from new `003000/pretrained_model`, then run official robot_client |
-| T16 | P1 | todo | Analyze Option A evaluation | Trace shows camera frames, Pi05 action chunks, executed actions, state, timing, and task text | Compare against previous trace and video outcome |
+| T15 | P1 | todo | Run staged longer Option A fine-tune | RTX 3090 batch_size=4 train reaches checkpoint `012000/pretrained_model` | Restart from complete `003000/pretrained_model` into fresh output folder after confirming no duplicate process |
+| T16 | P1 | todo | Offline-compare staged checkpoint against 003000 | Same focus frames show improved close/lift predictions and fewer missed strong-close cases | Run comparison only after a complete staged checkpoint exists |
+| T17 | P1 | todo | Evaluate staged checkpoint on real arm | Official 3-camera async run with trace, logs, and physical outcome | Only start after offline comparison improves |
+| T18 | P1 | todo | Analyze staged real-arm evaluation | Trace shows camera frames, Pi05 action chunks, executed actions, state, timing, and task text | Compare against previous reach-without-grasp trace |
 
 ## 5. Current Highest Priority
 
 Current highest priority:
 
 ```text
-T15: Evaluate the new Option A focused checkpoint on the real arm through official LeRobot async.
+Restart the staged 12000-step batch_size=4 fine-tune from the complete focused 003000 checkpoint.
 ```
 
 Why:
@@ -172,18 +182,18 @@ Why:
 The official traced run proved the software path, cameras, policy server, and action execution are working.
 The trace showed Pi05 had clear 3-camera visual input and LeRobot sent the same actions Pi05 requested.
 The Option A dataset was built and validated from original 49 full episodes plus the 40 focused windows once.
-The Option A fine-tune completed and wrote a new checkpoint.
-The next evidence question is physical behavior: did the new focused checkpoint improve center-close-lift-move?
+The 003000 run used only 3000 effective samples, about 0.074 epoch on the 40,712-frame dataset.
+Batch_size=4 fits the RTX 3090, so the next evidence step is a longer staged checkpoint before another real-arm run.
+The staged run reached 6000 steps but failed while writing the checkpoint because the RunPod volume quota was exceeded.
 ```
 
 Acceptance criteria:
 
 ```text
-Policy server starts from `/workspace/outputs/pi05_orange49_plus_grasp_focus_expert/checkpoints/003000/pretrained_model`.
-Robot client uses top/front/wrist cameras.
-`robot.max_relative_target` is not set unless the user approves a change.
-Read-only trace is enabled.
-Physical result is labeled as success, partial, or failure.
+Current RunPod endpoint is known.
+Partial `006000` checkpoint is marked unusable.
+At least the complete `005000` base checkpoint and complete focused `003000` checkpoint are kept.
+Restarted run writes a complete checkpoint before offline comparison.
 ```
 
 ## 6. Current Known Commands And Paths
@@ -204,6 +214,26 @@ Current focused Option A checkpoint:
 
 ```text
 /workspace/outputs/pi05_orange49_plus_grasp_focus_expert/checkpoints/003000/pretrained_model
+```
+
+Current staged fine-tune output:
+
+```text
+/workspace/outputs/pi05_orange49_plus_grasp_focus_bs4_from003000_restart_012000
+```
+
+Current staged fine-tune target checkpoint:
+
+```text
+/workspace/outputs/pi05_orange49_plus_grasp_focus_bs4_from003000_restart_012000/checkpoints/012000/pretrained_model
+```
+
+Known failed staged checkpoint:
+
+```text
+/workspace/outputs/pi05_orange49_plus_grasp_focus_bs4_from003000_012000/checkpoints/006000
+status: incomplete, do not use
+reason: Disk quota exceeded while writing model.safetensors
 ```
 
 Validated local training datasets:
@@ -277,6 +307,8 @@ Use this section to record important evidence files after each run.
 | 2026-07-21 | runpod_option_a_upload_20260721 | `/workspace/lerobot_datasets/so101_orange_49_plus_grasp_pick_move_focus` | Option A dataset uploaded and extracted on RunPod | Uploaded to `root@213.192.2.83:40161` using `~/.ssh/runpod_ed25519`; extracted size about 793 MB |
 | 2026-07-21 | pi05_orange49_plus_grasp_focus_smoke_20260721 | `/workspace/logs/pi05_orange49_plus_grasp_focus_smoke_20260721.log` | Dataset, checkpoint loading, and training loop worked on RunPod | 200/200 steps completed; checkpoint save hit disk quota before cleanup, so it was treated as train-loop proof only |
 | 2026-07-21 | pi05_orange49_plus_grasp_focus_expert_20260721 | `/workspace/logs/pi05_orange49_plus_grasp_focus_expert_20260721.log`; `/workspace/outputs/pi05_orange49_plus_grasp_focus_expert/checkpoints/003000/pretrained_model` | Option A fine-tune completed from checkpoint 005000 and wrote a usable Pi05 checkpoint | 3000/3000 steps, final loss about 0.053, `model.safetensors` 8.8 GB, checkpoint directory 11 GB |
+| 2026-07-22 | pi05_orange49_focus_bs4_from003000_012000_20260721_193801 | `/workspace/logs/pi05_orange49_focus_bs4_from003000_012000_20260721_193801.log`; partial `/workspace/outputs/pi05_orange49_plus_grasp_focus_bs4_from003000_012000/checkpoints/006000` | Batch_size=4 training ran successfully to step 6000, but checkpoint save failed because of disk quota | `006000` is incomplete: only `config.json`, no `model.safetensors`, no `train_config.json`, no `training_state`; do not use |
+| 2026-07-22 | runpod_checkpoint_cleanup_20260722 | RunPod `/workspace/outputs/pi05_base_to_orange49_expert/checkpoints` | Deleted old base checkpoints `001000`-`004000` after user approval; kept complete `005000` base and complete focused `003000` | Workspace usage dropped from about 91 GB to about 48 GB |
 
 Add every serious run here.
 
@@ -619,6 +651,7 @@ Decision:
 
 ```text
 Use the new Option A checkpoint for the next real-arm evaluation.
+Superseded on 2026-07-22 by the staged fine-tuning plan because the `003000` checkpoint was judged undertrained.
 ```
 
 Evidence:
@@ -663,9 +696,8 @@ The remaining question is not training infrastructure anymore; it is real-arm be
 Follow-up:
 
 ```text
-Start official policy_server from the new 003000 checkpoint.
-Run official robot_client with top/front/wrist, official defaults, read-only trace, and external video if possible.
-Compare new trace/video against the previous reach-without-grasp trace.
+Restart staged batch_size=4 fine-tuning from the complete focused 003000 checkpoint.
+Run offline comparison before any real-arm evaluation.
 ```
 
 ### 2026-07-21 RunPod Upload Blocked By Stale Endpoint
@@ -673,7 +705,7 @@ Compare new trace/video against the previous reach-without-grasp trace.
 Decision:
 
 ```text
-Do not attempt the 764 MB upload until the current RunPod direct TCP SSH endpoint is known.
+Historical resolved block: do not attempt a large upload when the active RunPod direct TCP SSH endpoint is unknown.
 ```
 
 Evidence:
@@ -695,9 +727,9 @@ The local dataset and package are ready, but the pod endpoint changed or the pod
 Follow-up:
 
 ```text
-User should provide the current RunPod direct TCP SSH host and port from the active pod.
-Then run:
-  RUNPOD_HOST=<host> RUNPOD_PORT=<port> projects/testproject/scripts/runpod/upload_orange49_plus_grasp_focus_to_runpod.sh
+This was later resolved by the successful Option A upload.
+The current known RunPod endpoint for staged training restart is:
+  root@213.192.2.67 -p 40066
 ```
 
 ### 2026-07-19 Wrist Camera Hardware Timeout Blocks Trace Run
@@ -860,13 +892,15 @@ ESP32 serial camera workaround
 Next concrete action:
 
 ```text
-Evaluate the new Option A checkpoint on the real arm using official LeRobot async.
+Restart the staged batch_size=4 fine-tune from the complete focused 003000 checkpoint into:
+
+/workspace/outputs/pi05_orange49_plus_grasp_focus_bs4_from003000_restart_012000
 ```
 
 After that:
 
 ```text
-Analyze the trace and video.
-If the new checkpoint improves center-close-lift-move, repeat for reliability.
-If it still reaches without grasp/lift, compare the new Pi05 action chunks to the old traced failure before deciding on new correction episodes or Option B.
+Verify a complete checkpoint exists.
+Run offline comparison against the old focused 003000 checkpoint.
+Only if offline comparison improves, evaluate the staged checkpoint on the real arm through official LeRobot async with three cameras and read-only trace.
 ```
