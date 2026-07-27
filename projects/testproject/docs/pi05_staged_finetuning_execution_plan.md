@@ -1,6 +1,6 @@
 # Pi05 Staged Fine-Tuning Execution Plan
 
-Last updated: 2026-07-23
+Last updated: 2026-07-25
 
 This document is the active fine-tuning plan for the SO-101 orange pick task.
 
@@ -26,8 +26,8 @@ pick/lift the orange.
 The next goal is:
 
 ```text
-compare the 012000 checkpoint offline against successful focus-window demonstrations
-then decide whether to train more, correct deployment/start state, or collect new correction episodes
+run the full offline audit of 012000 against successful focus-window demonstrations
+then decide whether to train more, fix action/gripper handling, adjust focused-window weighting, correct deployment/start state, or collect new correction episodes
 ```
 
 ## 2. Evidence Behind This Plan
@@ -480,12 +480,18 @@ old direct endpoint example:
 
 If direct SSH says `Connection refused`, get the new direct TCP SSH line from RunPod before making decisions.
 
-### Current 012000 Status: 2026-07-23
+### Current 012000 Status: 2026-07-25
 
 Complete checkpoint:
 
 ```text
 /workspace/outputs/pi05_orange49_plus_grasp_focus_bs4_from003000_restart_012000/checkpoints/012000/pretrained_model
+```
+
+Local checkpoint copy used for the sampled CPU probe:
+
+```text
+/home/gaikwad-prakash/PrakashProjects/lerobot/lerobot/projects/testproject/artifacts/checkpoints/pi05_orange49_plus_grasp_focus_bs4_from003000_restart_012000/012000/pretrained_model
 ```
 
 Real-arm evidence:
@@ -504,12 +510,29 @@ official_async_3cam_012000_trace_20260722_233341:
   pick/lift: no
 ```
 
+Sampled offline CPU-probe evidence:
+
+```text
+selected successful close/hold focus frames: 6
+recorded first gripper mean: 21.80
+012000 predicted first gripper mean: 40.35
+predicted strong close in next 10 actions: 0/6
+predicted near close in next 10 actions: 0/6
+```
+
+Detailed report:
+
+```text
+projects/testproject/docs/pi05_012000_cpu_probe_close_frames_20260725.md
+```
+
 Current conclusion:
 
 ```text
 Do not treat 012000 as solved.
 Do not repeat the same ordinary physical test as the next step.
-Run offline comparison on successful focus-window frames first.
+Run the full GPU offline audit on all successful focus-window phases first.
+If the audit confirms the sampled failure, fix training/action handling before more ordinary real-arm tests.
 ```
 
 ## 7. Monitoring Commands
@@ -549,11 +572,20 @@ Checkpoint size command:
 du -sh /workspace/outputs/pi05_orange49_plus_grasp_focus_bs4_from003000_restart_012000/checkpoints/* 2>/dev/null
 ```
 
-## 8. Offline Comparison Before More Real-Robot Testing
+## 8. Offline Audit Before More Real-Robot Testing
 
 Do not run another ordinary real-arm test immediately.
 
-First compare the 012000 checkpoint against recorded demonstration frames.
+First compare the 012000 checkpoint against recorded demonstration frames across
+the full focused-window set.
+
+Current sampled result:
+
+```text
+The 2026-07-25 CPU probe tested six successful close/hold frames.
+All six recorded frames asked for strong close.
+012000 predicted no near-close action in the next 10 actions for any of them.
+```
 
 Minimum comparison:
 
@@ -591,19 +623,20 @@ Evidence target:
 
 ```text
 The 012000 checkpoint should reduce missed close/lift cases compared with 003000.
+It must predict close/hold on known-good close/hold focus frames before another ordinary physical test.
 ```
 
 If it does not improve offline:
 
 ```text
 do not run the real arm
-inspect training mix, action normalization, gripper labels, and visual/state alignment
+inspect training mix, action normalization, gripper labels, gripper-dimension loss, frame/action timing, focused-window weighting, and visual/state alignment
 ```
 
 ## 9. Real-Arm Evaluation Gate
 
-Only after offline comparison improves, or after explicit user approval for a
-start-state diagnostic run:
+Only after the full offline audit improves, or after explicit user approval for
+a start-state diagnostic run despite offline failure:
 
 ```text
 start official LeRobot policy_server from the new checkpoint
@@ -715,7 +748,7 @@ After restart:
 ```text
 1. Monitor until training reaches step 3000 and writes a complete checkpoint.
 2. Verify every checkpoint has `pretrained_model/model.safetensors`.
-3. If training reaches `012000`, run offline comparison before real-arm testing.
+3. If training reaches `012000`, run full offline audit before real-arm testing.
 4. If training stops after a complete `003000`, `006000`, or `009000`, offline-compare the latest complete checkpoint before restarting.
 5. If checkpoint save fails again, stop and inspect storage before any new run.
 ```
@@ -726,5 +759,5 @@ Do not:
 do not reuse the old failed output folder
 do not use the incomplete old `006000`
 do not set save_freq=1000 unless storage is expanded or old checkpoints are actively pruned
-do not run the real arm until offline comparison improves
+do not run the real arm until offline comparison improves, unless the user explicitly approves a diagnostic physical run
 ```

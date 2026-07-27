@@ -1,6 +1,6 @@
 # Pi05 Official LeRobot Async Test Plan
 
-Last updated: 2026-07-23
+Last updated: 2026-07-25
 
 This document is the plan to test Pi05 using LeRobot's official async inference flow with the real SO-101 follower arm.
 
@@ -365,19 +365,30 @@ complete trace:
   result: reach/contact, no pick/lift
 ```
 
+Sampled offline evidence from 2026-07-25:
+
+```text
+six successful close/hold focus frames were probed locally
+recorded first gripper mean: 21.80
+012000 predicted first gripper mean: 40.35
+predicted near-close in next 10 actions: 0/6 frames
+```
+
 Current conclusion:
 
 ```text
 Official async execution works.
-The remaining failure is close timing and grasp geometry, not basic LeRobot connectivity.
+The remaining failure is close timing/action selection and grasp geometry, not basic LeRobot connectivity.
+The sampled offline probe suggests 012000 may not be reproducing close/hold even on known-good frames.
 ```
 
 Current next work:
 
 ```text
-1. offline-compare 012000 on successful focus-window frames
-2. if another real-arm test is needed, control start state first
-3. keep official defaults and read-only trace enabled
+1. run the full GPU offline 012000 audit across all successful focus-window phases
+2. include 003000 baseline if available
+3. if another real-arm test is needed after that, control start state first
+4. keep official defaults and read-only trace enabled
 ```
 
 ## 12. Missing Practical Details We Must Handle
@@ -574,13 +585,14 @@ stop the L40S if no more tests are ready
 The next implementation work should be:
 
 ```text
-1. run offline 012000 comparison on successful focus-window frames
-2. if offline comparison is good, prepare a start-state-controlled real-arm run
-3. open the gripper visibly before the run
-4. confirm first observed gripper state is near the training open range
-5. run official async three-camera test with official defaults
-6. save manifest, logs, trace, and optional external video
-7. update docs/pi05_active_work_tracker.md with evidence and outcome
+1. run the full GPU offline 012000 audit across all successful focus-window phases
+2. compare against 003000 if that checkpoint is available
+3. if offline close/hold/lift improves, prepare a start-state-controlled real-arm run
+4. open the gripper visibly before the run
+5. confirm first observed gripper state is near the training open range
+6. run official async three-camera test with official defaults
+7. save manifest, logs, trace, and optional external video
+8. update docs/pi05_active_work_tracker.md with evidence and outcome
 ```
 
 This avoids repeating a low-evidence physical run and keeps the test evidence clean.

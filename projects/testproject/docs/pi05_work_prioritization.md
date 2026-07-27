@@ -1,6 +1,6 @@
 # Pi05 Work Prioritization
 
-Last updated: 2026-07-23
+Last updated: 2026-07-25
 
 This document defines how we decide what to work on first for the SO-101 Pi05 orange-pick project.
 
@@ -158,9 +158,10 @@ P2. The 49-episode training dataset has been reviewed for full grasp-pick-move w
 P2. Offline focused-dataset builder was approved, created, and validated.
 P3. Option A 003000 fine-tune is complete: original 49 episodes plus focused grasp-pick-move windows once.
 P1. Option A staged 012000 checkpoint is complete and has been tested twice on the real arm.
-P1. Next: offline-compare 012000 on successful focus-window frames.
-P1. Then: run a start-state-controlled official 3-camera trace only if needed and approved.
-P2. Then: decide whether the issue is undertraining, start-state/camera deployment mismatch, or missing correction data.
+P1. Sampled CPU offline probe is complete: 012000 failed to predict close/hold on six successful focus frames.
+P1. Next: full GPU offline audit 012000 across all focus windows, with 003000 baseline if available.
+P1. Then: decide whether the issue is training depth, action normalization/timing, gripper-dimension learning, or data weighting.
+P1. Then: run a start-state-controlled official 3-camera trace only if offline evidence improves or the user explicitly approves a diagnostic run.
 P3. Record new correction episodes only if the evidence says existing focused windows are still insufficient.
 ```
 
@@ -212,6 +213,7 @@ latency too high -> maybe adjust inference/timing setup
 camera missing -> fix camera mapping/source
 action too large and unsafe -> discuss robot safety setting
 task text mismatch -> compare training task/instruction text
+known-good close frame predicts open -> inspect training/action handling before more physical tests
 ```
 
 Every non-default must be recorded in the run manifest:
@@ -401,20 +403,30 @@ trace 233341:
   strong close happened at timesteps 0-84
   final near-orange window was open, gripper 54.33-58.88
   no pick/lift
+
+sampled CPU offline probe 20260725:
+  selected successful close/hold focus frames: 6
+  recorded first gripper mean: 21.80
+  predicted first gripper mean: 40.35
+  predicted strong close in next 10 actions: 0/6
+  predicted near close in next 10 actions: 0/6
 ```
 
 Priority rule:
 
 ```text
 Do not repeat the same ordinary 012000 real-arm run again as the next step.
-First run offline 012000 comparison on successful focus-window frames.
-Then control the real-arm start state before any next physical evaluation.
+First run the full GPU offline 012000 audit on all successful focus-window phases.
+Use 003000 as a baseline if available.
+Then fix training/action handling if the full audit confirms the sampled failure.
+Only then control the real-arm start state before any next physical evaluation.
 ```
 
 Reason:
 
 ```text
 The current failure is not basic reach, camera connection, LeRobot execution, or action clamp.
-The current failure is close timing and grasp geometry.
-Repeating the same setup is lower evidence value than checking whether 012000 can imitate successful close/lift frames offline.
+The current failure is close timing/action selection and grasp geometry.
+The sampled offline probe already shows 012000 failed to imitate six successful close/hold frames.
+Repeating the same robot setup is lower evidence value than quantifying and fixing that offline failure.
 ```

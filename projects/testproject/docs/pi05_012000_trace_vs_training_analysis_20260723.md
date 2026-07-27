@@ -1,9 +1,10 @@
 # Pi05 012000 Trace vs Training Analysis
 
-Last updated: 2026-07-23
+Last updated: 2026-07-25
 
 This document records the evidence from the two complete official LeRobot
-3-camera real-arm evaluations of the 012000 checkpoint.
+3-camera real-arm evaluations of the 012000 checkpoint, plus the later sampled
+offline CPU probe against successful close/hold focus frames.
 
 The goal is to answer:
 
@@ -35,6 +36,12 @@ Generated analysis artifacts:
 
 ```text
 projects/testproject/artifacts/trace_vs_training_analysis_20260723/
+```
+
+Sampled offline CPU-probe artifacts:
+
+```text
+projects/testproject/artifacts/offline_compare_012000_focus_20260725_cpu_probe/
 ```
 
 Important generated files:
@@ -339,6 +346,7 @@ The real-arm runs used official defaults with robot.max_relative_target=null.
 The failure is not caused by our old custom movement script.
 The failure is not simply "Pi05 never learned to close", because trace 233341 has 85 strong-close executed frames.
 The failure is close timing and grasp geometry: close does not happen when the orange is correctly centered between the fingers, and lift does not follow a captured grasp.
+The sampled offline CPU probe supports a model/training/action-learning issue: on six successful close/hold focus frames, 012000 predicted no near-close action in the next 10 actions.
 ```
 
 ## 8. What This Does Not Prove Yet
@@ -346,17 +354,62 @@ The failure is close timing and grasp geometry: close does not happen when the o
 Still-open evidence gaps:
 
 ```text
-We have not yet run an offline 012000 checkpoint comparison on the successful training/focus frames.
-So we do not yet know whether 012000 predicts correct close/lift actions when it sees the exact successful training images.
+We have run a sampled offline CPU probe on six successful close/hold focus frames.
+That probe suggests 012000 does not reproduce the recorded close/hold actions.
+We have not yet run the full GPU audit across all 40 focused windows or compared against the 003000 baseline.
 
 We have not yet run a start-state-controlled real-arm test.
 So we do not yet know how much the low/closed-ish initial gripper state contributed to the early-close/open timing.
 
 We have not yet compared camera geometry quantitatively between live final contact frames and successful training contact frames.
-The visual evidence suggests live contact is offset, but this still needs side-by-side camera-pose review before changing camera placement.
+The visual evidence suggests live contact is offset, but camera/geometry changes should wait until the full offline audit confirms whether the checkpoint itself can predict close/hold/lift correctly.
 ```
 
-## 9. Recommended Next Actions
+## 9. 2026-07-25 Sampled Offline CPU Probe
+
+Purpose:
+
+```text
+Check whether 012000 predicts close/hold when shown known-good close/hold frames
+from the focused training-style dataset.
+```
+
+Selected evidence:
+
+```text
+selected frames: 6
+recorded first gripper mean: 21.80
+012000 predicted first gripper mean: 40.35
+predicted strong close in next 10 actions: 0/6 frames
+predicted near close in next 10 actions: 0/6 frames
+```
+
+Example:
+
+```text
+Episode 49 frame 59:
+  recorded next grippers: 24.98, 24.82, 24.90 ...
+  012000 predicted grippers: 40.64, 41.63, 40.96 ...
+```
+
+Meaning:
+
+```text
+The demonstration says close and hold.
+The checkpoint says open-ish/partial.
+```
+
+Detailed report:
+
+```text
+projects/testproject/docs/pi05_012000_cpu_probe_close_frames_20260725.md
+```
+
+This does not replace the full audit. It is a strong sampled warning that the
+checkpoint may not have learned the close/hold action even on training-style
+images.
+
+## 10. Recommended Next Actions
 
 Do not run another ordinary real-arm test immediately. We already have enough
 evidence that repeating the same setup is unlikely to explain the problem.
@@ -364,20 +417,37 @@ evidence that repeating the same setup is unlikely to explain the problem.
 Next action 1:
 
 ```text
-Run offline 012000 checkpoint comparison on selected successful focus-window frames.
+Run the full GPU offline 012000 audit on all successful focus-window phases, with 003000 baseline if available.
 ```
 
 Why:
 
 ```text
-If 012000 fails to predict the recorded close/lift actions on successful training frames, then it is still undertrained or the training mix is wrong.
-If 012000 predicts the training frames correctly, then the live failure is more likely deployment-state/camera-geometry/start-pose mismatch.
+The sampled CPU probe already failed on six close/hold frames.
+The full audit tells us whether that failure is general and whether 003000 behaves differently.
 ```
 
 Next action 2:
 
 ```text
-Before the next real-arm evaluation, control the physical start state.
+If the full audit confirms the sampled failure, fix training/action handling before another ordinary real-arm evaluation.
+```
+
+Inspect:
+
+```text
+training depth
+gripper/action normalization
+gripper-dimension loss
+frame/action timing
+focused-window weighting
+whether close/hold/lift frames need stronger sampling
+```
+
+Next action 3:
+
+```text
+Before any next real-arm evaluation, control the physical start state.
 ```
 
 Target:
@@ -390,22 +460,22 @@ Use the same official LeRobot async command and trace recording.
 Do not change actions_per_chunk, task text, camera mapping, or robot.max_relative_target.
 ```
 
-Next action 3:
+Next action 4:
 
 ```text
-If offline comparison is good but start-state-controlled run still fails, inspect camera/geometry mismatch and then decide whether to record new close-range correction episodes.
+If full offline audit is good but start-state-controlled run still fails, inspect camera/geometry mismatch and then decide whether to record new close-range correction episodes.
 ```
 
 Correction episodes should only be recorded after the above evidence, because
 the existing 40 focused windows already contain many successful close/lift
 examples.
 
-## 10. Current Working Conclusion
+## 11. Current Working Conclusion
 
 Evidence-based conclusion:
 
 ```text
-The 012000 checkpoint can reach the orange and can command gripper close, but it has not reliably learned the conditional timing:
+The 012000 checkpoint can reach the orange and can command gripper close in some live conditions, but it has not reliably learned the conditional timing/action:
 
 when orange is centered between the fingers -> close strongly -> keep closed -> lift/move.
 
@@ -418,6 +488,6 @@ The two latest runs fail in two different timing modes:
 Most useful next evidence:
 
 ```text
-offline 012000 checkpoint comparison on successful focus frames
-start-state-controlled official 3-camera trace run only after that comparison or with explicit user approval
+full GPU offline 012000 audit on all successful focus frames, with 003000 baseline if available
+start-state-controlled official 3-camera trace run only after that audit/checkpoint fix or with explicit user approval
 ```

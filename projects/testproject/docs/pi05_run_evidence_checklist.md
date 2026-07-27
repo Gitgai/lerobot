@@ -1,6 +1,6 @@
 # Pi05 Official Async Run Evidence Checklist
 
-Date: 2026-07-23
+Date: 2026-07-25
 
 Use this checklist for every serious Pi05 real-arm test.
 
@@ -177,6 +177,8 @@ Current follower port:
 ### 2.5.1 Current 012000 Start-State Gate
 
 The two complete 012000 traces showed reach/contact but no pick/lift.
+The sampled 2026-07-25 CPU offline probe also showed 012000 did not reproduce
+close/hold actions on six known-good focus frames.
 
 Important evidence:
 
@@ -190,6 +192,7 @@ focus-window training start gripper state p10-p90: 41.91-55.84
 Before the next 012000 physical evaluation:
 
 ```text
+complete the full GPU offline audit, or get explicit user approval for a diagnostic physical run despite offline failure
 open the gripper visibly
 save the first observed robot state
 confirm gripper state is closer to 40-55 than 20-30
@@ -201,6 +204,7 @@ Reason:
 ```text
 trace 233341 strongly closed at the beginning, then opened before/while reaching the orange.
 Starting closed-ish may contribute to wrong close/open timing.
+But the sampled offline probe already points to a checkpoint close/hold learning issue, so physical start-state control is not a substitute for the full offline audit.
 ```
 
 ### 2.6 Official Defaults

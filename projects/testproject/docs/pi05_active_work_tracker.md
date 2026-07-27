@@ -1,6 +1,18 @@
 # Pi05 Active Work Tracker
 
-Last updated: 2026-07-23
+Last updated: 2026-07-28
+
+> **STATUS CHANGE 2026-07-28.** The offline question is ANSWERED, in the
+> opposite direction from the July 25-26 local probes: 012000 DID learn
+> close/hold (pod comparison from 2026-07-22, recovered 2026-07-28: gripper
+> corr 0.83, MAE 4.4 on closed frames, better than 003000 on every joint).
+> The local probes were a broken harness (newer lerobot code than the
+> checkpoint was trained with). Retraining is OFF. The active investigation
+> is LIVE DEPLOYMENT MISMATCH.
+> Read: `pi05_012000_pod_evidence_correction_20260728.md`
+> Active plan: `pi05_live_mismatch_investigation_plan_20260728.md`
+> The "Current Objective" below reflects the pre-correction state and is
+> superseded by the docs above.
 
 This is the active tracker for the SO-101 Pi05 orange-pick work.
 
@@ -21,7 +33,7 @@ This is different from the older progress documents. Older docs explain history.
 Main objective:
 
 ```text
-Explain the 012000 real-arm grasp failure with trace-vs-training evidence, then decide the next evidence run.
+Confirm the 012000 close/hold failure with offline evidence, then choose the next training fix before more ordinary real-arm runs.
 ```
 
 Current execution rule:
@@ -64,6 +76,7 @@ The staged batch_size=4 012000 checkpoint exists on RunPod and was tested twice 
 Official 012000 trace official_async_3cam_012000_trace_20260722_230756 captured 37 observations, 29 Pi05 chunks, and 422 executed actions.
 Official 012000 trace official_async_3cam_012000_trace_20260722_233341 captured 21 observations, 16 Pi05 chunks, and 220 executed actions.
 Trace-vs-training analysis artifacts were generated under projects/testproject/artifacts/trace_vs_training_analysis_20260723.
+A sampled local CPU offline probe of 012000 on six successful close/hold focus frames loaded the checkpoint successfully and saved results under projects/testproject/artifacts/offline_compare_012000_focus_20260725_cpu_probe.
 ```
 
 ### Blocked
@@ -75,7 +88,8 @@ No current P0 hardware/software blocker is known for another official 3-camera a
 Current evidence gap:
 
 ```text
-We need an offline 012000 checkpoint comparison on successful focus-window frames.
+A sampled offline 012000 checkpoint probe on successful focus-window frames is complete.
+We still need a full GPU offline audit over all 40 focused windows, with 003000 baseline if available.
 We also need to control the physical start gripper state before the next real-arm run.
 ```
 
@@ -91,7 +105,9 @@ The 3000-step batch_size=1 checkpoint is likely undertrained relative to the 40,
 The staged 12000-step batch_size=4 checkpoint exists and has been tested on the real arm.
 The partial `006000` folder from the failed earlier run exists but is incomplete and unusable.
 The 012000 real-arm tests improved/changed gripper behavior but did not produce a reliable pick/lift.
-We do not yet know whether 012000 predicts correct close/lift actions when shown successful training/focus frames offline.
+The sampled local CPU probe indicates 012000 does not predict close/hold actions on six successful close/hold focus frames.
+We do not yet know whether the same result holds across all 40 focused windows in a full GPU audit.
+We do not yet have a 003000 baseline comparison in the local probe.
 We do not yet know whether a controlled open-gripper start state fixes the early-close/open timing seen in trace 233341.
 ```
 
@@ -140,7 +156,10 @@ docs/pi05_012000_trace_vs_training_analysis_20260723.md
   Evidence report for the two complete 012000 real-arm traces and training-window comparison.
 
 docs/pi05_012000_offline_comparison_plan.md
-  Next evidence plan: compare 012000 against successful focus-window frames before another ordinary physical run.
+  Full evidence plan: compare 012000 against successful focus-window frames before another ordinary physical run.
+
+docs/pi05_012000_cpu_probe_close_frames_20260725.md
+  Sampled local CPU probe showing 012000 did not reproduce close/hold actions on six successful focus-window frames.
 ```
 
 ## 4. Active Task Board
@@ -181,18 +200,20 @@ P3 = later improvement
 | T13 | P1 | done | Upload Option A dataset to RunPod | Current RunPod direct TCP SSH host/port works and dataset extracts under `/workspace/lerobot_datasets` | Uploaded to active pod at `213.192.2.83:40161` using `~/.ssh/runpod_ed25519` |
 | T14 | P1 | done | Fine-tune Option A | Smoke train passes, then expert train writes checkpoints | 3000-step expert run completed; checkpoint `003000/pretrained_model` exists |
 | T15 | P1 | done | Run staged longer Option A fine-tune | RTX 3090 batch_size=4 train reaches checkpoint `012000/pretrained_model` | Complete checkpoint exists at `012000/pretrained_model` |
-| T16 | P1 | todo | Offline-compare staged checkpoint against training/focus frames | Same successful focus frames show correct close/lift predictions | Run comparison when RunPod/checkpoint endpoint is accessible |
+| T16 | P1 | done | Sampled offline-compare 012000 against successful close/hold focus frames | Same successful focus frames should show close/hold predictions | 6-frame CPU probe found 0 predicted near-close chunks; see `docs/pi05_012000_cpu_probe_close_frames_20260725.md` |
 | T17 | P1 | done | Evaluate staged checkpoint on real arm | Official 3-camera async run with trace, logs, and physical outcome | Two complete 012000 traces were captured |
 | T18 | P1 | done | Analyze staged real-arm evaluation | Trace shows camera frames, Pi05 action chunks, executed actions, state, timing, and task text | See `docs/pi05_012000_trace_vs_training_analysis_20260723.md` |
-| T19 | P1 | todo | Run start-state-controlled official evaluation | First observed gripper state is in/near training open range, then official 3-camera async trace | Do only after offline compare or explicit user approval |
-| T20 | P2 | todo | Decide correction-data strategy | Evidence separates undertrained checkpoint from deployment/start/camera mismatch | Choose more training, new correction episodes, or start/camera correction based on T16/T19 |
+| T19 | P1 | todo | Full GPU offline audit 012000 across all focus windows | All focused close/hold/lift phases compared against recorded actions, with 003000 baseline if available | Run before another ordinary physical test |
+| T20 | P1 | todo | Decide training fix from offline audit | Evidence separates checkpoint undertraining, gripper/action normalization, timing, or data weighting | Choose next training/change only after T19 |
+| T21 | P1 | todo | Run start-state-controlled official evaluation | First observed gripper state is in/near training open range, then official 3-camera async trace | Do only after full offline audit/checkpoint fix or explicit user approval |
+| T22 | P2 | todo | Decide correction-data strategy | Evidence says whether existing focused windows are insufficient after training/action checks | Record new correction episodes only if audit says existing data is not enough |
 
 ## 5. Current Highest Priority
 
 Current highest priority:
 
 ```text
-Run offline 012000 checkpoint comparison on successful focus-window frames.
+Run the full GPU offline 012000 audit across all successful focus-window phases, with 003000 baseline if available.
 ```
 
 Why:
@@ -202,17 +223,20 @@ The 012000 checkpoint has now been tested twice on the real arm.
 Both official 3-camera traces show reach/near-contact but no pick/lift.
 Trace 230756 shows no strong close near the orange.
 Trace 233341 shows strong close early, then open gripper near the orange.
-The focused training windows contain many successful close/lift examples, so the next question is whether 012000 predicts those examples correctly offline.
+The focused training windows contain many successful close/lift examples.
+The 2026-07-25 sampled CPU probe tested six successful close/hold frames and 012000 predicted no near-close action in the next 10 actions for any of them.
+The next question is whether this failure holds across all 40 focus windows and whether 003000 behaves differently.
 ```
 
 Acceptance criteria:
 
 ```text
-RunPod endpoint is accessible.
+RunPod or equivalent GPU endpoint is accessible.
 012000 checkpoint path is accessible.
-Offline comparison CSV/summary is saved.
-Comparison covers selected successful focus frames around center-close-lift.
-Result says whether 012000 reproduces the training close/lift actions or not.
+003000 baseline checkpoint path is accessible if possible.
+Full offline audit CSV/summary is saved.
+Comparison covers before-close, centered-close, held-close, lift-begin, and move-begin frames.
+Result says whether 012000 reproduces the recorded close/hold/lift actions across the full focus set.
 ```
 
 ## 6. Current Known Commands And Paths
@@ -328,6 +352,8 @@ Use this section to record important evidence files after each run.
 | 2026-07-21 | pi05_orange49_plus_grasp_focus_expert_20260721 | `/workspace/logs/pi05_orange49_plus_grasp_focus_expert_20260721.log`; `/workspace/outputs/pi05_orange49_plus_grasp_focus_expert/checkpoints/003000/pretrained_model` | Option A fine-tune completed from checkpoint 005000 and wrote a usable Pi05 checkpoint | 3000/3000 steps, final loss about 0.053, `model.safetensors` 8.8 GB, checkpoint directory 11 GB |
 | 2026-07-22 | pi05_orange49_focus_bs4_from003000_012000_20260721_193801 | `/workspace/logs/pi05_orange49_focus_bs4_from003000_012000_20260721_193801.log`; partial `/workspace/outputs/pi05_orange49_plus_grasp_focus_bs4_from003000_012000/checkpoints/006000` | Batch_size=4 training ran successfully to step 6000, but checkpoint save failed because of disk quota | `006000` is incomplete: only `config.json`, no `model.safetensors`, no `train_config.json`, no `training_state`; do not use |
 | 2026-07-22 | runpod_checkpoint_cleanup_20260722 | RunPod `/workspace/outputs/pi05_base_to_orange49_expert/checkpoints` | Deleted old base checkpoints `001000`-`004000` after user approval; kept complete `005000` base and complete focused `003000` | Workspace usage dropped from about 91 GB to about 48 GB |
+| 2026-07-23 | pi05_012000_trace_vs_training_analysis_20260723 | `docs/pi05_012000_trace_vs_training_analysis_20260723.md`; `artifacts/trace_vs_training_analysis_20260723/`; traces `official_async_3cam_012000_trace_20260722_230756` and `official_async_3cam_012000_trace_20260722_233341` | 012000 reached/contacted the orange but did not produce reliable center-close-hold-lift behavior | Trace 230756 had 0 strong-close actions; trace 233341 had early strong close, then open near the orange |
+| 2026-07-25 | offline_compare_012000_focus_20260725_cpu_probe | `docs/pi05_012000_cpu_probe_close_frames_20260725.md`; `artifacts/offline_compare_012000_focus_20260725_cpu_probe/summary.json`; `artifacts/offline_compare_012000_focus_20260725_cpu_probe/012000_cpu_probe_close_frames.csv` | On six successful focus-window close/hold frames, recorded first gripper averaged 21.80 but 012000 predicted first gripper averaged 40.35 and predicted 0 near-close chunks | Sampled CPU-only probe; next step is full GPU audit across all 40 focus windows and 003000 baseline if available |
 
 Add every serious run here.
 
@@ -773,8 +799,49 @@ The next question is whether 012000 can imitate successful close/lift frames off
 Follow-up:
 
 ```text
-Run T16 offline comparison when RunPod/checkpoint endpoint is accessible.
-Then decide whether to run T19 start-state-controlled official evaluation.
+Completed a sampled local CPU offline probe on 2026-07-25.
+Next run the full GPU offline audit across all focused windows and 003000 baseline if available.
+Then decide whether to fix training/action handling or run T21 start-state-controlled official evaluation.
+```
+
+### 2026-07-25 Sampled 012000 Offline CPU Probe
+
+Decision:
+
+```text
+Treat 012000 as not yet ready for another ordinary real-arm test.
+Run a full GPU offline audit before changing training or repeating the robot run.
+```
+
+Evidence:
+
+```text
+Analysis report:
+  docs/pi05_012000_cpu_probe_close_frames_20260725.md
+
+Generated artifacts:
+  projects/testproject/artifacts/offline_compare_012000_focus_20260725_cpu_probe/
+
+Probe result:
+  selected successful close/hold frames: 6
+  recorded first gripper mean: 21.80
+  predicted first gripper mean: 40.35
+  predicted strong-close frames in next 10 actions: 0/6
+  predicted near-close frames in next 10 actions: 0/6
+```
+
+Reason:
+
+```text
+The probe showed known-good demonstration frames where the recorded action says close/hold, but 012000 predicted open-ish actions.
+This supports a model/training/action-learning issue more than a pure live camera or LeRobot execution issue.
+```
+
+Follow-up:
+
+```text
+Run full offline audit on all 40 focused windows with 003000 baseline if available.
+If confirmed, inspect training depth, action normalization, gripper-dimension learning, frame/action timing, and focused-window weighting before any more ordinary physical tests.
 ```
 
 ### 2026-07-21 RunPod Upload Blocked By Stale Endpoint
@@ -969,15 +1036,13 @@ ESP32 serial camera workaround
 Next concrete action:
 
 ```text
-Restart the staged batch_size=4 fine-tune from the complete focused 003000 checkpoint into:
-
-/workspace/outputs/pi05_orange49_plus_grasp_focus_bs4_from003000_restart_012000
+Run the full GPU offline 012000 audit across all 40 successful focus windows.
 ```
 
 After that:
 
 ```text
-Verify a complete checkpoint exists.
-Run offline comparison against the old focused 003000 checkpoint.
-Only if offline comparison improves, evaluate the staged checkpoint on the real arm through official LeRobot async with three cameras and read-only trace.
+Compare against the old focused 003000 checkpoint if available.
+If 012000 still predicts open on recorded close/hold/lift frames, fix training/action handling before more ordinary real-arm tests.
+Only if offline close/hold/lift improves, evaluate the staged checkpoint on the real arm through official LeRobot async with three cameras and read-only trace.
 ```

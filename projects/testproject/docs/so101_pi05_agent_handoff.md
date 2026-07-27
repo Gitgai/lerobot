@@ -1,6 +1,6 @@
 # SO-101 Pi05 Agent Handoff
 
-Last updated: 2026-07-23
+Last updated: 2026-07-25
 
 This document is the fast handoff for the next agent. It summarizes the
 current SO-101 Pi05 orange-pick project state, the evidence we have, the rules
@@ -461,7 +461,7 @@ That is why the next question is not "do we have any grasp frames?" We do.
 The next question is:
 
 ```text
-Does checkpoint 012000 reproduce the correct action when shown those successful frames?
+Does checkpoint 012000 reproduce the correct action when shown those successful frames across the full focused set?
 ```
 
 ## 12. Current Highest Priority
@@ -471,13 +471,13 @@ Do not repeat another ordinary physical 012000 run yet.
 Next priority:
 
 ```text
-Run offline 012000 checkpoint comparison on successful focus-window frames.
+Run the full GPU offline 012000 audit on all successful focus-window phases, with 003000 baseline if available.
 ```
 
 Purpose:
 
 ```text
-If 012000 fails on known-good training/focus frames, the issue is model/training.
+If 012000 fails on known-good training/focus frames, the issue is model/training/action handling.
 If 012000 succeeds on known-good training/focus frames, the live failure is more likely deployment mismatch:
   start gripper state
   camera geometry
@@ -485,10 +485,29 @@ If 012000 succeeds on known-good training/focus frames, the live failure is more
   timing/latency
 ```
 
+Current sampled offline evidence from 2026-07-25:
+
+```text
+selected successful close/hold focus frames: 6
+recorded first gripper mean: 21.80
+012000 predicted first gripper mean: 40.35
+predicted strong close in next 10 actions: 0/6
+predicted near close in next 10 actions: 0/6
+```
+
+Plain meaning:
+
+```text
+The sampled frames say close/hold.
+012000 predicted open-ish actions.
+So the next step is a full offline audit, not another ordinary robot run.
+```
+
 Detailed plan:
 
 ```text
 projects/testproject/docs/pi05_012000_offline_comparison_plan.md
+projects/testproject/docs/pi05_012000_cpu_probe_close_frames_20260725.md
 ```
 
 Expected output folder:
@@ -523,10 +542,10 @@ ssh -i ~/.ssh/runpod_ed25519 -p <PORT> root@<RUNPOD_IP> \
   'ls -lh /workspace/outputs/pi05_orange49_plus_grasp_focus_bs4_from003000_restart_012000/checkpoints/012000/pretrained_model'
 ```
 
-Step 4: run the offline comparison from the plan.
+Step 4: run the full offline audit from the plan.
 
 ```text
-Compare 003000 vs 012000 on selected successful focus-window frames.
+Compare 003000 vs 012000 on all successful focus-window phases if both checkpoints are available.
 Save predictions, comparison CSV, failure examples, and notes under artifacts/.
 ```
 
@@ -543,7 +562,7 @@ Step 5: decide from evidence.
 ```text
 Case A: 012000 misses close/lift on training frames
   -> do not run real arm again yet
-  -> inspect training depth, gripper/action normalization, frame timing, and dataset balance
+  -> inspect training depth, gripper/action normalization, gripper-dimension loss, frame timing, focused-window weighting, and dataset balance
 
 Case B: 012000 predicts close/lift correctly on training frames
   -> next physical test should control start state and camera geometry
@@ -557,8 +576,8 @@ Case C: offline results are mixed
 
 ## 14. Next Physical Run Gate
 
-Only run another real-arm evaluation after the offline comparison or explicit
-user approval.
+Only run another real-arm evaluation after the full offline audit/checkpoint fix
+or explicit user approval for a diagnostic run despite offline failure.
 
 Before the next physical 012000 run:
 
@@ -626,7 +645,8 @@ Both runs reached/contacted the orange but did not pick/lift it.
 One run did not close strongly near the orange.
 One run closed strongly too early, then opened near the orange.
 Training data contains many verified close/lift examples.
-The next evidence step is offline 012000-vs-training-frame comparison.
+The sampled CPU offline probe showed 012000 did not reproduce close/hold on six known-good frames.
+The next evidence step is the full GPU offline audit across all focus windows.
 ```
 
 The next agent should start there.
