@@ -11,6 +11,18 @@ Last updated: 2026-07-28
 > is LIVE DEPLOYMENT MISMATCH.
 > Read: `pi05_012000_pod_evidence_correction_20260728.md`
 > Active plan: `pi05_live_mismatch_investigation_plan_20260728.md`
+>
+> **2026-07-28 LATER: FIRST SUCCESSFUL GRASP.** With the fix set applied
+> (chunk_size_threshold 0.85, open start gripper, corrected camera devices),
+> 012000 reached, grasped, held, lifted and carried the orange on the real
+> arm - 395 strong-close actions executed vs 0 in the failed runs. Place/
+> release not yet achieved; client-side stutter remains the top open issue.
+> Read: `pi05_012000_first_successful_grasp_20260728.md`
+>
+> **NEXT SESSION PLAN:** smoothness fixes (JPEG observations + decoupled
+> observation thread) are implemented and offline-verified; the pod server
+> needs a one-command patch, then a 30 s smoke run gates the full attempt.
+> Execute: `pi05_smooth_run_session_plan_20260728.md`
 > The "Current Objective" below reflects the pre-correction state and is
 > superseded by the docs above.
 

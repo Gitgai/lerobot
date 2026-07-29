@@ -28,6 +28,9 @@ def main() -> None:
     p.add_argument("--actions-per-chunk", type=int, default=50)
     p.add_argument("--chunk-size-threshold", type=float, default=0.6, help="->1 = more feedback/closed-loop")
     p.add_argument("--aggregate-fn", default="weighted_average")
+    p.add_argument("--policy-type", default="act", help="policy type on the server (act, pi05, ...)")
+    p.add_argument("--trace-dir", default=None, help="optional read-only trace output directory")
+    p.add_argument("--jpeg-quality", type=int, default=None, help="JPEG-compress observation images (e.g. 92)")
     p.add_argument("--print-only", action="store_true")
     args = p.parse_args()
 
@@ -40,7 +43,7 @@ def main() -> None:
         f"--robot.max_relative_target={args.max_relative_target}",
         f"--robot.cameras={cameras_arg(cfg, args.fps)}",
         f"--task={args.task}",
-        "--policy_type=act",
+        f"--policy_type={args.policy_type}",
         f"--pretrained_name_or_path={args.ckpt}",
         "--policy_device=cuda",
         "--client_device=cpu",
@@ -50,7 +53,11 @@ def main() -> None:
         f"--fps={args.fps}",
         "--debug_visualize_queue_size=False",
     ]
-    print("Async client -> server", args.server, "| closed-loop ACT")
+    if args.trace_dir:
+        argv.append(f"--trace_dir={args.trace_dir}")
+    if args.jpeg_quality is not None:
+        argv.append(f"--jpeg_quality={args.jpeg_quality}")
+    print("Async client -> server", args.server, f"| closed-loop {args.policy_type}")
     print(" \\\n  ".join(argv[1:]))
     if args.print_only:
         return

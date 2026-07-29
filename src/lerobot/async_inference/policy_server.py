@@ -49,6 +49,7 @@ from lerobot.types import PolicyAction
 
 from .configs import PolicyServerConfig
 from .constants import SUPPORTED_POLICIES
+from .image_codec import decompress_observation_images
 from .helpers import (
     FPSTracker,
     Observation,
@@ -181,6 +182,8 @@ class PolicyServer(services_pb2_grpc.AsyncInferenceServicer):
             request_iterator, None, self.shutdown_event, self.logger
         )  # blocking call while looping over request_iterator
         timed_observation = pickle.loads(received_bytes)  # nosec
+        # Decode any JPEG-compressed image entries produced by the client's image_codec
+        decompress_observation_images(timed_observation.observation)
         deserialize_time = time.perf_counter() - start_deserialize
 
         self.logger.debug(f"Received observation #{timed_observation.get_timestep()}")

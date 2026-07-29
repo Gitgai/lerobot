@@ -22,8 +22,10 @@ Project folder:
 Read these docs, in this order:
 
 ```text
-projects/testproject/docs/pi05_012000_pod_evidence_correction_20260728.md      (READ FIRST - retracts the local-probe collapse conclusion; 012000 DID learn)
-projects/testproject/docs/pi05_live_mismatch_investigation_plan_20260728.md    (ACTIVE PLAN - trace replay + input comparison; section 4 below is superseded by it)
+projects/testproject/docs/pi05_smooth_run_session_plan_20260728.md             (CURRENT EXECUTABLE PLAN - next robot session: pod patch, smoke run, full attempt)
+projects/testproject/docs/pi05_012000_first_successful_grasp_20260728.md       (FIRST SUCCESSFUL GRASP 2026-07-28 + stutter root cause and fixes)
+projects/testproject/docs/pi05_012000_pod_evidence_correction_20260728.md      (retracts the local-probe collapse conclusion; 012000 DID learn)
+projects/testproject/docs/pi05_live_mismatch_investigation_plan_20260728.md    (completed investigation - trace replay + input comparison; section 4 below is superseded)
 projects/testproject/docs/pi05_training_investigation_retrain_plan_20260727.md (ON HOLD - see correction doc)
 projects/testproject/docs/pi05_012000_saved_pipeline_probe_20260726.md         (RETRACTED probe - kept for harness forensics)
 projects/testproject/docs/claude_handoff_pi05_20260725.md        (previous agent handoff, most detail)

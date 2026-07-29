@@ -157,6 +157,20 @@ class RobotClientConfig:
         },
     )
 
+    # JPEG-compress observation images before sending (None = raw arrays, unchanged
+    # wire behavior). Requires a policy_server that decodes image_codec markers.
+    jpeg_quality: int | None = field(
+        default=None,
+        metadata={"help": "JPEG quality (1-100) for observation images sent to the server; None sends raw"},
+    )
+
+    # Minimum seconds between observation sends. Prevents the decoupled observation
+    # thread from flooding the server with redundant inferences.
+    obs_min_interval_s: float = field(
+        default=0.3,
+        metadata={"help": "Minimum interval between observations sent to the server"},
+    )
+
     @property
     def environment_dt(self) -> float:
         """Environment time step, in seconds"""

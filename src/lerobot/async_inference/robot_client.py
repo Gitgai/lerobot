@@ -66,6 +66,7 @@ from lerobot.transport.utils import grpc_channel_options, send_bytes_in_chunks
 from lerobot.utils.import_utils import register_third_party_plugins
 
 from .configs import RobotClientConfig
+from .image_codec import compress_observation_images
 from .helpers import (
     Action,
     FPSTracker,
@@ -129,7 +130,12 @@ class RobotClient:
         self.action_queue = Queue()
         self.action_queue_lock = threading.Lock()  # Protect queue operations
         self.action_queue_size = []
-        self.start_barrier = threading.Barrier(2)  # 2 threads: action receiver, control loop
+        # 3 threads: action receiver, action loop, observation loop
+        self.start_barrier = threading.Barrier(3)
+        # Serialize robot bus access between the action loop (send_action) and the
+        # observation loop (get_observation) - the motor bus is not thread-safe.
+        self.robot_lock = threading.Lock()
+        self._last_obs_sent_at = 0.0
 
         # FPS measurement
         self.fps_tracker = FPSTracker(target_fps=self.config.fps)
@@ -414,7 +420,8 @@ class RobotClient:
         get_end = time.perf_counter() - get_start
 
         requested_action = self._action_tensor_to_action_dict(timed_action.get_action())
-        _performed_action = self.robot.send_action(requested_action)
+        with self.robot_lock:
+            _performed_action = self.robot.send_action(requested_action)
         with self.latest_action_lock:
             self.latest_action = timed_action.get_timestep()
 
@@ -447,6 +454,8 @@ class RobotClient:
 
     def _ready_to_send_observation(self):
         """Flags when the client is ready to send an observation"""
+        if time.perf_counter() - self._last_obs_sent_at < self.config.obs_min_interval_s:
+            return False
         with self.action_queue_lock:
             return self.action_queue.qsize() / self.action_chunk_size <= self._chunk_size_threshold
 
@@ -455,7 +464,8 @@ class RobotClient:
             # Get serialized observation bytes from the function
             start_time = time.perf_counter()
 
-            raw_observation: RawObservation = self.robot.get_observation()
+            with self.robot_lock:
+                raw_observation: RawObservation = self.robot.get_observation()
             raw_observation["task"] = task
 
             with self.latest_action_lock:
@@ -481,6 +491,11 @@ class RobotClient:
                     queue_size=current_queue_size,
                 )
 
+            # Compress AFTER trace recording so the trace keeps full frames.
+            if self.config.jpeg_quality is not None:
+                compress_observation_images(observation.observation, self.config.jpeg_quality)
+
+            self._last_obs_sent_at = time.perf_counter()
             _ = self.send_observation(observation)
 
             self.logger.debug(f"QUEUE SIZE: {current_queue_size} (Must go: {observation.must_go})")
@@ -508,29 +523,39 @@ class RobotClient:
             self.logger.error(f"Error in observation sender: {e}")
 
     def control_loop(self, task: str, verbose: bool = False) -> tuple[Observation, Action]:
-        """Combined function for executing actions and streaming observations"""
+        """Action-execution loop. Runs at fps; never blocks on network or cameras.
+
+        Observation capture/upload runs in observation_loop on its own thread so a
+        slow link cannot stall actuation (a 2.8 MB raw upload used to freeze the
+        arm ~1.5-2 s per observation).
+        """
         # Wait at barrier for synchronized start
         self.start_barrier.wait()
         self.logger.info("Control loop thread starting")
 
         _performed_action = None
-        _captured_observation = None
 
         while self.running:
             control_loop_start = time.perf_counter()
-            """Control loop: (1) Performing actions, when available"""
             if self.actions_available():
                 _performed_action = self.control_loop_action(verbose)
-
-            """Control loop: (2) Streaming observations to the remote policy server"""
-            if self._ready_to_send_observation():
-                _captured_observation = self.control_loop_observation(task, verbose)
 
             self.logger.debug(f"Control loop (ms): {(time.perf_counter() - control_loop_start) * 1000:.2f}")
             # Dynamically adjust sleep time to maintain the desired control frequency
             time.sleep(max(0, self.config.environment_dt - (time.perf_counter() - control_loop_start)))
 
-        return _captured_observation, _performed_action
+        return None, _performed_action
+
+    def observation_loop(self, task: str, verbose: bool = False) -> None:
+        """Observation capture/upload loop, decoupled from actuation."""
+        self.start_barrier.wait()
+        self.logger.info("Observation loop thread starting")
+
+        while self.running:
+            loop_start = time.perf_counter()
+            if self._ready_to_send_observation():
+                self.control_loop_observation(task, verbose)
+            time.sleep(max(0, self.config.environment_dt - (time.perf_counter() - loop_start)))
 
 
 @draccus.wrap()
@@ -552,8 +577,12 @@ def async_client(cfg: RobotClientConfig):
         # Start action receiver thread
         action_receiver_thread.start()
 
+        # Observation capture/upload runs decoupled from actuation
+        observation_thread = threading.Thread(target=client.observation_loop, args=(cfg.task,), daemon=True)
+        observation_thread.start()
+
         try:
-            # The main thread runs the control loop
+            # The main thread runs the action loop
             client.control_loop(task=cfg.task)
 
         finally:
