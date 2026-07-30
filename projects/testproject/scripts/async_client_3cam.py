@@ -31,6 +31,7 @@ def main() -> None:
     p.add_argument("--policy-type", default="act", help="policy type on the server (act, pi05, ...)")
     p.add_argument("--trace-dir", default=None, help="optional read-only trace output directory")
     p.add_argument("--jpeg-quality", type=int, default=None, help="JPEG-compress observation images (e.g. 92)")
+    p.add_argument("--obs-min-interval", type=float, default=None, help="min seconds between observation sends")
     p.add_argument("--print-only", action="store_true")
     args = p.parse_args()
 
@@ -57,6 +58,8 @@ def main() -> None:
         argv.append(f"--trace_dir={args.trace_dir}")
     if args.jpeg_quality is not None:
         argv.append(f"--jpeg_quality={args.jpeg_quality}")
+    if args.obs_min_interval is not None:
+        argv.append(f"--obs_min_interval_s={args.obs_min_interval}")
     print("Async client -> server", args.server, f"| closed-loop {args.policy_type}")
     print(" \\\n  ".join(argv[1:]))
     if args.print_only:

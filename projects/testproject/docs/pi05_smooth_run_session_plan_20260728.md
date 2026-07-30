@@ -146,6 +146,68 @@ grasp now fails (regression vs yesterday):
      threading), and fall back one fix at a time.
 ```
 
+## 7b. SESSION RESULTS (2026-07-29)
+
+Smoke run: PASS decisively.
+
+```text
+action-gap p95 33 ms (was ~2400) | 23.3 Hz (was 2.2) | latency 974 ms (was 1839)
+trace: smoke_smooth_20260729_000607
+```
+
+Full attempts: NO grasp secured this session. Root causes found, in order of
+discovery (each with trace evidence):
+
+```text
+1. Smoke run object was an ONION, not the orange (user confirmed) - model
+   approached but missed: partial generalization to unseen objects noted.
+2. Orange placement off-distribution (nestled against the arm bracket) in the
+   first full attempt: 18 misses. placement_comparison.png.
+3. CHUNK-CYCLING failure mode discovered: at obs cadence 0.3-0.4 s, fresh
+   chunks interrupt closes in progress; grip-and-release loops. Calmed by
+   obs_min_interval 0.8-1.5 s (our client's knob, not a lerobot default).
+4. TOP CAMERA HAD PHYSICALLY MOVED since the successful run (closer/lower) -
+   biased spatial reading, systematic too-high/lateral misses in every
+   attempt. Confirmed by user's phone videos (fingers at orange crown, not
+   equator). Fixed by re-aiming to match reference; verified.
+   -> NEW STANDING GATE: before every session, capture the top camera and
+   visually match it against the successful run's first frame
+   (official_async_3cam_012000_fixed_20260728_021800/images/top first jpg).
+5. SPEED: arm runs ~2x demo speed with occasional 70-114 unit single-step
+   snaps (training max 6.5). Mechanism confirmed in official code: actions
+   whose timestep expired in transit are discarded on arrival
+   (robot_client aggregation), so ~60% of every chunk is skipped at ~1 s
+   latency and the arm fast-forwards. This IS lerobot-default behavior under
+   high latency; max_relative_target=None (uncapped) is the official
+   follower default. User chose to keep pure defaults.
+```
+
+Final attempt (fixed camera, clean scene, defaults): the closest miss of the
+day - contact, strong close, partial lift, orange slipped out; then retry
+loop. Trace: final_attempt_* of 2026-07-29.
+
+Session verdict:
+
+```text
+The smoothness fixes work and are permanent wins. Live grasping with this
+checkpoint is highly sensitive to (a) exact top-camera pose, (b) object
+placement, (c) execution speed vs demo speed. Success rate with 012000
+across all live attempts so far: 1 grasp+carry (2026-07-28) in ~7 tries.
+```
+
+Recommended next steps, in order:
+
+```text
+1. Camera-reference gate before every run (now standing).
+2. Attack the speed/latency properly WITHIN official designs: investigate
+   lerobot's RTC (real-time chunking, rtc_config in PI05Config) - built
+   exactly for high-latency serving; or find a lower-latency GPU (nearer
+   region / local).
+3. If grasp reliability stays poor after speed is fixed: record 15-25 fresh
+   demos (grasp emphasis + place emphasis + slight camera-pose variation for
+   robustness) and fine-tune from 012000.
+```
+
 ## 8. Standing Rules (unchanged)
 
 ```text
