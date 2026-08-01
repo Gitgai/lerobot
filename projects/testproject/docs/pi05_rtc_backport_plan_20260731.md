@@ -2,6 +2,19 @@
 
 Last updated: 2026-07-31
 
+> **PHASE 1 COMPLETE - AND SIMPLER THAN PLANNED.** Verified against upstream
+> GitHub at e40b58a8: the training-era code ALREADY CONTAINS the full RTC
+> module and Pi05 integration (my earlier "pod lacks RTC" check was a bad
+> git probe - the commit didn't exist locally, so cat-file failed for the
+> wrong reason). No modeling backport needed. The only missing piece in ANY
+> version is the async-server adapter, now built and validated offline:
+>   scripts/runpod/apply_rtc_server_adapter.sh  (idempotent, .rtc.bak,
+>     env-gated: RTC_ENABLE=1, RTC_EXEC_HORIZON, RTC_DELAY_MARGIN_S;
+>     applied to a local copy of the real old file: compiles, idempotent)
+>   scripts/runpod/rtc_gates_test.py            (Gates A/B/C runner)
+> Next session: pod up -> apply adapter -> run gates (~10 GPU min) ->
+> if all green, live test per section 4. Top up ~$5 first.
+
 ## 0. Why This Plan Exists (evidence)
 
 ```text

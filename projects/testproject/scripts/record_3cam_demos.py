@@ -66,7 +66,7 @@ def cameras_arg(cfg: dict, fps: int) -> str:
     # contain ':' or '/' so they are read as plain scalars.
     return (
         "{ "
-        f'front: {{type: opencv, index_or_path: "{front_index}", width: {w}, height: {h}, fps: {fps}}}, '
+        f'front: {{type: opencv, index_or_path: "{front_index}", fourcc: MJPG, width: {w}, height: {h}, fps: {fps}}}, '
         f'top: {{type: opencv, index_or_path: "{top_index}", fourcc: {top_fourcc}, warmup_s: {top_warmup}, width: {w}, height: {h}, fps: {fps}}}, '
         f'wrist: {{type: http, url: "{wrist_url}", width: {w}, height: {h}, fps: {fps}}} '
         "}"

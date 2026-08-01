@@ -24,7 +24,15 @@ Last updated: 2026-07-28
 > needs a one-command patch, then a 30 s smoke run gates the full attempt.
 > Execute: `pi05_smooth_run_session_plan_20260728.md`
 >
-> **2026-07-31 CURRENT PLAN: RTC backport.** The 07-29 session proved smooth
+> **2026-08-01 MILESTONE: FIRST GRASP+LIFT+CARRY UNDER RTC.** The backported
+> RTC server (execution_horizon=35) produced a textbook grasp that SURVIVED
+> into lift and carry - the transition that failed all week - with the best
+> motion metrics ever (p95 step 4.60 vs demos 3.25). Orange slipped mid-carry
+> as the grip command eased; that easing is the last open problem before full
+> task completion. Read: `pi05_rtc_first_live_sessions_20260801.md`
+> Next: 3-5 reliability runs + carry-phase gripper analysis.
+>
+> **2026-07-31 PRIOR PLAN: RTC backport.** The 07-29 session proved smooth
 > execution but exposed ~2x fast-forward + 70-114 unit plan-switch jumps
 > (latency eats 60% of each chunk; confirmed lerobot-default behavior). The
 > 07-30 trust exam PROVED the newer lerobot code cannot serve this checkpoint
