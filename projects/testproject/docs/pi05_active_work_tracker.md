@@ -24,6 +24,13 @@ Last updated: 2026-07-28
 > needs a one-command patch, then a 30 s smoke run gates the full attempt.
 > Execute: `pi05_smooth_run_session_plan_20260728.md`
 >
+> **2026-08-02 CURRENT PLAN: GENERALIZATION ROADMAP.** Five-run count done
+> (grips 4/5, lifts 4/5, carries 2/5, places 0/5 on the small fruit; edge-grip
+> mechanism user-confirmed on video). New goal: size/type-independent
+> manipulation. Stages: big-orange diagnostic -> zero-shot probes (onion,
+> tomato, push) -> multi-object data round -> generalist fine-tune on new
+> code -> per-object counts. Execute: `pi05_generalization_roadmap_20260802.md`
+>
 > **2026-08-01 MILESTONE: FIRST GRASP+LIFT+CARRY UNDER RTC.** The backported
 > RTC server (execution_horizon=35) produced a textbook grasp that SURVIVED
 > into lift and carry - the transition that failed all week - with the best

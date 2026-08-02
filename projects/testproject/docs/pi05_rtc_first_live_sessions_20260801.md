@@ -100,6 +100,60 @@ Action: terminate this pod chain; deploy fresh from the volume page (new
 host lottery) before the real five-run count.
 ```
 
+## 4d. THE FIVE-RUN RELIABILITY COUNT (2026-08-01, completed)
+
+Setup: h35 recipe frozen, SMALL orange (user's choice - deliberately harder
+than the demo-sized fruit), fresh pod (healthy: latency 1.3-1.7 s median),
+scene reset between runs, ~2500-action cutoff per run.
+
+```text
+RUN  GRIP  LIFT  SUSTAINED CARRY           PLACE  notes
+1    yes   yes   yes (w23 to -45; regripped w32 at -47; 37 airborne obs)  no
+2    yes   yes   yes (w22-23 to -85/-94, highest ever; dropped at altitude) no
+3    yes   yes(brief) no (clean w32 grip disrupted by a 3 s latency spike)  no
+4    yes   yes   brief (to -32, slipped in the climb)                       no
+5    no    no    no  (misses + wandering; "altitude w32" readings proven
+                     empty-finger command-following via cmd-vs-state check)  no
+
+SCORE: grips 4/5 | lifts 4/5 | sustained carries 2/5 | places 0/5
+```
+
+Reading of the number:
+
+```text
+- Grasp acquisition on an off-distribution (smaller) fruit: 80%. Solid.
+- The failure funnel is entirely in CARRY-RETENTION: every carry ended in a
+  mid-air slip, consistent with the fruit-size force-margin analysis (4b).
+  No slip occurred at demo width; the fruit never held at >=31 for long.
+- Place: never reached, because no carry survived long enough. The run-2
+  descent-while-holding (from -85 to -20 with grip intact) shows the place
+  BEHAVIOR exists in the policy - it began a controlled descent before the
+  slip. The blocker is retention, not intent.
+- Infra: fresh pod stayed healthy (1.3-1.7 s median); one 3 s spike cost
+  run 3 its best grip. Latency remains a meaningful tax at every step.
+```
+
+USER OBSERVATION (confirmed from video IMG_9357.MOV, frames t=37-91):
+the slips are EDGE GRIPS - the fingers catch the fruit's upper edge at the
+fingertips instead of wrapping the equator, because the approach depth was
+learned on a taller demo fruit; on the smaller, flatter orange that height
+lands the tips at the edge. Chain: small/flat fruit -> learned approach
+height -> tip-pinch on the edge -> tiny contact area -> slips under motion.
+This unifies the size theory (4b) with the observed geometry: a demo-sized
+fruit fills the hand at the learned height (equator wrap + full pressure).
+
+What the count decides (per the plan's decision tree):
+
+```text
+The bottleneck is physical grip retention on a small fruit + latency tax -
+NOT grasp ability. Highest-leverage next steps, in order:
+1. Repeat-run WITH a demo-sized orange (predictor says carries then hold) -
+   one session, settles whether size alone closes the gap to place.
+2. Latency reduction (bf16 serving next, offline-validated first).
+3. If place still absent with the right fruit: place/carry-emphasis demos +
+   multi-size fruits -> fine-tune on new code (native RTC).
+```
+
 ## 5. Next Session Plan
 
 ```text
