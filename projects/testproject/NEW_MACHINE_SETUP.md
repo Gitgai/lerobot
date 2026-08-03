@@ -87,7 +87,29 @@ Small, essential, no substitutes - about 8 KB of calibration plus one SSH key.
        cp /media/$USER/<STICK>/runpod_ed25519 ~/.ssh/ && chmod 600 ~/.ssh/runpod_ed25519
 ```
 
-Network method (only after the SSH server is running on the old laptop):
+**Best network method - PUSH from the old laptop to the new machine.** This
+needs an SSH server on the NEW machine (fresh Ubuntu often lacks it:
+`sudo apt install -y openssh-server`), and avoids starting one on the old
+laptop. One command, one password prompt, moves everything:
+
+```bash
+NEW=<user>@<new-machine-ip>        # e.g. prakash@192.168.194.158
+# verify reachable first:
+IP=${NEW#*@}
+ping -c2 -W3 "$IP" && timeout 5 bash -c "echo > /dev/tcp/$IP/22" && echo SSH_OK
+
+tar -cz -C ~ .cache/huggingface/lerobot/calibration .ssh/runpod_ed25519 \
+  | ssh $NEW 'tar -xz -C ~ && chmod 600 ~/.ssh/runpod_ed25519 && echo COPIED'
+```
+
+Verify ON THE NEW MACHINE - both files must exist:
+
+```bash
+ls ~/.cache/huggingface/lerobot/calibration/robots/so_follower/my_so101_follower.json \
+   ~/.cache/huggingface/lerobot/calibration/teleoperators/so_leader/my_so101_leader.json
+```
+
+Pull method (only after the SSH server is running on the old laptop):
 
 ```bash
 OLD=gaikwad-prakash@192.168.1.14        # CONFIRM with `hostname -I` first
