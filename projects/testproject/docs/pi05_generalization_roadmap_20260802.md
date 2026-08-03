@@ -93,6 +93,51 @@ TAUGHT (P6 confirms it will not emerge on its own); (c) object variety
 mostly works already - fewer episodes needed per object than feared.
 ```
 
+## Stage 1 ADDENDUM (2026-08-02 evening + 08-03 code investigation)
+
+```text
+ONION -> PLATE, two runs, both FAILED - and the failure is informative.
+Run 1 (healthy: 1.73 obs/s, 20.9 act/s): 3 stalled squeezes vs 145 EMPTY over
+10 minutes. Zero real holds. Same onion, same checkpoint, same recipe that
+carried it 40 s that MORNING. The variable was the SCENE: plate added to the
+view, onion at an unpracticed spot. -> POSITION/SCENE generalization is a
+verified failure mode, now co-top Stage 2 priority alongside approach height.
+Run 2: starved (0.39 obs/s = one image every 2.6 s, tunnel dying) - discarded
+as infrastructure. An external video analysis (codex) independently read the
+same runs as "reach and press, never a real grasp"; the traces confirmed it.
+Because no pick completed, the PLATE/GOAL question got NO new evidence - the
+"goal-conditioning not observed" finding still rests on the midday P6 runs.
+
+NEW TOOL: scripts/analyze_grasp_from_trace.py - the finger-stall test (fingers
+cannot pass through an object: commanded squeeze + measured width STALLS =
+real grasp; measured FOLLOWS the command down = closed on air). It corrected
+two verbal claims, including an assistant's own "carries happened" read.
+Also gates on obs rate: below 0.8 obs/s a run is BLIND, discard behaviorally.
+Use it to score every Stage 4 run instead of eyeballing video.
+
+ARCHITECTURE FINDING (full detail in agent_handoff_pi05_20260803.md Section 6):
+Physical Intelligence released only pi05's LOW-LEVEL half - openpi states
+"we currently only support the flow matching head". The high-level brain that
+decodes subtask TEXT ("pick up the pillow") before acting was never released,
+so lerobot could not port it. Our compound instruction goes straight to the
+motor expert. Verified by code reading (incl. the training-era commit the pod
+runs) that the task string is re-read and re-tokenized on EVERY inference with
+no caching -> we can switch it mid-episode from the laptop with zero pod
+changes. Hence the new first experiment:
+
+  SUBTASK-SWITCHING PROBE (do before Stage 2 recording, ~15 min):
+  start "pick up the onion"; when the live stall test says it is held, switch
+  to "put the onion on the plate". Onion at its PRACTICED spot, plate
+  elsewhere (isolate the goal question). Either outcome sharpens Stage 2 -
+  and if switching helps, subtask-style strings become standard in how we run
+  AND how we record.
+
+Also found: use_relative_actions (OpenPI DeltaActions) exists in the port and
+is OFF by default; we trained ABSOLUTE joint targets, which encode the
+practiced table position - precisely the failure above. Training-time only ->
+Stage 3 decision below.
+```
+
 ## Stage 2 - The Generalist Data Round (recording, ~2-3 h teleop)
 
 ```text
@@ -100,6 +145,15 @@ mostly works already - fewer episodes needed per object than feared.
   objects: small orange, big orange, ONION, TOMATO (gentle-grip exemplars!),
            BANANA (elongated - teaches grip orientation/alignment),
            a ball or block - 4-6 objects across sizes/shapes/colors
+  POSITIONS: vary object AND plate positions widely across the table (added
+           2026-08-02 evening: the specialist fails at unpracticed spots).
+           Vary scene too - background, lighting, small camera nudges. PI's
+           own ablation ranks ENVIRONMENT diversity as the single biggest
+           driver of out-of-distribution success.
+  TASK STRINGS AT TWO LEVELS: some episodes compound ("pick up the onion and
+           put it on the plate"), some single-subtask ("pick up the onion" /
+           "put the onion on the plate"). This is how PI built the hierarchy
+           and it makes subtask switching trainable rather than a hack.
   every episode driven to full completion: grasp -> lift -> carry -> PLACE
   PLACE TARGET = THE PLATE (user's idea, adopted): every episode ends with
   the object set down ON the plate; task strings become
@@ -120,9 +174,17 @@ pick-and-place.
 ```text
 Train on the NEW lerobot code (code-pairing rule; native RTC - adapter
 retires). Enable the banked features: image_transforms ON, wandb ON,
-eval_split ON. Init from pi05 base vs 012000: decide at training time from
-the data mix (leaning fresh-from-base if the mix is diverse, to avoid
-inheriting the orange-specialist narrowing).
+eval_split ON.
+DECIDED 2026-08-03: use_relative_actions=true (gripper excluded) -
+  --policy.use_relative_actions=true --policy.relative_exclude_joints='["gripper"]'
+  Absolute targets encode the practiced table position; relative offsets from
+  the current state make the SHAPE of a grasp reusable anywhere. Pairs with
+  the position diversity above - flag and data work together, neither alone.
+DECIDED 2026-08-03: init from BASE, not 012000. The base weights carry the
+  web + multi-robot co-training that our single-task fine-tune partially
+  overwrote; body adaptation is cheap to re-learn from diverse data, that
+  education is not (PI ablations: dropping those data sources costs tens of
+  points of OOD success).
 Gate offline (exam harness) before any robot time.
 ```
 

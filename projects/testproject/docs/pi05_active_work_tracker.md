@@ -1,6 +1,21 @@
 # Pi05 Active Work Tracker
 
-Last updated: 2026-07-28
+Last updated: 2026-08-03
+
+> **START HERE (2026-08-03): `agent_handoff_pi05_20260803.md`** - full state of
+> the project for a new agent: verified capabilities, history with the wrong
+> turns, the finger-stall measurement method, the pi05 architecture finding
+> (PI released only the low-level half; hierarchy was never available to port),
+> the runbook, the traps, and the prioritized next steps.
+>
+> **2026-08-02 EVENING: onion->plate probes FAILED, two distinct causes.**
+> Run 1 was healthy (1.73 obs/s) and still closed on air 145 times in 10 min -
+> same onion that carried 40 s that morning. The variable was the SCENE
+> (plate in view, onion relocated): position generalization, now co-top data
+> priority. Every other evening run was starved (0.3-0.4 obs/s, dying tunnel)
+> and proves nothing. No pick completed, so the plate/goal question got NO new
+> evidence. New tool: `scripts/analyze_grasp_from_trace.py` scores any run
+> objectively (real hold vs empty fingers) and flags blind runs.
 
 > **STATUS CHANGE 2026-07-28.** The offline question is ANSWERED, in the
 > opposite direction from the July 25-26 local probes: 012000 DID learn
