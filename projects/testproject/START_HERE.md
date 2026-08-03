@@ -1,8 +1,16 @@
 # START HERE — SO-101 Orange Pick Project (Handoff)
 
-> **If you are an AI agent (Claude / Codex) opening this folder: read this whole file first.**
-> It tells you what this project is, the current state, the one open problem, where everything
-> lives, and how to continue. Last updated: **2026-07-10**.
+> ## ⚠️ OUTDATED — do not follow this file (2026-08-03)
+>
+> **If you are an AI agent opening this folder, read these instead:**
+> 1. `NEW_MACHINE_SETUP.md` — only if the machine is not set up yet
+> 2. `docs/agent_handoff_pi05_20260803.md` — **the current project handoff**
+>
+> This file is from the **ACT era (2026-07-10)** and is wrong in its most
+> important claim: the project moved from **ACT to Pi05** (a
+> vision-language-action model), and the robot now grasps, lifts and carries —
+> including objects it never trained on. The "one open problem" described
+> below was solved weeks ago. Kept for history only.
 
 ---
 

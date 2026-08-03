@@ -1,5 +1,15 @@
 # RESTORE ON NEW MACHINE — SO-101 Orange Pick
 
+> **OUTDATED (2026-08-03). Use [`NEW_MACHINE_SETUP.md`](NEW_MACHINE_SETUP.md) instead.**
+> This file describes the pre-fork layout (`/data/projects/lerobot`,
+> `~/PrakashProjects/testproject`) from before the project moved inside the
+> lerobot fork, and it points at `START_HERE.md` → `GRASP_FIX_PLAN.md`, both
+> long superseded. The current entry points are
+> `NEW_MACHINE_SETUP.md` (machine bring-up) and
+> `docs/agent_handoff_pi05_20260803.md` (the project).
+> Still useful here: the bulk-transfer rsync/tar recipes in the two transfer
+> methods below, if you are moving datasets and checkpoints as well.
+
 This bundle is the **SO-101 orange-pick robotics project**. After you copy it onto the new
 machine and restore the folders, **open the project and read [`testproject/START_HERE.md`](START_HERE.md)** —
 that explains the project, current state, the open problem, and how to continue.

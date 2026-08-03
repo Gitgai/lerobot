@@ -8,6 +8,13 @@ This document is for any agent taking over this work. It states what is
 VERIFIED, what is BELIEVED, what is OPEN, and what to do next. Read Sections
 1-3 before touching anything; they are the rules and the current truth.
 
+> **ON A NEW MACHINE? Read `../NEW_MACHINE_SETUP.md` FIRST.** This document
+> assumes a working environment. A fresh `git clone` is missing six things
+> that live outside git - the venv, ROBOT CALIBRATION, SSH keys, correct
+> camera device paths (machine-specific!), the HF token, and datasets. Two of
+> those fail silently and will look like model problems: missing calibration
+> and stale camera paths.
+
 ---
 
 ## 1. The Project In One Paragraph
