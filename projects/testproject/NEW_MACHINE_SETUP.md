@@ -14,6 +14,28 @@ project moved inside the lerobot fork.
 
 ---
 
+## 0. Getting The Code Onto The New Machine
+
+```bash
+# fresh machine:
+git clone https://github.com/Gitgai/lerobot.git
+cd lerobot
+
+# already cloned earlier? just update - the setup and handoff docs are new:
+git pull
+
+# confirm you have them (all three must be present):
+git log --oneline -3
+#   613a6c02 New-machine setup guide; redirect stale entry-point docs
+#   8fd62fc9 Agent handoff doc, objective grasp scorer, pi05 architecture findings
+#   95925d87 Five-run count, edge-grip diagnosis, generalization roadmap + Stage 1 probes
+```
+
+Then read this file from Section 1, and finish with
+`docs/agent_handoff_pi05_20260803.md`.
+
+---
+
 ## 1. What `git clone` Gives You, And What It Does Not
 
 ```text
@@ -42,11 +64,33 @@ old values point at hardware that does not exist here).
 
 ## 2. Copy These From The Old Machine First
 
-Small, essential, no substitutes. Replace `OLD` with the old laptop's user@ip
-(`hostname -I` there to confirm - it is DHCP and moves).
+Small, essential, no substitutes - about 8 KB of calibration plus one SSH key.
+
+**Two gotchas checked on 2026-08-03:**
+
+```text
+1. The old laptop's IP MOVES. It was 192.168.1.163, then 192.168.1.14.
+   Confirm on the old laptop with `hostname -I` immediately before copying.
+   (Note .14 was once the Raspberry Pi's address - the Pi is now .15. Do not
+   copy from the Pi by mistake.)
+2. The old laptop's SSH SERVER IS NOT RUNNING by default, so pulling from the
+   new machine fails with "connection refused". Either start it on the old
+   laptop first:  sudo systemctl start ssh
+   or skip the network entirely and use a USB stick - it is 8 KB, and this is
+   the more reliable option:
+       # on the OLD laptop
+       cp -r ~/.cache/huggingface/lerobot/calibration /media/$USER/<STICK>/
+       cp ~/.ssh/runpod_ed25519 /media/$USER/<STICK>/
+       # on the NEW machine
+       mkdir -p ~/.cache/huggingface/lerobot ~/.ssh
+       cp -r /media/$USER/<STICK>/calibration ~/.cache/huggingface/lerobot/
+       cp /media/$USER/<STICK>/runpod_ed25519 ~/.ssh/ && chmod 600 ~/.ssh/runpod_ed25519
+```
+
+Network method (only after the SSH server is running on the old laptop):
 
 ```bash
-OLD=gaikwad-prakash@192.168.1.163
+OLD=gaikwad-prakash@192.168.1.14        # CONFIRM with `hostname -I` first
 
 # 1. ROBOT CALIBRATION - the most important non-git files in the project.
 #    Travels with the physical arms; if you moved the same arms, do NOT
