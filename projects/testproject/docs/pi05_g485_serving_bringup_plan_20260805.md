@@ -174,11 +174,45 @@ Checked, and it does not work for THIS checkpoint:
    a known-good session and comparing against known-good outputs.
 
 Where sim IS legitimately useful, and stays on the table:
-  - dry-running the Phase 6 subtask-switching WRAPPER logic (mutable task
-    string, watcher thread) against a mock robot - no simulator needed, a
-    replay/mock harness is enough and is faster to build.
   - future work with a policy TRAINED in that sim (e.g. the LIBERO pi05
     checkpoints), which is a different project, not a test of 012000.
+```
+
+The goal behind the question - "validate without risking the arm" - is fully
+served by Phases 3 and 3b, which together test the model, the stack, and the
+new control logic with NO robot and NO cameras. Only Phases 4-6 need hardware.
+
+## Phase 3b - Mock-robot dry run of the subtask-switching wrapper (NO hardware)
+
+The Phase 6 wrapper is the only NEW control code in this plan, so it gets
+tested before it is ever near a motor. Build the wrapper first, exercise it
+against a fake robot, and only then attach it to the arm.
+
+```text
+Mock robot: an object with the same surface the client uses -
+  get_observation()  -> returns canned images + a state dict we control
+  send_action(a)      -> records the commanded action, returns it unchanged
+  connect()/disconnect() -> no-ops
+Feed it a SCRIPTED gripper sequence that reproduces the real signatures:
+  (a) EMPTY squeeze  - measured width FOLLOWS command down to ~1
+  (b) REAL grasp     - command < 22 while measured STALLS at ~30 for 2+ s
+  (c) transient blip - a single stalled sample, then follows down
+
+ASSERT:
+  (a) and (c) must NOT trigger the task switch   <- guards against the false
+      positives we measured (3 transient stalls in a 10-minute run)
+  (b) MUST trigger exactly once, and the task string sent with subsequent
+      observations must change to "put the onion on the plate"
+  the manual override key switches the task at any time
+  the watcher never blocks or crashes the control loop
+```
+
+```text
+Why this matters: the trigger reads the COMMANDED gripper width, which the
+client does not expose directly (self.latest_action is only an index), so the
+wrapper must hook robot.send_action (robot_client.py:424). That hook sits in
+the live control path - a bug there is a bug in every future run, not just
+this experiment. Test it on a mock, not on the arm.
 ```
 
 ## Phase 4 - Camera gate (laptop side)
@@ -245,7 +279,9 @@ Never change two of these at once.
 
 ## Phase 6 - First real experiment: the subtask-switching probe
 
-Only after Phases 3-5 pass. Full rationale in the handoff doc, Section 9.
+Only after Phases 3, 3b, 4 and 5 pass - the wrapper itself was already proven
+against the mock in 3b, so this phase adds only the robot. Full rationale in
+the handoff doc, Section 9.
 
 ```text
 WHY: Physical Intelligence released only pi05's low-level half; the high-level
@@ -289,6 +325,7 @@ refuses connections. Treat the pod copy as already unreliable.
 
 ```text
 Phase 3 exam fails ................ never touch the robot; wrong stack
+Phase 3b mock triggers on (a)/(c) . false-positive switch; fix before robot
 obs rate < 0.8/s .................. infrastructure, not behavior; Phase 5b
 actions NaN / collapse to constant . the Era 1 signature; stop immediately
 arm serial glitches return ........ note frequency; hardware watch item
@@ -307,11 +344,19 @@ the SERVER MOVE is the only suspect.
 ## Time And Cost
 
 ```text
-Phase 1-2  ~30 min   (patch + start + gates)
-Phase 3    ~30 min   (offline exam; no robot, no risk)
-Phase 4    ~15 min   (cameras; needs Chrome closed)
-Phase 5    ~10 min   (smoke + rate measurement)
-Phase 6    ~30 min   (build the wrapper) + ~15 min robot time
-Phase 7    ~30 min   (copy + verify + release)
+NO HARDWARE NEEDED (can be done any time, alone, zero risk):
+  Phase 1-2  ~30 min   patch + start server + connectivity gates
+  Phase 3    ~30 min   offline trust exam on recorded observations
+  Phase 3b   ~45 min   build the wrapper + mock-robot dry run
+  Phase 7a-b ~30 min   second checkpoint copy + verify
+
+NEEDS THE ROBOT (user physically present):
+  Phase 4    ~15 min   camera gate (needs Chrome closed)
+  Phase 5    ~10 min   smoke run, judged only on obs/act rates
+  Phase 6    ~15 min   the subtask-switching probe itself
+
 Cost: $0. This is the point of the move.
+Sequencing note: doing 1-3b before the next robot session means that session
+spends its time on the EXPERIMENT, not on setup - and if anything is wrong
+with the stack, we find it with no arm powered.
 ```
