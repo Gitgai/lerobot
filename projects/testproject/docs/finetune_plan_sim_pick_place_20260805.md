@@ -1,0 +1,203 @@
+# Fine-tuning plan: GR00T first, then Pi05 — sim pick-and-place
+
+Date: 2026-08-05. Written after a sim-trained GR00T N1.6 checkpoint completed
+the whole PickOrange task, which is what makes this plan worth running.
+
+---
+
+## 0. Read this before planning anything
+
+```text
+THE PREMISE THAT MOTIVATED THIS PLAN IS ALREADY OUT OF DATE.
+
+"N1.6 grasps but never places" was OUR RUN LENGTH, not the policy. At 3,000
+steps it picks and places ALL THREE oranges (lifts 0.162/0.190/0.187 m, 33
+place-term steps vs the scripted state machine's 16).
+-> gr00t_n16_sim_trained_SUCCESS_20260805.md section 1b
+
+SO THE GOAL IS NOT "TEACH IT TO PLACE". IT PLACES.
+The honest open questions are:
+  1. RELIABILITY. n=2 runs, NO SEED CONTROL, and they differed. We do not know
+     the success rate. This is the cheapest and most valuable thing to measure
+     and it needs NO training at all.
+  2. Whether OUR OWN fine-tune can match 0.17-0.19 m of lift and 3 place cycles.
+     That is a pipeline-validation goal, not a capability goal.
+```
+
+**Recommendation: measure reliability BEFORE training anything.** Five seeded
+3,000-step runs cost ~1 hour of GPU and tell us what "working" actually means
+here. Fine-tuning to beat an unmeasured baseline is how you end up unable to
+tell improvement from variance.
+
+---
+
+## 1. What already exists, verified today
+
+```text
+DATA
+  LightwheelAI/leisaac-pick-orange        v2.1, 60 eps, 36,293 frames, 30 fps,
+                                          front+wrist, so101_follower, ungated
+                                          task: "Grab orange and place into plate"
+  LightwheelAI/leisaac-pick-orange-mimic-v0   60 eps / 41,891 frames (Mimic-made)
+  our own sim place data                  4 episodes / 12 place operations, HDF5
+
+GENERATION (no hardware, no teleop)
+  state machine   scripts/datagen/state_machine/generate.py   PickOrange ONLY
+  Isaac Lab Mimic scripts/mimic/{annotate_demos,generate_dataset}.py
+                  PickOrange AND LiftCube - a few demos in, many out
+
+CONVERSION
+  leisaac scripts/convert/isaaclab2lerobot.py     HDF5 -> LeRobot v2  <- what GR00T wants
+                        isaaclab2lerobotv3.py     HDF5 -> LeRobot v3.0
+                        lerobot2isaaclab.py       the reverse
+
+TRAINING
+  Isaac-GR00T-n16/gr00t/experiment/launch_finetune.py  +  examples/finetune.sh
+  defaults: GLOBAL_BATCH_SIZE=32, MAX_STEPS=10000, SAVE_STEPS=1000
+  tune_diffusion_model=True, tune_projector=True   (trained)
+  tune_llm=False, tune_visual=False                (frozen)  <- keeps VRAM down
+  NO LoRA flag found in n1.6 - it is full fine-tuning of the action head.
+```
+
+---
+
+## 2. THE TWO REAL BLOCKERS (both found by inspection, neither is fatal)
+
+### 2a. The public dataset is NOT GR00T-flavored
+
+GR00T needs **"GR00T-flavored LeRobot v2"**, which is standard LeRobot *plus*
+extra meta files. Compare:
+
+```text
+LightwheelAI/leisaac-pick-orange   meta/: episodes.jsonl  episodes_stats.jsonl
+                                          info.json  tasks.jsonl
+GR00T demo_data/cube_to_bowl_5     meta/: episodes.jsonl  info.json  tasks.jsonl
+                                          modality.json       <- MISSING
+                                          stats.json          <- MISSING
+                                          relative_stats.json <- MISSING
+```
+
+`modality.json` is trivial — `examples/SO100/modality.json` maps **exactly** onto
+this dataset (single_arm 0:5, gripper 5:6, front/wrist, task_index) and can be
+copied verbatim. `stats.json` / `relative_stats.json` must be **computed** from
+the data; `gr00t/data/stats.py` is the code that reads them, so check whether it
+can also generate them before writing anything by hand.
+
+> **Do not assume the v2.1 tag means compatible.** The version matched and three
+> required files were still absent. This is the same class of trap as the ACT
+> checkpoint that loaded fine while silently dropping its normalization.
+
+### 2b. LeIsaac's converter needs ITS OWN era-matched venv
+
+`isaaclab2lerobot.py` docstring: **`pip install lerobot==0.3.3`,
+`numpy==1.26.0`**. Ours are LeRobot 0.6.1 / 0.5.2. So converting *our own* sim
+HDF5 costs another venv — the fourth today.
+
+**This is avoidable at first.** The public dataset is already in LeRobot format;
+only our own generated data needs the converter. Sequence the plan so the
+converter is not on the critical path.
+
+---
+
+## 3. The plan
+
+### Phase 0 — MEASURE THE BASELINE (no training, ~1 h)
+
+```text
+5 x 3,000-step runs of 12e21/gr00t_n1d6_leisaac_pick_orange, varying seed.
+Record per run: oranges placed (0-3), max lift, place-term steps, time-to-first-
+place. Report a SUCCESS RATE, not an anecdote.
+GATE: if it places 3/3 only occasionally, that number is the bar every later
+      experiment is measured against.
+```
+
+Everything after this is optional if the answer is "it already works reliably".
+
+### Phase 1 — REPRODUCE THEIR RESULT (pipeline validation, ~half a day)
+
+```text
+1. Download LightwheelAI/leisaac-pick-orange (v2.1, 60 eps).
+2. Add meta/modality.json (copy examples/SO100/modality.json).
+3. Generate meta/stats.json + relative_stats.json - check gr00t/data/stats.py
+   for a generator before hand-rolling.
+4. Fine-tune GR00T N1.6 from the BASE model (nvidia/GR00T-N1.6-3B), 10k steps,
+   batch 32, tune_diffusion_model+projector only.
+5. Score with sim_policy_eval_instrumented.py at 3,000 steps.
+GATE: does OUR fine-tune reach ~0.17 m lift and place 3/3, like theirs?
+      If yes, the whole training pipeline is ours and verified end to end.
+      If no, the gap is in OUR pipeline - and we have their checkpoint as a
+      known-good control to diff against. That is a luxury we have never had.
+```
+
+**This is the highest-value phase.** It converts "someone else's checkpoint
+works" into "we can produce a working checkpoint", using a dataset whose correct
+answer we have already seen.
+
+### Phase 2 — OUR OWN DATA (~half a day)
+
+```text
+1. Build the lerobot==0.3.3 + numpy==1.26 venv for isaaclab2lerobot.py.
+2. Generate a few hundred episodes with the state machine (fully automatic).
+3. Convert -> LeRobot v2, add modality.json + stats.
+4. Fine-tune again, compare against Phase 1.
+GATE: does OUR data match THEIR data's result? This isolates data quality from
+      pipeline correctness, because Phase 1 already fixed the pipeline.
+Optional: Isaac Lab Mimic to multiply episodes instead of long generation runs.
+```
+
+### Phase 3 — PI05, same shape
+
+```text
+Only after Phases 1-2 succeed. Pi05 is the harder case and we know why:
+  - it is 4.14B vs N1.6's ~1.09B DiT
+  - our 012000 is welded to ONE real table and hovers 13-18 cm in sim,
+    0 grasps in EVERY run
+  - Era 1 applies: it must be trained AND served on matching code
+  - LeRobot writes v3.0; GR00T wanted v2.1 - for Pi05 we stay in LeRobot, so
+    the version question changes shape, but CHECK IT rather than assume
+Same gates: reproduce on the public dataset first, then our own data.
+```
+
+---
+
+## 4. What I think (asked directly)
+
+```text
+1. MEASURE BEFORE TRAINING. We have exactly two runs of the working checkpoint
+   and they disagreed. Every hour of fine-tuning spent before we know the
+   variance is an hour we cannot interpret afterwards.
+
+2. PHASE 1 IS THE ONE THAT MATTERS. Reproducing a KNOWN-GOOD result on a
+   KNOWN-GOOD dataset is the only experiment here with an unambiguous verdict.
+   Skipping straight to our own data confounds "bad pipeline" with "bad data".
+
+3. THE SIM->REAL QUESTION IS STILL COMPLETELY UNTOUCHED. Everything above
+   improves a simulator score. Nothing has been tested on the real arm ALL DAY,
+   and the project's central bet is that sim results transfer. A working sim
+   policy makes that bet TESTABLE for the first time - which is arguably more
+   valuable than any further sim tuning.
+
+4. PI05 LAST, AND POSSIBLY NOT AT ALL. N1.6 already does the task at 1/4 the
+   parameters. If the goal is a working arm, fine-tuning GR00T further is the
+   cheaper road; if the goal is understanding why 012000 fails, that is a
+   different investigation and the sim is now a good place to run it.
+```
+
+---
+
+## 5. Costs, honestly
+
+```text
+Phase 0   ~1 h GPU, no training, no new environments        <- do this first
+Phase 1   ~half a day: download + 3 meta files + a 10k-step run + scoring
+Phase 2   ~half a day + ONE MORE VENV (lerobot 0.3.3)
+Phase 3   unscoped; Pi05 is a bigger model and a harder starting point
+
+VRAM: 32 GB available; N1.6 SERVES in ~8.2 GB. Fine-tuning with tune_llm=False
+and tune_visual=False should fit, but this is UNVERIFIED - the NVIDIA post's
+~25 GB figure was for a different configuration and has never been checked here.
+Measure it on the first run rather than planning around the blog number.
+```
+
+**Unchanged, and increasingly load-bearing:** nothing has been tested on the
+real arm.

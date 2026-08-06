@@ -168,10 +168,21 @@ proved for N1.7. See `gr00t_n17_sim_evaluation_20260805.md` section 2b.
 3. This checkpoint is the REFERENCE for what "working" looks like in this scene:
    0.17-0.19 m of lift, three complete pick-and-place cycles, ~2,500 steps.
    Compare any future fine-tune of ours against THAT, not against a predicate.
-4. Reliability is UNMEASURED: n=2 runs, no seed control, and the two differed
-   (the 900-step run got one strong grasp; this one completed everything). Flow
-   matching samples stochastically. Several seeded runs would tell us the real
-   success rate.
+4. RELIABILITY IS THE REAL OPEN QUESTION - and it IS variable. Two 3,000-step
+   runs, identical settings, no seed control:
+
+     run    placed   per-orange lift (m)      place-steps
+     run2    3/3     0.187, 0.190, 0.162          33
+     run3    2/3     0.156, 0.003, 0.160           3
+
+   Run 3 never even lifted orange002 (0.003 m) and logged 3 place-steps against
+   run 2's 33. So the policy is STOCHASTIC - flow matching samples, and there is
+   no seed control in the eval path.
+
+   => MEASURE THE SUCCESS RATE BEFORE TRAINING ANYTHING. Five seeded runs cost
+      ~1 h of GPU and no training. Fine-tuning to beat an unmeasured, visibly
+      variable baseline makes improvement indistinguishable from variance.
+   -> finetune_plan_sim_pick_place_20260805.md Phase 0
 ```
 
 **Unchanged:** nothing has been tested on the real arm.
