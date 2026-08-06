@@ -84,8 +84,10 @@ parser.add_argument("--policy_checkpoint_path", default=None,
                     help="LeRobot path only; the GR00T server already holds its own checkpoint.")
 parser.add_argument(
     "--policy_language_instruction",
-    default="pick up the orange and move it to another place",
-    help="MUST match the training task string exactly (project rule).",
+    default=None,
+    help="Defaults to the ENV'S OWN cfg.task_description, which is the string a "
+    "sim-trained checkpoint was recorded with. Override only to run a deliberate "
+    "instruction experiment - never to invent a sentence.",
 )
 parser.add_argument("--max_steps", type=int, default=1200)
 parser.add_argument("--out", default="logs/sim_policy_gt.csv")
@@ -124,6 +126,23 @@ def main() -> None:
     task_type = get_task_type(args.task)
     print(f"[eval] task_type={task_type}")
     env_cfg.use_teleop_device(task_type)
+
+    # THE INSTRUCTION IS NOT A FREE PARAMETER. Every LeIsaac task declares its own
+    # cfg.task_description, and that is the string recorded into any dataset
+    # collected in this scene - so it is what a sim-trained checkpoint saw. For
+    # PickOrange it is:
+    #   "Pick three oranges and put them into the plate, then reset the arm to
+    #    rest state."
+    # Runs up to 2026-08-05 sent an INVENTED sentence ("pick up the orange and
+    # move it to another place") that appears nowhere in the env or any dataset,
+    # and instruction wording measurably changes behaviour. Read it from the env.
+    if args.policy_language_instruction is None:
+        args.policy_language_instruction = getattr(env_cfg, "task_description", None)
+        if not args.policy_language_instruction:
+            raise RuntimeError(f"{args.task} declares no task_description; pass --policy_language_instruction")
+        print(f"[eval] instruction FROM ENV: {args.policy_language_instruction!r}")
+    else:
+        print(f"[eval] instruction OVERRIDDEN: {args.policy_language_instruction!r}")
 
     # S1: shift the oranges to test whether the policy's reach is
     # OBJECT-DIRECTED or merely a learned positional prior. Each scene object is

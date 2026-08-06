@@ -171,6 +171,46 @@ The displacement + z-travel columns are what turn a predicate into evidence.
 
 ---
 
+## 4b. THE POSITIVE CONTROL — the harness is PROVEN GOOD
+
+Every policy we had scored in this scene FAILED, which left a hole we could not
+argue our way out of: **is the harness even capable of registering a success?**
+Until that was excluded, every negative result in this project was
+uninterpretable.
+
+`scripts/sim_harness_positive_control.py` settles it. It runs LeIsaac's own
+scripted state machine — the actor that produced this project's 12 place
+operations, so it is known to succeed — through the **same** ground-truth code
+path used to score the policies.
+
+```text
+run                            grasps longest  place#   maxDisp   maxLift
+STATE MACHINE (known-good)      3/3      212      16    0.3015    0.1959
+GR00T N1.7 (best run)           1/3       80       0    0.0029    0.0029
+```
+
+```text
+All three pick_orange00N fire, sustained 209-212 steps.
+All three put_orange00N_to_plate fire - the PLACE term works too.
+The oranges MOVE 0.30 / 0.056 / 0.031 m and LIFT 0.17-0.20 m.
+d_grasp_min reaches 0.021 m, under the 0.05 threshold for 984 steps.
+
+=> THE HARNESS DETECTS GRASPS, PLACES, AND OBJECT MOTION.
+=> Therefore EVERY FAILURE WE HAVE RECORDED IS A REAL FAILURE.
+   Pi05's 0 grasps: real. GR00T's closing-on-air: real.
+```
+
+This also calibrates section 4's trap with a number. A **real** grasp lifts the
+orange **0.17-0.20 m**. GR00T's predicate-TRUE-for-80-steps lifted it
+**0.0026 m** — roughly *seventy times less*. The predicate could not tell those
+apart; displacement separates them instantly.
+
+> Run the positive control again after ANY change to the scene, the env cfg or
+> the scoring code. It is ~8 minutes and it is the only thing standing between
+> "the policy failed" and "our measurement failed".
+
+---
+
 ## 5. Honest standing
 
 ```text

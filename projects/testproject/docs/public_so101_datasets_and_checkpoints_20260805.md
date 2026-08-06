@@ -183,6 +183,42 @@ yen-0/smolvla-so101-digits-0707            OUT - IMPOSSIBLE OBSERVATIONS
   CHECKED: the repo has NO MODEL CARD - no task description, no environment, no
   dataset, no code. Just weights.
 
+*** SIM-TRAINED CHECKPOINTS EXIST - AND BLACKWELL BLOCKS THEM (2026-08-05) ***
+
+```text
+Checkpoints trained INSIDE LeIsaac, on our exact task, all ungated:
+  LightwheelAI/leisaac-pick-orange-v0      GR00T N1.5   (the LeIsaac authors)
+  12e21/gr00t_n1d6_leisaac_pick_orange     GR00T N1.6
+  tshiamor/groot-n1.6-leisaac-pick-block   GR00T N1.6
+  omkarmayekar555/act_leisaac_orange       LeRobot ACT, 51.6M params
+Also: LightwheelAI/leisaac_env ships the kitchen_with_orange scene assets.
+
+LightwheelAI/leisaac-pick-orange-v0 SCREENS PERFECTLY: motor units (arm +/-100,
+gripper 0..100), "absolute": true (no relative trap), front+wrist at 640x480 -
+exactly what our scene exposes - and N1.5 is driven NATIVELY by LeIsaac, so no
+adapter of ours would sit in the path. Downloaded, 7.1 GB.
+
+*** BUT NONE OF THEM CAN BE SERVED ON THIS MACHINE TODAY. ***
+  our Isaac-GR00T ships ONLY gr00t_n1d7 - zero references to n1_5/n1_6, and it
+    is a SHALLOW clone (1 commit) so there is no older revision to check out
+  act_leisaac_orange loads on our LeRobot but SILENTLY DROPS its normalization:
+      "Unexpected key(s): normalize_inputs.buffer_observation_state.mean ..."
+    Old-style embedded norm buffers; our lerobot is 0.6.1 (project repo 0.5.2),
+    both NEWER than the checkpoint. Serving it as-loaded = garbage, and it would
+    have looked like a harness failure.
+
+THE STRUCTURAL PROBLEM, worth remembering:
+  Era 1 says serve a checkpoint on TRAINING-ERA code.
+  Blackwell/sm_120 needs torch >= 2.7 + cu128.
+  Old checkpoint eras pin OLD torch, which has NO sm_120 support.
+  => on a 5090 these two rules CONFLICT. Old checkpoints are not simply a
+     "download and run"; each needs an era-matched env that also builds for
+     Blackwell. Budget for that BEFORE promising a comparison.
+
+This is why the harness positive control was done with LeIsaac's own state
+machine instead - no checkpoint, no venv, and it answered the same question.
+```
+
 robocurve/gr00t-n1.7-so101-molmoact2   *** EVALUATED IN SIM - SEE BELOW ***
   *** STATUS 2026-08-05 (final) - gate SOLVED, adapter WORKS, and the model has
   now been SCORED in LeIsaac from ground truth. ***
