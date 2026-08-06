@@ -40,6 +40,45 @@ A1. FIELD-BY-FIELD DESK CHECK - real client vs the VALIDATED sim client
                probe the wire if in doubt, never trust the config)
     Output: a table in this doc with each row marked VERIFIED or MISMATCH.
 
+    *** COMPLETED 2026-08-06 for the N1.6 as-is test ***
+
+    field            real client (eval_so100.py + lerobot 0.4.4)     status
+    --------------   ---------------------------------------------   --------
+    video keys       hardcoded ["front","wrist"] - the robot config  VERIFIED
+                     MUST name its cameras exactly front / wrist
+    resolution       config duty: OpenCVCameraConfig width=640
+                     height=480 (set it; not automatic)              CONFIG
+    channel order    lerobot 0.4.4 OpenCVCamera DEFAULTS TO RGB and
+                     converts BGR2RGB (camera_opencv.py:421)         VERIFIED
+    video layout     two recursive_add_extra_dim -> (1,1,H,W,C)
+                     uint8 - same shape the sim client produced      VERIFIED
+    state order      shoulder_pan, shoulder_lift, elbow_flex,
+                     wrist_flex, wrist_roll, gripper - matches the
+                     training dataset's names exactly                VERIFIED
+    state units      robot-native LeRobot motor units, NO conversion
+                     applied (and none needed - unlike sim)          VERIFIED
+    language         {"annotation.human.task_description": [[str]]}  VERIFIED
+    action handling  decode_action_chunk concatenates and returns -
+                     NO composition, NO clipping (server already
+                     composed; matches the probe-the-wire finding)   VERIFIED
+    wire protocol    PolicyClient from the same repo as the server;
+                     LIVE HANDSHAKE PASSED: synthetic obs -> 16
+                     action steps in motor-unit scale                VERIFIED
+
+    NOTES
+    - lerobot 0.6.1 needs Python >=3.12; this venv is 3.11, so 0.4.4 is the
+      newest installable. GOOD NEWS: our calibration dir is literally named
+      so_follower/ - the 0.4.x module layout - so 0.4.4 matches the rig's own
+      era. lerobot[feetech] extra required for the motor bus.
+    - upstream imports so100_follower/so101_follower, which do not exist in
+      0.4.4; patched to so_follower (backup: eval_so100.py.orig). The
+      "so101_follower" CONFIG NAME is registered by that module, so the CLI
+      is unchanged.
+    - A2 smoke test PASSED: with no arm attached it fails exactly at
+      "Could not connect on port /dev/ttyACM0" - imports, draccus config,
+      robot construction and calibration lookup all upstream-verified.
+    - torch 2.7.1+cu128 / sm_120 CONFIRMED intact after every install.
+
 A2. NO-ROBOT SMOKE TEST
     Run the real client against the live server with no arm attached. It must
     get as far as hardware discovery and fail THERE - proving imports, config,

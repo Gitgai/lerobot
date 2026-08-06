@@ -120,6 +120,27 @@ parser.add_argument("--add-decoys", type=int, default=0,
                     help="Spawn N orange-COLORED spheres near the oranges. We have no other fruit assets; a same-color decoy is the sharper test anyway - does it grab AN ORANGE or anything orange-ish?")
 parser.add_argument("--scale-oranges", type=float, default=None,
                     help="Scale the oranges (0.75 = small, 1.3 = large). Changes both the visual and the grasp width needed.")
+# ---- PREFLIGHT flags (sim_to_real_preflight_protocol_20260806.md) ----
+# Image mods apply to the frames the POLICY sees, after rendering - mimicking
+# camera artifacts the renderer never produces. GT scoring is untouched.
+parser.add_argument("--img-bgr-swap", action="store_true",
+                    help="B1: swap RGB->BGR on policy frames. OpenCV cameras deliver BGR; this run is the FAILURE SIGNATURE for a channel-order bug in a real client.")
+parser.add_argument("--img-noise", type=float, default=None,
+                    help="B2: gaussian sensor noise, sigma in uint8 units (e.g. 8).")
+parser.add_argument("--img-blur", type=int, default=None,
+                    help="B3: box blur kernel in px (e.g. 3).")
+parser.add_argument("--img-jpeg", type=int, default=None,
+                    help="B4: JPEG encode/decode at this quality (e.g. 40).")
+parser.add_argument("--img-gamma", type=float, default=None,
+                    help="B5: gamma shift (1.35 = washed out) - a white-balance stand-in.")
+parser.add_argument("--obs-delay", type=int, default=0,
+                    help="B6: policy sees the observation from K env-steps ago. On hardware the world moves ~100-200 ms during capture+inference; this isolates that staleness.")
+parser.add_argument("--rotate-camera", type=float, default=None,
+                    help="B7: pitch the FRONT camera by DEG degrees. Position jitter was tested in the campaign; ANGLE was not, and degrees move the image more than centimetres.")
+parser.add_argument("--jitter-wrist-camera", default=None,
+                    help="B8: perturb the WRIST camera mount by \"dx,dy,dz\" metres - it was never perturbed at all.")
+parser.add_argument("--park-oranges", default=None,
+                    help="C: comma-list of orange indices (e.g. \"2,3\") moved ~1 m out of the workspace, approximating removal. Score only the remaining orange(s).")
 args = parser.parse_args()
 
 from isaaclab.app import AppLauncher  # noqa: E402
@@ -247,6 +268,48 @@ def main() -> None:
             cam.offset.pos = (old[0] + dx, old[1] + dy, old[2] + dz)
             print(f"[eval] jittered front camera: {tuple(round(v, 3) for v in old)} -> "
                   f"{tuple(round(v, 3) for v in cam.offset.pos)}")
+
+    if args.rotate_camera:
+        import math
+
+        cam = getattr(env_cfg.scene, "front", None)
+        if cam is None:
+            raise RuntimeError("--rotate-camera: front camera not on scene cfg")
+        # Compose the existing wxyz quaternion with a pitch about the camera's
+        # local X axis: q_new = q_old * q_delta (local-frame rotation).
+        w1, x1, y1, z1 = cam.offset.rot
+        half = math.radians(args.rotate_camera) / 2.0
+        w2, x2, y2, z2 = math.cos(half), math.sin(half), 0.0, 0.0
+        cam.offset.rot = (
+            w1 * w2 - x1 * x2 - y1 * y2 - z1 * z2,
+            w1 * x2 + x1 * w2 + y1 * z2 - z1 * y2,
+            w1 * y2 - x1 * z2 + y1 * w2 + z1 * x2,
+            w1 * z2 + x1 * y2 - y1 * x2 + z1 * w2,
+        )
+        print(f"[eval] front camera pitched {args.rotate_camera} deg")
+
+    if args.jitter_wrist_camera:
+        dx, dy, dz = (float(v) for v in args.jitter_wrist_camera.split(","))
+        cam = getattr(env_cfg.scene, "wrist", None)
+        if cam is None:
+            raise RuntimeError("--jitter-wrist-camera: wrist camera not on scene cfg")
+        old = cam.offset.pos
+        cam.offset.pos = (old[0] + dx, old[1] + dy, old[2] + dz)
+        print(f"[eval] jittered wrist camera: {tuple(round(v, 3) for v in old)} -> "
+              f"{tuple(round(v, 3) for v in cam.offset.pos)}")
+
+    if args.park_oranges:
+        # ~1 m to the side: out of both camera views and off the table. The
+        # object falls to whatever is below and rests there; GT still tracks it
+        # (it will simply never be picked), so score only the remaining orange.
+        for idx in args.park_oranges.split(","):
+            name = f"Orange00{int(idx)}"
+            cfg = getattr(env_cfg.scene, name, None)
+            if cfg is None:
+                raise RuntimeError(f"--park-oranges: {name} not on scene cfg")
+            old = cfg.init_state.pos
+            cfg.init_state.pos = (old[0] + 1.0, old[1] + 0.8, old[2])
+            print(f"[eval] parked {name} out of the workspace")
 
     # ---- CFG-LEVEL scene additions (must happen BEFORE gym.make) ----
     if args.scale_oranges:
@@ -419,7 +482,51 @@ def main() -> None:
             device=args.device,
         )
 
+    # ---- PREFLIGHT: image perturbations + observation staleness ----
+    _img_mods_on = any([args.img_bgr_swap, args.img_noise, args.img_blur, args.img_jpeg, args.img_gamma])
+    if _img_mods_on or args.obs_delay:
+        import numpy as _np
+
+        if args.img_blur or args.img_jpeg:
+            import cv2 as _cv2
+
+        def _perturb_frame(t: torch.Tensor) -> torch.Tensor:
+            """Apply camera-artifact mods to one [H,W,C] uint8 frame tensor."""
+            a = t.cpu().numpy()
+            if args.img_bgr_swap:
+                a = a[..., ::-1].copy()
+            if args.img_noise:
+                a = _np.clip(
+                    a.astype(_np.float32) + _np.random.normal(0, args.img_noise, a.shape), 0, 255
+                ).astype(_np.uint8)
+            if args.img_blur:
+                a = _cv2.blur(a, (args.img_blur, args.img_blur))
+            if args.img_jpeg:
+                ok, enc = _cv2.imencode(".jpg", a, [_cv2.IMWRITE_JPEG_QUALITY, args.img_jpeg])
+                assert ok
+                a = _cv2.imdecode(enc, _cv2.IMREAD_COLOR)
+            if args.img_gamma:
+                a = (255.0 * (a.astype(_np.float32) / 255.0) ** (1.0 / args.img_gamma)).astype(_np.uint8)
+            return torch.from_numpy(_np.ascontiguousarray(a)).to(t.device)
+
+        print(f"[eval] PREFLIGHT mods: bgr={args.img_bgr_swap} noise={args.img_noise} "
+              f"blur={args.img_blur} jpeg={args.img_jpeg} gamma={args.img_gamma} delay={args.obs_delay}")
+
+    # obs_history[k] = the policy-facing observation as of k env-steps ago.
+    from collections import deque as _deque
+
+    obs_history: "_deque[dict]" = _deque(maxlen=max(args.obs_delay, 0) + 1)
+
+    def _remember(od: dict) -> None:
+        """Snapshot the policy-facing obs (clone tensors - sim buffers may be
+        reused in place) so --obs-delay can serve a genuinely OLD frame."""
+        if args.obs_delay:
+            obs_history.append(
+                {k: (v.clone() if torch.is_tensor(v) else v) for k, v in od["policy"].items()}
+            )
+
     obs_dict, _ = env.reset()
+    _remember(obs_dict)
     out_path = Path(args.out)
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -433,9 +540,17 @@ def main() -> None:
         writer.writeheader()
 
         while simulation_app.is_running() and step < args.max_steps:
-            policy_obs = obs_dict["policy"]
-            policy_obs = dict(policy_obs)
+            # B6: serve the observation from K steps ago once history is warm.
+            if args.obs_delay and len(obs_history) > args.obs_delay:
+                policy_obs = dict(obs_history[0])
+            else:
+                policy_obs = dict(obs_dict["policy"])
             policy_obs["task_description"] = args.policy_language_instruction
+            # B1-B5: camera artifacts, applied ONLY to what the policy sees.
+            if _img_mods_on:
+                for _k in camera_infos:
+                    if _k in policy_obs:
+                        policy_obs[_k] = _perturb_frame(policy_obs[_k])
             actions = policy.get_action(policy_obs).to(env.device)
             if args.policy_type.startswith("gr00t") and actions.ndim == 2:
                 # The adapter returns [T, DOF]; the env loop below wants LeRobot's
@@ -450,6 +565,7 @@ def main() -> None:
                 if env.cfg.dynamic_reset_gripper_effort_limit:
                     dynamic_reset_gripper_effort_limit_sim(env, task_type)
                 obs_dict, _, terminated, timed_out, _ = env.step(action)
+                _remember(obs_dict)
 
                 # ---- GROUND TRUTH ----
                 # TWO frames matter and they are NOT the same point:
@@ -517,6 +633,8 @@ def main() -> None:
                 if bool(terminated[0]) or bool(timed_out[0]):
                     print(f"[eval] episode ended at step {step} (terminated={bool(terminated[0])})")
                     obs_dict, _ = env.reset()
+                    obs_history.clear()
+                    _remember(obs_dict)
                     break
 
     print(f"[eval] wrote {out_path} ({step} steps)")
