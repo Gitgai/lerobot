@@ -82,30 +82,35 @@ Two implications, honestly:
 
 ## 3. THE PLAN (revised 2026-08-06 — user's correction)
 
-### Step 0 — ROBUSTNESS CAMPAIGN IN SIM (added 2026-08-06, user's call: don't rush to hardware)
+### Step 0 — ROBUSTNESS CAMPAIGN IN SIM — *** DONE 2026-08-06, GATE LIFTED ***
 
 ```text
-The user watched the policy live and said "it appears to struggle" - and
-re-scoring proved it: across all 12 full runs, 94% of oranges placed but 1.1
-DROPS per run, and two runs ended 2/3. The Phase-0 "100%, stdev 0.00" was the
-policy's best face, not its typical behaviour.
-
-So BEFORE any hardware: three batteries of scene variation (geometry, hard
-geometry, appearance - including the user's requested color/decoy/multi-plate
-tests). Full design, results and decision rules:
+17/18 runs scored (twoPlates crashed on a known script bug). Full results:
 -> n16_robustness_campaign_20260806.md
 
-The batteries directly gate the hardware step:
-  cam2cm/cam5cm  -> how precisely the real front camera must be mounted
-  decoys         -> whether the real table must be kept clean of orange-ish
-                    clutter
-  lighting       -> whether room lighting is a controlled variable
-  overall curve  -> sets EXPECTATIONS: a policy at ~85% with 1.1 drops/run at
-                    home will not be better on hardware; if the hard batteries
-                    crater it, the as-is test's realistic goal is "any
-                    purposeful reach", not task completion.
+THE THREE FINDINGS
+  1. APPEARANCE IS FREE. Blue plate, GREEN ROBOT, 35% light, warm light, small
+     oranges - all essentially unaffected. dimLight was the campaign's cleanest
+     run (3/3, zero drops).
+  2. GEOMETRY COSTS ~ONE ORANGE. Everything-moved is reliably 2/3. Perception
+     is object-directed; precision suffers. Camera mount: 2 cm FREE, 5 cm
+     fumbling-but-functional.
+  3. DECOYS ARE FATAL. Two orange-colored spheres -> 1/3, two oranges NEVER
+     touched. Largest effect of ANY variation, larger than moving every object
+     and the goal at once. The policy grabs "orange blobs", not oranges.
 
-THE HARDWARE TEST STAYS PARKED until the campaign is scored and read.
+WHAT IT DECIDED (per the rules agreed before the results)
+  camera mounting   has slack - careful, not obsessive
+  TABLE CLEANLINESS THE hard requirement: nothing orange-ish near the workspace
+  room lighting     ignore
+  expectations      "purposeful reach" is the realistic as-is goal on real
+                    pixels; completion would be a pleasant surprise
+
+WHY THIS MILDLY RAISES THE AS-IS TEST'S ODDS
+  The sim->real gap is largely an APPEARANCE gap, and appearance is exactly
+  where this policy proved robust. Bounded encouragement only: tints and
+  lighting are still the SAME renderer - real optics, noise and textures are a
+  bigger step than any variation we could synthesize.
 ```
 
 ### Step 1 — TRY THE SIM-TRAINED N1.6 CHECKPOINT AS-IS ON THE REAL ARM
@@ -147,16 +152,20 @@ NEEDED - SOFTWARE (me)
      Pi05's 3-camera gate - is NOT used by GR00T. Simpler rig than every
      previous real-arm session.
 
-NEEDED - HARDWARE (the user)
+NEEDED - HARDWARE (the user)  [rig spec UPDATED by the step-0 campaign]
   4. Plug in the arm (currently NO /dev/ttyACM*) and the front + wrist cameras
      (currently NO /dev/video*). Wrist previously came via the RPi bridge as
      /dev/video6 - needs re-checking on this machine.
   5. MOUNT THE FRONT CAMERA TO MATCH THE SIM: rigidly attached to the ROBOT
      BASE at pos=(0.0, -0.5, 0.6) relative to base, focal 28.7 (sim spec).
-     This is the single cheapest thing that improves the as-is test's odds -
-     the checkpoint has only ever seen that viewpoint. Do NOT eyeball a
-     different pose: S2 proved a wrong view is worse than a missing one.
-  6. Scene: orange(s) + a plate on the table, roughly matching the sim layout.
+     Campaign result: there is SLACK - 2 cm off was free, 5 cm off fumbled but
+     worked. Mount carefully; do not obsess over millimetres.
+  6. Scene: orange(s) + a plate, roughly the sim layout. Geometry has slack too
+     (moved objects cost ~one orange, not the task).
+  7. *** THE HARD REQUIREMENT - A CLEAN TABLE. *** Nothing orange-ish anywhere
+     near the workspace. Two orange decoy spheres was the ONE variation that
+     broke the policy (1/3, two oranges never touched). No clutter, period.
+  8. Room lighting: whatever it is. The policy demonstrably does not care.
 
 RUN PROTOCOL
   instruction "Grab orange and place into plate"  (the string that worked in sim)
@@ -245,12 +254,12 @@ camera pose cut Pi05's near-object time from 86% to 23%.
 ## 4. Order of work
 
 ```text
-0. ROBUSTNESS CAMPAIGN in sim (running 2026-08-06) - gates everything below.
-   -> n16_robustness_campaign_20260806.md
-1. AS-IS HARDWARE TEST of the sim-trained N1.6 (scoped above), with
-   expectations and rig requirements SET BY the campaign's results
+0. DONE - robustness campaign. Verdicts: appearance free, geometry ~one orange,
+   DECOYS FATAL -> the real table must be CLEAN. Camera mount has 2 cm slack.
+1. AS-IS HARDWARE TEST of the sim-trained N1.6 - NOW UNBLOCKED, rig spec above
      me:   lerobot into the n1.6 venv (guard torch!), client smoke test
-     user: plug in arm + front/wrist cameras, mount front camera to sim spec
+     user: plug in arm + front/wrist cameras, mount front camera (careful, not
+           obsessive), CLEAN TABLE - nothing orange-ish in the workspace
 2. In parallel, 8-bit Adam -> unblock fine-tuning (needed if step 1 fails,
    which is likely; costs nothing to prepare)
 3. v3.0 -> GR00T v2 converter for our 89 real episodes   (drop `top`)
@@ -258,6 +267,11 @@ camera pose cut Pi05's near-object time from 86% to 23%.
 5. serve the fine-tune on the arm - SAME serving path step 1 already built -
    score with the finger-stall test
 6. sim regression check of the serving path before anything touches hardware
+
+Optional sim follow-ups, NOT gating anything:
+  - characterize the decoy failure (does it GRAB decoys or freeze? log decoy
+    positions in the eval script)
+  - fix --add-plate (known broken) if the goal-ambiguity answer matters
 ```
 
 ---
