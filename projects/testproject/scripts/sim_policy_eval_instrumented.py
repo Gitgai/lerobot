@@ -90,6 +90,15 @@ parser.add_argument(
     "instruction experiment - never to invent a sentence.",
 )
 parser.add_argument("--max_steps", type=int, default=1200)
+parser.add_argument(
+    "--seed",
+    type=int,
+    default=None,
+    help="Seeds the ENV only. NOTE: it does NOT control the policy server's "
+    "sampling - GR00T's flow matching draws its own noise in the server process, "
+    "so repeated runs differ even at a fixed seed. That is exactly why a success "
+    "RATE is needed rather than one run.",
+)
 parser.add_argument("--out", default="logs/sim_policy_gt.csv")
 parser.add_argument("--move-oranges", default=None,
                     help="S1: shift ALL oranges by \"dx,dy,dz\" metres to test whether the reach is object-directed or a positional prior.")
@@ -124,6 +133,10 @@ DATASET_TASK_STRINGS = {
 
 def main() -> None:
     env_cfg = parse_env_cfg(args.task, device=args.device, num_envs=1)
+    if args.seed is not None:
+        env_cfg.seed = args.seed
+        torch.manual_seed(args.seed)
+        print(f"[eval] env seed={args.seed} (does NOT bind the policy server's sampling)")
     # MUST match the policy's action space. get_task_type() returns "so101leader"
     # for single-arm SO-101 tasks, which configures 6-DoF JOINT actions - what
     # pi05 emits. Using "so101_state_machine" instead configures 8-dim EE-pose

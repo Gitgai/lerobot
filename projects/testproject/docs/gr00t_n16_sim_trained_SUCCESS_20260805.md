@@ -179,9 +179,17 @@ proved for N1.7. See `gr00t_n17_sim_evaluation_20260805.md` section 2b.
    run 2's 33. So the policy is STOCHASTIC - flow matching samples, and there is
    no seed control in the eval path.
 
-   => MEASURE THE SUCCESS RATE BEFORE TRAINING ANYTHING. Five seeded runs cost
-      ~1 h of GPU and no training. Fine-tuning to beat an unmeasured, visibly
-      variable baseline makes improvement indistinguishable from variance.
+   => MEASURED 2026-08-06, AND THE "STOCHASTIC" CALL DID NOT HOLD UP.
+      Five seeded 3,000-step runs: 5/5 full task, 15/15 oranges placed,
+      15/15 lifts above 0.10 m (every grasp real), stdev 0.00.
+      Including the two earlier unseeded runs: 6/7 = 86% full task, 20/21 = 95%
+      of oranges. The n=2 "it is variable" reading came from one unlucky run.
+
+      THE REAL FINDING: first place occurred between step 228 and step 1832 -
+      an 8x spread on the SAME policy and task. A 900-step run would have MISSED
+      the success in run5 outright. That is precisely how this project concluded
+      "grasps but never places", and it indicts every 900-1500 step verdict
+      recorded here, Pi05's included.
    -> finetune_plan_sim_pick_place_20260805.md Phase 0
 ```
 

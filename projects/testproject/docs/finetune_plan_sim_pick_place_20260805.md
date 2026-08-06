@@ -101,17 +101,45 @@ converter is not on the critical path.
 
 ## 3. The plan
 
-### Phase 0 — MEASURE THE BASELINE (no training, ~1 h)
+### Phase 0 — MEASURE THE BASELINE — *** DONE 2026-08-06 ***
 
 ```text
-5 x 3,000-step runs of 12e21/gr00t_n1d6_leisaac_pick_orange, varying seed.
-Record per run: oranges placed (0-3), max lift, place-term steps, time-to-first-
-place. Report a SUCCESS RATE, not an anecdote.
-GATE: if it places 3/3 only occasionally, that number is the bar every later
-      experiment is measured against.
+run                     steps  placed          lifts (m)      placeSteps  1stPlace
+run1_seed1001            3000   3/3   [0.145, 0.146, 0.160]        20        552
+run2_seed1002            3000   3/3   [0.167, 0.130, 0.146]        23        784
+run3_seed1003            3000   3/3   [0.188, 0.160, 0.162]        33        421
+run4_seed1004            3000   3/3   [0.173, 0.286, 0.171]        19        228
+run5_seed1005            3000   3/3   [0.180, 0.163, 0.141]        19       1832
+
+  full task (3/3 placed)  : 5/5  = 100%      placed per run: mean 3.00, stdev 0.00
+  real grasps (lift>0.10) : 15/15 = 100%     every single grasp is REAL, not a
+                                             proximity artefact
+
+INCLUDING the two earlier UNSEEDED 3,000-step runs (one of which placed 2/3):
+  full task 3/3   6/7 = 86%
+  oranges placed  20/21 = 95%
 ```
 
-Everything after this is optional if the answer is "it already works reliably".
+**The baseline is not "variable". It is ~86-100% and stdev 0.00 across the
+seeded sweep.** My earlier "the policy is stochastic" call came from n=2 with one
+unlucky run; five controlled runs do not reproduce it.
+
+```text
+*** AND THE FINDING THAT MATTERS MOST ***
+first place occurred anywhere between step 228 and step 1832.
+
+A 900-STEP RUN WOULD HAVE MISSED THE SUCCESS IN run5 ENTIRELY.
+
+That is exactly how this project concluded "N1.6 grasps but never places", and
+it is a warning about every 900-1500 step verdict recorded here - including
+Pi05's. Time-to-first-success varies by 8x between runs of the SAME policy on
+the SAME task.
+```
+
+**Consequence for the rest of this plan: there is no capability gap to close.**
+The reference policy performs the full task essentially every time. Phases 1-2
+are therefore PIPELINE VALIDATION - can *we* produce a checkpoint this good? -
+and not an attempt to beat a weak baseline.
 
 ### Phase 1 — REPRODUCE THEIR RESULT (pipeline validation, ~half a day)
 
