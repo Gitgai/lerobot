@@ -54,11 +54,99 @@ does not.** Pi05 has now failed on our data repeatedly, in two environments. The
 sensible move is to change the ARCHITECTURE, not to keep tuning the one that
 does not work.
 
+### Sharpened by the user (2026-08-06): domain match is NECESSARY, NOT SUFFICIENT
+
+Pi05 was trained on 40,712 frames of OUR real table and still fails ON that
+table. So the grid is:
+
+```text
+                     in-domain data          out-of-domain
+GR00T architecture   WORKS (N1.6 in sim)     fails (N1.7 in sim)
+Pi05  architecture   FAILS (our real arm)    fails (sim)
+```
+
+Every cell is measured except one: **GR00T + our real data + our real arm.**
+GR00T-with-in-domain-data is the only combination that has ever worked anywhere
+in this project — and Pi05 failing WITH the domain advantage is the strongest
+evidence the problem is Pi05's architecture/recipe, not deployment.
+
+Two implications, honestly:
+- the as-is hardware test (step 1 below) starts from further back than domain
+  logic alone suggests — in-domain training didn't save Pi05 on hardware
+- if our 89 episodes are themselves flawed, GR00T inherits the flaw. Counter-
+  point: sim N1.6 succeeded off ~60 episodes, fewer than our 89, so quantity
+  alone is not the problem. A GR00T failure on our data would finally isolate
+  DATA QUALITY as the variable — an answer Pi05's failures could never give.
+
 ---
 
-## 3. THE PLAN
+## 3. THE PLAN (revised 2026-08-06 — user's correction)
 
-### Step 1 — Fine-tune GR00T N1.6 on OUR 89 REAL episodes
+### Step 1 — TRY THE SIM-TRAINED N1.6 CHECKPOINT AS-IS ON THE REAL ARM
+
+Added on the user's standing rule: *"instead of guessing we could just test,
+because testing doesn't cost us much."* The prediction is that it fails (visual
+domain gap, and Pi05 failed even in-domain) — but a prediction is not a
+measurement, this is literally the project's original use-others'-work-as-is
+strategy, and **nothing is wasted either way**: the serving path built for this
+test is the SAME one the fine-tuned model needs later, and a failure MEASURES
+the sim-to-real gap on the exact architecture we intend to use.
+
+#### Scoped 2026-08-06 — what the as-is test actually needs
+
+```text
+ALREADY IN PLACE
+  checkpoint     12e21/gr00t_n1d6_leisaac_pick_orange, local, serves in 8.2 GB
+  server         gr00t.eval.run_gr00t_server on :5556 - the exact stack that
+                 scored 15/15 in sim
+  real-arm client SHIPS WITH THE REPO: gr00t/eval/real_robot/SO100/eval_so100.py
+                 - drives an SO-101 via LeRobot robot classes, packages
+                 front+wrist frames + state, queries the server, streams actions.
+                 Its camera_keys are hardcoded ["front","wrist"] - exactly what
+                 the checkpoint wants.
+  calibration    ~/.cache/huggingface/lerobot/calibration/robots/so_follower/
+                 my_so101_follower.json (transferred + verified day 1)
+  units          NO conversion layer needed on real hardware - the arm speaks
+                 LeRobot motor units natively, which is what the checkpoint was
+                 trained on. The sim needed rad<->motor conversion; the real arm
+                 does not. One less place to be wrong.
+
+NEEDED - SOFTWARE (me)
+  1. pip install lerobot into the n1.6 venv (it is NOT there - eval_so100.py
+     imports lerobot.robots). RISK: must not disturb torch 2.7.1+cu128/sm_120.
+     Verify torch after install; use --no-deps if it tries.
+  2. Smoke-test eval_so100.py end-to-end with the server, no robot attached
+     (it should fail at hardware discovery, proving imports and wiring).
+  3. Only TWO cameras needed: front + wrist. The top camera - required for
+     Pi05's 3-camera gate - is NOT used by GR00T. Simpler rig than every
+     previous real-arm session.
+
+NEEDED - HARDWARE (the user)
+  4. Plug in the arm (currently NO /dev/ttyACM*) and the front + wrist cameras
+     (currently NO /dev/video*). Wrist previously came via the RPi bridge as
+     /dev/video6 - needs re-checking on this machine.
+  5. MOUNT THE FRONT CAMERA TO MATCH THE SIM: rigidly attached to the ROBOT
+     BASE at pos=(0.0, -0.5, 0.6) relative to base, focal 28.7 (sim spec).
+     This is the single cheapest thing that improves the as-is test's odds -
+     the checkpoint has only ever seen that viewpoint. Do NOT eyeball a
+     different pose: S2 proved a wrong view is worse than a missing one.
+  6. Scene: orange(s) + a plate on the table, roughly matching the sim layout.
+
+RUN PROTOCOL
+  instruction "Grab orange and place into plate"  (the string that worked in sim)
+  workspace clear, hand on the kill switch, start from rest pose
+  RECORD the episode (video + trace)
+  score with analyze_grasp_from_trace.py's finger-stall test - NEVER
+  "gripper closed" alone. Sim twin of the object-displacement rule.
+
+VERDICT RULES
+  works at all      -> enormous result, the original bet pays; iterate in place
+  reaches wrong     -> visual gap dominates; fine-tune (step 2) attacks exactly this
+  freezes / erratic -> check the SERVING path first (sim regression run on :5556)
+                       before blaming the model - Era 1's lesson.
+```
+
+### Step 2 — Fine-tune GR00T N1.6 on OUR 89 REAL episodes
 
 This is the main line. Rationale:
 
@@ -95,7 +183,7 @@ BLOCKER B - DATASET FORMAT
   proved a view the model never trained on is actively harmful.
 ```
 
-### Step 2 — Serve it on the REAL ARM and measure properly
+### Step 3 — Serve the FINE-TUNE on the real arm, same protocol as step 1
 
 ```text
 NOT in the simulator. This is the step that has never happened.
@@ -105,7 +193,7 @@ check that exposed a convincing false "grasp" in sim.
 NEVER accept "gripper closed" as evidence of a grasp, in either environment.
 ```
 
-### Step 3 — Keep the simulator as a REGRESSION HARNESS
+### Step 4 — Keep the simulator as a REGRESSION HARNESS
 
 ```text
 Its real value is validating a SERVING PATH before hardware touches it. The
@@ -131,11 +219,16 @@ camera pose cut Pi05's near-object time from 86% to 23%.
 ## 4. Order of work
 
 ```text
-1. 8-bit Adam / adafactor -> unblock fine-tuning         (needed by everything)
-2. v3.0 -> GR00T v2 converter for our 89 real episodes   (drop `top`)
-3. fine-tune GR00T N1.6 on our real data
-4. serve on the REAL ARM, score with the finger-stall test
-5. sim regression check of the serving path before step 4 touches hardware
+1. AS-IS HARDWARE TEST of the sim-trained N1.6 (scoped above)
+     me:   lerobot into the n1.6 venv (guard torch!), client smoke test
+     user: plug in arm + front/wrist cameras, mount front camera to sim spec
+2. In parallel, 8-bit Adam -> unblock fine-tuning (needed if step 1 fails,
+   which is likely; costs nothing to prepare)
+3. v3.0 -> GR00T v2 converter for our 89 real episodes   (drop `top`)
+4. fine-tune GR00T N1.6 on our real data
+5. serve the fine-tune on the arm - SAME serving path step 1 already built -
+   score with the finger-stall test
+6. sim regression check of the serving path before anything touches hardware
 ```
 
 ---
