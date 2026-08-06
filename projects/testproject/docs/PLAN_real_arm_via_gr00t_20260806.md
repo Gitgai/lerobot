@@ -254,19 +254,34 @@ camera pose cut Pi05's near-object time from 86% to 23%.
 ## 4. Order of work
 
 ```text
-0. DONE - robustness campaign. Verdicts: appearance free, geometry ~one orange,
-   DECOYS FATAL -> the real table must be CLEAN. Camera mount has 2 cm slack.
-1. AS-IS HARDWARE TEST of the sim-trained N1.6 - NOW UNBLOCKED, rig spec above
-     me:   lerobot into the n1.6 venv (guard torch!), client smoke test
+0.  DONE - robustness campaign. Verdicts: appearance free, geometry ~one
+    orange, DECOYS FATAL -> the real table must be CLEAN. Camera: 2 cm slack.
+0b. SIM-TO-REAL PREFLIGHT (STANDING PROTOCOL - runs before EVERY hardware
+    deployment from now on, this one and all future ones):
+      Stage A  client equivalence: field-by-field desk check of the real
+               client vs the validated sim client + no-robot smoke test.
+               THE Era-1 check. Any mismatch is fixed before power-on.
+      Stage B  failure-signature runs: BGR swap, noise, blur, JPEG, white
+               balance, stale observations, camera ANGLE, wrist-cam jitter -
+               one defect per run, so hardware misbehaviour can be matched
+               against a known signature instead of guessed at.
+      Stage C  exact-scene match: sim run with the scene the user will
+               physically build.
+    ~2.5 h total. Decision rules pre-agreed.
+    -> sim_to_real_preflight_protocol_20260806.md
+1.  AS-IS HARDWARE TEST of the sim-trained N1.6 - after 0b passes
+     me:   lerobot into the n1.6 venv (guard torch!) = part of Stage A
      user: plug in arm + front/wrist cameras, mount front camera (careful, not
            obsessive), CLEAN TABLE - nothing orange-ish in the workspace
-2. In parallel, 8-bit Adam -> unblock fine-tuning (needed if step 1 fails,
-   which is likely; costs nothing to prepare)
-3. v3.0 -> GR00T v2 converter for our 89 real episodes   (drop `top`)
-4. fine-tune GR00T N1.6 on our real data
-5. serve the fine-tune on the arm - SAME serving path step 1 already built -
-   score with the finger-stall test
-6. sim regression check of the serving path before anything touches hardware
+2.  In parallel, 8-bit Adam -> unblock fine-tuning (needed if step 1 fails,
+    which is likely; costs nothing to prepare)
+3.  v3.0 -> GR00T v2 converter for our 89 real episodes   (drop `top`)
+4.  fine-tune GR00T N1.6 on our real data
+5.  serve the fine-tune on the arm - SAME serving path step 1 already built -
+    PREFLIGHT REPEATS first (Stages B/C: the policy changed; Stage A only if
+    the client changed), then score with the finger-stall test
+6.  (absorbed into 0b - the preflight IS the sim regression check, made
+    systematic)
 
 Optional sim follow-ups, NOT gating anything:
   - characterize the decoy failure (does it GRAB decoys or freeze? log decoy
