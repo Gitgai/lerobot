@@ -102,6 +102,12 @@ parser.add_argument(
 parser.add_argument("--out", default="logs/sim_policy_gt.csv")
 parser.add_argument("--move-oranges", default=None,
                     help="S1: shift ALL oranges by \"dx,dy,dz\" metres to test whether the reach is object-directed or a positional prior.")
+parser.add_argument("--scatter-oranges", default=None,
+                    help="Harder than --move-oranges: PER-ORANGE offsets \"dx1,dy1,dx2,dy2,dx3,dy3\" (z unchanged). A uniform shift preserves the objects' relative layout; scattering destroys it.")
+parser.add_argument("--move-plate", default=None,
+                    help="Shift the PLATE (the goal) by \"dx,dy,dz\" metres. Tests goal perception separately from object perception - the env's own training randomization was only +/-3 cm.")
+parser.add_argument("--jitter-camera", default=None,
+                    help="Perturb the FRONT camera mount by \"dx,dy,dz\" metres. Measures viewpoint sensitivity, which is exactly the error a real camera mount will have. S2 warns: a wrong view can be worse than none.")
 args = parser.parse_args()
 
 from isaaclab.app import AppLauncher  # noqa: E402
@@ -195,6 +201,40 @@ def main() -> None:
             cfg.init_state.pos = (old[0] + dx, old[1] + dy, old[2] + dz)
             print(f"[eval] moved {name}: {tuple(round(v, 3) for v in old)} -> "
                   f"{tuple(round(v, 3) for v in cfg.init_state.pos)}")
+
+    if args.scatter_oranges:
+        vals = [float(v) for v in args.scatter_oranges.split(",")]
+        assert len(vals) == 6, "--scatter-oranges wants dx1,dy1,dx2,dy2,dx3,dy3"
+        for (name, dx, dy) in zip(ORANGES, vals[0::2], vals[1::2], strict=True):
+            cfg = getattr(env_cfg.scene, name, None)
+            if cfg is None:
+                continue
+            old = cfg.init_state.pos
+            cfg.init_state.pos = (old[0] + dx, old[1] + dy, old[2])
+            print(f"[eval] scattered {name}: {tuple(round(v, 3) for v in old)} -> "
+                  f"{tuple(round(v, 3) for v in cfg.init_state.pos)}")
+
+    if args.move_plate:
+        dx, dy, dz = (float(v) for v in args.move_plate.split(","))
+        cfg = getattr(env_cfg.scene, "Plate", None)
+        if cfg is None:
+            print("[eval] WARNING: Plate not found on scene cfg - not moved")
+        else:
+            old = cfg.init_state.pos
+            cfg.init_state.pos = (old[0] + dx, old[1] + dy, old[2] + dz)
+            print(f"[eval] moved Plate: {tuple(round(v, 3) for v in old)} -> "
+                  f"{tuple(round(v, 3) for v in cfg.init_state.pos)}")
+
+    if args.jitter_camera:
+        dx, dy, dz = (float(v) for v in args.jitter_camera.split(","))
+        cam = getattr(env_cfg.scene, "front", None)
+        if cam is None:
+            print("[eval] WARNING: front camera not on scene cfg - not jittered")
+        else:
+            old = cam.offset.pos
+            cam.offset.pos = (old[0] + dx, old[1] + dy, old[2] + dz)
+            print(f"[eval] jittered front camera: {tuple(round(v, 3) for v in old)} -> "
+                  f"{tuple(round(v, 3) for v in cam.offset.pos)}")
     # The recorder defaults to EXPORT_ALL, which opens an HDF5 for writing. We
     # only want the scored CSV, and if ANOTHER sim is still shutting down the two
     # collide with a bewildering
