@@ -108,6 +108,18 @@ parser.add_argument("--move-plate", default=None,
                     help="Shift the PLATE (the goal) by \"dx,dy,dz\" metres. Tests goal perception separately from object perception - the env's own training randomization was only +/-3 cm.")
 parser.add_argument("--jitter-camera", default=None,
                     help="Perturb the FRONT camera mount by \"dx,dy,dz\" metres. Measures viewpoint sensitivity, which is exactly the error a real camera mount will have. S2 warns: a wrong view can be worse than none.")
+parser.add_argument("--tint", default=None,
+                    help="Recolor scene entities: \"Name:r,g,b;Name2:r,g,b\" (0-1 floats). Binds a PreviewSurface material stronger-than-descendants, so it overrides the asset's own textures. Names match prim paths, e.g. Plate, Robot, Orange001.")
+parser.add_argument("--light-scale", type=float, default=None,
+                    help="Multiply every light's intensity (0.35 = dim evening, 2.5 = blown out).")
+parser.add_argument("--light-color", default=None,
+                    help="Set every light's color to \"r,g,b\" - warm/cool lighting recolors the WHOLE scene cheaply.")
+parser.add_argument("--add-plate", default=None,
+                    help="Spawn a SECOND identical plate at \"dx,dy\" from the real one. The GT place term still tracks only the original -> measures whether the policy is goal-ambiguous.")
+parser.add_argument("--add-decoys", type=int, default=0,
+                    help="Spawn N orange-COLORED spheres near the oranges. We have no other fruit assets; a same-color decoy is the sharper test anyway - does it grab AN ORANGE or anything orange-ish?")
+parser.add_argument("--scale-oranges", type=float, default=None,
+                    help="Scale the oranges (0.75 = small, 1.3 = large). Changes both the visual and the grasp width needed.")
 args = parser.parse_args()
 
 from isaaclab.app import AppLauncher  # noqa: E402
@@ -235,6 +247,54 @@ def main() -> None:
             cam.offset.pos = (old[0] + dx, old[1] + dy, old[2] + dz)
             print(f"[eval] jittered front camera: {tuple(round(v, 3) for v in old)} -> "
                   f"{tuple(round(v, 3) for v in cam.offset.pos)}")
+
+    # ---- CFG-LEVEL scene additions (must happen BEFORE gym.make) ----
+    if args.scale_oranges:
+        for name in ORANGES:
+            cfg = getattr(env_cfg.scene, name, None)
+            if cfg is not None:
+                cfg.spawn.scale = (args.scale_oranges,) * 3
+        print(f"[eval] oranges scaled x{args.scale_oranges}")
+
+    if args.add_plate:
+        import copy as _copy
+
+        dx, dy = (float(v) for v in args.add_plate.split(","))
+        plate = getattr(env_cfg.scene, "Plate", None)
+        if plate is None:
+            raise RuntimeError("--add-plate: no Plate on scene cfg")
+        plate2 = _copy.deepcopy(plate)
+        plate2.prim_path = "{ENV_REGEX_NS}/Plate2"
+        old = plate.init_state.pos
+        plate2.init_state.pos = (old[0] + dx, old[1] + dy, old[2])
+        env_cfg.scene.Plate2 = plate2
+        print(f"[eval] second plate at {tuple(round(v, 3) for v in plate2.init_state.pos)} "
+              "(GT place term still tracks the ORIGINAL only)")
+
+    if args.add_decoys:
+        import isaaclab.sim as sim_utils
+        from isaaclab.assets import RigidObjectCfg
+
+        # Offsets fan the decoys out between/around the real oranges.
+        offsets = [(0.07, -0.07), (-0.09, 0.06), (0.05, 0.11), (-0.06, -0.10)]
+        base = getattr(env_cfg.scene, "Orange001").init_state.pos
+        for i in range(min(args.add_decoys, len(offsets))):
+            ox, oy = offsets[i]
+            decoy = RigidObjectCfg(
+                prim_path=f"{{ENV_REGEX_NS}}/Decoy{i + 1}",
+                spawn=sim_utils.SphereCfg(
+                    radius=0.035,  # ~ the oranges
+                    rigid_props=sim_utils.RigidBodyPropertiesCfg(),
+                    mass_props=sim_utils.MassPropertiesCfg(mass=0.15),
+                    collision_props=sim_utils.CollisionPropertiesCfg(),
+                    # orange-fruit colour: the whole point is SAME colour,
+                    # different object
+                    visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.95, 0.55, 0.12)),
+                ),
+                init_state=RigidObjectCfg.InitialStateCfg(pos=(base[0] + ox, base[1] + oy, base[2] + 0.02)),
+            )
+            setattr(env_cfg.scene, f"Decoy{i + 1}", decoy)
+        print(f"[eval] {args.add_decoys} orange-coloured decoy spheres added")
     # The recorder defaults to EXPORT_ALL, which opens an HDF5 for writing. We
     # only want the scored CSV, and if ANOTHER sim is still shutting down the two
     # collide with a bewildering
@@ -247,6 +307,53 @@ def main() -> None:
         env_cfg.recorders.dataset_export_mode = DatasetExportMode.EXPORT_NONE
 
     env = gym.make(args.task, cfg=env_cfg).unwrapped
+
+    # ---- STAGE-LEVEL mods (need the live USD stage, i.e. AFTER gym.make) ----
+    if args.tint or args.light_scale or args.light_color:
+        import omni.usd
+        from pxr import Gf, Sdf, UsdShade
+
+        stage = omni.usd.get_context().get_stage()
+
+        if args.tint:
+            for spec in args.tint.split(";"):
+                name, rgb = spec.split(":")
+                r, g, b = (float(v) for v in rgb.split(","))
+                mat_path = Sdf.Path(f"/World/Looks/tint_{name}")
+                material = UsdShade.Material.Define(stage, mat_path)
+                shader = UsdShade.Shader.Define(stage, mat_path.AppendChild("shader"))
+                shader.CreateIdAttr("UsdPreviewSurface")
+                shader.CreateInput("diffuseColor", Sdf.ValueTypeNames.Color3f).Set(Gf.Vec3f(r, g, b))
+                material.CreateSurfaceOutput().ConnectToSource(shader.ConnectableAPI(), "surface")
+                bound = 0
+                for prim in stage.Traverse():
+                    if prim.GetPath().pathString.endswith(f"/{name}"):
+                        UsdShade.MaterialBindingAPI.Apply(prim).Bind(
+                            material, bindingStrength=UsdShade.Tokens.strongerThanDescendants
+                        )
+                        bound += 1
+                if bound == 0:
+                    raise RuntimeError(f"--tint: no prim ending in /{name} found")
+                print(f"[eval] tinted {bound} prim(s) named {name} -> ({r},{g},{b})")
+
+        if args.light_scale or args.light_color:
+            changed = 0
+            for prim in stage.Traverse():
+                if not prim.GetTypeName().endswith("Light"):
+                    continue
+                if args.light_scale:
+                    attr = prim.GetAttribute("inputs:intensity")
+                    if attr and attr.Get() is not None:
+                        attr.Set(attr.Get() * args.light_scale)
+                        changed += 1
+                if args.light_color:
+                    r, g, b = (float(v) for v in args.light_color.split(","))
+                    cattr = prim.GetAttribute("inputs:color")
+                    if cattr:
+                        cattr.Set(Gf.Vec3f(r, g, b))
+            if changed == 0 and args.light_scale:
+                raise RuntimeError("--light-scale: no lights found on stage")
+            print(f"[eval] lighting adjusted on {changed} light prim(s)")
 
     from isaaclab.sensors import Camera
 
