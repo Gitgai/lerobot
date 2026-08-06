@@ -89,6 +89,40 @@ wrist: /dev/video6 via Raspberry Pi bridge
 
 Do not run 2-camera tests as a clean Pi05 result.
 
+Never call a grasp a grasp without object displacement (added 2026-08-05):
+
+```text
+A "gripper closed" signal is NOT a grasp - on the real arm OR in simulation.
+
+REAL ARM: analyze_grasp_from_trace.py uses the finger-stall test, because
+  fingers cannot pass through an object.
+SIMULATION: mdp.orange_grasped is
+      distance(object, ee_frame[1]) < 0.05  AND  gripper_joint < 0.60
+  which is PROXIMITY AND CLOSURE. It tests no contact, no force, no lift.
+  A policy that parks beside the object and closes on air scores TRUE
+  indefinitely - GR00T N1.7 did exactly that for 80 consecutive steps while
+  displacing the orange by 0.0001 m.
+
+=> Report OBJECT DISPLACEMENT (and z-travel) alongside every grasp claim.
+=> We assumed sim ground truth was immune because the simulator knows
+   everything. It does. The PREDICATE was the weak part.
+-> gr00t_n17_sim_evaluation_20260805.md section 4
+```
+
+Read a checkpoint's own config before trusting any number from it (2026-08-05):
+
+```text
+UNITS        experiment_cfg/dataset_statistics.json - arm ~+/-100 and gripper
+             ~0..100 means LeRobot MOTOR units, not the sim's radians
+ACTION SPACE conf.yaml use_relative_action + per-modality reps: [RELATIVE,...]
+CAMERAS      conf.yaml video.modality_keys is the authority; sending a view the
+             model never trained on is actively harmful (S2 proved it)
+
+All three were wrong on the first GR00T run and it produced a confident,
+completely false "grasp=TRUE". "The server replied with varied numbers" only
+proves the wire format parses.
+```
+
 ## 3. Current Checkpoints And Dataset
 
 Main focused training dataset:

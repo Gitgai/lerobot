@@ -461,6 +461,32 @@ Do P3 only when evidence says it is the right fix.
 
 ## 3. Current Priority Order
 
+> **SUPERSEDED FOR DAY-TO-DAY WORK (2026-08-05).** The list below was written
+> for the real-arm Pi05 failure investigation and is kept for that context. The
+> project is now SIM-FIRST on a local 5090, so the live order is:
+>
+> ```text
+> N1. INSTRUCTION SWEEP on GR00T N1.7 in sim. Highest information per minute
+>     available: ~12 min/run, no new code. "Grab pens and place into pen holder"
+>     made the model approach and close; "pick up the orange and move it to
+>     another place" made it retreat and freeze. Neither is a verified training
+>     string, so what phrasing actually buys is UNKNOWN and cheap to find out.
+> N2. Drive the openpi checkpoint (felixmayor/pi05_so101_orange_cube). LeIsaac
+>     speaks openpi natively; openpi is installed and still not driven.
+> N3. GR00T pipeline validation on izuluaga/finish_sandwich (S3).
+> N4. More LeIsaac scenes for environment diversity (S4) - Strategy B.
+> N5. Fine-tune GR00T on our 12 sim place operations. Worth doing now ONLY
+>     because the serving path beneath it is finally verified.
+> ```
+>
+> **Report object displacement with every "grasp" from now on.** The sim's own
+> grasp predicate is proximity+closure and does not test lift.
+>
+> **Note on P0 below:** the three-camera gate applies to OFFICIAL REAL-ARM runs.
+> In sim, S2 showed that adding a third camera at an INVENTED pose is actively
+> harmful (near-object time 86% -> 23%). Do not read P0 as "always add a top
+> camera in sim" — a mismatched view is worse than a masked one.
+
 Current priority order:
 
 ```text

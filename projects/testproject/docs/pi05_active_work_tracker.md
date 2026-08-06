@@ -2,6 +2,28 @@
 
 Last updated: 2026-08-05
 
+> **2026-08-05 LATEST: A PUBLIC GR00T CHECKPOINT NOW RUNS AND IS SCORED — and
+> our sim "grasp" signal turned out to be weaker than we assumed.**
+>
+> GR00T N1.7 (`robocurve/gr00t-n1.7-so101-molmoact2`) reaches the grasp frame to
+> **0.039 m** and closes the gripper for **80 consecutive steps**, where Pi05
+> never satisfies even proximity+closure — **and the orange moves 0.0001 m.** It
+> acquires nothing.
+>
+> **The trap:** `mdp.orange_grasped` is `distance < 0.05 AND gripper < 0.60`.
+> Proximity and closure, with **no test of contact or lift**. A policy parking
+> beside the orange and closing on air scores TRUE indefinitely. This is the
+> simulation twin of the real-arm lesson behind the finger-stall test. **Every
+> sim "grasp" in this project must be read as proximity+closure unless object
+> displacement is reported with it.** All historical runs were re-scored: no Pi05
+> run ever fired the predicate, so nothing earlier was flattered.
+>
+> Getting a trustworthy number first required fixing **three** adapter bugs —
+> units (the checkpoint speaks LeRobot motor units, not the sim's radians),
+> relative-vs-absolute actions, and an extra camera. Before those fixes the run
+> reported a confident, entirely false `grasp=TRUE`.
+> Read: `gr00t_n17_sim_evaluation_20260805.md`
+
 > # 👉 START HERE: `STATE_20260805.md`
 > One page: what is verified, what we learned about 012000, the strategy in
 > force, the next step, and the unchanged load-bearing unknown — **nothing has

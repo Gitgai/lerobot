@@ -1,9 +1,32 @@
 # GR00T N1.5 vs Pi05: Architecture Comparison Plan
 
-Last updated: 2026-08-04
-Status: PLAN - not started. No robot time, no GPU time spent yet.
+Last updated: 2026-08-05
+Status: **PARTLY OVERTAKEN BY EVENTS — read this box before following the plan.**
 Slots into: `pi05_generalization_roadmap_20260802.md` as **Stage 3b**, after the
-Stage 2 recording session. Do not run this before Stage 2.
+Stage 2 recording session.
+
+```text
+WHAT ACTUALLY HAPPENED, 2026-08-05
+This plan assumed the comparison required FINE-TUNING GR00T on our data. It did
+not. A PUBLIC GR00T N1.7 checkpoint (robocurve/gr00t-n1.7-so101-molmoact2) was
+served locally and scored against Pi05 in the SAME sim scene, on the SAME
+ground-truth metrics, with NO fine-tuning and NO robot time.
+
+  Pi05 012000  hovers 13-18 cm, never satisfies even proximity+closure
+  GR00T N1.7   reaches the grasp frame to 0.039 m and closes for 80 steps,
+               but the orange moves 0.0001 m - it acquires NOTHING
+
+  -> gr00t_n17_sim_evaluation_20260805.md
+
+SO THE VERSION IS N1.7, NOT N1.5, and Sections 3-6 below (dataset conversion,
+fine-tuning, VRAM budgeting) are NOT prerequisites for a first comparison. They
+remain the plan for a FINE-TUNED comparison, which is a different question.
+
+READ THE COMPARISON CAUTIOUSLY: it is not apples-to-apples. Pi05 is a
+single-task specialist trained on THIS task and doing only a sim-transfer;
+GR00T is a broad generalist (2,242 eps / 39 repos) doing task-transfer AND
+sim-transfer at once.
+```
 
 ---
 
@@ -353,6 +376,16 @@ FROM THE NVIDIA POST - NOT VERIFIED HERE
   LeRobot v2.0+ datasets are supported
   10k steps is a reasonable starting point
   SO-101 works as a new_embodiment
+
+VERIFIED 2026-08-05 (serving, not fine-tuning)
+  GR00T N1.7 SERVES locally in ~8 GB VRAM: 1,091,722,240 DiT + 201,433,088
+    SelfAttn params, ZMQ REP on :5555
+  The gated backbone (nvidia/Cosmos-Reason2-2B, 4.6 GB) is cached and OFFLINE
+  LeIsaac's n1.5/n1.6 clients do NOT speak N1.7 - seven wire-format differences,
+    bridged by scripts/gr00t_n17_client_adapter.py
+  A checkpoint's UNITS, ABSOLUTE-vs-RELATIVE actions and CAMERA COUNT must all
+    be read out of experiment_cfg/ BEFORE trusting any number. All three were
+    wrong on the first run and it produced a convincing false "grasp".
 
 UNKNOWN
   Whether GR00T's loader accepts v3.0 today

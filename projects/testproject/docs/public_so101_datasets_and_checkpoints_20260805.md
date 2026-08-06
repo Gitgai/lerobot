@@ -183,9 +183,34 @@ yen-0/smolvla-so101-digits-0707            OUT - IMPOSSIBLE OBSERVATIONS
   CHECKED: the repo has NO MODEL CARD - no task description, no environment, no
   dataset, no code. Just weights.
 
-robocurve/gr00t-n1.7-so101-molmoact2   GATE CLEARED; N1.6<->N1.7 PROTOCOL GAP
-  *** STATUS 2026-08-05 - the gated access is SOLVED and PERMANENT. The
-  remaining blocker is a client/server VERSION mismatch. ***
+robocurve/gr00t-n1.7-so101-molmoact2   *** EVALUATED IN SIM - SEE BELOW ***
+  *** STATUS 2026-08-05 (final) - gate SOLVED, adapter WORKS, and the model has
+  now been SCORED in LeIsaac from ground truth. ***
+
+  RESULT: reaches the grasp frame to 0.039 m and closes the gripper (predicate
+  TRUE for 80 consecutive steps) - but the orange moves 0.0001 m. It approaches
+  far better than Pi05, which never satisfies even proximity+closure, and it
+  ACQUIRES NOTHING. No place, ever.
+  -> gr00t_n17_sim_evaluation_20260805.md   (full write-up + the 3 adapter bugs)
+
+  WHAT IT WAS ACTUALLY TRAINED ON (checked the model card 2026-08-05, because
+  an earlier draft of the eval doc got this WRONG and said "table cleanup"):
+    SO-101 subset of allenai/MolmoAct2-SO100_101-Dataset
+    2,242 episodes / 1.8M frames, filtered from 39 public community repos
+    task family: tabletop pick/place, stacking, sorting
+    THE CARD PUBLISHES NO INSTRUCTION STRINGS. So no instruction we send can be
+    called "the training string", and phrasing experiments must be reported as
+    sensitivity, not as matching.
+
+  THREE SCREENING CRITERIA THIS CHECKPOINT ADDED (apply to the NEXT one BEFORE
+  spending an hour on an adapter):
+    1. UNITS. Read experiment_cfg/dataset_statistics.json FIRST. Arm ~ +/-100
+       and gripper ~ 0..100 means LeRobot MOTOR units, NOT the sim's radians.
+       LeIsaac's LeRobot client converts; a hand-written client must too.
+    2. ABSOLUTE vs RELATIVE. conf.yaml `use_relative_action` + the per-modality
+       `reps:` list. Here [RELATIVE, ABSOLUTE] - arm is a delta, gripper is not.
+    3. CAMERA COUNT. conf.yaml video.modality_keys is the authority. Sending a
+       view it never trained on is actively harmful (S2 proved that on Pi05).
 
   SOLVED:
     gated backbone nvidia/Cosmos-Reason2-2B: access granted (gated: auto - a
@@ -205,9 +230,21 @@ robocurve/gr00t-n1.7-so101-molmoact2   GATE CLEARED; N1.6<->N1.7 PROTOCOL GAP
 
   *** SOLVED 2026-08-05: N1.7 NOW WORKS via a written adapter. ***
     scripts/gr00t_n17_client_adapter.py  ->  Gr00tN17Client
-    Smoke test against the live server returned REAL, VARIED actions:
-      action shape (1, 96) float32   = 16 timesteps x 6 DoF, a full chunk
-      first row: [0.0971, 2.724, -0.7633, 0.4511, 0.4671, 0.0142]
+    Returns [16, 6] float32 = 16 timesteps x 6 DoF, IN SIM RADIANS.
+
+    WARNING - an earlier note here quoted a smoke test of "(1, 96), first row
+    [0.0971, 2.724, -0.7633, ...]". Those numbers came from the BUGGED adapter
+    (raw motor-space deltas passed through as absolute radians) and mean
+    nothing. "The server replied with varied numbers" is NOT a working adapter;
+    it only proves the wire format parses. The real gates are units, relative-
+    vs-absolute, and camera count - all three were wrong while that smoke test
+    was passing.
+
+    Current smoke test, from a plausible rest pose, is checkable BY SCALE:
+      rest [0.1,-0.5,0.3,0.2,-0.1,0.4] rad -> motor [5.2,-28.7,23.4,12.1,-3.6,29.9]
+      which sits mid-distribution for this checkpoint (arm +/-100, gripper 0..100)
+      returned actions stay within ~0.5 rad of the current state
+      round-trip motor_to_sim(sim_to_motor(x)) == x to 1.5e-7
 
   THE N1.6 -> N1.7 WIRE FORMAT MAP (seven differences, one probe each):
 

@@ -14,19 +14,37 @@ the command stream alone." Here the equivalent of the trace tool is direct GT.
 
 What it records per step
 ------------------------
-    ee_x/y/z            end-effector position (world)
-    d_orange1..3        EE distance to each orange
-    d_min               distance to the NEAREST orange   <- the key signal
+    ee_x/y/z            end-effector position, ee_frame index 0 (tool origin)
+    d_orange1..3        distance from THAT frame to each orange
+    d_min               distance to the NEAREST orange
+    d_grasp_min         distance from ee_frame index 1, THE GRASP POINT - this
+                        is the frame mdp.orange_grasped actually tests, and it
+                        reads ~0.06-0.07 m shorter than d_min
     gripper_cmd         commanded gripper value from the policy action
-    pick_orangeNNN      GT: is that orange grasped?      (mdp.orange_grasped)
+    o1/o2/o3 x,y,z      world position of EVERY orange   <- the honesty column
+    pick_orangeNNN      GT predicate                     (mdp.orange_grasped)
     put_orangeNNN_to_plate  GT: is it on the plate?      <- the PLACE term
+
+*** DO NOT TRUST pick_* ON ITS OWN ***
+mdp.orange_grasped (tasks/pick_orange/mdp/observations.py) is:
+
+    (distance(object, ee_frame[1]) < 0.05)  AND  (gripper_joint < 0.60)
+
+PROXIMITY AND CLOSURE. It tests no contact, no force and no lift. A policy that
+parks beside the orange and closes on air scores True indefinitely - GR00T N1.7
+scored True for 80 consecutive steps while displacing the orange by 0.0001 m.
+That is why o1/o2/o3 are logged: OBJECT DISPLACEMENT is what turns the predicate
+into evidence. This is the sim twin of the real-arm finger-stall test.
 
 Reading the result
 ------------------
     d_min never decreases            -> the policy is not reaching at all
     d_min decreases then plateaus    -> it approaches but cannot grasp
-    pick_* ever True                 -> a real grasp happened
+    pick_* True AND the object moves -> a real grasp
+    pick_* True and it does NOT move -> closed on air; report it as such
     put_*_to_plate ever True         -> a PLACE happened
+    ee position frozen for many steps -> for a RELATIVE-action policy this means
+                        it is emitting ~zero deltas, i.e. it believes it is done
 
 IMPORTANT - read failure asymmetrically. This checkpoint was fine-tuned on REAL
 camera frames of a specific table. Sim renders, sim lighting and sim camera poses

@@ -1,6 +1,11 @@
 # GR00T N1.7 evaluated in LeIsaac — and a trap in our ground truth
 
-Date: 2026-08-05. Checkpoint: `gr00t-n1.7-so101` (NVIDIA blog fine-tune).
+Date: 2026-08-05.
+Checkpoint: **`robocurve/gr00t-n1.7-so101-molmoact2`**, local dir
+`~/lerobot_assets/checkpoints/gr00t_n17_so101`. A broad community fine-tune
+(MolmoAct2 SO-101 subset: 2,242 episodes, 1.8M frames, 39 repos; tabletop
+pick/place, stacking, sorting). **Not** NVIDIA's so101-table-cleanup blog
+checkpoint — see the correction in section 3.
 Scene: `LeIsaac-SO101-PickOrange-v0`, 900 steps, scored from simulator GT by
 `scripts/sim_policy_eval_instrumented.py`.
 
@@ -83,11 +88,24 @@ GR00T run4  confirmation    0.110   0.245     -       -        yes*    -
 Gripper range fell from **70.5** (bugged) to **0.35** rad — the same scale as
 Pi05's 1.4, i.e. finally a physically sane command stream.
 
-### The language instruction dominates
+### The language instruction dominates — but NOT for the reason first written
 
-This checkpoint was trained on **"Grab pens and place into pen holder."**
-(so101-table-cleanup). We had been commanding *"pick up the orange and move it
-to another place"* — a task string it never saw.
+```text
+CORRECTION (same day). The first version of this doc said the checkpoint "was
+trained on 'Grab pens and place into pen holder.'" THAT IS WRONG. That string
+comes from NVIDIA's so101-table-cleanup blog tutorial, which is a DIFFERENT
+checkpoint. What we are serving is:
+
+    robocurve/gr00t-n1.7-so101-molmoact2
+    fine-tuned on the SO-101 subset of allenai/MolmoAct2-SO100_101-Dataset
+    2,242 episodes / 1.8M frames, filtered from 39 public community repos
+    task family: tabletop pick/place, stacking, sorting
+    the model card does NOT publish its instruction strings
+
+So NEITHER sentence we tested is a verified training string.
+```
+
+The measurement stands; only its explanation changes:
 
 ```text
 "pick up the orange..."  -> approaches to 0.164 m, RETREATS to 0.394 m,
@@ -96,9 +114,20 @@ to another place"* — a task string it never saw.
                             fires for 80 steps.
 ```
 
-Same checkpoint, same scene, same code — **only the sentence changed**. The
-project's existing rule ("the instruction MUST match the training string
-exactly") is now demonstrated on a second, independent checkpoint.
+Same checkpoint, same scene, same code — **only the sentence changed**. What
+this demonstrates is **instruction SENSITIVITY**, not "match the training string
+and it works". We cannot claim the latter, because we do not know this model's
+training strings and the winning sentence names *pens* in a scene full of
+*oranges*.
+
+The plausible reading is that `"Grab <X> and place into <Y>"` matches a common
+PHRASING PATTERN across those 39 community repos, while *"pick up the orange and
+move it to another place"* does not — i.e. the policy is keying on sentence form
+more than on the noun. That is a hypothesis, and it is cheap to test: sweep
+several phrasings over the same scene and compare `d_grasp_min`.
+
+> **Do not** carry the old claim forward. The lever is *phrasing*, and which
+> phrasing works is currently **unknown** rather than known-from-the-model-card.
 
 A relative-action policy that outputs ~zero deltas holds position forever, which
 is exactly the observed freeze: the model believes it is finished.
@@ -145,17 +174,22 @@ The displacement + z-travel columns are what turn a predicate into evidence.
 ## 5. Honest standing
 
 ```text
-Pi05 012000    trained on THIS task (orange pick), real data.
+Pi05 012000    trained on THIS task (orange pick) on OUR real arm, one table.
                Hovers 13-18 cm. Never satisfies even proximity+closure.
 
-GR00T N1.7     trained on a DIFFERENT task (pens -> pen holder), real data.
+GR00T N1.7     trained on a BROAD community mix (2,242 eps / 39 repos) of
+               tabletop pick/place - never on this task, this scene, or this
+               arm's calibration.
                Reaches the orange to 3.9 cm and closes. Acquires nothing.
 ```
 
 The comparison is **not** apples-to-apples and should not be quoted as
-"GR00T beats Pi05". GR00T is doing a task-transfer *and* a sim-transfer at once;
-Pi05 is doing only the sim-transfer. That GR00T's approach is better under a
-harder ask is interesting, not conclusive.
+"GR00T beats Pi05". Pi05 is a single-task specialist doing only a sim-transfer;
+GR00T is a broad generalist doing task-transfer *and* sim-transfer at once. That
+the generalist's approach is better under the harder ask is interesting, not
+conclusive — and it is the first datapoint that actually speaks to the project's
+central bet ("large VLAs should generalise across similar SO-101 arms"). One
+datapoint, with no acquisition, is not a verdict.
 
 What is now solid: **the serving path for GR00T N1.7 is correct and verified**,
 so any future GR00T result (including a fine-tune on our own sim episodes) is

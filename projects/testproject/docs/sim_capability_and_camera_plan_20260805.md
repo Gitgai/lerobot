@@ -188,6 +188,11 @@ Both scripts ship upstream. Neither is yet tested by us.
    Until this is done, only "it reaches" is established. CHEAP AND HIGH VALUE.
 3. Add a `top` camera matched to our real rig, re-run Pi05.
    Separates the missing-camera penalty from the domain gap.
+   *** DONE 2026-08-05 AND IT BACKFIRED. *** With an INVENTED pose, time within
+   0.20 m fell 86% -> 23%. A masked view the model ignores; a WRONG view it
+   cannot. The camera has since been REVERTED and the scene is back to
+   ['wrist','front']. Re-adding it is only worth it with a pose measured from
+   the real rig, never a guessed one.  -> s1_s2_results_20260805.md section 2
 4. Convert our 4 sim place episodes to LeRobot v2 and fine-tune GR00T on them.
 5. Download more scenes; generate PickOrange demos across several environments.
    This is the environment diversity our real table cannot produce.
@@ -201,8 +206,13 @@ and each isolates ONE variable - which is this project's hard rule #8.
 ## 5. Open Questions
 
 ```text
-Is Pi05's sim reach ORANGE-DIRECTED or a positional prior?      -> step 2
-How much of the 2-camera penalty is the missing top view?       -> step 3
+Is Pi05's sim reach ORANGE-DIRECTED or a positional prior?      -> ANSWERED:
+  object-directed. Moving the oranges +0.150 m moved the reach +0.095..0.117 m
+  = 64-78% tracking. Perception survived; FINAL POSITIONING is the failure.
+How much of the 2-camera penalty is the missing top view?       -> ANSWERED the
+  hard way: an invented top pose HURT (86% -> 23%). The question as posed is
+  unanswerable without a pose measured from the real rig - a guessed one
+  measures the guess, not the penalty.
 Can a top camera be posed closely enough to our real C270 for
   the model to actually use it?
 Do sim demos transfer to the real arm at all?                   -> unproven,
