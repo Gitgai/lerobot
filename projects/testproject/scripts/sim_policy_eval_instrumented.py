@@ -113,6 +113,14 @@ from leisaac.utils.env_utils import dynamic_reset_gripper_effort_limit_sim  # no
 
 ORANGES = ["Orange001", "Orange002", "Orange003"]
 
+# Task strings taken from the TRAINING DATASET's meta/tasks.jsonl - not from the
+# env's cfg.task_description, which differs and is not what a model was trained
+# on. Source: LightwheelAI/leisaac-pick-orange (v2.1, 60 eps, front+wrist).
+DATASET_TASK_STRINGS = {
+    "LeIsaac-SO101-PickOrange-v0": "Grab orange and place into plate",
+    "LeIsaac-SO101-PickOrange-Direct-v0": "Grab orange and place into plate",
+}
+
 
 def main() -> None:
     env_cfg = parse_env_cfg(args.task, device=args.device, num_envs=1)
@@ -137,10 +145,22 @@ def main() -> None:
     # move it to another place") that appears nowhere in the env or any dataset,
     # and instruction wording measurably changes behaviour. Read it from the env.
     if args.policy_language_instruction is None:
-        args.policy_language_instruction = getattr(env_cfg, "task_description", None)
+        # PREFER THE DATASET STRING. The env's task_description and the string in
+        # the training dataset's meta/tasks.jsonl are DIFFERENT, and the dataset
+        # one is what a trained model actually saw:
+        #   env     "Pick three oranges and put them into the plate, then reset
+        #            the arm to rest state."
+        #   dataset "Grab orange and place into plate"   (LightwheelAI/leisaac-
+        #            pick-orange, the reference corpus for this scene)
+        # Measured on GR00T N1.7, 900 steps each: the dataset string gave the
+        # closest approach (d_min 0.100) and the ONLY run that moved the orange
+        # (0.023 m); the invented string moved it 0.000 m.
+        args.policy_language_instruction = DATASET_TASK_STRINGS.get(args.task) or getattr(
+            env_cfg, "task_description", None
+        )
         if not args.policy_language_instruction:
-            raise RuntimeError(f"{args.task} declares no task_description; pass --policy_language_instruction")
-        print(f"[eval] instruction FROM ENV: {args.policy_language_instruction!r}")
+            raise RuntimeError(f"{args.task} has no known task string; pass --policy_language_instruction")
+        print(f"[eval] instruction: {args.policy_language_instruction!r}")
     else:
         print(f"[eval] instruction OVERRIDDEN: {args.policy_language_instruction!r}")
 
