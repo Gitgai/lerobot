@@ -99,12 +99,69 @@ Read: **the policy is good but not clean.** It fumbles ~1-2 times per run even
 at home, and moving the oranges costs about one orange in nine. Perception is
 object-directed (it FINDS moved oranges) but precision suffers.
 
-### Battery 2 — pending
+### Battery 2 — hard geometry (DONE)
 
-### Battery 3 — pending
+```text
+run        placed  drops  lifts               read
+plate10      2/3     2    [0.19, 0.21, 0.18]  goal moved 10 cm: still finds it
+scatter      2/3     1    [0.15, 0.16, 0.11]  layout destroyed: still works
+cam2cm       3/3     1    [0.17, 0.15, 0.17]  2 cm mount error: NO degradation
+cam5cm       2/3     4    [0.13, 0.14, 0.20]  5 cm: works but FUMBLES (4 drops)
+combo        2/3     0    [0.18, 0.04, 0.10]  everything moved: 2/3, no drops
+```
 
-*(fill in as they complete; each battery ends with "[batteryN] complete" in
-/home/kiran/sim/n16_batteryN.log)*
+### Battery 3 — appearance (DONE)
+
+```text
+run        placed  drops  lifts               read
+bluePlate    3/3     2    [0.17, 0.13, 0.12]  plate color: does not care
+greenArm     3/3     1    [0.14, 0.17, 0.16]  own arm recolored: does not care
+decoys       1/3     1    [0.16, 0.00, 0.01]  *** CRATERED - see below ***
+twoPlates   CRASHED - script bug in --add-plate ("Accessed schema on invalid
+            prim": deepcopying a parse_usd-created scene entity cfg is not a
+            valid way to clone one). KNOWN BROKEN, needs a proper fix.
+dimLight     3/3     0    [0.17, 0.16, 0.18]  35% light: PERFECT run, 0 drops
+warmLight    2/3     2    [0.15, 0.19, 0.16]  scene recolored: minor cost
+smallOrng    3/3     2    [0.14, 0.14, 0.13]  75% oranges: fine
+```
+
+---
+
+## 2b. THE CAMPAIGN'S THREE FINDINGS
+
+```text
+1. APPEARANCE BARELY MATTERS. Blue plate, green robot, 35% lighting, warm
+   lighting, small oranges - all essentially unaffected. The policy is NOT
+   keying on precise colors or brightness. (dimLight was its cleanest run of
+   the entire campaign: 3/3, zero drops, done by step 624.)
+
+2. GEOMETRY COSTS ABOUT ONE ORANGE. Move things - the oranges, the plate, the
+   layout, everything at once - and it drops from ~89% to reliably 2/3. It
+   still FINDS everything (perception is genuinely object-directed, confirming
+   S1), but precision suffers. Camera mounting has real slack: 2 cm is free,
+   5 cm works with fumbling.
+
+3. *** DECOYS CRATER IT: 1/3, two oranges NEVER TOUCHED (lifts 0.00/0.01). ***
+   Two orange-colored spheres reduced the task's best policy to a third of its
+   performance - the single largest effect of ANY variation tested, larger
+   than moving every object and the goal simultaneously. It keys on "orange
+   blob", not "an orange".
+```
+
+### What this decides for hardware (per the pre-agreed rules in section 3)
+
+```text
+camera mounting   SLACK EXISTS. 2 cm free, 5 cm degraded-but-functional.
+                  Mount carefully but do not obsess.
+table cleanliness THE HARD REQUIREMENT. Nothing orange-ish anywhere near the
+                  workspace - no clutter, period. This is the one variation
+                  that broke it.
+room lighting     not a controlled variable; it does not care.
+expectations      at HOME it is ~85% with 1.1 drops/run and degrades gracefully
+                  except for decoys. On out-of-domain real pixels, the as-is
+                  test's realistic goal remains "purposeful reach toward the
+                  orange", with task completion a pleasant surprise.
+```
 
 ---
 
