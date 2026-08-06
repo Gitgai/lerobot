@@ -1,5 +1,16 @@
 # Fine-tuning plan: GR00T first, then Pi05 — sim pick-and-place
 
+> # ⚠️ SUPERSEDED 2026-08-06 by `PLAN_real_arm_via_gr00t_20260806.md`
+> **Phase 1 (reproduce their fine-tune on their dataset) is DROPPED.** It answers
+> "could we train one if we needed to", but we already have a working sim
+> checkpoint and the real blocker is HARDWARE, not sim capability.
+>
+> Kept because its findings are still load-bearing: **Phase 0's measured
+> baseline** (5/5 runs, 15/15 oranges, first-place ranging step 228–1832), the
+> **AV1 codec trap**, and the **32 GB memory ceiling** — that last one blocks the
+> new plan too, and is now its first step. The data-prep work is done and
+> committed, so Phase 1 can be resumed cheaply if ever wanted.
+
 Date: 2026-08-05. Written after a sim-trained GR00T N1.6 checkpoint completed
 the whole PickOrange task, which is what makes this plan worth running.
 
