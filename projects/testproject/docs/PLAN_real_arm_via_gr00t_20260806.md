@@ -82,6 +82,32 @@ Two implications, honestly:
 
 ## 3. THE PLAN (revised 2026-08-06 — user's correction)
 
+### Step 0 — ROBUSTNESS CAMPAIGN IN SIM (added 2026-08-06, user's call: don't rush to hardware)
+
+```text
+The user watched the policy live and said "it appears to struggle" - and
+re-scoring proved it: across all 12 full runs, 94% of oranges placed but 1.1
+DROPS per run, and two runs ended 2/3. The Phase-0 "100%, stdev 0.00" was the
+policy's best face, not its typical behaviour.
+
+So BEFORE any hardware: three batteries of scene variation (geometry, hard
+geometry, appearance - including the user's requested color/decoy/multi-plate
+tests). Full design, results and decision rules:
+-> n16_robustness_campaign_20260806.md
+
+The batteries directly gate the hardware step:
+  cam2cm/cam5cm  -> how precisely the real front camera must be mounted
+  decoys         -> whether the real table must be kept clean of orange-ish
+                    clutter
+  lighting       -> whether room lighting is a controlled variable
+  overall curve  -> sets EXPECTATIONS: a policy at ~85% with 1.1 drops/run at
+                    home will not be better on hardware; if the hard batteries
+                    crater it, the as-is test's realistic goal is "any
+                    purposeful reach", not task completion.
+
+THE HARDWARE TEST STAYS PARKED until the campaign is scored and read.
+```
+
 ### Step 1 — TRY THE SIM-TRAINED N1.6 CHECKPOINT AS-IS ON THE REAL ARM
 
 Added on the user's standing rule: *"instead of guessing we could just test,
@@ -219,7 +245,10 @@ camera pose cut Pi05's near-object time from 86% to 23%.
 ## 4. Order of work
 
 ```text
-1. AS-IS HARDWARE TEST of the sim-trained N1.6 (scoped above)
+0. ROBUSTNESS CAMPAIGN in sim (running 2026-08-06) - gates everything below.
+   -> n16_robustness_campaign_20260806.md
+1. AS-IS HARDWARE TEST of the sim-trained N1.6 (scoped above), with
+   expectations and rig requirements SET BY the campaign's results
      me:   lerobot into the n1.6 venv (guard torch!), client smoke test
      user: plug in arm + front/wrist cameras, mount front camera to sim spec
 2. In parallel, 8-bit Adam -> unblock fine-tuning (needed if step 1 fails,
