@@ -207,13 +207,25 @@ adapter of ours would sit in the path. Downloaded, 7.1 GB.
     both NEWER than the checkpoint. Serving it as-loaded = garbage, and it would
     have looked like a harness failure.
 
-THE STRUCTURAL PROBLEM, worth remembering:
+THE STRUCTURAL PROBLEM - and its LIMIT (corrected 2026-08-05, pins CHECKED):
   Era 1 says serve a checkpoint on TRAINING-ERA code.
   Blackwell/sm_120 needs torch >= 2.7 + cu128.
-  Old checkpoint eras pin OLD torch, which has NO sm_120 support.
-  => on a 5090 these two rules CONFLICT. Old checkpoints are not simply a
-     "download and run"; each needs an era-matched env that also builds for
-     Blackwell. Budget for that BEFORE promising a comparison.
+  An earlier draft claimed old eras ALWAYS pin torch too old for sm_120.
+  THAT IS TRUE FOR N1.5 AND FALSE FOR N1.6. Read from the release tags:
+
+    release          torch pin    sm_120 / Blackwell?
+    n1.5-release     2.5.1        NO  - predates Blackwell entirely
+    n1.6-release     2.7.1        YES - 2.7.x+cu128 is the first that works
+    n1.7-release     2.9.0        YES - what we run (arch list has sm_120)
+
+  => N1.5 (LightwheelAI/leisaac-pick-orange-v0) IS blocked.
+  => N1.6 IS NOT. 12e21/gr00t_n1d6_leisaac_pick_orange is a LeIsaac PickOrange
+     checkpoint whose era pins the very torch version this project already
+     verified on sm_120, and LeIsaac ships a NATIVE n1.6 client so no adapter of
+     ours is in the path. Residual risk is flash-attn==2.7.4.post1 building for
+     Blackwell, NOT torch.
+  => Still budget an era-matched venv per checkpoint. Just do not write the
+     whole idea off - CHECK THE PIN FIRST, it is one curl.
 
 This is why the harness positive control was done with LeIsaac's own state
 machine instead - no checkpoint, no venv, and it answered the same question.

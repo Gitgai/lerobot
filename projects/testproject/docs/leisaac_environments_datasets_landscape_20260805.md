@@ -139,12 +139,41 @@ LiftCube     none found
 CleanToyTable / FoldCloth / CleanupTrash   none found
 ```
 
-**All are currently unservable here** — see
-`public_so101_datasets_and_checkpoints_20260805.md` for the detail. Short
-version: our Isaac-GR00T carries only `n1d7` and is a shallow clone; the ACT
-checkpoint silently drops its normalization on our newer LeRobot; and old
-checkpoint eras pin old torch that has no sm_120, so Era 1 and Blackwell
-conflict.
+### Which of these can actually be served on a 5090 — CHECKED, not assumed
+
+An earlier draft said flatly that "old checkpoint eras pin old torch with no
+sm_120, so Era 1 and Blackwell conflict". **That is true for N1.5 and FALSE for
+N1.6.** The actual pins, read from the NVIDIA/Isaac-GR00T release tags:
+
+```text
+release          torch pin    sm_120 (Blackwell / RTX 5090)?
+n1.5-release     2.5.1        NO  - predates Blackwell support entirely
+n1.6-release     2.7.1        YES - 2.7.x+cu128 is the first Blackwell-capable
+n1.7-release     2.9.0        YES - what we run today (verified, arch list
+                                    includes sm_120)
+```
+
+```text
+=> LightwheelAI/leisaac-pick-orange-v0 (N1.5) IS genuinely blocked: its era
+   wants torch 2.5.1, which has no sm_120 at all.
+
+=> THE N1.6 CHECKPOINTS ARE NOT BLOCKED:
+       12e21/gr00t_n1d6_leisaac_pick_orange     (LeIsaac PickOrange!)
+       tshiamor/groot-n1.6-leisaac-pick-block
+   n1.6-release pins torch 2.7.1, and 2.7.x+cu128 is exactly the version this
+   project already verified on sm_120. LeIsaac ALSO ships a native n1.6 client,
+   so none of our adapter code would sit in the path.
+   Remaining risk is flash-attn==2.7.4.post1 building for Blackwell, not torch.
+
+=> the ACT checkpoint is blocked for a DIFFERENT reason: it silently drops its
+   normalization on our LeRobot 0.6.1 (old embedded norm buffers), which would
+   have produced garbage that looked like a harness failure.
+```
+
+**So a matched, sim-trained comparison IS reachable** — via N1.6, not N1.5, and
+it costs one era-matched venv rather than "impossible". See
+`public_so101_datasets_and_checkpoints_20260805.md` for the per-checkpoint
+detail.
 
 ---
 

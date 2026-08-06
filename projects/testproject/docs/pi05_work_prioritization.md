@@ -466,17 +466,27 @@ Do P3 only when evidence says it is the right fix.
 > project is now SIM-FIRST on a local 5090, so the live order is:
 >
 > ```text
-> N1. INSTRUCTION SWEEP on GR00T N1.7 in sim. Highest information per minute
->     available: ~12 min/run, no new code. "Grab pens and place into pen holder"
->     made the model approach and close; "pick up the orange and move it to
->     another place" made it retreat and freeze. Neither is a verified training
->     string, so what phrasing actually buys is UNKNOWN and cheap to find out.
-> N2. Drive the openpi checkpoint (felixmayor/pi05_so101_orange_cube). LeIsaac
->     speaks openpi natively; openpi is installed and still not driven.
-> N3. GR00T pipeline validation on izuluaga/finish_sandwich (S3).
-> N4. More LeIsaac scenes for environment diversity (S4) - Strategy B.
-> N5. Fine-tune GR00T on our 12 sim place operations. Worth doing now ONLY
->     because the serving path beneath it is finally verified.
+> DONE 2026-08-05: the INSTRUCTION SWEEP and the HARNESS POSITIVE CONTROL.
+>   canonical string is "Grab orange and place into plate" (from the reference
+>   dataset's meta/tasks.jsonl, NOT the env's task_description). It wins on
+>   approach and is the only GR00T run that moved the object - and it is STILL
+>   not enough. The positive control PASSED: grasp, place and lift all detected,
+>   so every failure recorded is a real failure.
+>
+> *** STOP HUNTING PUBLIC CHECKPOINTS. FINE-TUNE. ***
+> Three have now failed this scene, and every remaining one costs an era-matched,
+> Blackwell-capable env build EACH - Era 1 and sm_120 CONFLICT on a 5090.
+>
+> N1. FINE-TUNE GR00T N1.7 on LightwheelAI/leisaac-pick-orange (ungated, v2.1,
+>     60 eps / 36,293 frames, front+wrist, so101_follower - our scene, robot,
+>     cameras and resolution exactly). N1.7 is the version we ALREADY serve, so
+>     there is no era problem.
+> N2. Add table_with_cube (9 files) -> LiftCube as a second task.
+> N3. Use Isaac Lab Mimic to multiply episodes instead of recording by hand.
+>     Mimic covers PickOrange AND LiftCube; the shipped state machine covers
+>     PickOrange only. Neither needs hardware.
+> N4. Drive the openpi checkpoint (felixmayor/pi05_so101_orange_cube) - cheap,
+>     unblocked, LeIsaac speaks openpi natively, still not driven.
 > ```
 >
 > **Report object displacement with every "grasp" from now on.** The sim's own

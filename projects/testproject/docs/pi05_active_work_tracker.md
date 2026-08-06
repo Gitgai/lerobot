@@ -2,7 +2,34 @@
 
 Last updated: 2026-08-05
 
-> **2026-08-05 LATEST: A PUBLIC GR00T CHECKPOINT NOW RUNS AND IS SCORED — and
+> **2026-08-05 (end of day): THE HARNESS IS PROVEN GOOD, THE INSTRUCTION
+> QUESTION IS CLOSED, AND THE PLAN CHANGED TO FINE-TUNING.**
+>
+> **Positive control PASSED.** LeIsaac's own state machine, scored through the
+> same GT path: 3/3 picks (sustained 209–212 steps), **all three place terms**,
+> oranges lift **0.17–0.20 m**. So the harness detects grasp, place and lift —
+> **every failure we have recorded is a real failure.** It also calibrates the
+> predicate trap: GR00T's 80-step "grasp" lifted the orange **0.0026 m**, about
+> seventy times less than a real one.
+>
+> **The task string comes from the DATASET, not the env, and never from us.**
+> `LightwheelAI/leisaac-pick-orange` → `"Grab orange and place into plate"`,
+> which disagrees with the env's `task_description`. Across three instructions
+> the canonical one gives the closest approach and is the **only** GR00T run that
+> moved the orange (0.023 m) — and still lifts 8× less than a real grasp.
+> **Worth real performance; not enough.**
+>
+> **Plan change: stop hunting public checkpoints, fine-tune.** Three have now
+> failed this scene, and each remaining one costs an era-matched,
+> Blackwell-capable env build — Era 1 and sm_120 conflict on a 5090. Meanwhile a
+> perfectly matched ungated dataset exists (v2.1, 60 eps, front+wrist), we can
+> generate unlimited more with no hardware (state machine **and** Mimic), and
+> GR00T N1.7 is the version we already serve.
+> Read: `leisaac_environments_datasets_landscape_20260805.md`
+>
+> ---
+>
+> **2026-08-05 EARLIER: A PUBLIC GR00T CHECKPOINT NOW RUNS AND IS SCORED — and
 > our sim "grasp" signal turned out to be weaker than we assumed.**
 >
 > GR00T N1.7 (`robocurve/gr00t-n1.7-so101-molmoact2`) reaches the grasp frame to

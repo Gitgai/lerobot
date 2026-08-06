@@ -120,14 +120,53 @@ and it works". We cannot claim the latter, because we do not know this model's
 training strings and the winning sentence names *pens* in a scene full of
 *oranges*.
 
-The plausible reading is that `"Grab <X> and place into <Y>"` matches a common
-PHRASING PATTERN across those 39 community repos, while *"pick up the orange and
-move it to another place"* does not — i.e. the policy is keying on sentence form
-more than on the noun. That is a hypothesis, and it is cheap to test: sweep
-several phrasings over the same scene and compare `d_grasp_min`.
+The plausible reading was that `"Grab <X> and place into <Y>"` matches a common
+PHRASING PATTERN, while *"pick up the orange and move it to another place"* does
+not — the policy keying on sentence form more than on the noun.
 
-> **Do not** carry the old claim forward. The lever is *phrasing*, and which
-> phrasing works is currently **unknown** rather than known-from-the-model-card.
+### THAT HYPOTHESIS IS NOW TESTED — and the canonical string is KNOWN
+
+`meta/tasks.jsonl` of `LightwheelAI/leisaac-pick-orange`, the reference dataset
+for this exact scene:
+
+```text
+{"task_index": 0, "task": "Grab orange and place into plate"}
+```
+
+The canonical form really is `Grab <object> and place into <container>`. Three
+instructions, 900 steps each, same scene, same checkpoint:
+
+```text
+instruction                              d_min  d_grasp  pickTRUE  objLift
+invented   "pick up the orange..."       0.164      -         0    0.0000
+wrong-obj  "Grab pens and place..."      0.110    0.039      80    0.0029
+CANONICAL  "Grab orange and place..."    0.100    0.047       3    0.0234
+------------------------------------------------------------------------
+state machine (known-good reference)     0.111    0.021     842    0.1959
+```
+
+**The canonical string wins on approach and is the ONLY GR00T run that moved the
+orange at all** (0.023 m, 8x the pens run). It still holds for 3 steps and lifts
+8x less than a real grasp.
+
+```text
+=> THE INSTRUCTION IS WORTH REAL PERFORMANCE, AND IT IS NOT ENOUGH.
+   Getting it right took this checkpoint from "never touches the object" to
+   "nudges it" - not to "picks it up".
+```
+
+Note also that the ENV and the DATASET disagree, and the dataset wins:
+
+```text
+env cfg.task_description  "Pick three oranges and put them into the plate, then
+                           reset the arm to rest state."
+dataset meta/tasks.jsonl  "Grab orange and place into plate"   <- what a model saw
+```
+
+> **Rule:** read `meta/tasks.jsonl` of the dataset the checkpoint was trained on.
+> Not the env's `task_description`, and never a sentence you wrote yourself.
+> `sim_policy_eval_instrumented.py` now sources it from a dataset-derived table.
+> -> leisaac_environments_datasets_landscape_20260805.md section 4
 
 A relative-action policy that outputs ~zero deltas holds position forever, which
 is exactly the observed freeze: the model believes it is finished.
@@ -209,6 +248,32 @@ apart; displacement separates them instantly.
 > the scoring code. It is ~8 minutes and it is the only thing standing between
 > "the policy failed" and "our measurement failed".
 
+### How much of this was ALREADY known — an honest accounting
+
+Fair challenge raised at the time: *we had already run the state machine several
+times; didn't we know it works?* Partly yes, and
+`sim_place_data_generation_20260805.md` already recorded both "Episode success!"
+and that "the environment emits six scored subtask terms". **The fact that the
+state machine succeeds on this machine was established and documented.** That
+part was re-established rather than looked up.
+
+What was genuinely NEW, and load-bearing:
+
+```text
+1. THE LIFT MAGNITUDE. Nobody had ever measured how far a REAL grasp moves the
+   orange: 0.17-0.20 m. Without that number "GR00T lifted it 0.0026 m" is just a
+   small number with nothing to compare against. This is the measurement that
+   actually kills the false grasp, and it did not exist before.
+2. That the CSV scoring path in sim_policy_eval_instrumented.py - the
+   obs_dict["subtask_terms"] read, written the same day - emits positives. It
+   had only ever been observed emitting zeros. The earlier place-data runs used
+   LeIsaac's own recorder/termination success, NOT this code path.
+```
+
+So the honest framing is narrower than "we could not tell whether the harness
+works": the *simulator* was known good; *our scoring code* was not, and the
+*discriminating magnitude* did not exist. Both now do.
+
 ---
 
 ## 5. Honest standing
@@ -237,14 +302,30 @@ measuring the model. That was not true this morning.
 
 ---
 
-## 6. Next
+## 6. Next — the conclusion changed during the day
 
-1. The obvious test of the section-4 trap: re-score every historical run for
-   object displacement, not just the predicate.
-2. Drive the openpi checkpoint (`felixmayor/pi05_so101_orange_cube`) — LeIsaac
-   speaks openpi natively; still not driven.
-3. GR00T pipeline validation on `izuluaga/finish_sandwich` (S3).
-4. Fine-tune GR00T on our own 12 sim place operations — now worth doing, because
-   the serving path underneath it is trustworthy.
+```text
+STOP HUNTING PUBLIC CHECKPOINTS. FINE-TUNE INSTEAD.
+
+Three public checkpoints have now failed this scene, and every REMAINING public
+option costs an era-matched, Blackwell-capable environment build EACH (Era 1 vs
+sm_120 - see leisaac_environments_datasets_landscape_20260805.md section 5).
+
+Against that:
+  - LightwheelAI/leisaac-pick-orange is ungated and matches our scene, robot,
+    cameras and resolution EXACTLY. v2.1, 60 eps, 36,293 frames.
+  - we can generate unlimited more with NO hardware (state machine AND Mimic)
+  - the harness is PROVEN to detect grasp, place and lift (section 4b)
+  - fine-tuning GR00T *N1.7* reuses the serving path verified today, so there is
+    no era problem at all
+```
+
+Order:
+
+1. Fine-tune GR00T N1.7 on `LightwheelAI/leisaac-pick-orange`.
+2. Add `table_with_cube` (9 files) and bring up LiftCube as a second task.
+3. Use Mimic to multiply episodes rather than recording by hand.
+4. Still open, cheap, unblocked: drive the openpi checkpoint
+   (`felixmayor/pi05_so101_orange_cube`) — LeIsaac speaks openpi natively.
 
 **Unchanged:** nothing has been tested on the real arm.

@@ -109,6 +109,27 @@ SIMULATION: mdp.orange_grasped is
 -> gr00t_n17_sim_evaluation_20260805.md section 4
 ```
 
+The task string comes from the DATASET, never from you (added 2026-08-05):
+
+```text
+Read meta/tasks.jsonl of the dataset the checkpoint was trained on.
+NOT the env's cfg.task_description - they disagree, and the dataset wins:
+
+  env      "Pick three oranges and put them into the plate, then reset the arm
+            to rest state."
+  dataset  "Grab orange and place into plate"     <- what a trained model saw
+
+NEVER invent one. Three separate runs on 2026-08-05 used a sentence written by
+the agent, and instruction wording measurably changes behaviour:
+
+  invented   "pick up the orange..."   object moved 0.0000 m, 0 predicate steps
+  CANONICAL  "Grab orange and place..." object moved 0.0234 m, closest approach
+
+The canonical string was the ONLY GR00T run that moved the object at all - and
+it STILL lifted 8x less than a real grasp. The instruction is worth real
+performance and is not a substitute for a model that can do the task.
+```
+
 Read a checkpoint's own config before trusting any number from it (2026-08-05):
 
 ```text
