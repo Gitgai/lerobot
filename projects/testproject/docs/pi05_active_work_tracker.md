@@ -1,6 +1,413 @@
 # Pi05 Active Work Tracker
 
-Last updated: 2026-08-03
+Last updated: 2026-08-05
+
+> # 👉 START HERE: `STATE_20260805.md`
+> One page: what is verified, what we learned about 012000, the strategy in
+> force, the next step, and the unchanged load-bearing unknown — **nothing has
+> been tested on the real arm.** The banners below are the running log, newest
+> first; read the summary before wading through them.
+
+> **2026-08-04 MILESTONE: THE POLICY NOW RUNS LOCALLY ON AN RTX 5090.**
+> Migration to the new machine is complete. Pi05 012000 loads and runs on the
+> local GPU - 4.14B params, 9.5 GB VRAM, **153 ms per 50-action chunk** vs the
+> pod's ~30-step latency (~9% of a chunk consumed, against ~60% before).
+> **The pod is STOPPED and the SSH tunnel is retired.** Checkpoint, training-era
+> serving code (e40b58a8 + JPEG/RTC patches), tokenizer and calibration are all
+> local. Three separate venvs pin conflicting torch versions - do not merge them.
+>
+> **NOT YET VERIFIED: numerical agreement with the pod.** The model emits finite
+> actions on random input; that proves nothing about correctness. Run the trust
+> exam against the known-good pod numbers (gripper corr 0.83, MAE 4.4) BEFORE any
+> robot motion. Era 1's lesson applies squarely to a freshly built stack.
+>
+> **SEQUENCING CHANGED: simulation now comes before hardware.** With a local GPU,
+> Isaac Sim / LeIsaac work, the GR00T pipeline dry run and the trust exam all need
+> NOTHING plugged in; sim teleop needs only the leader arm. LeIsaac's
+> `so101_pick_orange` ends in "put them into the plate" - the one thing this
+> project has never done.
+> Read: `new_machine_local_serving_20260804.md`
+> Also new: `groot_vs_pi05_comparison_plan_20260804.md` (Stage 3b)
+>
+> Checkpoint backup: user confirms one exists (2026-08-04), so the local copy is
+> not a single point of failure. Do not re-raise this.
+
+> **2026-08-04 ISAAC SIM RESOLVED: THE MACHINE IS FINE, THE DRIVER IS THE ONLY
+> WRONG VARIABLE.** The `nvcr.io/nvidia/isaac-sim:6.0.1` container ran cleanly
+> here on the CURRENT driver — 23 s startup, engine loop ran, clean shutdown,
+> **0 errors, 0 crashes**, Warp reporting `sm_120` with mempool enabled.
+> **Blackwell is not broken; Ubuntu 26.04 was never the cause.** Isaac Sim 5.1's
+> segfault was purely a version-vs-driver-branch mismatch.
+>
+> ```text
+> Isaac Sim 5.1 + Isaac Lab 2.3.0 + LeIsaac 0.4.0  needs driver 580.65.06
+> Isaac Sim 6.0 (no Isaac Lab, no LeIsaac exists)  needs driver 595.58.03
+> we run 595.84 -> only 6.0 works -> but LeIsaac only exists for 5.1
+> ```
+>
+> **So the driver must move to 580. Nothing else needs installing** — the whole
+> 5.1 stack is already correct in `~/sim/leisaac-venv`. The downgrade was
+> rejected earlier and is now REINSTATED on evidence (see the investigation doc
+> for why both positions were right at the time).
+>
+> **"Can't we just run LeIsaac on Isaac Sim 6.0?" — TESTED 2026-08-04, NO.**
+> Isaac Lab 3.0.0b2 does target 6.0 (an earlier claim that no Isaac Lab existed
+> for 6.0 was wrong). But **LeIsaac is the binding constraint**: checked by git
+> clone, its latest commit is 2026-04-15, latest tag v0.4.0, and main still
+> pins `isaaclab==2.3.0`. LeIsaac predates Isaac Sim 6.0 entirely. Separately,
+> Isaac Lab 2.3.0 breaks on 6.0 at `omni.physics.tensors.impl`, removed in 6.0's
+> Newton physics rewrite. **Re-check only one thing before revisiting: has
+> LeIsaac shipped Isaac Lab 3.0 support?** One upstream release collapses this.
+>
+> Install command must INCLUDE the prebuilt kernel module, or apt DKMS-compiles
+> against kernel 7.0.0:
+> `sudo apt install -y nvidia-driver-580-open linux-modules-nvidia-580-open-7.0.0-28-generic`
+> Rollback needs no network — 17 cached 595 .debs are in /var/cache/apt/archives.
+> Verify after reboot in order: nvidia-smi → torch sm_120 → **Pi05 serving
+> (roll back if it regresses)** → Isaac Sim 5.1 → LeIsaac.
+> Full matrix, so nobody re-investigates: `isaac_sim_blackwell_investigation_20260804.md` **Section 0**.
+>
+> **Brev is CLOUD-ONLY** (hourly billing, not installable locally) and its
+> instances were L4-class — weaker than the 5090 we own. Using local hardware
+> is the right call; the only edge Brev had was being pre-configured, and
+> Section 0 now records that configuration.
+>
+> **LeIsaac capability worth planning around: automated data collection via
+> STATE-MACHINE POLICIES** — demonstrations generated with no teleoperation, no
+> leader arm, no robot time. That is a path to PLACE data, our one total gap.
+
+> **2026-08-04 THE SO-101 NOW RUNS IN SIMULATION ON THIS MACHINE.**
+> `LeIsaac-SO101-PickOrange-v0` ("pick three oranges and put them into the
+> plate") **constructs and resets cleanly**: kitchen scene loaded, physics built,
+> cameras spawned, robot instantiated, 0 crashes.
+> `action_space Box(-inf,inf,(1,8))`, obs keys `policy` + **`subtask_terms`** —
+> that second one tracks SUBTASK COMPLETION, i.e. the structure needed to score
+> a PLACE phase, which the real robot has never achieved.
+>
+> Setup that works: driver 580.173.02 + Isaac Sim 5.1 + **SOURCE-installed**
+> Isaac Lab 2.3.0 and LeIsaac 0.4.0 at `~/sim/leisaac-src`, assets from the
+> v0.1.0 release. **The pip install of LeIsaac silently registers ZERO tasks**
+> (it swallows an ImportError and prints instead of raising) — use the source
+> install, as their own docs recommend.
+> Four non-obvious construction traps (asset path via git-root-of-CWD,
+> parse_env_cfg, use_teleop_device, AppLauncher-not-SimulationApp for cameras)
+> are documented in `scripts/leisaac_task_check.py` and
+> `new_machine_local_serving_20260804.md`.
+>
+> **2026-08-05 FIRST COMPLETED PLACES IN PROJECT HISTORY — in simulation.**
+> A scripted state machine (`PickOrangeStateMachine`) completes the full task:
+> reach → grasp → lift → transport → **release over the plate**, three oranges
+> per episode. **4 successful episodes recorded = 12 completed place operations**
+> in a project whose real-robot place count is still 0.
+> Success rate ~4/9 attempts. Recorded to HDF5 (`~/sim/leisaac-src/datasets/`),
+> not yet converted to LeRobot v3.0.
+> Read: **`sim_place_data_generation_20260805.md`**
+>
+> Storage note: ~2.9 GB/episode in HDF5 is RAW uncompressed frames; h264 is
+> ~1000× smaller (2.2 GB → 1.8 MB). Size plans off the CONVERTED dataset.
+>
+> **Pi05 012000 was also run in the simulator — RESULT INCONCLUSIVE, do NOT
+> record it as a finding about the model.** The infrastructure works (our
+> training-era policy server serving 012000 to LeIsaac over gRPC, 144 ms
+> inference, checkpoint on its own code so Era 1 pairing holds). But the
+> instrumented GT run showed the arm essentially frozen (1.4 cm over 900 steps)
+> with `gripper_cmd` **exactly 0.0000, zero variance** — which looks like a
+> value not arriving, not a model predicting badly. **Suspect the harness before
+> the model**: that harness is hours old and unvalidated. Settle it by logging
+> the raw actions the server returns before drawing any conclusion.
+> Note also the sim exposes only `front` + `wrist` — there is **no `top`**, so
+> that view is padded and masked.
+
+> **2026-08-05 CORRECTED + REPEATED: Pi05 012000 DOES reach in simulation.**
+> The "frozen arm" run was FAULTY (stale policy-server state). Three clean runs
+> with a fresh server, same scene:
+> ```text
+> run    steps  d_start  closest  grip_range  grasp  place
+> run2     600   0.239    0.145      1.421     no     no
+> run3     600   0.237    0.184      1.017     no     no
+> run4     600   0.236    0.181      1.354     no     no
+> demo    1500   0.248    0.130      1.395     no     no
+> ```
+> **The 1500-step run is the informative one:** closest approach 0.130 m, 71% of
+> steps within 0.20 m, 32% within 0.15 m — and still no grasp. **2.5× the time
+> bought 1.5 cm.** So the policy does not slowly converge and stall; it settles
+> at a STABLE HOVERING DISTANCE of 13–18 cm and holds there. Not lost, not
+> wandering — a *consistent wrong distance*. That is what you would expect if
+> depth/scale cues come from a camera geometry that no longer matches, and it
+> makes S1 (move the orange) and S2 (add the `top` camera) directly diagnostic.
+> It approaches 5–9 cm and works the gripper, in a rendered kitchen it has never
+> seen, with the `top` camera masked. **0/3 grasps, 0/3 places.** That fits the
+> verified model exactly: coarse approach survived the fine-tune, grasp geometry
+> is welded to the trained scene.
+> **NOT established: that the reach is ORANGE-DIRECTED** rather than a prior
+> toward the table centre. Moving the orange separates them — cheap, high value,
+> not yet run. Until then only "it reaches" is established.
+> Lesson: a single sim run is not evidence — the same discipline as the
+> real-robot five-run count.
+>
+> **Sim capability, camera options and data-source questions answered in
+> `sim_capability_and_camera_plan_20260805.md`:** only PickOrange has a state
+> machine (the other 14 tasks need teleop); a `top` camera CAN be added since
+> LeIsaac is editable-installed, but must be posed like our real C270 to help;
+> NVIDIA's dataset is worth using for PIPELINE VALIDATION, not for its data.
+>
+> **GR00T installed and GPU-verified** (gr00t 0.1.0, torch 2.9.0+cu128, sm_120).
+> The HF blog is a year stale — follow `examples/SO100/README.md` in the repo.
+
+> **2026-08-05 STRATEGY: SIM-FIRST. The simulator is the REFERENCE; the real rig
+> gets built to match it — not the reverse.** Earlier docs had this backwards
+> ("match the sim camera to our real C270"). If we train on sim data, sim IS the
+> training distribution and the robot must see what the training data saw.
+> **"Blocked on hardware" was the wrong frame** — the rig is the FINAL
+> VALIDATION step, not a blocker. Read: `sim_first_strategy_20260805.md`
+>
+> Decided: **add a `top` camera to sim**, keeping three. Choose its pose
+> deliberately in the config — that becomes the spec the physical camera is
+> mounted to. **GR00T does NOT force us back to two**: checked the code, there
+> is no view-count limit; `modality_keys` is a plain list and two cameras is
+> merely their example. Since view selection is a config swap, record ONCE with
+> three cameras and evaluate GR00T-2cam / GR00T-3cam / Pi05-3cam off the same
+> episodes.
+>
+> ## 2026-08-05 PUBLIC SO-101 DATASETS + CHECKPOINTS — and we can run them in sim
+> **Fine-tuned SO-101 checkpoints exist for both families, and our harness can
+> already evaluate them** — testing one is just a different
+> `--policy_checkpoint_path`.
+> ```text
+> GR00T   robocurve/gr00t-n1.7-so101-molmoact2   3B  <- N1.7, our repo's version
+> PI0.5   hjkso1406/pi05-peft-so101-4tasks-aug   4B
+>         felixmayor/pi05_so101_orange_cube      <- ORANGE
+> SMALL   yen-0/smolvla-so101-digits-0707        0.5B (8x smaller than our Pi05)
+>         orange5546/act_cylinder_pick_so101     51.7M
+> DATA    izuluaga/finish_sandwich  80 eps/70k frames — INSPECTED: toy food
+>         stacked onto bread, a real PICK-AND-PLACE task, SO-101, v3.0
+>         jinseonylee/SO101_PickAndPlace_Fruit   <- closest to our task
+>         gpudad/so101_pick_cube_chunked  1.46M rows (largest)
+> ```
+> Conditions unchanged: **Era 1 rule** (each checkpoint needs its training-era
+> code identified — most repos have no model card) and **read failure
+> asymmetrically** (works in sim = strong; fails = weak).
+>
+> **GOAL: use someone else's checkpoint AS IS and skip fine-tuning.** Worth
+> testing. **Test GR00T FIRST** — 012000 uses ABSOLUTE joint targets, which are
+> tied to a specific arm's *calibration*, so a stranger's pi05 checkpoint emits
+> angles offset from ours (same robot model, different zero points). **GR00T
+> defaults to RELATIVE actions**, which carry no calibration assumption — the
+> only candidate whose action representation can cross between arms.
+> **Then test the rest anyway, don't stop early** — an earlier draft advised
+> skipping pi05 if GR00T failed; that was a prediction substituting for a cheap
+> measurement, and a uniform negative is itself a finding.
+> Cost is BANDWIDTH not compute: ~15 GB at ~2 MB/s ≈ 2 h downloading, ~20 min
+> GPU per eval.
+> Tempering fact: "large models generalize" is contradicted by our own data —
+> 012000 is 4.14B and still gives 145 empty squeezes when an onion moves inches.
+>
+> **SCREENED 2026-08-05 — 3 candidates, 1 survived, ~1 GB spent.**
+> ```text
+> felixmayor/pi05_so101_orange_cube   RUNNABLE AS-IS via openpi (see below)
+> yen-0/smolvla-so101-digits-0707     OUT  needs observation.target_drawing
+>                                          (digit-drawing task; no env exists)
+> robocurve/gr00t-n1.7-so101-molmoact2  ** VIABLE **  new_embodiment,
+>                                       front+wrist, RELATIVE action space
+> ```
+> **CORRECTION: the openpi checkpoint is NOT out.** I first said "convert it (a
+> day's work) or skip it" — both wrong. **LeIsaac speaks openpi natively**:
+> `OpenPIServicePolicyClient` (websocket, port 8000, `camera_keys=["front",
+> "wrist"]` — matching our sim), `--policy_type=openpi`, and it even **pins a
+> target openpi commit** (`5bff19b0…`), which partly solves the Era 1 pairing
+> problem. So: clone openpi at that commit, serve the checkpoint, point LeIsaac
+> at it. That is an install over a slow link, not a day of conversion code — and
+> openpi reads `norm_stats.json` natively, which is the piece a hand-written
+> converter would most likely get silently wrong.
+> **Lesson: check what the HARNESS supports before calling a checkpoint
+> unusable.** LeIsaac ships THREE policy clients — `lerobot-<type>`,
+> `gr00tn1.5/1.6`, and `openpi`. "No LeRobot loader" ≠ "cannot run".
+>
+> ## ✅ 2026-08-05 GR00T N1.7 NOW RUNS — gate cleared AND protocol bridged
+> ```text
+> gated backbone  nvidia/Cosmos-Reason2-2B  ACCESS GRANTED, 4.6 GB cached
+>                 -> offline from now on; unblocks S3/S5 fine-tuning too
+> server          1.09B DiT + 201M SelfAttn loaded, ZMQ :5555
+> adapter         scripts/gr00t_n17_client_adapter.py
+> smoke test      action shape (1, 96) float32 = 16 timesteps x 6 DoF
+>                 first row [0.0971, 2.724, -0.7633, 0.4511, 0.4671, 0.0142]
+> ```
+> **LeIsaac ships n1.5/n1.6 clients only; this checkpoint is N1.7.** Seven wire
+> differences, each found by one probe: `data` must wrap `{"observation": obs}`;
+> observation is **nested** not flat-dotted; groups are `video`/`state`/**`language`**
+> (not `annotation`); video is **5-D** `[B,T,H,W,C]`; state must be **float32**;
+> the language key keeps its **full name** inside the group; the response is a
+> **tuple** `(action, info)` — and arrays can arrive as raw msgpack_numpy
+> envelopes with byte keys needing manual decode.
+> Full symptom→cause map in the adapter docstring and
+> `public_so101_datasets_and_checkpoints_20260805.md`.
+>
+> **Honest cost:** ~an hour of protocol archaeology. Against the goal "use
+> someone else's work as-is instead of spending hours", this was **not** as-is.
+> The adapter is reusable — weigh that before doing the same for other
+> non-matching checkpoints.
+>
+> Also needed: `pyzmq` in the sim venv (LeIsaac's `[gr00t]` extra) — verified it
+> does not disturb torch 2.7.0+cu128/sm_120.
+>
+> NEXT: wire the adapter into `sim_policy_eval_instrumented.py` so GR00T is
+> scored from ground truth in the SAME scene as Pi05 — directly comparable to
+> *hovers 13–18 cm, 0/6 grasps*.
+
+> (superseded) **⛔ GR00T IS BLOCKED ON GATED ACCESS (2026-08-05).** The checkpoint downloaded
+> fine (6.1 GB, verified) but the server will not start:
+> ```text
+> Cannot download the VLM backbone 'nvidia/Cosmos-Reason2-2B' — gated HF repo.
+> EVERY GR00T checkpoint (incl. base GR00T-N1.7-3B) loads this backbone, so both
+> zero-shot inference AND FINETUNING require access.
+> ```
+> **This blocks the entire GR00T track — S3 and S5 too, not just this
+> checkpoint.** The 6.1 GB we hold is the action expert + adapters; the
+> vision-language backbone is a separate gated download, and **it cannot be
+> recovered from the old laptop** (GR00T was never run there).
+> **USER ACTION:** request access at `huggingface.co/nvidia/Cosmos-Reason2-2B`,
+> then `~/sim/Isaac-GR00T/.venv/bin/hf auth login` — you type the token, it must
+> not appear in a transcript (hard rule #3).
+> Protocols otherwise MATCH (GR00T PolicyServer ZMQ :5555 ↔ LeIsaac
+> Gr00tServicePolicyClient :5555, `embodiment_tag=new_embodiment`), so this is
+> purely an access problem.
+>
+> **Meanwhile the openpi path may be unblocked:** pi05 uses **PaliGemma**, which
+> is gated but **already cached here** from today's transfer
+> (`~/.cache/huggingface/hub/models--google--paligemma-3b-pt-224`). So
+> `felixmayor/pi05_so101_orange_cube` via openpi likely needs no new access —
+> making it the better next move while Cosmos access is pending.
+> **The cheapest screen is "does its observation space match an env we HAVE?"**
+> LeIsaac gives state+front+wrist; anything needing other inputs is untestable
+> however good it is — and **you cannot just download the missing environment.**
+> People publish models constantly (one command); publishing an environment means
+> packaging scene assets, task logic and termination code. That is what LeIsaac
+> *is*, and why there is essentially only one for the SO-101.
+> Screen order, all free before any weights: observation space → checkpoint
+> format → absolute vs relative actions → *then* download.
+
+
+>
+> **TRAP: camera key names lie.** `finish_sandwich`'s `front` camera is mounted
+> TOP-DOWN. Same key name as ours, different geometry — so "has front+wrist"
+> does not mean the views match. Check the POSE, not the key. Same lesson as S2
+> from another direction.
+>
+> **STRATEGY NOTE:** "build the real rig to match sim" is right, but S2 showed a
+> *mismatched* match is worse than none. A stronger variant is to make **sim
+> diverse enough that the real rig falls inside its distribution** (PI's ablation
+> ranks environment diversity highest; LeIsaac declares 6 scenes and object
+> positions are config values). Our own 012000 is welded to ONE table — matching
+> one sim scene risks reproducing that brittleness.
+> Read: **`public_so101_datasets_and_checkpoints_20260805.md`**
+
+> ## 2026-08-05 S1 + S2 RESULTS — the reach IS object-directed; a 3rd camera HURT
+> ```text
+> S1  moved all 3 oranges +0.150 m in y
+>     arm followed +0.095 m (run) / +0.117 m (settled) = 64-78% tracking
+>     a positional prior would have given ~0
+> S2  added an overhead `top` camera (pose INVENTED by us)
+>     closest 0.133 -> 0.136 (unchanged), time within 0.20 m 86% -> 23%
+> ```
+> **S1 is the real finding: 012000 RETAINS VISUAL GROUNDING** and it survived a
+> room-scale domain shift — rendered kitchen, different lighting, synthetic
+> orange, `top` masked. It is no longer "it reaches", it **reaches for the
+> orange**. So the failure is **FINAL POSITIONING, not perception** — it knows
+> where the orange is and stops 13–15 cm short. The 64–78% (not 100%) tracking
+> plus a rising d_min in the moved scene points to a *systematic offset that
+> worsens away from the trained position*.
+>
+> **S2 is a useful negative: a wrong view is worse than no view.** The pose was
+> invented, so the model got a `top` slot full of pixels matching nothing in
+> training. A masked view it can ignore. **The fix is not "add a camera."**
+> Keep two cases separate: evaluating 012000 needs a pose matching what it was
+> TRAINED with; training a NEW policy can choose the pose freely (sim-first).
+> `top` camera is a LOCAL EDIT to LeIsaac — backup `~/sim/single_arm_env_cfg.py.orig`,
+> not upstream, a `git pull` will conflict with it.
+> Read: **`s1_s2_results_20260805.md`**
+
+> ## ✅ 2026-08-05: THE TRUST EXAM PASSED. THE LOCAL STACK IS SOUND.
+> ```text
+> first-gripper correlation  0.714    pod 0.826    broken-harness sig 0.197
+> closed-ish frames  n=21             pod n=21          <- EXACT MATCH
+> recorded mean      21.4             pod 21.4          <- EXACT MATCH
+> predicted mean     24.7             pod 24.1
+> MAE                5.45             pod 4.41
+> ```
+> The exact match on n and recorded mean proves the frame selection reproduced
+> the pod protocol, which is what makes the rest comparable. 0.714 is **3.6× the
+> broken-harness signature** and in the pod's regime — a working stack, not a
+> broken one. The 0.714-vs-0.826 gap is unexplained (torch/GPU differences, or
+> indices off by a frame); isolate it only if a future result hinges on it.
+>
+> **CONSEQUENCE: the four simulator runs STAND.** They used this same stack, so
+> "Pi05 converges to a stable hover at 13–18 cm" is a real measurement. The
+> question that gated everything is answered — **S1 (move the orange) is now
+> clear to run.**
+> Reproduce: `new_machine_local_serving_20260804.md` Section 5 — and note the
+> two traps there (use the TRAINING-ERA venv; do NOT use the script's default
+> `--indices`, which are not the pod protocol).
+
+> (superseded) 2026-08-05 earlier: trust exam unblocked, dataset arrived:
+> `~/lerobot_assets/datasets/so101_orange_49_plus_grasp_pick_move_focus` —
+> v3.0, **89 episodes (49 original + 40 focus), 40,712 frames**, 3 cameras.
+> Verified independently rather than on report: 0 symlinks, 0 zero-byte files.
+> Two things that look wrong but are NOT — both datasets are ~770 MB because
+> they **share the same video files byte-for-byte** (the focus set adds episode
+> boundaries, it does not re-encode), and wrist has 1 mp4 vs front/top's 2
+> purely from LeRobot chunk sizes. Do not re-investigate either.
+>
+> **This now outranks S1.** It validates the SERVING STACK — and that same stack
+> fed all four simulator runs. **If it fails, every number measured on this
+> machine is void, including "Pi05 hovers at 13–18 cm."** Target: gripper
+> corr **0.826** / MAE **4.41**; broken-harness signature **0.197**.
+> Do not build further on an unvalidated stack.
+> Isaac Sim 5.1 installs fine on Ubuntu 26.04 but **segfaults on startup** -
+> it is validated against driver 580.65.06 and is incompatible with the R590
+> branch (595.x) this machine runs. **Not Ubuntu's fault** (same crash reported
+> on 24.04), and **a container would not help** (containers use the host driver).
+> Isaac Sim 6.0 IS validated against 595.58.03 - our branch - but LeIsaac 0.4.0
+> hard-pins `isaaclab==2.3.0`, i.e. Isaac Sim 5.1. Deadlock.
+> **A driver downgrade was proposed and is RETRACTED** - it would disturb the
+> verified 5090 baseline and the working Pi05 stack for nothing.
+> Brev is user-confirmed working, so sim work is relocated, not blocked.
+> Read: `isaac_sim_blackwell_investigation_20260804.md`
+>
+> Two smaller findings there: the TiledCamera/5090 hang has a workaround that
+> fits our single-environment case (use `Camera`, not `TiledCamera`), and
+> **LeIsaac already ships `openpi` and `gr00t` extras** - the sim harness for
+> evaluating both policy families exists and does not need writing.
+>
+> **PRIORITY NOW: the TRUST EXAM (P0)** - the local stack has never been checked
+> against the pod's known-good numbers (corr 0.826 / MAE 4.41; failure looks
+> like 0.197). **It is BLOCKED on one transfer:** the exam needs a dataset and
+> none came over during the migration (serving never needed one). Copy
+> `/data/lerobot_datasets/so101_orange_49_plus_grasp_pick_move_focus` from the
+> old laptop - check the focus-only variant's size first, it may be far smaller.
+> Exact command: `new_machine_local_serving_20260804.md` Section 5.
+>
+> **That block does NOT stop other work.** Rank by evidence value, then do the
+> highest-value AVAILABLE item. Free right now, needing no dataset and no
+> hardware: the second checkpoint copy (P1), sim work on Brev (P4), and the
+> Isaac Sim 6.0 capability probe (P5). See `pi05_work_prioritization.md`.
+
+> **2026-08-04 P3 ANSWERED: pi05 CAN train on datasets with fewer cameras than
+> the policy declares.** Missing cameras are padded with -1 and **masked out**,
+> derived per batch (`modeling_pi05.py:1150`), and `rename_map` is a top-level
+> **training** config field (`configs/train.py:120`) - 012000's own
+> `train_config.json` already carries it. **The 1,222-dataset community corpus
+> is not architecturally excluded**, so the co-training strategy survives its
+> gating question. Caveat: code reading proves the mechanism, not that such a
+> mix trains well; that needs a real run.
+>
+> **New risk it surfaced, now the direction's most important question:** our
+> weakest verified skill is GRASP GEOMETRY, the wrist camera is the view that
+> matters most for grasp, and most community datasets have no wrist view. A
+> wrist-less corpus could add environment diversity while diluting exactly what
+> we need. **Camera composition may matter more than episode count** - so the
+> next data task is mining the MolmoAct2 index for place-style datasets that
+> carry a wrist view, not bulk downloading.
+> Read: `community_data_strategy_20260804.md` Section 5
 
 > **START HERE (2026-08-03): `agent_handoff_pi05_20260803.md`** - full state of
 > the project for a new agent: verified capabilities, history with the wrong

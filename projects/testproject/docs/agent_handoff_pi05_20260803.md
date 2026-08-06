@@ -15,6 +15,25 @@ VERIFIED, what is BELIEVED, what is OPEN, and what to do next. Read Sections
 > those fail silently and will look like model problems: missing calibration
 > and stale camera paths.
 
+> ## ⚠️ SECTION 7 IS PARTLY OUT OF DATE (2026-08-04)
+>
+> **The migration is done and the policy now runs on a LOCAL RTX 5090.**
+> The pod is STOPPED, the SSH tunnel is retired, and the checkpoint, the
+> training-era serving code and the tokenizer are all on the new machine.
+> Local chunk inference measures **153 ms** vs the pod's ~30-step latency.
+>
+> Section 7's "POD (RunPod, RTX 3090)" runbook and its tunnel command still
+> describe the old setup. Do not follow them without reading:
+> **`new_machine_local_serving_20260804.md`** - new paths, the three separate
+> venvs, what is verified vs unverified, and the trust-exam gate that must
+> pass before any robot motion.
+>
+> Sections 1-6 and 8-11 (rules, capability state, history, the measurement
+> method, the architecture finding, the traps) are unchanged and still correct.
+>
+> Sequencing also changed: with a local GPU, simulation work is now cheaper
+> than robot work and comes first. See Section 7 of the new doc.
+
 ---
 
 ## 1. The Project In One Paragraph

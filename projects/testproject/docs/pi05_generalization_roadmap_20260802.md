@@ -1,6 +1,34 @@
 # Generalization Roadmap: From One-Orange Specialist To Multi-Task Robot
 
-Last updated: 2026-08-02
+Last updated: 2026-08-04 (banner); roadmap body 2026-08-02
+
+> ## ⚠️ STAGE 2 AND THE BUDGET LINES ARE SUPERSEDED (2026-08-04)
+>
+> **Stage 2 as written cannot deliver what this roadmap is built on.** Its
+> "standing insight" is that diverse data widens the policy - but Stage 2
+> records 40-60 episodes in ONE room, on ONE table, under ONE lighting setup.
+> That buys object and position variety; it cannot buy **environment** variety,
+> which PI's own ablation ranks as the single most damaging thing to remove
+> (OOD success -> 31%). You cannot un-weld a model from a scene using more data
+> from that same scene.
+>
+> A public corpus of ~1,222 SO-100/101 datasets from **377 users** - i.e. 377
+> different rooms - supplies exactly that missing variable.
+> **Do not skip Stage 2; restructure it.** Record fewer, more focused episodes
+> covering OUR scene, OUR three cameras and the PLACE phase, and let community
+> data supply environment diversity. Co-train, as PI did.
+> Read: **`community_data_strategy_20260804.md`**
+> Gating question there: can pi05 train on datasets with fewer cameras than the
+> policy declares? If not, this narrows sharply.
+>
+> **Costs are also stale.** Stages priced at $0.50-$5 assumed a rented pod. The
+> policy now runs on a local RTX 5090 and the pod is stopped, so training and
+> evaluation cost electricity. Sequencing changed too: simulation work comes
+> before hardware, and testing checkpoints in sim is now nearly free.
+> Read: `new_machine_local_serving_20260804.md`
+>
+> Stages 0, 1, 1-RESULTS and 1-ADDENDUM are historical record and stand as
+> written. Stages 3-5 stand, with costs reinterpreted as local GPU time.
 
 User goal, verbatim intent: the robot should NOT depend on fruit size or type,
 and should progress toward doing other tasks (onion, tomato, more) without a
