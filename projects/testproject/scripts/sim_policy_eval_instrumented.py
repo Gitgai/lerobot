@@ -194,7 +194,25 @@ def main() -> None:
 
     # Two serving paths, ONE scoring path - so Pi05 and GR00T numbers are
     # directly comparable (same scene, same ground-truth metrics).
-    if args.policy_type.startswith("gr00t"):
+    if args.policy_type == "gr00t-n16":
+        # LeIsaac's NATIVE n1.6 client - no adapter of ours in the path. It does
+        # the unit conversion (convert_leisaac_action_to_lerobot / ..._to_leisaac)
+        # itself and does NOT compose relative actions, which is the correct
+        # shape for a server that already applies to_absolute_chunking. That
+        # matches what we PROVED for N1.7 by probing the wire (see
+        # gr00t_n17_client_adapter.py) and is the strongest reason to prefer this
+        # path: it removes our code from the measurement entirely.
+        from leisaac.policy import Gr00t16ServicePolicyClient
+
+        gr00t_cameras = [k for k in ("front", "wrist") if k in camera_infos]
+        policy = Gr00t16ServicePolicyClient(
+            host=args.policy_host,
+            port=args.policy_port,
+            timeout_ms=args.policy_timeout_ms,
+            camera_keys=gr00t_cameras,
+        )
+        print(f"[eval] GR00T N1.6 via LeIsaac's NATIVE client, cameras={gr00t_cameras}")
+    elif args.policy_type.startswith("gr00t"):
         # LeIsaac ships n1.5/n1.6 clients only; N1.7 changed the wire format in
         # seven ways. See scripts/gr00t_n17_client_adapter.py.
         import sys as _sys

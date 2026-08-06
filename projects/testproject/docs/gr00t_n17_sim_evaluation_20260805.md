@@ -42,12 +42,13 @@ BUG 1  UNITS - the big one
        => the model was shown a state pinned near the bottom of its input
           range, and its outputs were applied ~57x too large.
 
-BUG 2  RELATIVE ACTIONS
+BUG 2  RELATIVE ACTIONS  *** AND THE OVERCORRECTION - READ SECTION 2b ***
        conf.yaml declares  use_relative_action: true  with
            modality_keys: [single_arm, gripper]
            reps:          [RELATIVE,   ABSOLUTE]
-       The arm output is a DELTA from the current state; only the gripper is an
-       absolute target. The adapter passed both through as absolute.
+       which READS as "the arm output is a delta". I therefore added the current
+       state to it. That was WRONG - see 2b. The config describes how the model
+       was TRAINED, not what crosses the wire.
 
 BUG 3  AN EXTRA CAMERA
        conf.yaml video.modality_keys = [front, wrist] - TWO views. The scene was
@@ -69,6 +70,37 @@ bypassed all of it.
 > Sim, parsing the same literals outside) so there is one source of truth.
 
 Round-trip `motor_to_sim(sim_to_motor(x)) == x` to 1.5e-7.
+
+---
+
+## 2b. *** THE OVERCORRECTION: THE SERVER ALREADY COMPOSES ***
+
+```text
+conf.yaml says use_relative_action: true, so I made the adapter add the current
+joint state to the arm output. THE SERVER HAD ALREADY DONE THAT.
+N1.7's server applies to_absolute_chunking() itself, so the wire carries
+ABSOLUTE motor-space targets. Adding state again DOUBLED every joint target.
+
+THE PROBE THAT SETTLED IT - send a known state, print the raw reply in motor
+units, and just look:
+
+    state [ 5.21, -28.65, 23.36, 12.06, -3.58, 29.93]
+    raw   [ 5.39, -27.17, 22.92, 11.69, -2.79, 20.64]   <- ABSOLUTE, not deltas
+
+    near the state  => absolute, compose NOTHING
+    near zero       => deltas, compose
+
+CORROBORATION: LeIsaac's own Gr00t16ServicePolicyClient does NO composition
+either. It converts units and returns - which is exactly the shape of a client
+talking to a server that already composed.
+
+=> THE CONFIG DESCRIBES TRAINING, NOT THE WIRE. Probe the wire.
+=> runs 2, 4 and 5 were all driven with doubled joint targets and are VOID.
+```
+
+This is the fourth GR00T correction in one day (units, relative, camera count,
+now the overcorrection). Every one was caught by measuring rather than reading,
+and the config was actively misleading on two of them.
 
 ---
 
@@ -151,8 +183,35 @@ orange at all** (0.023 m, 8x the pens run). It still holds for 3 steps and lifts
 
 ```text
 => THE INSTRUCTION IS WORTH REAL PERFORMANCE, AND IT IS NOT ENOUGH.
-   Getting it right took this checkpoint from "never touches the object" to
-   "nudges it" - not to "picks it up".
+```
+
+*(Those three rows were all measured with the doubled-target bug of section 2b,
+so treat them as a comparison BETWEEN INSTRUCTIONS under one consistent defect,
+not as absolute numbers. The instruction ordering is the finding; the values
+are superseded by the valid run below.)*
+
+### THE VALID RUN — correct units, correct absolute actions, canonical string
+
+```text
+run                              d_min  d_grasp  <0.20m  pickT  objLift
+GR00T N1.7  VALID                0.098    0.045    96%     31   0.0029
+state machine (known-good)       0.111    0.021    58%    842   0.1959
+Pi05 012000 (its own task)       0.130      -      71%      0   0.0000
+```
+
+**GR00T holds within 20 cm of the orange for 96% of the run** — closer, and far
+more consistently, than Pi05 (71%) or even the successful state machine (58%,
+which spends time carrying oranges to the plate). It reaches `d_grasp` 0.045 m,
+inside the 0.05 m predicate threshold.
+
+**And it still lifts the orange 0.0029 m against a real grasp's 0.196 m.**
+
+```text
+So the corrected result does NOT change the verdict, it sharpens it:
+  APPROACH AND TRACKING  - genuinely good, better than our own fine-tuned Pi05
+  ACQUISITION            - absent. It parks at the object and closes on air.
+The failure is the FINAL CENTIMETRES AND THE GRIP, not perception or reaching.
+That is the same failure mode Pi05 shows on the real arm.
 ```
 
 Note also that the ENV and the DATASET disagree, and the dataset wins:

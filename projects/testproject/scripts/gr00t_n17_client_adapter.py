@@ -140,7 +140,7 @@ class Gr00tN17Client:
         timeout_ms: int = 60000,
         camera_keys: tuple[str, ...] = ("front", "wrist"),
         language_key: str = "annotation.human.task_description",
-        relative_arm: bool = True,
+        relative_arm: bool = False,
     ) -> None:
         self.camera_keys = tuple(camera_keys)
         self.language_key = language_key
@@ -216,7 +216,20 @@ class Gr00tN17Client:
         # -24..+46 (vs Pi05's +/-1.4), a flailing arm, and spurious 1-2 step
         # "grasps" at 11 cm from the object. That run measured THIS BUG, not
         # the policy.
-        # Everything here is in MOTOR units, which is the space the deltas live in.
+        # *** DEFAULT OFF - THE SERVER ALREADY COMPOSES. ***
+        # conf.yaml says use_relative_action: true with reps [RELATIVE, ABSOLUTE],
+        # which reads as "the arm output is a delta". It is NOT what reaches the
+        # client: the N1.7 server applies to_absolute_chunking() itself, so the
+        # wire already carries ABSOLUTE motor-space targets. Composing again here
+        # doubles every joint target.
+        #
+        # Do not argue this from the config - PROBE IT. Send a known state and
+        # print the raw reply in motor units:
+        #     state [ 5.21, -28.65, 23.36, 12.06, -3.58, 29.93]
+        #     raw   [ 5.39, -27.17, 22.92, 11.69, -2.79, 20.64]   <- ABSOLUTE
+        # near the state => absolute (leave this off). near zero => deltas.
+        # Corroboration: LeIsaac's own Gr00t16ServicePolicyClient does NO
+        # composition either - it converts units and returns.
         if self.relative_arm:
             arm = arm + state_motor[0, :SINGLE_ARM_DOF][None, :]
 
