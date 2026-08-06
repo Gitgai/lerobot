@@ -195,6 +195,17 @@ def main() -> None:
             cfg.init_state.pos = (old[0] + dx, old[1] + dy, old[2] + dz)
             print(f"[eval] moved {name}: {tuple(round(v, 3) for v in old)} -> "
                   f"{tuple(round(v, 3) for v in cfg.init_state.pos)}")
+    # The recorder defaults to EXPORT_ALL, which opens an HDF5 for writing. We
+    # only want the scored CSV, and if ANOTHER sim is still shutting down the two
+    # collide with a bewildering
+    #   BlockingIOError: unable to lock file, errno = 11
+    # that says nothing about recording. Turning the export off removes both the
+    # collision and a pointless multi-GB write.
+    from isaaclab.managers import DatasetExportMode
+
+    if getattr(env_cfg, "recorders", None) is not None:
+        env_cfg.recorders.dataset_export_mode = DatasetExportMode.EXPORT_NONE
+
     env = gym.make(args.task, cfg=env_cfg).unwrapped
 
     from isaaclab.sensors import Camera
