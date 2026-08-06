@@ -131,10 +131,15 @@ scene.
 ## 5. Checkpoints for these environments
 
 ```text
-PickOrange   LightwheelAI/leisaac-pick-orange-v0     GR00T N1.5  (LeIsaac authors)
-             12e21/gr00t_n1d6_leisaac_pick_orange    GR00T N1.6
-             omkarmayekar555/act_leisaac_orange      LeRobot ACT, 51.6M
-pick-block   tshiamor/groot-n1.6-leisaac-pick-block  GR00T N1.6
+PickOrange   12e21/gr00t_n1d6_leisaac_pick_orange    N1.6  *** RUN - SUCCEEDED,
+                                                     lifted 0.173 m, carried ***
+             LightwheelAI/leisaac-pick-orange-v0     N1.5  BLOCKED (torch 2.5.1,
+                                                     no sm_120). 7.1 GB on disk,
+                                                     downloaded before checking.
+             omkarmayekar555/act_leisaac_orange      ACT   BLOCKED (drops its
+                                                     normalization on our 0.6.1)
+pick-block   tshiamor/groot-n1.6-leisaac-pick-block  N1.6  untried; the n1.6 env
+                                                     now exists, so it is cheap
 LiftCube     none found
 CleanToyTable / FoldCloth / CleanupTrash   none found
 ```
@@ -157,45 +162,62 @@ n1.7-release     2.9.0        YES - what we run today (verified, arch list
 => LightwheelAI/leisaac-pick-orange-v0 (N1.5) IS genuinely blocked: its era
    wants torch 2.5.1, which has no sm_120 at all.
 
-=> THE N1.6 CHECKPOINTS ARE NOT BLOCKED:
-       12e21/gr00t_n1d6_leisaac_pick_orange     (LeIsaac PickOrange!)
-       tshiamor/groot-n1.6-leisaac-pick-block
-   n1.6-release pins torch 2.7.1, and 2.7.x+cu128 is exactly the version this
-   project already verified on sm_120. LeIsaac ALSO ships a native n1.6 client,
-   so none of our adapter code would sit in the path.
-   Remaining risk is flash-attn==2.7.4.post1 building for Blackwell, not torch.
+=> *** THE N1.6 PATH WAS BUILT AND IT WORKED. ***
+       12e21/gr00t_n1d6_leisaac_pick_orange  -> GRASPED, LIFTED 0.173 m,
+       CARRIED THE ORANGE 0.260 m. The project's first real manipulation
+       success. Driven by LeIsaac's NATIVE n1.6 client, so none of our adapter
+       code is in the measurement.
+       -> gr00t_n16_sim_trained_SUCCESS_20260805.md
+
+   Build cost: ~1 hour, NO SUDO. Three packaging traps, each cheaply fixed:
+     tensorrt-cu13-libs   needs wheel_stub as a build dep
+     flash-attn 2.7.4     do NOT compile it (needs nvcc/CUDA_HOME we lack) -
+                          install the PREBUILT wheel, abi picked from
+                          torch._C._GLIBCXX_USE_CXX11_ABI
+     deepspeed            uninstall; training-only, breaks import without
+                          CUDA_HOME
+   Server flags DIFFER from n1.7: --embodiment-tag=NEW_EMBODIMENT (hyphen,
+   uppercase) vs n1.7's --embodiment_tag=new_embodiment.
 
 => the ACT checkpoint is blocked for a DIFFERENT reason: it silently drops its
    normalization on our LeRobot 0.6.1 (old embedded norm buffers), which would
    have produced garbage that looked like a harness failure.
 ```
 
-**So a matched, sim-trained comparison IS reachable** — via N1.6, not N1.5, and
-it costs one era-matched venv rather than "impossible". See
-`public_so101_datasets_and_checkpoints_20260805.md` for the per-checkpoint
-detail.
+**The matched sim-trained comparison is DONE, and it succeeded.** It also
+reframes every earlier failure: Pi05 and GR00T N1.7 are *real-world*-trained
+checkpoints failing in *sim* — a genuine domain gap, not our tooling, because a
+sim-trained checkpoint on the same rig, scene, cameras and scoring picks the
+fruit up.
 
 ---
 
 ## 6. What this implies
 
 ```text
-FINE-TUNING IS NOW THE STRONGEST PLAY, not more public-checkpoint hunting.
+FINE-TUNING IS THE STRONGEST PLAY - and it now has a TARGET TO HIT, not a hope.
   - a perfectly matched 60-episode v2.1 dataset exists and is ungated
   - we can generate unlimited more (state machine AND Mimic) with no hardware
   - the harness is proven to detect grasp, place and lift
-  - and three public checkpoints in a row have failed this scene
+  - *** and we have WATCHED a sim-trained policy hit 0.173 m of lift on this
+    exact rig, so we know the target is achievable and what it looks like ***
 
-The remaining public-checkpoint options all cost an era-matched, Blackwell-
-capable environment build EACH. Fine-tuning on our own verified stack costs one
-GPU run and reuses everything already validated today.
+REVISED after the N1.6 success: "public checkpoints always cost an era-matched
+build EACH" was overstated. n1.6 cost ~1 hour with no sudo and is now BUILT, so
+any other n1.6 checkpoint is nearly free from here. What remains true is that
+n1.5 and older-LeRobot checkpoints are genuinely blocked on Blackwell.
 ```
 
-Suggested order:
+Suggested order (revised after the N1.6 success):
 
-1. Download `LightwheelAI/leisaac-pick-orange` (v2.1, 60 eps) and fine-tune
-   GR00T N1.7 on it — same version we can already serve, so no era problem.
-2. Add `table_with_cube` (9 files) and bring LiftCube up as a second task.
-3. Use Mimic to multiply episodes rather than recording more by hand.
+1. **Why does N1.6 grasp but never place?** It lifts and carries, then loses the
+   orange. This run was 900 steps; the state machine needs ~2,300 for three full
+   place cycles. Longer runs and multiple seeds — cheapest open question we have,
+   and it is about a policy that DEMONSTRABLY WORKS.
+2. Fine-tune on `LightwheelAI/leisaac-pick-orange` (v2.1, 60 eps). Target the
+   N1.6 reference: **0.173 m of lift**, not a predicate.
+3. Add `table_with_cube` (9 files) and bring LiftCube up as a second task.
+4. Use Mimic to multiply episodes rather than recording more by hand.
+5. Cheap now that the n1.6 env exists: `tshiamor/groot-n1.6-leisaac-pick-block`.
 
 **Unchanged:** nothing has been tested on the real arm.

@@ -2,7 +2,32 @@
 
 Last updated: 2026-08-05
 
-> **2026-08-05 (end of day): THE HARNESS IS PROVEN GOOD, THE INSTRUCTION
+> # 🍊 **2026-08-05: A POLICY PICKED UP THE ORANGE.**
+>
+> `12e21/gr00t_n1d6_leisaac_pick_orange` — GR00T **N1.6**, fine-tuned *inside*
+> LeIsaac on this exact task — **grasped, lifted 0.173 m, and carried the orange
+> 0.260 m**, holding it for **59 consecutive steps**. The known-good state
+> machine lifts 0.196 m. It did **not** place.
+>
+> **The project's first real manipulation success**, in sim or on hardware.
+>
+> It reframes every earlier failure: Pi05 and GR00T N1.7 are *real-world*-trained
+> checkpoints failing in *sim* — a genuine **domain gap**, not our tooling and not
+> a broken metric, because a sim-trained checkpoint on the same rig, scene,
+> cameras and scoring picks the fruit up. Driven by LeIsaac's **native** n1.6
+> client, so none of our adapter code is in the measurement.
+>
+> Two corrections it exposed: (1) I had declared this comparison out of reach on
+> an **unchecked** assumption — n1.6 pins torch 2.7.1, which *does* support
+> sm_120; verifying was one `curl`. (2) The N1.7 server already applies
+> `to_absolute_chunking`, so our adapter was **doubling every joint target** and
+> three scored runs were void. Corrected, N1.7 tracks the orange within 20 cm for
+> **96%** of steps and still lifts it 0.0029 m.
+> Read: `gr00t_n16_sim_trained_SUCCESS_20260805.md`
+>
+> ---
+>
+> **2026-08-05 (earlier): THE HARNESS IS PROVEN GOOD, THE INSTRUCTION
 > QUESTION IS CLOSED, AND THE PLAN CHANGED TO FINE-TUNING.**
 >
 > **Positive control PASSED.** LeIsaac's own state machine, scored through the

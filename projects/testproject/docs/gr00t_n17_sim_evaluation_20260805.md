@@ -349,11 +349,31 @@ GR00T N1.7     trained on a BROAD community mix (2,242 eps / 39 repos) of
 
 The comparison is **not** apples-to-apples and should not be quoted as
 "GR00T beats Pi05". Pi05 is a single-task specialist doing only a sim-transfer;
-GR00T is a broad generalist doing task-transfer *and* sim-transfer at once. That
-the generalist's approach is better under the harder ask is interesting, not
-conclusive — and it is the first datapoint that actually speaks to the project's
-central bet ("large VLAs should generalise across similar SO-101 arms"). One
-datapoint, with no acquisition, is not a verdict.
+GR00T is a broad generalist doing task-transfer *and* sim-transfer at once.
+
+### WHAT THE N1.6 SUCCESS DID TO THIS SECTION
+
+A GR00T **N1.6** checkpoint fine-tuned *inside* LeIsaac then **grasped, lifted
+0.173 m and carried the orange 0.260 m** in this same scene, scored the same way.
+That changes how the failures above should be read:
+
+```text
+BEFORE: "these checkpoints fail" - with no way to know whether ANY policy could
+        succeed here, so the failures were hard to interpret.
+AFTER:  a SIM-trained checkpoint succeeds on the same rig, scene, cameras and
+        scoring. So Pi05 and N1.7 are REAL-WORLD-trained models failing in SIM.
+
+=> THE FAILURE IS A DOMAIN GAP. It is not our tooling, not the metric, not a
+   broken harness, and not "manipulation is too hard here".
+```
+
+That is a much stronger and much more useful conclusion than "one datapoint, no
+verdict" — and it is the first hard evidence bearing on the project's central
+bet. The bet was that a large VLA would generalise across similar SO-101 arms.
+What we can now say: **training domain dominates.** The 1.09B model trained on
+*this* simulator beats the 4.14B model trained on real frames *and* the broad
+2,242-episode community generalist, in this scene, decisively.
+-> gr00t_n16_sim_trained_SUCCESS_20260805.md
 
 What is now solid: **the serving path for GR00T N1.7 is correct and verified**,
 so any future GR00T result (including a fine-tune on our own sim episodes) is

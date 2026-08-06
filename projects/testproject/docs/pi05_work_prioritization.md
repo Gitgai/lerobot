@@ -477,15 +477,26 @@ Do P3 only when evidence says it is the right fix.
 > Three have now failed this scene, and every remaining one costs an era-matched,
 > Blackwell-capable env build EACH - Era 1 and sm_120 CONFLICT on a 5090.
 >
-> N1. FINE-TUNE GR00T N1.7 on LightwheelAI/leisaac-pick-orange (ungated, v2.1,
->     60 eps / 36,293 frames, front+wrist, so101_follower - our scene, robot,
->     cameras and resolution exactly). N1.7 is the version we ALREADY serve, so
->     there is no era problem.
-> N2. Add table_with_cube (9 files) -> LiftCube as a second task.
-> N3. Use Isaac Lab Mimic to multiply episodes instead of recording by hand.
+> *** AND THEN A SIM-TRAINED POLICY ACTUALLY PICKED THE ORANGE UP. ***
+> 12e21/gr00t_n1d6_leisaac_pick_orange (N1.6): lifted 0.173 m, carried 0.260 m,
+> held 59 consecutive steps, vs the state machine's 0.196 m. It did NOT place.
+> The n1.6 environment is BUILT (~1 h, no sudo), so further n1.6 checkpoints are
+> nearly free. -> gr00t_n16_sim_trained_SUCCESS_20260805.md
+>
+> N1. WHY DOES IT GRASP BUT NEVER PLACE? It lifts and carries, then loses the
+>     orange. This run was 900 steps; the state machine needs ~2,300 for three
+>     full place cycles. Longer runs, multiple seeds. Cheapest open question we
+>     have AND it concerns a policy that demonstrably works.
+> N2. FINE-TUNE on LightwheelAI/leisaac-pick-orange (ungated, v2.1, 60 eps /
+>     36,293 frames, front+wrist, so101_follower - our scene, robot, cameras and
+>     resolution exactly). Target the N1.6 reference: 0.173 m OF LIFT, not a
+>     predicate. N1.7 is the version we already serve, so no era problem.
+> N3. Add table_with_cube (9 files) -> LiftCube as a second task.
+> N4. Use Isaac Lab Mimic to multiply episodes instead of recording by hand.
 >     Mimic covers PickOrange AND LiftCube; the shipped state machine covers
 >     PickOrange only. Neither needs hardware.
-> N4. Drive the openpi checkpoint (felixmayor/pi05_so101_orange_cube) - cheap,
+> N5. Cheap now the n1.6 env exists: tshiamor/groot-n1.6-leisaac-pick-block.
+> N6. Drive the openpi checkpoint (felixmayor/pi05_so101_orange_cube) - cheap,
 >     unblocked, LeIsaac speaks openpi natively, still not driven.
 > ```
 >

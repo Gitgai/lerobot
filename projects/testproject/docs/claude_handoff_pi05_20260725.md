@@ -109,6 +109,40 @@ SIMULATION: mdp.orange_grasped is
 -> gr00t_n17_sim_evaluation_20260805.md section 4
 ```
 
+PROBE THE WIRE. The config describes TRAINING, not what crosses it (2026-08-05):
+
+```text
+The GR00T N1.7 checkpoint declares  use_relative_action: true  with
+reps [RELATIVE, ABSOLUTE], which reads as "the arm output is a delta". So the
+adapter added the current joint state to it. THE SERVER HAD ALREADY DONE THAT -
+it applies to_absolute_chunking() itself. Every joint target was DOUBLED and
+three scored runs were void.
+
+ONE PROBE SETTLES IT. Send a known state, print the raw reply in the same units:
+    state [ 5.21, -28.65, 23.36, 12.06, -3.58, 29.93]
+    raw   [ 5.39, -27.17, 22.92, 11.69, -2.79, 20.64]   -> ABSOLUTE
+  near the state => absolute, compose NOTHING
+  near zero      => deltas, compose
+Corroboration: LeIsaac's native Gr00t16ServicePolicyClient composes nothing
+either - the shape of a client talking to a server that already composed.
+
+=> A CONFIG FLAG IS A HYPOTHESIS. The wire is the evidence.
+```
+
+CHECK THE VERSION PIN BEFORE WRITING AN OPTION OFF (added 2026-08-05):
+
+```text
+Claimed, without checking: "old checkpoint eras pin old torch, which has no
+sm_120, so Era 1 and Blackwell always conflict on the 5090."
+TRUE for n1.5 (torch 2.5.1). FALSE for n1.6 (torch 2.7.1, sm_120 present).
+
+That error nearly cost the project its FIRST SUCCESSFUL GRASP - the n1.6
+checkpoint that picked the orange up was declared unreachable on an assumption.
+Verifying it was ONE curl against the GitHub release tag.
+
+=> Era 1 and Blackwell conflict SOMETIMES, not always. Read the pin.
+```
+
 The task string comes from the DATASET, never from you (added 2026-08-05):
 
 ```text

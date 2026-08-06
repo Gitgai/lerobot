@@ -183,6 +183,29 @@ yen-0/smolvla-so101-digits-0707            OUT - IMPOSSIBLE OBSERVATIONS
   CHECKED: the repo has NO MODEL CARD - no task description, no environment, no
   dataset, no code. Just weights.
 
+*** THE MATCHED SIM-TRAINED COMPARISON IS DONE - AND IT SUCCEEDED ***
+
+```text
+12e21/gr00t_n1d6_leisaac_pick_orange   GR00T N1.6, fine-tuned INSIDE LeIsaac
+  GRASPED, LIFTED 0.173 m, CARRIED 0.260 m, held 59 CONSECUTIVE steps.
+  Against the known-good state machine's 0.196 m lift. It did NOT place.
+  Driven by LeIsaac's NATIVE Gr00t16ServicePolicyClient - no adapter of ours in
+  the measurement.
+  -> gr00t_n16_sim_trained_SUCCESS_20260805.md
+
+THE PROJECT'S FIRST REAL MANIPULATION SUCCESS, and it reframes everything else:
+Pi05 and GR00T N1.7 are REAL-WORLD-trained checkpoints failing in SIM = a
+genuine domain gap, NOT our tooling and NOT a broken metric.
+
+BUILD COST: ~1 hour, NO SUDO. Traps: tensorrt needs wheel_stub as a build dep;
+flash-attn must come from the PREBUILT wheel (no nvcc on this machine) with the
+abi chosen by torch._C._GLIBCXX_USE_CXX11_ABI; uninstall deepspeed (training-
+only, breaks the transformers import without CUDA_HOME). Server flag DIFFERS
+from n1.7: --embodiment-tag=NEW_EMBODIMENT (hyphen, uppercase).
+Any FURTHER n1.6 checkpoint is now nearly free.
+```
+
+*** THE HEADING BELOW IS SUPERSEDED - kept for the reasoning that led here ***
 *** SIM-TRAINED CHECKPOINTS EXIST - AND BLACKWELL BLOCKS THEM (2026-08-05) ***
 
 ```text

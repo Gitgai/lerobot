@@ -26,6 +26,21 @@ READ THE COMPARISON CAUTIOUSLY: it is not apples-to-apples. Pi05 is a
 single-task specialist trained on THIS task and doing only a sim-transfer;
 GR00T is a broad generalist (2,242 eps / 39 repos) doing task-transfer AND
 sim-transfer at once.
+
+*** AND THE PLAN'S REAL QUESTION GOT ANSWERED A DIFFERENT WAY ***
+A GR00T N1.6 checkpoint fine-tuned INSIDE LeIsaac grasped, lifted 0.173 m and
+carried the orange 0.260 m in the same scene, scored identically - the project's
+first real manipulation success. So:
+
+  the 1.09B model trained on THIS SIMULATOR beats
+  the 4.14B Pi05 trained on real frames of THIS TASK, and
+  the broad 2,242-episode community generalist,
+  decisively, in this scene.
+
+=> TRAINING DOMAIN DOMINATES MODEL SIZE AND BREADTH. That is the architecture
+   comparison this document set out to run, arrived at without fine-tuning
+   anything ourselves.
+-> gr00t_n16_sim_trained_SUCCESS_20260805.md
 ```
 
 ---
