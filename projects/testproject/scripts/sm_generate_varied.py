@@ -280,6 +280,11 @@ def main() -> None:
                           f"kept {demos}/{args_cli.num_demos or '?'} | rate {rate:.0%} | {hours:.2f} h")
                     if args_cli.num_demos and demos >= args_cli.num_demos:
                         print("[gen] target reached")
+                        # BUG FIX (2026-08-07): breaking here WITHOUT a reset
+                        # leaves the final successful episode unmarked in the
+                        # HDF5 (no success attr -> the converter skips it).
+                        # The reset triggers the recorder's export-with-flag.
+                        env.reset()
                         break
                     if args_cli.max_attempts and attempts >= args_cli.max_attempts:
                         print("[gen] max attempts reached")
