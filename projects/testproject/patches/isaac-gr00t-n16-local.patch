@@ -1,0 +1,77 @@
+diff --git a/gr00t/configs/data/data_config.py b/gr00t/configs/data/data_config.py
+index dbf3342..49033ca 100755
+--- a/gr00t/configs/data/data_config.py
++++ b/gr00t/configs/data/data_config.py
+@@ -77,4 +77,14 @@ class DataConfig:
+     # DP Image Config
+     image_crop_size: List[int] = field(default_factory=lambda: [244, 244])
+     image_target_size: List[int] = field(default_factory=lambda: [224, 224])
+-    video_backend: str = "torchcodec"
++    # LOCAL PATCH (2026-08-06, backup at data_config.py.orig): was "torchcodec".
++    # torchcodec 0.4.0 links FFmpeg 4-6 (libavutil.so.56/57/58); this machine
++    # has FFmpeg 8, so torchcodec fails to import. resolve_backend then falls
++    # back to pyav, which get_frames_by_indices does NOT implement -> a bare
++    # NotImplementedError with no mention of video or codecs. The "ffmpeg"
++    # backend shells out to the system binary and decodes these files fine
++    # The dataset was then TRANSCODED AV1 -> H.264 (see
++    # scripts/transcode_dataset_av1_to_h264.sh), after which decord works and
++    # is 12x faster than the ffmpeg CLI: 15.8 ms vs 196 ms per 3-frame fetch.
++    # decord CANNOT demux AV1 - transcoding is what unlocked it.
++    video_backend: str = "decord"
+diff --git a/gr00t/eval/real_robot/SO100/eval_so100.py b/gr00t/eval/real_robot/SO100/eval_so100.py
+index 99e29af..aa69718 100644
+--- a/gr00t/eval/real_robot/SO100/eval_so100.py
++++ b/gr00t/eval/real_robot/SO100/eval_so100.py
+@@ -30,13 +30,18 @@ from gr00t.policy.server_client import PolicyClient
+ 
+ # Importing various robot configs ensures CLI autocompletion works
+ from lerobot.cameras.opencv.configuration_opencv import OpenCVCameraConfig  # noqa: F401
++# LOCAL PATCH 2026-08-06 (backup: eval_so100.py.orig): lerobot 0.4.4 - the
++# newest version supporting this venv's Python 3.11 - ships these robots as the
++# single module `so_follower` (which registers BOTH "so100_follower" and
++# "so101_follower" config names). Our calibration dir is `so_follower/`, so
++# 0.4.4 matches the rig's own era. Upstream imported so100_follower /
++# so101_follower, which do not exist in 0.4.4.
+ from lerobot.robots import (  # noqa: F401
+     Robot,
+     RobotConfig,
+     koch_follower,
+     make_robot_from_config,
+-    so100_follower,
+-    so101_follower,
++    so_follower,
+ )
+ from lerobot.utils.utils import init_logging, log_say
+ import numpy as np
+diff --git a/gr00t/experiment/launch_finetune.py b/gr00t/experiment/launch_finetune.py
+index a5baf0f..7cc1f97 100644
+--- a/gr00t/experiment/launch_finetune.py
++++ b/gr00t/experiment/launch_finetune.py
+@@ -67,7 +67,12 @@ if __name__ == "__main__":
+     else:
+         config.model.extra_augmentation_config = None
+ 
+-    config.model.load_bf16 = False
++    # LOCAL PATCH 2026-08-06: was False, which loads the 3B model in fp32
++    # (~12 GB of weights) even though training already runs bf16 mixed
++    # precision. On a 32 GB card that leaves too little for the Adam state of
++    # the ~1.09B trainable DiT: OOM at batch 16, batch 8, and even with
++    # gradient checkpointing, always inside _multi_tensor_adam.
++    config.model.load_bf16 = True
+     config.model.reproject_vision = False
+     config.model.eagle_collator = True
+     config.model.model_name = "nvidia/Eagle-Block2A-2B-v2"
+@@ -77,6 +82,13 @@ if __name__ == "__main__":
+     config.training.experiment_name = ft_config.experiment_name
+     config.training.start_from_checkpoint = ft_config.base_model_path
+     config.training.optim = "adamw_torch"
++    # LOCAL PATCH 2026-08-06 (backup: launch_finetune.py.orig).
++    # Default is False. Without it this fine-tune OOMs on a 32 GB RTX 5090
++    # at BOTH batch 16 and batch 8, dying inside _multi_tensor_adam - so it
++    # is the optimizer state for the ~1.09B trainable DiT, not the batch
++    # size. Gradient checkpointing trades compute for activation memory and
++    # is the standard fix. Recorded as a DEVIATION from the reference recipe.
++    config.training.gradient_checkpointing = True
+     config.training.global_batch_size = ft_config.global_batch_size
+     config.training.dataloader_num_workers = ft_config.dataloader_num_workers
+     config.training.learning_rate = ft_config.learning_rate
