@@ -87,6 +87,46 @@ clearly visible in-frame.
 orange — and they still cratered the neural policy (1/3). Even stronger
 evidence that N1.6 keys on saturated-blob structure, not hue.
 
+## 4b. THE CONTROL CAME BACK — the demonstrator is the variable, not the scenes
+
+```text
+canonical scene, no variations, 3 fresh runs:   1/3, 2/3, 2/3
+all nine lifts healthy (0.16-0.22)              <- grasping is RELIABLE
+placement is what fails                          <- the PLACE phase is fragile
+
+VERDICTS
+1. Yesterday's canonical 3/3 was a lucky n=1. The SM's real rate is ~56% of
+   oranges per run on its OWN scene.
+2. The entire variation table (1/3-2/3) is WITHIN the control's own range.
+   NO variation - geometry included - shows a clear effect beyond SM variance.
+   Even decoys' 0/3 is at most marginal. My earlier "the SM is scene-tuned,
+   geometry must move to Mimic" call was premature; the data say the SM is
+   equally shaky EVERYWHERE, canonical included.
+3. Ironic and worth saying: the NEURAL POLICY out-places the scripted
+   demonstrator (N1.6: 3/3 in 6 of 7 full-length runs; SM: 1-2/3 typical).
+```
+
+### Consequence: the SHAKY-BASELINE branch of the decision tree fires
+
+Success-filtered generation. `generate.py` already supports
+`EXPORT_SUCCEEDED_ONLY` — record until N episodes SUCCEED, keep only those.
+This is exactly how the project's original 4 episodes / 12 place operations
+were made, so the mechanism is proven. A ~50-60% demonstrator costs ~2x
+generation time and zero data quality. **All variation types stay usable,
+geometry included** — the filter, not the demonstrator, guarantees the corpus.
+
+## 4c. Snapshot addendum (user request: arm + room color)
+
+```text
+greenArm   WORKS - arm cleanly recolored, oranges/plate untouched
+warmRoom / coolRoom / dimRoom(0.25)   WEAK - the kitchen's DOME light
+           dominates the frame and largely ignores inputs:intensity/color on
+           the other lights. Light-based "room color" is not an effective knob
+           in THIS scene. Practical room-appearance proxies that DO work:
+           entity tints on large surfaces (the table would be the big one) or
+           swapping the dome texture. Note for the generation recipe.
+```
+
 ## 5. What happens next (decision tree, pre-agreed)
 
 ```text
