@@ -64,6 +64,7 @@ parser.add_argument("--add-decoys", type=int, default=0,
                     help="orange-coloured spheres near the oranges; the SM ignores them (GT-driven), so demos recorded with them teach 'the REAL orange despite lookalikes'")
 parser.add_argument("--tint", default=None, help='"Name:r,g,b;..." recolor scene entities')
 parser.add_argument("--light-scale", type=float, default=None)
+parser.add_argument("--light-color", default=None, help='"r,g,b" - recolors ALL lights, i.e. the whole room')
 parser.add_argument("--snapshot-dir", default=None,
                     help="Save the FRONT and WRIST camera frames as PNGs into this dir at the steps given by --snapshot-at. With a small --max_steps this doubles as a fast 'what does this variation look like' capture.")
 parser.add_argument("--snapshot-at", default="30,60",
@@ -177,12 +178,19 @@ def main() -> None:
                         UsdShade.MaterialBindingAPI.Apply(prim).Bind(
                             material, bindingStrength=UsdShade.Tokens.strongerThanDescendants
                         )
-        if args.light_scale:
+        if args.light_scale or args.light_color:
             for prim in stage.Traverse():
-                if prim.GetTypeName().endswith("Light"):
+                if not prim.GetTypeName().endswith("Light"):
+                    continue
+                if args.light_scale:
                     attr = prim.GetAttribute("inputs:intensity")
                     if attr and attr.Get() is not None:
                         attr.Set(attr.Get() * args.light_scale)
+                if args.light_color:
+                    r, g, b = (float(v) for v in args.light_color.split(","))
+                    cattr = prim.GetAttribute("inputs:color")
+                    if cattr:
+                        cattr.Set(Gf.Vec3f(r, g, b))
 
     # Takes num_oranges (int), NOT the env - passing env sets _num_oranges=env and
     # dies later with "'<' not supported between 'int' and 'ManagerBasedRLEnv'".
