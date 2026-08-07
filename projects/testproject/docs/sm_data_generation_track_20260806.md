@@ -1,8 +1,27 @@
 # Data-generation track: state machine + variations → diverse episodes → fine-tune Pi0.5
 
-Date: 2026-08-06. Status: **GENERATING — overnight batches RUNNING**
-(8 looks x 6 successes, cap 15 attempts each, ~3 GB/episode, EXPORT_ALL,
-logs at ~/sim/gen_b*.log, data at ~/sim/leisaac-src/datasets/varied/). (Sections 2-4 preserve the investigation;
+Date: 2026-08-06 (updated 08-07). Status: **GENERATION ROUND 1 DONE,
+TOP-UPS RUNNING.** Round 1 finished in ~2.8 h (not overnight):
+
+    batch         look                     kept  rate
+    b1_canonical  canonical                 4    27%
+    b2_counterA   blue counter+green wall   6    46%
+    b3_counterB   brown counter+cabinets    3    20%
+    b4_plate      blue plate                1     7%  <- top-up running
+    b5_arm        green arm                 3    20%
+    b6_decoys     decoys                    3    20%
+    b7_scale      small oranges             4    27%
+    b8_geometry   moved oranges+plate       1     7%  <- top-up running
+    + smoke4      canonical                 2   (2/2)
+    TOTAL: 27 successful episodes ~ 81 pick-place demos, 264 GB raw
+
+TOP-UP RULE (user-approved 2026-08-07): a look with 1 episode is barely
+taught - the corpus must not weight looks by generation luck. b4/b8 re-run
+with NEW seeds and files (b4_plate_topup, b8_geometry_topup), num_demos 5,
+cap 25. Merges at conversion; round-1 files untouched.
+b4's 7% also gets its second measurement this way: repeat ~7% = real config
+problem; ~25% = layout dice (the SM cannot see a plate tint).
+Driver: scripts/sm_generate_topups.sh (Sections 2-4 preserve the investigation;
 the tinted-paradox warning in section 3 was resolved by the control in 4b,
 and 4b itself now carries a correction — read 4d.)
 
