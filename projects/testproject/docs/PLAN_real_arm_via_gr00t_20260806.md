@@ -95,9 +95,10 @@ THE THREE FINDINGS
   2. GEOMETRY COSTS ~ONE ORANGE. Everything-moved is reliably 2/3. Perception
      is object-directed; precision suffers. Camera mount: 2 cm FREE, 5 cm
      fumbling-but-functional.
-  3. DECOYS ARE FATAL. Two orange-colored spheres -> 1/3, two oranges NEVER
-     touched. Largest effect of ANY variation, larger than moving every object
-     and the goal at once. The policy grabs "orange blobs", not oranges.
+  3. DECOYS ARE FATAL. Two orange-colored spheres -> 1/3. [SUPERSEDED at
+     n>=3, 08-07: decoys recovered to 6/9 = 67% - moderate, not fatal. The
+     TRUE worst condition is the MOVED PLATE at 3/9 = 33%. Geometry, not
+     lookalikes, is the weak axis. -> n16_robustness_campaign doc section 5]
 
 WHAT IT DECIDED (per the rules agreed before the results)
   camera mounting   has slack - careful, not obsessive
@@ -162,6 +163,10 @@ NEEDED - HARDWARE (the user)  [rig spec UPDATED by the step-0 campaign]
      worked. Mount carefully; do not obsess over millimetres.
   6. Scene: orange(s) + a plate, roughly the sim layout. Geometry has slack too
      (moved objects cost ~one orange, not the task).
+  6b. *** HARD REQUIREMENT 0 - LAYOUT MATCH (n=3 finding, 08-07). *** Plate
+     left, oranges clustered 10-15 cm right, matching the sim's canonical
+     arrangement. The displaced GOAL is the measured worst condition (33%);
+     match the layout before worrying about anything visual.
   7. *** HARD REQUIREMENT 1 - A CLEAN TABLE. *** Nothing orange-ish anywhere
      near the workspace. Two orange decoy spheres was the ONE scene variation
      that broke the policy (1/3, two oranges never touched). No clutter.

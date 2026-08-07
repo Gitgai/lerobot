@@ -31,7 +31,13 @@ TOP-UP RESULTS (2026-08-07):
                     static offsets (oranges +6,+5cm / plate -8,+6cm) sit
                     genuinely outside the SM choreography's competence,
                     plausibly at the plate-approach reach edge.
-  FIX RUNNING: b8_geometry_half - same look, HALVED offsets (+3,+2.5 / -4,+3).
+  FIX RESULT: b8_geometry_half kept 2/20 at 10% - halved offsets are hard
+  for the SM too, but the geometry look now has 3 episodes total.
+  *** FINAL CENSUS (corpus COMPLETE, 08-07): 34 successful episodes ~ 102
+  pick-place demos across 8 looks, 380 GB raw. Conversion NOT started -
+  fallback prep awaits the user's go; the main line is the as-is hardware
+  test. Recorded episodes replay in their varied scenes via
+  scripts/sim_replay_varied.py (needs --enable_cameras). ***
   NOTE the corpus is not geometry-poor even without b8: the env re-randomizes
   object layouts EVERY episode inside EVERY batch, so all ~35 episodes carry
   layout variation within the canonical range; b8 only adds LARGER shifts. (Sections 2-4 preserve the investigation;
