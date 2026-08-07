@@ -410,8 +410,10 @@ fallback). CAVEAT: GR00T's loader cannot read AV1 (measured 08-06) - IF this
 corpus is ever used for GR00T training, transcode first
 (scripts/transcode_dataset_av1_to_h264.sh).
 
-PENDING USER DECISIONS:
-  1. delete the 380 GB raw HDF5s (dataset validated; raw regenerable from
-     committed scripts + pins)
-  2. Pi0.5 memory audit -> fully arms the fallback
+DECISIONS:
+  1. raw DELETED (user-approved 2026-08-07 after intactness check): 380 GB
+     reclaimed, disk back to 1.4 TB free. The 966 MB corpus is the sole
+     artifact; scripts + pins can recreate everything else.
+  2. Pi0.5 memory audit -> still pending; the last step to fully arm the
+     fallback.
 ```
