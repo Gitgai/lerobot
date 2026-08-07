@@ -1,7 +1,9 @@
 # N1.6 robustness campaign — how much can the scene change before it breaks?
 
-Date: 2026-08-06. Status: **battery 1 DONE, battery 2 RUNNING, battery 3 QUEUED.**
+Date: 2026-08-06 (final update 08-07). Status: **COMPLETE at n>=3.**
 User's call, and the right one: *more sim testing before hardware; don't rush.*
+> **READ SECTION 5 (end of file) FIRST** — the final n>=3 table supersedes every
+> intermediate verdict in sections 2-4, and several INVERTED at proper n.
 
 ---
 
