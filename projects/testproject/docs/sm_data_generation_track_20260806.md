@@ -21,7 +21,20 @@ with NEW seeds and files (b4_plate_topup, b8_geometry_topup), num_demos 5,
 cap 25. Merges at conversion; round-1 files untouched.
 b4's 7% also gets its second measurement this way: repeat ~7% = real config
 problem; ~25% = layout dice (the SM cannot see a plate tint).
-Driver: scripts/sm_generate_topups.sh (Sections 2-4 preserve the investigation;
+Driver: scripts/sm_generate_topups.sh
+
+TOP-UP RESULTS (2026-08-07):
+  b4_plate_topup    5/5 kept at 36% (14 attempts) -> the 7% WAS layout dice,
+                    confirmed by the second measurement exactly as designed.
+                    Blue plate look: now 6 episodes.
+  b8_geometry_topup 0/25. Combined round1+topup: 1/40 = 2.5%. NOT dice - the
+                    static offsets (oranges +6,+5cm / plate -8,+6cm) sit
+                    genuinely outside the SM choreography's competence,
+                    plausibly at the plate-approach reach edge.
+  FIX RUNNING: b8_geometry_half - same look, HALVED offsets (+3,+2.5 / -4,+3).
+  NOTE the corpus is not geometry-poor even without b8: the env re-randomizes
+  object layouts EVERY episode inside EVERY batch, so all ~35 episodes carry
+  layout variation within the canonical range; b8 only adds LARGER shifts. (Sections 2-4 preserve the investigation;
 the tinted-paradox warning in section 3 was resolved by the control in 4b,
 and 4b itself now carries a correction — read 4d.)
 
