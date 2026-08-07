@@ -389,3 +389,21 @@ Another user (kkondo) runs a ROS/Gazebo/Flightmare stack on this box, which is
   and are not yours to back up - but your ASIS scripts DRIVE their build, so
   your harness is worthless on a new machine without dynus_ws also being there.
 ```
+
+
+## Added 2026-08-07 — the N1.6 stack (see docs/N16_REBUILD_RUNBOOK.md)
+
+```text
+MUST BACK UP (cannot be rebuilt from git):
+  ~/lerobot_assets/checkpoints/gr00t_n16_leisaac_orange   9.2 GB
+      THE working policy. Third-party HF upload (12e21/..., revision
+      6d73eafb...) - author could delete it; local copy is primary.
+      RECOMMENDED: mirror to the user's own private HF repo.
+  ~/.cache/huggingface/lerobot/local/varied_corpus        966 MB
+      the varied training corpus (35 eps; raw was deleted - this is the
+      only copy; regenerable but costs ~4 h of generation + conversion)
+  ~/lerobot_assets/datasets/leisaac_pick_orange           667 MB
+      LightwheelAI dataset, GR00T-prepped (re-downloadable + ~30 min prep)
+
+EVERYTHING ELSE N1.6-RELATED rebuilds from the runbook + patches/ + pins.
+```
