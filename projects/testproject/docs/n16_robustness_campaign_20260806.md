@@ -196,3 +196,29 @@ That ordering is the user's decision and it stands.
 > policy. Every sim evaluation now reports drops/retries and last-placement
 > step alongside the success rate — and when a human watching the GUI disagrees
 > with the summary statistics, RE-SCORE before defending the summary.
+
+
+---
+
+## 5. FINAL n>=3 TABLE (2026-08-07, tour + round 3) — supersedes every number above
+
+```text
+condition       runs           total   verdict
+decoys          1/3, 2/3, 3/3  6/9=67% moderate - "FATAL" was an n=1 artifact
+scattered       2/3, 0/3, 2/3  4/9=44% geometry hurts
+moved plate     2/3, 1/3, 0/3  3/9=33% THE WORST CONDITION of the whole suite
+moved oranges   class 1-3/3    ~33-60% geometry hurts
+appearance      all runs       ~100%   confirmed free at n=2 everywhere
+canonical       n=12           94%     the baseline
+
+THE INVERSION: the n=1 campaign said "decoys fatal, geometry ~one orange".
+n>=3 says the opposite: decoys moderate, MOVED GOAL worst. Every dramatic n=1
+verdict this project produced flipped or softened at n>=3.
+
+RIG SPEC UPDATE (supersedes section 2b priorities):
+  1. LAYOUT MATCH is now the TOP requirement: plate left, oranges clustered
+     10-15 cm right of it, matching the sim's canonical arrangement.
+  2. clean table (nothing orange-ish) - stays, demoted to second
+  3. locked white balance - stays (preflight finding, n=1 but mechanism-clear)
+  4. camera mounting slack unchanged
+```
