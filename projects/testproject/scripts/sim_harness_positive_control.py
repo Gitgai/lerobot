@@ -64,6 +64,10 @@ parser.add_argument("--add-decoys", type=int, default=0,
                     help="orange-coloured spheres near the oranges; the SM ignores them (GT-driven), so demos recorded with them teach 'the REAL orange despite lookalikes'")
 parser.add_argument("--tint", default=None, help='"Name:r,g,b;..." recolor scene entities')
 parser.add_argument("--light-scale", type=float, default=None)
+parser.add_argument("--snapshot-dir", default=None,
+                    help="Save the FRONT and WRIST camera frames as PNGs into this dir at the steps given by --snapshot-at. With a small --max_steps this doubles as a fast 'what does this variation look like' capture.")
+parser.add_argument("--snapshot-at", default="30,60",
+                    help="Comma-separated step indices at which to save frames.")
 args = parser.parse_args()
 
 from isaaclab.app import AppLauncher  # noqa: E402
@@ -191,6 +195,8 @@ def main() -> None:
     fields += [f"o{i}_{a}" for i in (1, 2, 3) for a in ("x", "y", "z")]
     fields += [f"pick_{o.lower()}" for o in ORANGES] + [f"put_{o.lower()}_to_plate" for o in ORANGES]
 
+    _snapshot_steps = {int(v) for v in args.snapshot_at.split(",")} if args.snapshot_dir else set()
+
     step = 0
     with open(out_path, "w", newline="") as handle, torch.inference_mode():
         writer = csv.DictWriter(handle, fieldnames=fields)
@@ -239,6 +245,24 @@ def main() -> None:
                 for key in (f"pick_{name.lower()}", f"put_{name.lower()}_to_plate"):
                     row[key] = int(bool(subtasks.get(key, torch.zeros(1))[0])) if key in subtasks else ""
             writer.writerow(row)
+
+            if args.snapshot_dir and step in _snapshot_steps:
+                import cv2
+
+                Path(args.snapshot_dir).mkdir(parents=True, exist_ok=True)
+                for cam in ("front", "wrist"):
+                    frame = obs_dict["policy"].get(cam)
+                    if frame is None:
+                        continue
+                    a = frame.cpu().numpy()
+                    if a.ndim == 4:
+                        a = a[0]
+                    # sim frames are RGB; cv2 writes BGR
+                    cv2.imwrite(
+                        f"{args.snapshot_dir}/{Path(args.out).stem}_{cam}_step{step}.png",
+                        cv2.cvtColor(a, cv2.COLOR_RGB2BGR),
+                    )
+                print(f"[pc] snapshots saved at step {step}")
 
             if step % 200 == 0:
                 handle.flush()
