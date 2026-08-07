@@ -457,3 +457,17 @@ never published. The wider workspace coverage is plausibly mimic-style
 layout randomization - consistent with (but not proof of) the policy's
 strong geometry handling relative to our SM.
 ```
+
+
+## 10. Housekeeping closed (2026-08-07)
+
+```text
+day-1 raw recordings DELETED (user yes): sim_pick_place.hdf5 (24.3 GB) +
+  sim_pick_place_ep4.hdf5 (12.3 GB). Verified state-machine-made (8-dim
+  actions, uniform 2,340 steps, timestamp seeds) and superseded by the
+  converted corpus. ALL raw sim data is now gone; the 966 MB corpus is the
+  sole data artifact.
+HF checkpoint mirror: user decided NOT NOW. The risk stands as documented in
+  N16_REBUILD_RUNBOOK.md section 0 - the local 9.2 GB copy is the primary
+  artifact and is on the backup manifest; revisit when convenient.
+```
