@@ -1,7 +1,8 @@
 # Data-generation track: state machine + variations → diverse episodes → fine-tune Pi0.5
 
-Date: 2026-08-06. Status: **EXECUTING — generator BUILT, smoke test in
-flight, overnight batches staged.** (Sections 2-4 preserve the investigation;
+Date: 2026-08-06. Status: **GENERATING — overnight batches RUNNING**
+(8 looks x 6 successes, cap 15 attempts each, ~3 GB/episode, EXPORT_ALL,
+logs at ~/sim/gen_b*.log, data at ~/sim/leisaac-src/datasets/varied/). (Sections 2-4 preserve the investigation;
 the tinted-paradox warning in section 3 was resolved by the control in 4b,
 and 4b itself now carries a correction — read 4d.)
 
@@ -207,10 +208,25 @@ re-checked for Pi05's 4.14B before promising a training run.
 ### 6.1 What still has to be BUILT (one item)
 
 ```text
-scripts/sm_generate_varied.py - a generation wrapper.  *** BUILT 2026-08-06,
-smoke test in flight (tinted counter, 1 success or 3 attempts). Batch driver
-scripts/sm_generate_batches.sh staged: 8 looks x 6 successes, 15-attempt cap,
-HDF5s to ~/sim/leisaac-src/datasets/varied/ (outside git). ***
+scripts/sm_generate_varied.py - BUILT, DEBUGGED, RUNNING.
+
+*** TRAP FOUND ON FIRST RUN: EXPORT_SUCCEEDED_ONLY + StreamingRecorderManager
+HANGS SILENTLY on this stack *** - 100% CPU, zero output, log frozen at boot
+warnings. No error of any kind. Diagnosed with progress markers (the print
+between recorder attach and setup never fired) plus ONE controlled retry:
+EXPORT_ALL runs immediately. EXPORT_ALL is also the day-1-proven mode, so the
+default flipped and "success" is marked known-broken in the flag help.
+Filtering happens at conversion time from the per-episode verdicts the
+generator logs - which was the recommended design anyway.
+
+SMOKE TEST (canonical, --export all): 2 episodes, 2 SUCCESSES, ~70 s each.
+With sm.setup() + gravity-off done faithfully, the demonstrator is fast and
+healthy - the strongest confirmation yet that 4b's "~56%" was the harness,
+not the state machine. The overnight logs give the true per-variation rates.
+
+Batch driver: scripts/sm_generate_batches.sh (skip-if-present, per-batch
+seeds/logs). Launch verified BY LOG CONTENT, not by process grep - see the
+new hard rule below.
 LeIsaac's generate.py does the recording (state machine + recorder + success
 gating) but has NO variation flags; our variation code lives in the eval/PC
 scripts but does not record. The wrapper reuses generate.py's loop (it is

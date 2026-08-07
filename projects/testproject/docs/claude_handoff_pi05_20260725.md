@@ -164,6 +164,24 @@ it STILL lifted 8x less than a real grasp. The instruction is worth real
 performance and is not a substitute for a model that can do the task.
 ```
 
+Process management: never trust a pattern match (5th occurrence 2026-08-06):
+
+```text
+pgrep -f / pkill -f MATCH THEIR OWN CALLER whenever the pattern appears in the
+calling shell's command line. This has now bitten FIVE times: two pkill
+self-kills, one kill of the wrong sim, and one "batches running" that was the
+checker matching itself while nothing ran.
+
+RULES
+1. Filter every pgrep -f through /proc/PID/comm (python vs bash) before
+   believing or killing anything.
+2. Kill by explicit PID once identified, never by re-running the pattern.
+3. Verify a launch by its OUTPUT ARTIFACT (log file content, output file
+   growing), never by process greps.
+4. Long chains that wait-then-launch-then-commit break at timeouts and leave
+   HALF-DONE state. Launch, verify, commit as separate steps.
+```
+
 Read a checkpoint's own config before trusting any number from it (2026-08-05):
 
 ```text
