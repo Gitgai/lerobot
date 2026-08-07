@@ -260,11 +260,15 @@ control says the SM full-episode rate is LOW (0 of 3 control runs completed
 A. STRICT: generate.py --record with EXPORT_SUCCEEDED_ONLY.
    Proven mechanism (made the original 12 place ops), zero curation, but
    expect roughly 2-5 kept episodes per hour. Overnight runs.
-B. POST-FILTER (recommended): record EXPORT_ALL, then keep episodes by OUR
-   GT criterion (e.g. >=2 oranges placed, or slice per-orange successful
-   pick-and-place segments). More kept data per sim-hour, criterion is ours
-   to tune, and the scorer for it already exists. Costs disk (day-1 HDF5s ran
-   ~2 GB/episode raw - budget accordingly, and NEVER commit them).
+B. POST-FILTER (the mode in use - A is broken here, see 6.1): EXPORT_ALL,
+   keep episodes by OUR GT criterion. MEASURED SIZES (b1, 2026-08-07):
+     ~3.1 GB/episode raw, ~46 GB/batch at the 15-attempt cap,
+     ~370 GB worst-case for all 8 batches (1.3 TB free - fits 3.5x over).
+   TRANSIENT: post-filter keeps ~100-150 GB; conversion to v3 h264 shrinks
+   the actual training dataset to a FEW GB (measured before: 2.2 GB raw ->
+   1.8 MB video); raw HDF5s are then DELETABLE - regenerable from scripts.
+   Measured rates: b1 canonical 4/15 = 27% full-episode successes.
+   NEVER commit any of it.
 
 Either way the DEMONSTRATIONS kept are clean; the filter, not the SM's ~56%
 per-orange rate, guarantees corpus quality.
