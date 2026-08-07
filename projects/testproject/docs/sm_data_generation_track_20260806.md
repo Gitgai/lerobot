@@ -1,9 +1,9 @@
 # Data-generation track: state machine + variations → diverse episodes → fine-tune Pi0.5
 
-Date: 2026-08-06. Status: **investigation COMPLETE — all questions answered,
-recipe in section 6 is ready to execute.** (Sections 2-4 preserve the
-investigation; the tinted-paradox warning in section 3 applied to the n=1
-battery and was RESOLVED by the control in 4b.)
+Date: 2026-08-06. Status: **EXECUTING — generator BUILT, smoke test in
+flight, overnight batches staged.** (Sections 2-4 preserve the investigation;
+the tinted-paradox warning in section 3 was resolved by the control in 4b,
+and 4b itself now carries a correction — read 4d.)
 
 ## 1. The user's proposal, and why it is sound
 
@@ -139,6 +139,45 @@ FURNITURE TINTING (user question, answered empirically 2026-08-06):
   of cabinets per batch; skip light-color entirely.
 ```
 
+## 4d. CORRECTION to 4b — the control harness HANDICAPPED the demonstrator
+
+```text
+Found while replicating generate.py line-by-line for the generator (2026-08-06):
+
+  sm.setup(env)     generate.py calls it BEFORE the loop - FK calibration that
+                    records the rest-pose EE target used by the return-home
+                    phase and task_done(). The positive-control script NEVER
+                    CALLED IT, so _rest_joint_pos/_rest_ee_pos_world were None
+                    in every PC run - including the variance control.
+  gravity disable   generate.py turns gravity OFF on every robot link prim.
+                    The PC script left it on.
+
+=> The "~56% per-orange, everywhere" verdict of 4b was measured on a state
+   machine MISSING ITS CALIBRATION STEP under different physics. It is an
+   overstatement of the demonstrator's weakness. What SURVIVES from 4b:
+   variations still show no effect beyond the (mismeasured) baseline, and
+   success filtering remains the right design regardless of the true rate.
+   The TRUE pipeline rate gets measured tonight for free - every generation
+   episode logs SUCCESS/failed with a running rate.
+
+META: this is the second time in one day a harness deviation quietly became a
+"finding" (the tinted paradox exposed the first). The generation wrapper is a
+FAITHFUL replica precisely because of this: when reusing someone's actor,
+replicate their WHOLE pipeline, not just the loop that looks important.
+```
+
+## 4e. "Should we re-test N1.6 under variations first?" — asked and answered
+
+```text
+NO - not before generating. N1.6 plays no role in the generation pipeline;
+the demonstrator is the SM and it is measured. The n=1 N1.6 variation numbers
+are only load-bearing where they sit FAR outside the n=12 baseline (decoys
+1/3, gamma 0/3 vs 94% - both effectively certain); the mild 2/3 results decide
+nothing. Tight per-condition N1.6 rates become useful exactly ONCE: as the
+comparison baseline after the Pi0.5 fine-tune exists. Run that head-to-head
+(both models, same seeds, n>=3, canonical + decoys + geometry) ONE time, then.
+```
+
 ## 5. Decision tree (pre-agreed) — RESOLVED: the shaky-baseline branch fired
 
 ```text
@@ -168,7 +207,10 @@ re-checked for Pi05's 4.14B before promising a training run.
 ### 6.1 What still has to be BUILT (one item)
 
 ```text
-scripts/sm_generate_varied.py - a generation wrapper.
+scripts/sm_generate_varied.py - a generation wrapper.  *** BUILT 2026-08-06,
+smoke test in flight (tinted counter, 1 success or 3 attempts). Batch driver
+scripts/sm_generate_batches.sh staged: 8 looks x 6 successes, 15-attempt cap,
+HDF5s to ~/sim/leisaac-src/datasets/varied/ (outside git). ***
 LeIsaac's generate.py does the recording (state machine + recorder + success
 gating) but has NO variation flags; our variation code lives in the eval/PC
 scripts but does not record. The wrapper reuses generate.py's loop (it is
