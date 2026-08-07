@@ -125,6 +125,17 @@ warmRoom / coolRoom / dimRoom(0.25)   WEAK - the kitchen's DOME light
            in THIS scene. Practical room-appearance proxies that DO work:
            entity tints on large surfaces (the table would be the big one) or
            swapping the dome texture. Note for the generation recipe.
+
+FURNITURE TINTING (user question, answered empirically 2026-08-06):
+  The kitchen exposes 44 INDIVIDUALLY TINTABLE furniture prims under
+  /Root/Scene: walls, floor, two counters, seven cabinets, fridge, stove,
+  sink, microwave, dishwasher, four dish stacks, outlets, switches.
+  *** counter_main_main_group IS THE WORK SURFACE *** - tinting it recolors
+  ~80% of the front camera's frame, which makes it THE room-appearance lever
+  the lights could not provide. Verified: snap_furniture_front_step30.png
+  (bright blue surface, arm/oranges/plate untouched).
+  Generation recipe: randomize counter_main_main_group + wall_room + a couple
+  of cabinets per batch; skip light-color entirely.
 ```
 
 ## 5. What happens next (decision tree, pre-agreed)
