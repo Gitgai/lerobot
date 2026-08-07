@@ -417,3 +417,43 @@ DECISIONS:
   2. Pi0.5 memory audit -> still pending; the last step to fully arm the
      fallback.
 ```
+
+
+---
+
+## 9. STANDING POLICY: MIMIC FOR GEOMETRY, SM FOR APPEARANCE (user, 2026-08-07)
+
+```text
+THE DIVISION OF LABOR (each tool where it is strong):
+
+  GEOMETRY / LAYOUT variation  ->  ISAAC LAB MIMIC (default from now on)
+    The SM's fixed choreography collapses under moved objects: 5-33% success
+    at large offsets (measured, n>=20 per config). Mimic exists for exactly
+    this - it ADAPTS demonstration trajectories to new object poses instead
+    of replaying timing. LightwheelAI's mimic-v0 proves the pipeline works
+    for this task family; LeIsaac ships pick_orange_mimic_env_cfg with
+    subtask boundaries already defined.
+
+  APPEARANCE variation (tints, lighting, decoys, scale) -> SM + our flags
+    Mimic varies POSES, not pixels; appearance is orthogonal to it. Our
+    recording-time variation system is proven (35-episode corpus, tints
+    verified in-pixel through the training loader). No reason to change.
+
+  Both paths feed the same converter (convert_varied_to_v3.py) and can be
+  COMBINED: mimic-generated layouts recorded under appearance variations.
+
+VALIDATION GATE BEFORE MIMIC ENTERS THE RECIPE (we have never run it):
+  annotate a few of our 35 good episodes -> generate ~10 episodes at
+  randomized layouts -> convert -> verify success labels and REPLAY two to
+  watch. Known unknowns to check: whether annotation is automatic from the
+  env's subtask terms; what action space the generated episodes carry (our
+  converter's joint_pos_target mapping must still hold).
+  Per project rule: one validation run before any tool joins the pipeline.
+
+PROVENANCE NOTE THAT MOTIVATED THIS (2026-08-07): N1.6's training stats
+exceed BOTH public datasets combined (dim1 min -67 vs -38.5/-29.9; dim2 max
+94 vs 65.3/71.6) => 12e21 trained on their own wider-coverage generation,
+never published. The wider workspace coverage is plausibly mimic-style
+layout randomization - consistent with (but not proof of) the policy's
+strong geometry handling relative to our SM.
+```
