@@ -21,10 +21,11 @@ weakness):
     gravity disable    on every robot link prim, exactly as generate.py does
 
 EXPORT MODES
-    --export success   (default) keep ONLY episodes whose sm.check_success()
-                       is True - small files, clean corpus, strict 3/3+rest
-    --export all       keep everything; post-filter at conversion time with our
-                       own GT criterion (costs ~2.2 GB/episode of disk)
+    --export all       (default) keep everything, post-filter at conversion
+                       time (~2.2 GB/episode of disk). THE ONLY MODE THAT
+                       WORKS: "success" (EXPORT_SUCCEEDED_ONLY) hangs the
+                       streaming recorder silently on this stack.
+    --export success   KNOWN BROKEN HERE - kept for future debugging only
 
 Usage (one batch):
     cd ~/sim/leisaac-src && LEISAAC_ASSETS_ROOT=$HOME/sim/leisaac-src/assets \
@@ -58,7 +59,11 @@ parser.add_argument("--dataset_file", required=True)
 parser.add_argument("--num_demos", type=int, default=5, help="successful episodes to record; 0 = unlimited")
 parser.add_argument("--max_attempts", type=int, default=0,
                     help="stop after this many EPISODES regardless of success (0 = unlimited). Bounds an overnight batch.")
-parser.add_argument("--export", choices=("success", "all"), default="success")
+# DEFAULT IS "all": EXPORT_SUCCEEDED_ONLY + StreamingRecorderManager HANGS
+# SILENTLY on this stack (100% CPU, no output, diagnosed 2026-08-06 via probe
+# markers - "recorder attached" never printed). EXPORT_ALL is the day-1-proven
+# path; filter failures at conversion time with the GT criterion instead.
+parser.add_argument("--export", choices=("success", "all"), default="all")
 # variations
 parser.add_argument("--move-oranges", default=None)
 parser.add_argument("--scatter-oranges", default=None)
@@ -231,12 +236,15 @@ def main() -> None:
     env.recorder_manager = StreamingRecorderManager(env_cfg.recorders, env)
     env.recorder_manager.flush_steps = 100
     env.recorder_manager.compression = "lzf"
+    print("[gen] recorder attached", flush=True)
 
     rate_limiter = RateLimiter(args_cli.step_hz)
 
     sm = PickOrangeStateMachine()
     sm.setup(env)  # FK calibration - the step the PC harness missed
+    print("[gen] setup done", flush=True)
     env.reset()
+    print("[gen] first reset done", flush=True)
     sm.reset()
 
     demos = 0
@@ -284,6 +292,10 @@ def main() -> None:
                     actions = sm.get_action(env)
                     env.step(actions)
                     sm.advance()
+                    _steps = getattr(main, "_steps", 0) + 1
+                    main._steps = _steps
+                    if _steps % 200 == 0:
+                        print(f"[gen] step {_steps}", flush=True)
                 if rate_limiter:
                     rate_limiter.sleep(env)
     except Exception as e:

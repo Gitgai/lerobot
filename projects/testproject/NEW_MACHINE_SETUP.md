@@ -12,6 +12,11 @@ Supersedes `RESTORE_ON_NEW_MACHINE.md`, which describes an older layout
 (`/data/projects/lerobot`, `~/PrakashProjects/testproject`) from before the
 project moved inside the lerobot fork.
 
+**Coming off a still-living machine?** Read `BACKUP_MANIFEST.md` there first.
+This file assumes the non-git material already made it across; that one says
+what the non-git material is (63 GB, of which 35 GB is teleop recordings that
+sit inside a git clone and are lost by any re-clone-the-deps migration).
+
 ---
 
 ## 0. Getting The Code Onto The New Machine
@@ -54,6 +59,12 @@ NOT IN GIT (must come from the old machine, or be re-created):
   4. correct camera device paths ...... MACHINE-SPECIFIC, must re-detect
   5. HF token ......................... re-create, never commit
   6. datasets / checkpoints ........... only needed for training (Section 7)
+  7. projects/testproject/logs/ ....... GIT-IGNORED. All campaign and battery
+                                        evidence, 59 MB. A `git push` does not
+                                        save it (added 2026-08-06)
+  8. the sim stack .................... Isaac Sim / LeIsaac / GR00T live
+                                        OUTSIDE this repo under ~/sim and
+                                        ~/lerobot_assets. See BACKUP_MANIFEST.md
 ```
 
 The two that silently ruin a session if missed are **calibration** (the arm
@@ -271,6 +282,18 @@ environment (`huggingface-cli login`), never in a file in this repo.
 ---
 
 ## 7. Datasets And Checkpoints (only for Stage 2/3)
+
+> **Revised 2026-08-06.** The paragraph below is the RunPod/laptop era and is
+> no longer true. On the workstation the datasets and checkpoints are not
+> optional extras - the working policy is local, and 35 GB of teleop
+> recordings exist that no Hub copy replaces. Use
+> [`BACKUP_MANIFEST.md`](BACKUP_MANIFEST.md) Section 2, not this section.
+>
+> ```text
+> ~/lerobot_assets/checkpoints/gr00t_n16_leisaac_orange/  9.2 GB, the 94% policy
+> ~/sim/leisaac-src/datasets/*.hdf5                        35 GB, hand-teleoped
+> ~/lerobot_assets/datasets/                              1.9 GB, the 89 real eps
+> ```
 
 Not needed to run the robot. The active checkpoint lives on the pod at
 `/workspace/outputs/pi05_orange49_plus_grasp_focus_bs4_from003000_restart_012000/checkpoints/012000/`.

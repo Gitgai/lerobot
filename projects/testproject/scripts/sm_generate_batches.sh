@@ -16,7 +16,7 @@ run() {
   echo "[batches] === $name (seed $seed) $* ==="
   (cd ~/sim/leisaac-src && LEISAAC_ASSETS_ROOT=$HOME/sim/leisaac-src/assets ACCEPT_EULA=Y PRIVACY_CONSENT=Y OMNI_KIT_ACCEPT_EULA=YES DISPLAY=:0 \
    ~/sim/leisaac-venv/bin/python -u "$GEN" --dataset_file "$OUT/$name.hdf5" \
-   --num_demos "$DEMOS" --max_attempts "$CAP" --seed "$seed" "$@") > "$HOME/sim/gen_$name.log" 2>&1
+   --num_demos "$DEMOS" --max_attempts "$CAP" --seed "$seed" --export all "$@") > "$HOME/sim/gen_$name.log" 2>&1
   grep -E "\[gen\] DONE" "$HOME/sim/gen_$name.log" | tail -1
 }
 run b1_canonical 101

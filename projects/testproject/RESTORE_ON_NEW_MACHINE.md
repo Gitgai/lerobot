@@ -7,8 +7,12 @@
 > long superseded. The current entry points are
 > `NEW_MACHINE_SETUP.md` (machine bring-up) and
 > `docs/agent_handoff_pi05_20260803.md` (the project).
-> Still useful here: the bulk-transfer rsync/tar recipes in the two transfer
-> methods below, if you are moving datasets and checkpoints as well.
+>
+> **The transfer recipes below are also superseded.** They move ~9 GB from the
+> old laptop era. The workstation now holds 35 GB of teleop HDF5s and 26 GB of
+> fine-tuned checkpoints, none of which appear here, and the paths in every
+> command below no longer exist. For what to copy and how, use
+> [`BACKUP_MANIFEST.md`](BACKUP_MANIFEST.md) (audited 2026-08-06).
 
 This bundle is the **SO-101 orange-pick robotics project**. After you copy it onto the new
 machine and restore the folders, **open the project and read [`testproject/START_HERE.md`](START_HERE.md)** —
