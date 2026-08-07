@@ -298,6 +298,13 @@ camera pose cut Pi05's near-object time from 86% to 23%.
 6.  (absorbed into 0b - the preflight IS the sim regression check, made
     systematic)
 
+PARALLEL TRACK (user's proposal, investigation done, recipe ready):
+  SM + variations + success filter -> diverse v3.0 episodes -> fine-tune Pi0.5
+  (closes architecture-vs-data). One build item: sm_generate_varied.py.
+  Batch matrix + honest throughput + memory caveat:
+  -> sm_data_generation_track_20260806.md section 6
+  Hardware STILL preempts this the moment the arm is plugged in.
+
 Optional sim follow-ups, NOT gating anything:
   - characterize the decoy failure (does it GRAB decoys or freeze? log decoy
     positions in the eval script)

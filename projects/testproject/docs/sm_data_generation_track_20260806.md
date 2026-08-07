@@ -1,8 +1,9 @@
 # Data-generation track: state machine + variations → diverse episodes → fine-tune Pi0.5
 
-Date: 2026-08-06. Status: **variation battery DONE (n=1/condition, confounded);
-canonical variance control RUNNING — read section 3 before quoting any number
-from section 2.**
+Date: 2026-08-06. Status: **investigation COMPLETE — all questions answered,
+recipe in section 6 is ready to execute.** (Sections 2-4 preserve the
+investigation; the tinted-paradox warning in section 3 applied to the n=1
+battery and was RESOLVED by the control in 4b.)
 
 ## 1. The user's proposal, and why it is sound
 
@@ -138,7 +139,7 @@ FURNITURE TINTING (user question, answered empirically 2026-08-06):
   of cabinets per batch; skip light-color entirely.
 ```
 
-## 5. What happens next (decision tree, pre-agreed)
+## 5. Decision tree (pre-agreed) — RESOLVED: the shaky-baseline branch fired
 
 ```text
 CONTROL SAYS BASELINE IS SOLID (~3/3):
@@ -157,4 +158,81 @@ CONTROL SAYS BASELINE IS SHAKY (~1-2/3):
 EITHER WAY the fine-tune target stays Pi0.5 on v3.0 sim episodes, and the
 memory question from the GR00T attempt (26 GB floor on a 32 GB card) must be
 re-checked for Pi05's 4.14B before promising a training run.
+```
+
+
+---
+
+## 6. THE EXECUTABLE RECIPE (final — everything below is verified)
+
+### 6.1 What still has to be BUILT (one item)
+
+```text
+scripts/sm_generate_varied.py - a generation wrapper.
+LeIsaac's generate.py does the recording (state machine + recorder + success
+gating) but has NO variation flags; our variation code lives in the eval/PC
+scripts but does not record. The wrapper reuses generate.py's loop (it is
+~300 readable lines) and adds the variation args. Cfg-side variations
+(moves/scatter/scale/decoys) apply before gym.make; tints apply to the stage
+after. ~1 hour of work. LOCAL PATCHES TO LEISAAC ARE NOT NEEDED.
+```
+
+### 6.2 The batch matrix (each batch = one look; sample fresh colors per batch)
+
+```text
+batch 1  canonical                                (anchor - never skip it)
+batch 2  counter tint A + wall tint
+batch 3  counter tint B + 2 cabinet tints
+batch 4  plate tint + counter tint C
+batch 5  green/other arm tint + counter tint D
+batch 6  decoys x2 (the anti-decoy signal batch)
+batch 7  orange scale 0.8 + counter tint E
+batch 8  geometry: moved/scattered oranges + moved plate + counter tint F
+DROPPED: light-color/intensity (dome-dominated, does nothing - proven)
+KEY LEVER: counter_main_main_group recolors ~80% of the front frame.
+```
+
+### 6.3 Success filtering — the honest throughput math
+
+```text
+The env's own success term is ALL THREE oranges placed + arm at rest. The
+control says the SM full-episode rate is LOW (0 of 3 control runs completed
+3/3; the lucky first run did). Two options:
+
+A. STRICT: generate.py --record with EXPORT_SUCCEEDED_ONLY.
+   Proven mechanism (made the original 12 place ops), zero curation, but
+   expect roughly 2-5 kept episodes per hour. Overnight runs.
+B. POST-FILTER (recommended): record EXPORT_ALL, then keep episodes by OUR
+   GT criterion (e.g. >=2 oranges placed, or slice per-orange successful
+   pick-and-place segments). More kept data per sim-hour, criterion is ours
+   to tune, and the scorer for it already exists. Costs disk (day-1 HDF5s ran
+   ~2 GB/episode raw - budget accordingly, and NEVER commit them).
+
+Either way the DEMONSTRATIONS kept are clean; the filter, not the SM's ~56%
+per-orange rate, guarantees corpus quality.
+```
+
+### 6.4 Convert and train
+
+```text
+1. HDF5 -> LeRobot v3.0 via LeIsaac scripts/convert/isaaclab2lerobotv3.py
+   (v3 converter; check its pins - the v2 converter wanted lerobot 0.3.3, the
+   v3 one must be checked the same way before building any venv for it).
+2. Fine-tune Pi0.5 ON TRAINING-ERA CODE (lerobot_trainingera venv, 0.6.1) -
+   Era 1 applies to training as much as serving.
+   OPEN CHECK before promising a run: does a 4.14B fine-tune fit in 32 GB?
+   The GR00T attempt taught the arithmetic (weights+grads+Adam); do the same
+   audit for Pi05's trainable set FIRST, and expect to need 8-bit Adam.
+3. Score in sim at 3,000 steps, n>=3 (the rules of this project), against BOTH
+   baselines: Pi05 012000 (0 grasps ever) and sim-N1.6 (~94% oranges).
+   SUCCESS = any real grasp (lift >0.10 m). That alone closes the
+   architecture-vs-data question, because 012000 has never grasped anywhere.
+```
+
+### 6.5 Standing constraints
+
+```text
+- hardware test PREEMPTS this track the moment the arm is plugged in
+- artifacts (HDF5, videos, PNGs, datasets) NEVER go to git; scripts/docs only
+- n>=3 for any number anyone will quote; report drops alongside successes
 ```
