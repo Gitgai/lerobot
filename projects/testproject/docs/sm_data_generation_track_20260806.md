@@ -383,3 +383,35 @@ PARALLELIZE THE CONVERSION? (user asked; answered NO for this run)
 AFTER VALIDATION (pending): user go for deleting the 380 GB raw; then the
 Pi0.5 memory audit is the last prep step before the fallback is fully armed.
 ```
+
+
+## 8. CONVERSION COMPLETE AND VALIDATED (2026-08-07)
+
+```text
+DATASET  local/varied_corpus (~/.cache/huggingface/lerobot/local/varied_corpus)
+         35 episodes | 81,645 frames | v3.0 | 966 MB
+         (2x the real-arm dataset's frames, 8 looks vs its one)
+
+RECONCILIATION - exact:
+  179 episodes walked = 179 recorded. 35 saved + 144 failures skipped.
+  Per-file counts match the generation logs everywhere; the one "extra" vs
+  my running tally is b4_plate_topup at 6 (the recovered demo_13 - the
+  attr-fix WORKING, plus the lagging kept-counter under-reading the log).
+  Blue plate look final: 7 episodes.
+
+VALIDATED THROUGH THE REAL PIPELINE:
+  training-era lerobot 0.6.1 loads it, decodes frames, action/state (6,) -
+  and validation frames were pulled through that exact loader: tints are in
+  the pixels (blue counter, blue plate, green arm confirmed visually).
+
+CODEC NOTE: lerobot 0.4.2 wrote the videos as AV1. Training-era 0.6.1
+DECODES AV1 FINE (tested, the only gate that matters for the Pi0.5
+fallback). CAVEAT: GR00T's loader cannot read AV1 (measured 08-06) - IF this
+corpus is ever used for GR00T training, transcode first
+(scripts/transcode_dataset_av1_to_h264.sh).
+
+PENDING USER DECISIONS:
+  1. delete the 380 GB raw HDF5s (dataset validated; raw regenerable from
+     committed scripts + pins)
+  2. Pi0.5 memory audit -> fully arms the fallback
+```
