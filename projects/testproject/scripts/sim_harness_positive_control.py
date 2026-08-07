@@ -50,6 +50,20 @@ parser.add_argument("--task", default="LeIsaac-SO101-PickOrange-v0")
 parser.add_argument("--device", default="cuda")
 parser.add_argument("--max_steps", type=int, default=3000)
 parser.add_argument("--out", default="logs/positive_control.csv")
+# Scene variations - same semantics as sim_policy_eval_instrumented.py. Purpose
+# here: verify the SCRIPTED state machine still completes under each variation,
+# because if it does, it can GENERATE demonstration episodes across all of them
+# (it is vision-blind - it reads GT poses - so appearance changes cost it
+# nothing while enriching every recorded camera frame).
+parser.add_argument("--seed", type=int, default=None)
+parser.add_argument("--move-oranges", default=None, help="dx,dy,dz for ALL oranges")
+parser.add_argument("--scatter-oranges", default=None, help="dx1,dy1,dx2,dy2,dx3,dy3")
+parser.add_argument("--move-plate", default=None, help="dx,dy,dz for the goal")
+parser.add_argument("--scale-oranges", type=float, default=None)
+parser.add_argument("--add-decoys", type=int, default=0,
+                    help="orange-coloured spheres near the oranges; the SM ignores them (GT-driven), so demos recorded with them teach 'the REAL orange despite lookalikes'")
+parser.add_argument("--tint", default=None, help='"Name:r,g,b;..." recolor scene entities')
+parser.add_argument("--light-scale", type=float, default=None)
 args = parser.parse_args()
 
 from isaaclab.app import AppLauncher  # noqa: E402
@@ -77,6 +91,51 @@ def main() -> None:
     # device - NOT the "so101leader" 6-DoF joint mode the policies use.
     env_cfg.use_teleop_device("so101_state_machine")
 
+    if args.seed is not None:
+        env_cfg.seed = args.seed
+        torch.manual_seed(args.seed)
+
+    # ---- scene variations (cfg side, before gym.make) ----
+    if args.move_oranges:
+        dx, dy, dz = (float(v) for v in args.move_oranges.split(","))
+        for name in ORANGES:
+            cfg = getattr(env_cfg.scene, name)
+            old = cfg.init_state.pos
+            cfg.init_state.pos = (old[0] + dx, old[1] + dy, old[2] + dz)
+    if args.scatter_oranges:
+        vals = [float(v) for v in args.scatter_oranges.split(",")]
+        for (name, dx, dy) in zip(ORANGES, vals[0::2], vals[1::2], strict=True):
+            cfg = getattr(env_cfg.scene, name)
+            old = cfg.init_state.pos
+            cfg.init_state.pos = (old[0] + dx, old[1] + dy, old[2])
+    if args.move_plate:
+        dx, dy, dz = (float(v) for v in args.move_plate.split(","))
+        cfg = env_cfg.scene.Plate
+        old = cfg.init_state.pos
+        cfg.init_state.pos = (old[0] + dx, old[1] + dy, old[2] + dz)
+    if args.scale_oranges:
+        for name in ORANGES:
+            getattr(env_cfg.scene, name).spawn.scale = (args.scale_oranges,) * 3
+    if args.add_decoys:
+        import isaaclab.sim as sim_utils
+        from isaaclab.assets import RigidObjectCfg
+
+        offsets = [(0.07, -0.07), (-0.09, 0.06), (0.05, 0.11), (-0.06, -0.10)]
+        base = env_cfg.scene.Orange001.init_state.pos
+        for i in range(min(args.add_decoys, len(offsets))):
+            ox, oy = offsets[i]
+            setattr(env_cfg.scene, f"Decoy{i + 1}", RigidObjectCfg(
+                prim_path=f"{{ENV_REGEX_NS}}/Decoy{i + 1}",
+                spawn=sim_utils.SphereCfg(
+                    radius=0.035,
+                    rigid_props=sim_utils.RigidBodyPropertiesCfg(),
+                    mass_props=sim_utils.MassPropertiesCfg(mass=0.15),
+                    collision_props=sim_utils.CollisionPropertiesCfg(),
+                    visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.95, 0.55, 0.12)),
+                ),
+                init_state=RigidObjectCfg.InitialStateCfg(pos=(base[0] + ox, base[1] + oy, base[2] + 0.02)),
+            ))
+
     # The recorder defaults to EXPORT_ALL, which opens an HDF5 for writing and
     # fails with "unable to lock file" if anything else holds it - and would
     # otherwise dump another multi-GB dataset we do not want. We only need the
@@ -92,6 +151,34 @@ def main() -> None:
     env_cfg.never_time_out = True
 
     env = gym.make(args.task, cfg=env_cfg).unwrapped
+
+    # ---- appearance variations (stage side, after gym.make) ----
+    if args.tint or args.light_scale:
+        import omni.usd
+        from pxr import Gf, Sdf, UsdShade
+
+        stage = omni.usd.get_context().get_stage()
+        if args.tint:
+            for spec in args.tint.split(";"):
+                name, rgb = spec.split(":")
+                r, g, b = (float(v) for v in rgb.split(","))
+                mat_path = Sdf.Path(f"/World/Looks/tint_{name}")
+                material = UsdShade.Material.Define(stage, mat_path)
+                shader = UsdShade.Shader.Define(stage, mat_path.AppendChild("shader"))
+                shader.CreateIdAttr("UsdPreviewSurface")
+                shader.CreateInput("diffuseColor", Sdf.ValueTypeNames.Color3f).Set(Gf.Vec3f(r, g, b))
+                material.CreateSurfaceOutput().ConnectToSource(shader.ConnectableAPI(), "surface")
+                for prim in stage.Traverse():
+                    if prim.GetPath().pathString.endswith(f"/{name}"):
+                        UsdShade.MaterialBindingAPI.Apply(prim).Bind(
+                            material, bindingStrength=UsdShade.Tokens.strongerThanDescendants
+                        )
+        if args.light_scale:
+            for prim in stage.Traverse():
+                if prim.GetTypeName().endswith("Light"):
+                    attr = prim.GetAttribute("inputs:intensity")
+                    if attr and attr.Get() is not None:
+                        attr.Set(attr.Get() * args.light_scale)
 
     # Takes num_oranges (int), NOT the env - passing env sets _num_oranges=env and
     # dies later with "'<' not supported between 'int' and 'ManagerBasedRLEnv'".
