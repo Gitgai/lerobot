@@ -336,3 +336,50 @@ per-orange rate, guarantees corpus quality.
 - artifacts (HDF5, videos, PNGs, datasets) NEVER go to git; scripts/docs only
 - n>=3 for any number anyone will quote; report drops alongside successes
 ```
+
+
+---
+
+## 7. CONVERSION (2026-08-07) — measured, running, and two bugs it caught
+
+```text
+STACK   lerobot 0.4.2 installed into the leisaac venv WITHOUT dependencies
+        (its metadata demands numpy>=2; the converter's own docs and Isaac
+        both need numpy 1.26 - installed --no-deps plus the actual runtime
+        needs, torch/sm_120 verified untouched).
+SCRIPT  scripts/convert_varied_to_v3.py - copy of LeIsaac's v3 converter with
+        ONE patch: state-machine recordings store 8-DIM EE-POSE actions, but
+        a policy that drives the real arm needs 6-DIM JOINT actions. The
+        recording already carries the right signal - obs/joint_pos_target,
+        the controller's commanded joint position per step (same semantics
+        as a leader-teleop dataset's action). The frame's action is
+        overridden with it. Success filtering is the converter's own
+        (episode.success attr).
+
+BUG THE PROBE CAUGHT: runs that END by reaching their success target broke
+out of the generation loop before the reset that finalizes the last episode,
+leaving it WITHOUT its success attr -> silently skipped at conversion. Two
+genuinely good episodes (smoke4 demo_1, b4_plate_topup demo_13) were
+recovered by writing the attr from the generation logs, which record every
+verdict independently. Generator fixed (reset before break).
+
+MEASURED SIZES (answers "how does 380 GB become small?"):
+  one episode: ~3,000 MB raw -> 38 MB converted  (~80:1; it is just ~40 s of
+  two 480p H.264 streams + 12 floats/frame)
+  full corpus projection: ~1.1-1.3 GB     (my earlier 2-3 GB estimate was
+  high; the user's challenge produced the measurement)
+
+PARALLELIZE THE CONVERSION? (user asked; answered NO for this run)
+  Workers per file is easy, but LeRobotDataset CANNOT take concurrent
+  writers (global episode indices/stats/meta), so parallel = per-file repos
+  + a hand-written merge that does not exist in 0.4.2 - more dev time than
+  the ~1 h the sequential run costs, added to the artifact where silent
+  corruption is most expensive. Plus concurrent Isaac instances have bitten
+  twice already (window wedge, HDF5 lock).
+  AT SCALE (100s of episodes, e.g. post-fallback regeneration) the design
+  DOES flip: per-file worker -> per-file dataset -> one validated
+  merge/append pass. Recorded here so the thought is not lost.
+
+AFTER VALIDATION (pending): user go for deleting the 380 GB raw; then the
+Pi0.5 memory audit is the last prep step before the fallback is fully armed.
+```
