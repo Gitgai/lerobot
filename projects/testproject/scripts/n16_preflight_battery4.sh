@@ -7,6 +7,9 @@ OUT=$PROJ/logs/preflight
 mkdir -p "$OUT"
 run() {
   name=$1; seed=$2; shift 2
+  if [ -s "$OUT/$name.csv" ] && [ "$(wc -l < "$OUT/$name.csv")" -gt 2900 ]; then
+    echo "[battery4] $name already complete, skipping"; return 0
+  fi
   for p in $(pgrep -f "leisaac-venv/bin/python"); do [ "$(cat /proc/$p/comm 2>/dev/null)" = python ] && kill -9 $p; done
   sleep 3
   echo "[battery4] === $name (seed $seed) $* ==="

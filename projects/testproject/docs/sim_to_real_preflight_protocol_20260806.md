@@ -130,6 +130,50 @@ hardware does. (Implementation: --park-oranges "2,3" moves the others to a
 parking spot far outside the workspace; score only orange001.)
 ```
 
+## STAGE B/C RESULTS (2026-08-06, battery 4 — one run each, 3,000 steps)
+
+```text
+run        injected defect         placed  lifts               verdict
+bgrSwap    RGB->BGR channel swap    3/3    [.14,.15,.14]  INVISIBLE (see below)
+noise8     gaussian sensor noise    3/3    [.17,.14,.19]  free
+blur3      3px box blur             2/3    [.14,.13,.15]  mild (~baseline var.)
+jpeg40     JPEG quality 40          2/3    [.14,.13,.16]  mild
+gamma135   gamma/white-balance      0/3    [.04,.11,.18]  *** CRATERED ***
+stale2     obs 2 steps old          3/3    [.16,.12,.13]  free - latency NOT
+                                                          a first-class worry
+rot5       front cam pitched 5 deg  2/3    [.15,.15,.19]  mild
+wristJit   wrist cam +2 cm          3/3    [.18,.17,.16]  free
+oneOrange  single orange (C)        1/1*   [.16, -, - ]   PASS - the one
+                                                          available orange was
+                                                          picked AND placed
+```
+
+### The two findings that rewrite expectations
+
+```text
+1. BGR SWAP IS BEHAVIORALLY INVISIBLE (3/3, clean). The predicted "failure
+   signature" does not exist - the policy is so hue-invariant that a
+   channel-order bug in a real client would produce NO visible symptom.
+   => Stage A's SOURCE-LEVEL verification is the ONLY guard against this bug
+      class. Behavior-watching cannot catch it. (Verified: lerobot 0.4.4
+      converts BGR2RGB explicitly.)
+
+2. WHITE BALANCE IS THE ONE HARDWARE-GAP KILLER. gamma 1.35 - a mild washing-
+   out - produced the worst run of the ENTIRE preflight: 0/3 placed. It still
+   half-grasps (lifts to 0.18) but never completes. Contrast with bgrSwap:
+   a hue PERMUTATION is free, but a CONTRAST/SATURATION compression is fatal.
+   The policy appears to key on saturated-blob structure, not hue.
+
+   => RIG REQUIREMENT (new, hard): LOCK the real cameras' auto-white-balance
+      and auto-exposure. Webcams re-balance continuously by default; a drifting
+      white balance is this policy's one proven kill switch. Verify with
+      cv2 CAP_PROP_AUTO_WB=0 / v4l2-ctl before the first episode.
+```
+
+Minor: blur/jpeg/5-degree rotation each cost about one orange (baseline
+variance is 2/3-3/3 anyway); staleness and wrist jitter are free; the
+single-orange scene works, so the physical table may use 1 or 3 oranges.
+
 ## Decision rules (agreed now, before any results)
 
 ```text

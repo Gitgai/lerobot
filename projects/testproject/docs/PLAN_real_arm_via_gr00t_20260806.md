@@ -162,10 +162,18 @@ NEEDED - HARDWARE (the user)  [rig spec UPDATED by the step-0 campaign]
      worked. Mount carefully; do not obsess over millimetres.
   6. Scene: orange(s) + a plate, roughly the sim layout. Geometry has slack too
      (moved objects cost ~one orange, not the task).
-  7. *** THE HARD REQUIREMENT - A CLEAN TABLE. *** Nothing orange-ish anywhere
-     near the workspace. Two orange decoy spheres was the ONE variation that
-     broke the policy (1/3, two oranges never touched). No clutter, period.
-  8. Room lighting: whatever it is. The policy demonstrably does not care.
+  7. *** HARD REQUIREMENT 1 - A CLEAN TABLE. *** Nothing orange-ish anywhere
+     near the workspace. Two orange decoy spheres was the ONE scene variation
+     that broke the policy (1/3, two oranges never touched). No clutter.
+  8. *** HARD REQUIREMENT 2 - LOCK THE CAMERAS' WHITE BALANCE (preflight
+     finding). *** gamma/white-balance shift was the ONE observation-pipeline
+     defect that broke it: 0/3, the worst run of the entire preflight, while
+     even a full BGR channel swap was invisible. Webcams auto-white-balance
+     continuously by default. Disable it (cv2 CAP_PROP_AUTO_WB=0 or v4l2-ctl)
+     and lock exposure BEFORE the first episode.
+  9. Room lighting: intensity/warmth do not matter (proven twice). What
+     matters is that the CAMERA's rendering of it stays CONSTANT - see 8.
+ 10. Scene may use 1 or 3 oranges - the single-orange run passed (1/1).
 
 RUN PROTOCOL
   instruction "Grab orange and place into plate"  (the string that worked in sim)

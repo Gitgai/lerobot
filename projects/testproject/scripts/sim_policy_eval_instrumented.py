@@ -491,8 +491,16 @@ def main() -> None:
             import cv2 as _cv2
 
         def _perturb_frame(t: torch.Tensor) -> torch.Tensor:
-            """Apply camera-artifact mods to one [H,W,C] uint8 frame tensor."""
+            """Apply camera-artifact mods to one uint8 frame tensor.
+
+            Sim frames arrive as [B,H,W,C] (B=1), NOT [H,W,C] - cv2.blur/imencode
+            assert dims<=3, so strip the batch dim first and restore it after.
+            (bgr/noise are pure numpy and masked this; blur crashed on it.)
+            """
             a = t.cpu().numpy()
+            batched = a.ndim == 4
+            if batched:
+                a = a[0]
             if args.img_bgr_swap:
                 a = a[..., ::-1].copy()
             if args.img_noise:
@@ -507,6 +515,8 @@ def main() -> None:
                 a = _cv2.imdecode(enc, _cv2.IMREAD_COLOR)
             if args.img_gamma:
                 a = (255.0 * (a.astype(_np.float32) / 255.0) ** (1.0 / args.img_gamma)).astype(_np.uint8)
+            if batched:
+                a = a[None]
             return torch.from_numpy(_np.ascontiguousarray(a)).to(t.device)
 
         print(f"[eval] PREFLIGHT mods: bgr={args.img_bgr_swap} noise={args.img_noise} "
