@@ -1,6 +1,26 @@
 # Pi05 Active Work Tracker
 
-Last updated: 2026-08-05
+Last updated: 2026-08-06
+
+> **2026-08-06: EVERY SIM-SIDE GATE IS CLOSED. HARDWARE WAITS ONLY ON PLUGGING
+> THINGS IN.**
+>
+> Since the orange was first picked (banner below): the honest success rate is
+> **94% of oranges with 1.1 drops/run** (the user caught the fumbling from the
+> GUI before the statistics did); a 17-run **robustness campaign** mapped what
+> the policy attends to (appearance free, geometry ~one orange, **decoys
+> fatal**); and the new standing **sim-to-real preflight** verified the
+> real-arm client end to end and found the two facts that set the rig spec:
+> a full **BGR channel swap is behaviorally invisible** (so only source-level
+> client checks guard that bug class — done) and a mild **white-balance wash
+> is the single proven killer (0/3)** — so the real cameras' auto-WB/exposure
+> must be LOCKED. The policy keys on saturated-blob structure, not hue.
+>
+> **Next action is physical**: arm + two cameras (WB locked) + clean table —
+> checklist in `STATE_20260806.md` §2. Then the as-is test runs on an
+> already-verified path. Read: `STATE_20260806.md` (new entry point),
+> `sim_to_real_preflight_protocol_20260806.md`,
+> `n16_robustness_campaign_20260806.md`.
 
 > # 🍊 **2026-08-05: A POLICY PICKED UP THE ORANGE.**
 >

@@ -264,8 +264,12 @@ camera pose cut Pi05's near-object time from 86% to 23%.
 ```text
 0.  DONE - robustness campaign. Verdicts: appearance free, geometry ~one
     orange, DECOYS FATAL -> the real table must be CLEAN. Camera: 2 cm slack.
-0b. SIM-TO-REAL PREFLIGHT (STANDING PROTOCOL - runs before EVERY hardware
-    deployment from now on, this one and all future ones):
+0b. *** DONE 2026-08-06 *** SIM-TO-REAL PREFLIGHT - first run COMPLETE, all
+    stages passed. Verdicts: Stage A client VERIFIED end to end (incl. live
+    handshake); BGR swap has NO behavioral signature (source check is the only
+    guard); WHITE BALANCE is the one killer (0/3) -> new hard rig requirement;
+    staleness free; single-orange scene passes.
+    (STANDING PROTOCOL - repeats before EVERY future hardware deployment):
       Stage A  client equivalence: field-by-field desk check of the real
                client vs the validated sim client + no-robot smoke test.
                THE Era-1 check. Any mismatch is fixed before power-on.
@@ -277,10 +281,13 @@ camera pose cut Pi05's near-object time from 86% to 23%.
                physically build.
     ~2.5 h total. Decision rules pre-agreed.
     -> sim_to_real_preflight_protocol_20260806.md
-1.  AS-IS HARDWARE TEST of the sim-trained N1.6 - after 0b passes
-     me:   lerobot into the n1.6 venv (guard torch!) = part of Stage A
-     user: plug in arm + front/wrist cameras, mount front camera (careful, not
-           obsessive), CLEAN TABLE - nothing orange-ish in the workspace
+1.  AS-IS HARDWARE TEST of the sim-trained N1.6 - 0b PASSED; waits ONLY on the
+    user's hardware half now (full checklist: STATE_20260806.md section 2):
+     me:   DONE - lerobot 0.4.4 installed (torch intact), client patched,
+           smoke-tested, live handshake verified
+     user: plug in arm + front/wrist cameras, mount front camera (careful not
+           obsessive), LOCK WHITE BALANCE + EXPOSURE on both cameras,
+           CLEAN TABLE - nothing orange-ish in the workspace
 2.  In parallel, 8-bit Adam -> unblock fine-tuning (needed if step 1 fails,
     which is likely; costs nothing to prepare)
 3.  v3.0 -> GR00T v2 converter for our 89 real episodes   (drop `top`)
