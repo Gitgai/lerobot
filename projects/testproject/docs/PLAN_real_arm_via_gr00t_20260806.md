@@ -360,6 +360,19 @@ FURTHER SIM TUNING FOR ITS OWN SAKE
 
 ---
 
+## 6b. INSERTED 2026-08-08 — real-mimic battery before the fine-tune
+
+The as-is hardware test is DONE and FAILED (`REALARM_RESULT_20260808.md`:
+coherent motion, zero object-directedness). Before the N1.6 real-data
+fine-tune, one overnight diagnostic runs on otherwise-idle GPU:
+**`n16_realmimic_sim_battery_20260808.md`** — recreate the real rig's content
+(tomato-red fruit, wood table, paper plate, camera offset) inside sim and
+measure what each ingredient costs N1.6 at n>=3. It names the gap's
+ingredients and derisks the post-fine-tune hardware test; it is a diagnostic,
+NOT a gate — the fine-tune proceeds either way.
+
+---
+
 ## 7. What "done" looks like
 
 ```text

@@ -80,6 +80,10 @@ parser.add_argument("--policy_host", default="localhost")
 parser.add_argument("--policy_port", type=int, default=8080)
 parser.add_argument("--policy_timeout_ms", type=int, default=30000)
 parser.add_argument("--policy_action_horizon", type=int, default=50)
+parser.add_argument("--radian-actions", action="store_true",
+                    help="Checkpoint outputs RADIAN actions (converter unit bug); invert the client motor->rad conversion to recover them.")
+parser.add_argument("--camera-rename", default=None,
+                    help='Rename sim camera keys for the policy, e.g. "front:base_0_rgb,wrist:left_wrist_0_rgb" - needed when the checkpoint was trained under pi0-style names via --rename_map.')
 parser.add_argument("--policy_checkpoint_path", default=None,
                     help="LeRobot path only; the GR00T server already holds its own checkpoint.")
 parser.add_argument(
@@ -470,11 +474,13 @@ def main() -> None:
         )
         print(f"[eval] GR00T N1.7 client, cameras={gr00t_cameras} (scene has {list(camera_infos)})")
     else:
+        _cam_rename = dict(kv.split(":") for kv in args.camera_rename.split(",")) if args.camera_rename else {}
+        _client_infos = {_cam_rename.get(k, k): v for k, v in camera_infos.items()} if _cam_rename else camera_infos
         policy = LeRobotServicePolicyClient(
             host=args.policy_host,
             port=args.policy_port,
             timeout_ms=args.policy_timeout_ms,
-            camera_infos=camera_infos,
+            camera_infos=_client_infos,
             task_type=task_type,
             policy_type=args.policy_type.split("-")[1],
             pretrained_name_or_path=args.policy_checkpoint_path,
@@ -555,6 +561,10 @@ def main() -> None:
                 policy_obs = dict(obs_history[0])
             else:
                 policy_obs = dict(obs_dict["policy"])
+            if args.camera_rename:
+                for _src, _dst in _cam_rename.items():
+                    if _src in policy_obs:
+                        policy_obs[_dst] = policy_obs[_src]
             policy_obs["task_description"] = args.policy_language_instruction
             # B1-B5: camera artifacts, applied ONLY to what the policy sees.
             if _img_mods_on:
@@ -562,6 +572,16 @@ def main() -> None:
                     if _k in policy_obs:
                         policy_obs[_k] = _perturb_frame(policy_obs[_k])
             actions = policy.get_action(policy_obs).to(env.device)
+            if args.radian_actions:
+                import numpy as _np
+                _sysp = str(Path(__file__).parent)
+                import sys as _sys2
+                if _sysp not in _sys2.path:
+                    _sys2.path.insert(0, _sysp)
+                from gr00t_n17_client_adapter import sim_to_motor as _s2m
+                _a = actions.cpu().numpy()
+                _shape = _a.shape
+                actions = torch.from_numpy(_s2m(_a.reshape(-1, _shape[-1])).astype("float32").reshape(_shape)).to(env.device)
             if args.policy_type.startswith("gr00t") and actions.ndim == 2:
                 # The adapter returns [T, DOF]; the env loop below wants LeRobot's
                 # [T, 1, DOF]. (A flat [1, T*DOF] is also tolerated.)

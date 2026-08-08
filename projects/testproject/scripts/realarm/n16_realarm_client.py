@@ -218,6 +218,7 @@ def main() -> None:
         return
 
     # real path - lerobot imports only here so dry_run works anywhere
+    from lerobot.cameras.opencv.configuration_opencv import OpenCVCameraConfig  # noqa: F401
     from lerobot.robots import RobotConfig, make_robot_from_config, so_follower  # noqa: F401
 
     # register the `http` camera type (the wrist camera is the Raspberry Pi
@@ -251,11 +252,28 @@ def main() -> None:
         assert client.ping(), "policy server unreachable"
         policy = So100Adapter(client)
         print(f'[real] running with instruction: "{cfg.lang_instruction}"  (Ctrl+C stops)')
+        import cv2 as _cv2
+        from pathlib import Path as _Path
+
+        _fdir = _Path.home() / "run_frames"
+        _fdir.mkdir(exist_ok=True)
+        _chunk = 0
         try:
             while True:
                 obs = robot.get_observation()
                 obs["lang"] = cfg.lang_instruction
                 actions = policy.get_action(obs)
+                # EVIDENCE: what the policy saw + what it commanded, per chunk.
+                # (sim rule, applied to hardware: never diagnose blind)
+                for _cam in ("front", "wrist"):
+                    if _cam in obs:
+                        _cv2.imwrite(str(_fdir / f"c{_chunk:04d}_{_cam}.jpg"),
+                                     _cv2.cvtColor(obs[_cam], _cv2.COLOR_RGB2BGR))
+                _a0 = actions[0]
+                print(f"[real] chunk {_chunk}: pan={_a0['shoulder_pan.pos']:+.1f} "
+                      f"lift={_a0['shoulder_lift.pos']:+.1f} grip={_a0['gripper.pos']:+.1f}",
+                      flush=True)
+                _chunk += 1
                 for action_dict in actions[: cfg.action_horizon]:
                     tic = time.time()
                     robot.send_action(action_dict)
