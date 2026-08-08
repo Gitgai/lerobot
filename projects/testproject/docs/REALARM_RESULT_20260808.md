@@ -61,3 +61,35 @@ real + the 35-episode varied sim corpus.
 
 The hardware pipeline built today is permanent: any future checkpoint tests
 on the arm are now one command.
+
+---
+
+## Same-day follow-through: both fine-tune tracks unblocked, Pi0.5 TRAINING
+
+```text
+GR00T ceiling BROKEN   adamw_bnb_8bit: 100 probe steps at 4.15 it/s, 23.1 GB,
+                       zero OOM - the wall that blocked training for 3 days.
+                       (patch in launch_finetune.py; update the patches file)
+
+PI05 LAUNCHED          pi05_sim_varied: from pi05_base on the 35-episode
+                       varied corpus, 30k steps @ bs4, ~6 h, output
+                       ~/lerobot_assets/checkpoints/pi05_sim_varied
+   The OOM ladder that got there (each rung measured):
+     bs16 fp32                 OOM  (fp32 weights = 16.6 GB alone)
+     bs8/bs4 fp32              OOM
+     bs8 bf16                  OOM  (trainable was ALL 4.14B -> 33 GB Adam)
+     + train_expert_only=true  693M learnable - THE 012000 RECIPE; base
+       + freeze_vision_encoder   config does NOT set these, 012000's did
+     bs8 bf16 expert-only      OOM  (activations)
+     bs4 bf16 expert-only      TRAINS: 1.4 steps/s, 26.3 GB, GPU 97%
+   Also needed: --rename_map front->base_0_rgb, wrist->left_wrist_0_rgb
+   (pi05_base uses pi0 camera naming), --policy.push_to_hub=false, and
+   accelerate installed into the training venv.
+
+WHY THIS EXACT SETUP IS THE RIGHT DIAGNOSTIC: same recipe as 012000
+(expert-only, frozen VLM), same architecture, ONLY THE DATA differs
+(varied sim vs their real 89). Score in sim at n>=3:
+  grasps in sim   -> architecture exonerated; the real dataset is the suspect
+  fails where N1.6 succeeded -> architecture convicted, Pi05 retires
+TOMORROW: v3->GR00T-v2 bridge for the 89 real episodes -> GR00T-real
+fine-tune (the hardware shot; the only untested 2x2 cell).
