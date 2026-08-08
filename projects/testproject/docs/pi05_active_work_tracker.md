@@ -503,6 +503,15 @@ Last updated: 2026-08-06
 > carry a wrist view, not bulk downloading.
 > Read: `community_data_strategy_20260804.md` Section 5
 
+> **2026-08-05 ACTIVE PLAN: `pi05_g485_serving_bringup_plan_20260805.md`** -
+> RunPod is being replaced by the G485 box (RTX 5090, USA) reached over
+> ZeroTier from the robot laptop (India). Verified: G485 holds the checkpoint
+> and the training-era code at exactly e40b58a8, RTC adapter applied; the JPEG
+> decode patch is MISSING and is a hard blocker on a ~1 MB/s link. Phases 1-3b
+> and 7a-b need NO hardware; only the camera gate, smoke run and the
+> subtask-switching probe need the robot. Simulation was considered and ruled
+> out (no SO-101 env exists, and 012000 is fine-tuned on real camera images).
+>
 > **START HERE (2026-08-03): `agent_handoff_pi05_20260803.md`** - full state of
 > the project for a new agent: verified capabilities, history with the wrong
 > turns, the finger-stall measurement method, the pi05 architecture finding
