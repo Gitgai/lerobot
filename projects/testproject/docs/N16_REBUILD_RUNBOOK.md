@@ -95,7 +95,21 @@ Uses LeIsaac's NATIVE Gr00t16ServicePolicyClient - none of our adapter code.
 Score with object LIFT, never the grasp predicate alone.
 ```
 
-## 5. Real arm (when hardware exists)
+## 5. Real arm — TWO-MACHINE TOPOLOGY (verified 2026-08-08)
+
+```text
+GPU server:  THIS machine (192.168.194.158:5556) - server as section 3
+Arm client:  gaikwad-prakash@192.168.194.228 - the OLD rig, whose venv
+             (~/PrakashProjects/lerobot/lerobot/.venv, lerobot 0.5.2,
+             so_follower drivers) drove this arm before. Wire deps added:
+             pyzmq + msgpack (pip bootstrapped via ensurepip).
+Client:      ~/n16_realarm_client.py on the arm machine - VENDORED single
+             file (scripts/realarm/ in this repo), no gr00t install needed.
+DRY RUN PASSED from the arm machine: ping OK, 16 steps in 1.84 s over wifi.
+Arm present at /dev/ttyACM0; calibration file present on BOTH machines.
+```
+
+## 5b. Original single-machine notes (kept for reference)
 
 ```bash
 cd ~/sim/Isaac-GR00T-n16 && ./.venv/bin/python -m gr00t.eval.real_robot.SO100.eval_so100 \
