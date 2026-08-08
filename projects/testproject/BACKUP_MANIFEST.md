@@ -22,13 +22,23 @@ anything to bring up. Read both before a migration.
 >         DYNUS_ASIS_BACKUP_MANIFEST.md
 > ```
 
+> **SIZES HERE ARE SUPERSEDED.** Every figure lives in one place now:
+> `~/projects/git/mavlink-router/BACKUP_INVENTORY.md`. Keeping them in four
+> documents failed within a day. What changed since this file was written:
+>
+> ```text
+> 2026-08-07  the 380 GB of generated raw HDF5 was converted to a 966 MB
+>             corpus and deleted
+> 2026-08-07  the two day-1 HDF5s (35 GB) were deleted - see the correction
+>             in Section 2, they were regenerable state-machine output
+> => this project's keep-set went from ~63 GB to ~30 GB, and is now dominated
+>    by model checkpoints (26 GB), not data.
+> ```
+
 ```text
 Whole home directory ..................... 183 GB on disk
   ...but 253 GB if you tar/rsync it, because the uv venvs are HARDLINKS
      into ~/.cache/uv (67 GB) and get expanded into real copies on write.
-This manifest (NVIDIA project only) ......  63 GB
-  of which two HDF5 files are .............  35 GB
-  of which everything irreplaceable-and-small is .. under 400 MB
 ```
 
 ---
@@ -120,21 +130,56 @@ cp ~/lerobot_assets/lerobot_trainingera/src/lerobot/async_inference/image_codec.
 
 ---
 
-## 2. Tier B - irreplaceable data, large (about 63 GB)
+## 2. Tier B - the data worth keeping (about 30 GB)
 
-### Recorded demonstrations (35 GB) - the part you can never get back
+### CORRECTION 2026-08-07 - the "irreplaceable recordings" were neither
+
+This section used to open with *"Recorded demonstrations (35 GB) - the part you
+can never get back"*, describing `sim_pick_place.hdf5` and
+`sim_pick_place_ep4.hdf5` as hand-teleoped and unrecoverable. **Both claims
+were wrong.**
 
 ```text
-~/sim/leisaac-src/datasets/sim_pick_place.hdf5      23 GB, 8 episodes, 3 SUCCESS
-~/sim/leisaac-src/datasets/sim_pick_place_ep4.hdf5  12 GB, 1 episode,  1 SUCCESS
+what it said          hand-teleoped in LeIsaac, re-recording means sitting at
+                      the GUI again; a re-clone migration destroys 35 GB of
+                      irreplaceable data
+what was true         STATE-MACHINE OUTPUT. Regenerable in ~30 min by the
+                      committed generator. Deleted 2026-08-07 after conversion;
+                      nothing unique lost.
 ```
 
-Hand-teleoped in LeIsaac. Re-recording them means sitting at the GUI again.
+The provenance was never verified - it was inferred from the files living in
+LeIsaac's `datasets/` directory, which is the recording output path for **both**
+teleop and generation. The artifact disagreed the whole time:
 
-**The trap:** these live *inside* a git clone. `leisaac-src` is clean at
-`24d3bcd` and otherwise looks entirely re-clonable, so a "just re-clone the
-dependencies" migration deletes 35 GB of irreplaceable teleop data. The
-datasets are not in the repo and never were.
+```text
+leisaac/datagen/state_machine/pick_orange.py:134
+    """Compute the action tensor for the current step (8D IK pose target)."""
+    return torch.cat([target_pos_local, target_quat, gripper_cmd], -1)
+                         3 (pos)      +   4 (quat)  +  1 (grip)   = 8
+
+the deleted files                  actions (2340, 8)  -> state machine
+leisaac_pick_orange (real teleop)  action  [6] joint  -> leader arm
+```
+
+`seed = int(time.time())` proves nothing either way - it is the LeIsaac default
+in `generate.py`, `teleop_se3_agent.py` and `policy_inference.py` alike.
+
+**The rule this earns:** *"irreplaceable" is a claim about provenance, and
+provenance must be read out of the artifact, never inferred from its path.*
+Before marking anything unrecoverable, open it and find the signature.
+
+### What actually holds the data now
+
+```text
+~/.cache/huggingface/lerobot/local/varied_corpus/                  966 MB
+    35 episodes, 81,645 frames, LeRobot v3. The project's SOLE data artifact
+    since the raw deletions. Regenerable by sm_generate_varied.py in ~14 h, so
+    not irreplaceable - but 966 MB is far cheaper to keep than to rebuild.
+
+    *** Lives under ~/.cache/huggingface/, which Section 3 tells you to SKIP.
+        Re-include lerobot/local/ and lerobot/calibration/ explicitly. ***
+```
 
 ```text
 ~/lerobot_assets/datasets/                                        1.9 GB
@@ -248,100 +293,28 @@ starts clean.
 
 ---
 
-## 5. Recipes
+## 5-6. Recipes and verification - MOVED
 
-Sizes assume Tier A + Tier B, about 63 GB. Plain `tar`, no compression - HDF5
-and safetensors are already dense and `-z` only costs hours.
+These two sections held their own `tar`/`rsync` recipes and verification
+checks. They drifted: they still assumed ~63 GB, targeted an external SSD that
+never existed, and named `sim_pick_place*.hdf5` files that were deleted on
+2026-08-07. Two copies of a procedure means one of them is wrong, and it was
+this one.
 
-### To an external SSD
+**The single tested procedure now lives in the runbook**, against the real
+target and dry-run against the live machine:
 
-```bash
-mkdir -p ~/backup_staging          # run Section 1 + Section 4 captures first
-SSD=/media/$USER/<LABEL>           # needs >= 70 GB free
-
-tar -cvf "$SSD/nvidia_project_$(date +%Y%m%d).tar" -P \
-  --exclude='*/.venv' \
-  /home/kiran/projects/git/nvidia/lerobot \
-  /home/kiran/sim/leisaac-src/datasets \
-  /home/kiran/sim/*.log \
-  /home/kiran/lerobot_assets/datasets \
-  /home/kiran/lerobot_assets/checkpoints/gr00t_n16_leisaac_orange \
-  /home/kiran/lerobot_assets/checkpoints/pi05_012000 \
-  /home/kiran/lerobot_assets/checkpoints/leisaac_pick_orange_n15 \
-  /home/kiran/lerobot_assets/checkpoints/smolvla_so101_digits \
-  /home/kiran/lerobot_assets/checkpoints/act_leisaac_orange \
-  /home/kiran/.cache/huggingface/lerobot/calibration \
-  /home/kiran/.claude/projects/-home-kiran-projects-git-nvidia/memory \
-  /home/kiran/backup_staging \
-  /home/kiran/.ssh/runpod_ed25519
+```text
+~/projects/git/mavlink-router/BACKUP_RESTORE_RUNBOOK.md
+    Part I    quiesce pre-flight, the three tiers
+    Part III  the Orin: layout, retention, push, verify, promote, restore
+              Section 18 is the ordered first run
+~/projects/git/mavlink-router/BACKUP_INVENTORY.md
+    every path and size, with a completeness-check recipe
 ```
 
-`--exclude='*/.venv'` is what keeps this at 63 GB instead of 90. Verify it
-worked before trusting the archive (Section 6).
-
-Restore on the new machine:
-
-```bash
-sudo tar -xvf /media/$USER/<LABEL>/nvidia_project_<DATE>.tar -C /
-sudo chown -R $USER:$USER ~/projects ~/sim ~/lerobot_assets ~/.cache/huggingface ~/.ssh
-chmod 600 ~/.ssh/runpod_ed25519
-```
-
-### Directly to a new machine over the network
-
-`rsync` is resumable, which matters for a 35 GB file on a link that may drop.
-Push from here rather than pulling - it needs no SSH server on this end.
-
-```bash
-NEW=<user>@<new-machine-ip>
-IP=${NEW#*@}; ping -c2 -W3 "$IP" && timeout 5 bash -c "echo > /dev/tcp/$IP/22" && echo SSH_OK
-
-rsync -avz --progress --exclude='.venv' \
-      ~/projects/git/nvidia/lerobot/                  "$NEW:~/projects/git/nvidia/lerobot/"
-rsync -avz --progress ~/sim/leisaac-src/datasets/     "$NEW:~/sim/leisaac-src/datasets/"
-rsync -avz --progress ~/lerobot_assets/datasets/      "$NEW:~/lerobot_assets/datasets/"
-for c in gr00t_n16_leisaac_orange pi05_012000 leisaac_pick_orange_n15 \
-         smolvla_so101_digits act_leisaac_orange; do
-  rsync -avz --progress ~/lerobot_assets/checkpoints/$c/ "$NEW:~/lerobot_assets/checkpoints/$c/"
-done
-rsync -avz --progress ~/.cache/huggingface/lerobot/calibration/ \
-                      "$NEW:~/.cache/huggingface/lerobot/calibration/"
-rsync -avz --progress ~/backup_staging/ ~/sim/*.log    "$NEW:~/backup_staging/"
-```
-
-Note the **trailing slashes on both sides** - without them rsync nests the
-directory one level deeper and the restore silently lands in the wrong place.
-
----
-
-## 6. Verify the backup before you wipe anything
-
-A backup you have not read back is a hypothesis.
-
-```bash
-# the two big ones are intact - byte counts, not just presence
-tar -tvf "$SSD/nvidia_project_<DATE>.tar" | grep sim_pick_place
-#   expect  24305408326  sim_pick_place.hdf5
-#   expect  12260177895  sim_pick_place_ep4.hdf5
-
-# no venv sneaked in (each is GBs and makes the archive useless-fat)
-tar -tf "$SSD/nvidia_project_<DATE>.tar" | grep -c '/\.venv/'
-#   expect  0
-
-# the git-ignored evidence made it
-tar -tf "$SSD/nvidia_project_<DATE>.tar" | grep -c 'testproject/logs/'
-#   expect  a few thousand, NOT 0
-
-# calibration - the 8 KB whose loss costs a recalibration of both arms
-tar -tf "$SSD/nvidia_project_<DATE>.tar" | grep calibration
-#   expect  both my_so101_follower.json and my_so101_leader.json
-
-# the working policy is really in there
-tar -tf "$SSD/nvidia_project_<DATE>.tar" | grep -c 'gr00t_n16_leisaac_orange/ckpt'
-#   expect  > 0
-```
-
----
+Target: `kiran@192.168.0.146:~/backup/desktop/`. Tier 2 has been pushed and its
+restore verified byte-identical; Tier 3 has not run yet.
 
 ## 7. Restore order on the new machine
 
