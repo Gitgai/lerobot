@@ -27,8 +27,11 @@ gr00t/configs/data/data_config.py      video_backend torchcodec -> decord
                                        (torchcodec can't link FFmpeg 8; pyav
                                        fallback is unimplemented; dataset was
                                        transcoded AV1->H.264 to enable decord)
-gr00t/experiment/launch_finetune.py    gradient_checkpointing=True and
-                                       load_bf16=True (32 GB memory ceiling)
+gr00t/experiment/launch_finetune.py    gradient_checkpointing=True,
+                                       load_bf16=True, and optim="adamw_bnb_8bit"
+                                       (needs bitsandbytes in the venv; together
+                                       these hold full fine-tune at 23.1 GB -
+                                       under the 26 GB ceiling that blocked it)
 gr00t/eval/real_robot/SO100/eval_so100.py
                                        so100_follower/so101_follower imports ->
                                        so_follower (lerobot 0.4.4, the newest

@@ -44,7 +44,7 @@ index 99e29af..aa69718 100644
  from lerobot.utils.utils import init_logging, log_say
  import numpy as np
 diff --git a/gr00t/experiment/launch_finetune.py b/gr00t/experiment/launch_finetune.py
-index a5baf0f..7cc1f97 100644
+index a5baf0f..929dd40 100644
 --- a/gr00t/experiment/launch_finetune.py
 +++ b/gr00t/experiment/launch_finetune.py
 @@ -67,7 +67,12 @@ if __name__ == "__main__":
@@ -61,10 +61,15 @@ index a5baf0f..7cc1f97 100644
      config.model.reproject_vision = False
      config.model.eagle_collator = True
      config.model.model_name = "nvidia/Eagle-Block2A-2B-v2"
-@@ -77,6 +82,13 @@ if __name__ == "__main__":
+@@ -76,7 +81,17 @@ if __name__ == "__main__":
+ 
      config.training.experiment_name = ft_config.experiment_name
      config.training.start_from_checkpoint = ft_config.base_model_path
-     config.training.optim = "adamw_torch"
+-    config.training.optim = "adamw_torch"
++    # LOCAL PATCH 2026-08-08: adamw_torch's fp32 moments put the floor at
++    # 26.0 GB on this 31.35 GB card (measured; OOM in _multi_tensor_adam at
++    # every batch size). 8-bit Adam cuts optimizer state ~4x -> ~16.4 GB floor.
++    config.training.optim = "adamw_bnb_8bit"
 +    # LOCAL PATCH 2026-08-06 (backup: launch_finetune.py.orig).
 +    # Default is False. Without it this fine-tune OOMs on a 32 GB RTX 5090
 +    # at BOTH batch 16 and batch 8, dying inside _multi_tensor_adam - so it
