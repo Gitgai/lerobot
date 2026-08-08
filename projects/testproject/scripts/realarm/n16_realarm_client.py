@@ -220,6 +220,19 @@ def main() -> None:
     # real path - lerobot imports only here so dry_run works anywhere
     from lerobot.robots import RobotConfig, make_robot_from_config, so_follower  # noqa: F401
 
+    # register the `http` camera type (the wrist camera is the Raspberry Pi
+    # stream proxied at http://127.0.0.1:8092/frame). http_camera.py lives in
+    # the OLD repo on the arm machine and self-registers with draccus on import.
+    import sys as _sys
+
+    _sys.path.insert(0, str(__import__("pathlib").Path.home()
+                          / "PrakashProjects/lerobot/lerobot/projects/testproject/scripts"))
+    try:
+        import http_camera  # noqa: F401
+        print("[real] http camera type registered")
+    except Exception as e:
+        print(f"[real] http camera type unavailable: {e}")
+
     @dataclass
     class RealConfig:
         robot: RobotConfig = None
