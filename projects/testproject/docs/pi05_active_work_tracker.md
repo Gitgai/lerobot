@@ -1605,3 +1605,25 @@ Compare against the old focused 003000 checkpoint if available.
 If 012000 still predicts open on recorded close/hold/lift frames, fix training/action handling before more ordinary real-arm tests.
 Only if offline close/hold/lift improves, evaluate the staged checkpoint on the real arm through official LeRobot async with three cameras and read-only trace.
 ```
+
+---
+
+## 13. APPENDED 2026-08-08 — pi05_sim_varied: units bug, salvage, pruning
+
+```text
+TRAINED   pi05_sim_varied, 30k steps, 2h33m, bs4 bf16 expert-only (012000 recipe)
+BUG       corpus action column is RADIANS (converter wrote joint_pos_target raw)
+          while state is MOTOR UNITS -> eval client's motor->rad conversion
+          shrank outputs ~57x -> frozen arm (run 1: 4 mm motion in 3,000 steps)
+SALVAGE   --radian-actions flag in sim_policy_eval_instrumented.py inverts the
+          client conversion; model is self-consistent, so this is a fair test
+EVAL      corrected 3-seed battery truncates ~step 1500: recorder OOM while the
+          18.4 GB pi05 server is resident. Partials scorable; score on the
+          1,500-step horizon, note it in any comparison vs 3,000-step N1.6 runs
+PRUNED    2026-08-08 (user-approved): checkpoints 005000-025000 deleted, 54 GB
+          freed. KEPT 030000 (+ last symlink). All were buggy-corpus training;
+          rebuild = fixed corpus + recipe in git, ~2.5 h
+CORPUS    fix pending: rewrite action column rad->motor IN the v3 dataset
+          (raw HDF5 deleted; the affine fix needs only the corpus itself),
+          then refresh the Orin nvidia_data archive at next milestone
+```
