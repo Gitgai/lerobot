@@ -243,3 +243,64 @@ still renderer pixels, and passing everything here does not clear the real rig.
 The one exception is Phase 0: if `bgrSwap` reproduces the failure signature,
 that is not a domain-gap claim at all — it is a testable hypothesis about the
 client, checkable directly against the run-2 evidence frames.
+
+---
+
+## R6. PHASE 0 RESULTS — 2026-08-09, kiran-AI90. Categorical hypothesis is DEAD.
+
+Run on the rebuilt machine, one server, one session, 20 s GPU rest between Kit
+startups, all four runs `exit=0`.
+
+```text
+condition   seed   placed   lifts (cm)          d_grasp min   gripper range
+canonical   4001    1/3      0.6   4.2  17.7      2.5 cm      -0.09 .. +0.92
+canonical   4002    2/3     14.0   2.0  13.8      2.2 cm      -0.12 .. +0.94
+bgrSwap     4001    1/3     19.0  13.3  19.3      1.2 cm      -0.08 .. +0.96
+bgrSwap     4002    3/3     17.6  13.5  11.8      1.8 cm      -0.10 .. +0.98
+
+canonical   3/6 = 50%          bgrSwap   4/6 = 67%
+```
+
+**`--img-bgr-swap` does not reproduce the real-arm signature.** It does not even
+degrade the policy: one swapped run was a full 3/3, the end-effector closed to
+**1.2 cm**, and the gripper commanded **+0.96**. The hardware failure was the
+opposite — never approached, gripper never closed (range 45-59 where a close is
+single digits). Nothing resembling it appears here.
+
+⇒ **Channel order is ruled out.** R2's hypothesis was wrong, and cheaply so:
+four runs, twelve minutes.
+
+### The stronger result is the disconfirmation it carries
+
+The policy places oranges **with the colour channels inverted** — orange renders
+blue — and barely notices. That is a harder version of the robustness campaign's
+"appearance barely matters," and it makes §2's headline condition `tomatoRed`
+very unlikely to be the culprit: if a full BGR inversion costs nothing, a
+red-versus-orange fruit almost certainly does not either.
+
+⇒ **Phase 2 (appearance) drops further in expected value. Phase 1 (geometry) is
+now the main line**, which is where `n16_robustness_campaign_20260806.md`
+pointed before any of this: moved plate 33%, scattered 44%, and a real scene
+that was both at once plus a single orange where training had three.
+
+### Honesty about this sample
+
+```text
+n=2 per condition. bgrSwap scoring HIGHER than canonical is noise, not an
+effect - do not report it as one. What n=2 CAN settle is the categorical
+question, because the predicted signature was total failure and we observed
+normal grasping twice.
+
+The canonical pair scored 3/6 = 50%, against this machine's 76% at n=18. Within
+spread at n=2, but a reminder that every condition here is measured against a
+noisy baseline - and that the unresolved 76%-vs-94% gap sits underneath all of
+it (SIM_VALIDATION_20260809.md).
+```
+
+### obsDelay: deliberately not run
+
+R2 lists it, and it stays unrun on purpose. The plan's own instruction is to
+pick N from *measured* wire latency; the real rig is disconnected, so the
+Raspberry Pi wrist stream and the two-machine hop cannot be measured. An
+invented N proves nothing if it shows no effect and is an artifact of the guess
+if it does. **Run it when the hardware is back**, with a measured number.
