@@ -121,3 +121,125 @@ paperPlate  _/3 _/3 _/3     _/9
 camOff      _/3 _/3 _/3     _/9
 REALMIMIC   _/3 _/3 _/3     _/9
 ```
+
+---
+
+# REVISION 2026-08-09 — reorder before running. Machine rebuilt; plan unchanged since.
+
+Written on kiran-AI90 after the restore, before any condition ran. §2's battery
+is sound but its **priority is backwards against our own evidence**, and it
+omits the dimension most likely to explain the real-arm failure. Nothing below
+deletes §2 — it re-sequences it and adds two phases in front.
+
+## R1. Why the order changes
+
+`n16_robustness_campaign_20260806.md` already measured what this policy
+tolerates, and the answer is the opposite of §2's emphasis:
+
+```text
+APPEARANCE BARELY MATTERS   blue plate + green robot + 35% light + warm layout,
+                            all at once -> still reliably 2/3
+  dimLight  (35% light)     3/3, 0 drops, a PERFECT run
+  smallOrng (75% size)      3/3, fine
+
+GEOMETRY HURTS
+  decoys                    6/9  = 67%
+  scattered                 4/9  = 44%   "geometry hurts"
+  moved plate               3/9  = 33%   THE WORST CONDITION of the whole suite
+```
+
+§2 spends **4 of 5 conditions on appearance** (`tomatoRed`, `woodTable`,
+`paperPlate`, and the combined `REALMIMIC`), and only `camOff` touches
+geometry. That is the cheap-to-vary dimension, not the load-bearing one.
+
+**And the real rig was a geometry condition.** `REALARM_RESULT_20260808.md`
+records the scene as *"plate LEFT, one orange center-right"* — against a
+canonical sim scene of three oranges with the plate elsewhere. That is
+simultaneously **moved plate** (33%) and **a parked/relocated orange** (44%):
+the two worst conditions in the suite, combined, plus an object count the
+policy never saw in training.
+
+The observed behaviour fits. Run 1: *"smooth motion from rest, sweep to the
+LEFT — the plate side — never toward the orange."* That is what a policy
+following a learned spatial prior does when the layout it expects is absent.
+
+## R2. The real failure was CATEGORICAL, not graded — test that first
+
+Every §2 condition measures **degradation** (94% -> some lower number). The
+hardware failure was **total**: zero object-directedness, gripper never closed,
+no approach at any point. Ingredients that each cost 20-60% do not obviously
+compose into 100% failure. Something single-bit may be different.
+
+Run these two before anything else. **2 runs, ~5 minutes**, and either result
+is decisive:
+
+```text
+bgrSwap     --img-bgr-swap        Channel-order mismatch between the real client's
+                                  camera pipeline and training. A saturated ORANGE
+                                  blob becomes BLUE. The policy keys on that blob
+                                  (robustness campaign). Predicted symptom if true:
+                                  coherent motion, never approaches the object -
+                                  i.e. EXACTLY the real-arm observation.
+obsDelay    --obs-delay=N         Real pipeline latency (rpicam-vid -> proxy ->
+                                  HTTP) vs sim's instantaneous obs. Pick N from
+                                  measured wire latency, not a guess.
+```
+
+If `bgrSwap` reproduces the real-arm signature in sim, that is a far simpler
+and more actionable explanation than a domain-gap composite — and it is a
+**pipeline bug, fixable**, not a policy limitation.
+
+## R3. Revised execution order
+
+```text
+PHASE 0  categorical      bgrSwap, obsDelay                      2 runs   ~5 min
+PHASE 1  geometry         realLayout (plate left + single orange),
+                          movedPlate, parkedOrange               9 runs   ~20 min
+PHASE 2  appearance (§2)  tomatoRed, woodTable, paperPlate       9 runs   ~20 min
+PHASE 3  composite        REALMIMIC + camOff, and the winning
+                          ingredient(s) from 0-2                 6 runs   ~15 min
+```
+
+Stop early if Phase 0 reproduces the signature — Phases 1-3 then become
+confirmation, not diagnosis.
+
+**`realLayout` is the condition §2 lacks and the one that most resembles the
+real scene.** Build it with `--move-plate` and `--park-oranges` (both exist)
+to place the plate LEFT and leave a single orange center-right.
+
+## R4. Corrections to §2's mechanics, verified on the rebuilt machine
+
+```text
+port            §2 says :5556. The runbook §3 command and every run on this
+                machine used :5555. Either works - match the server.
+runtime         "5 conditions x 3 seeds = 15 runs, ~6-7 h" is far too
+                pessimistic. Measured: ~2 min per 3,000-step run. The whole
+                revised battery above is ~1 h, not overnight.
+Pi0.5 OOM       §4 steps 1-3 assume the 18.4 GB Pi0.5 server is resident. It is
+                not on this machine. Skip them.
+DROPS           §2 says scoring includes drops as a standing rule.
+                `phase0_score_sweep.py` DOES NOT COMPUTE DROPS. Either add it or
+                state its absence in the results - the campaign's own lesson was
+                that "a success RATE without a struggle metric flattered the
+                policy."
+baseline        Do NOT compare against the 94% reference. On this machine the
+                canonical rate is 76% (n=18, SIM_VALIDATION_20260809.md) and
+                that gap is itself unresolved. Run fresh canonical seeds in the
+                same session as the battery and compare against those.
+exit codes      Check them. Three runs died of Isaac Sim graphics crashes this
+                session; a crashed run writes no CSV and must not be scored as
+                a policy failure. Bound batteries to ~12 runs and rest the GPU.
+horizon         --policy_action_horizon is INERT on the gr00t-n16 path. Do not
+                vary it and do not report it as a condition.
+```
+
+## R5. What this still cannot prove
+
+§1's limit is unchanged and worth repeating against the temptation of a clean
+sweep: this can name which ingredient hurts, sized in oranges-placed at n>=3.
+It **cannot** prove transfer would have worked. Sim-rendered tomato-red is
+still renderer pixels, and passing everything here does not clear the real rig.
+
+The one exception is Phase 0: if `bgrSwap` reproduces the failure signature,
+that is not a domain-gap claim at all — it is a testable hypothesis about the
+client, checkable directly against the run-2 evidence frames.
