@@ -304,3 +304,67 @@ pick N from *measured* wire latency; the real rig is disconnected, so the
 Raspberry Pi wrist stream and the two-machine hop cannot be measured. An
 invented N proves nothing if it shows no effect and is an artifact of the guess
 if it does. **Run it when the hardware is back**, with a measured number.
+
+---
+
+## R7. PHASE 1 RESULTS — geometry does not reproduce it either. And the battery is UNDERPOWERED.
+
+Flag values taken from `n16_robustness_campaign_20260806.md` so these stay
+comparable to its numbers. 8 of 9 runs `exit=0`; `realLayout` seed 5001 died of
+an Isaac Sim graphics crash (exit 139, the 4th this session) so that condition
+is n=2.
+
+```text
+condition       placed          campaign reference
+parkedOrange    2/3  = 67%      (scattered 44%)
+realLayout      1/2  = 50%      (no campaign equivalent - new condition)
+movedPlate      6/9  = 67%      moved plate 33%   <- WORST in the campaign
+canonical (P0)  3/6  = 50%      canonical ~89-94%
+```
+
+**No geometry condition is worse than canonical.** `movedPlate` — the campaign's
+single worst condition at 33% — scored 67% here.
+
+### The finding that matters: this battery cannot currently measure what it is for
+
+The campaign detected degradation **from ~89-94% down to 33%**. Canonical on
+this machine, same session, is **50%**. You cannot resolve a drop to 33% from a
+50% floor at n=2-3: every condition here lands between 50% and 67%, which is
+noise around an unexplained baseline.
+
+⇒ **The unresolved canonical gap is now the blocker, not a curiosity.** Until
+canonical here matches the reference, no condition result is interpretable, and
+running Phases 2-3 would produce more numbers with the same defect.
+**Stop adding conditions. Fix the baseline.**
+
+### Scoring correction — parked oranges are not anomalies
+
+A first pass flagged 7 of 33 runs (21%) as having non-physical displacement.
+**That was a scoring bug.** `--park-oranges` deliberately moves oranges ~1 m
+out of the workspace, where they fall; counting that as displacement is wrong.
+Excluding parked oranges, the genuine rate is **2 of 33 = 6%**:
+
+```text
+gate_seed2004        56.3 cm
+p1_movedPlate_5001  156.9 cm    an orange displaced further than table height
+```
+
+6% is low enough not to explain the baseline gap on its own, but these runs
+should be excluded from any rate, and the cause is worth finding separately.
+
+### Venv difference: investigated, NOT the cause
+
+A name-diff suggested 66 packages present in `leisaac-venv.freeze` and absent
+from the fresh install. Checked properly:
+
+```text
+leisaac's own declared dependencies   ALL satisfied
+deepdiff, pydantic, av, datasets, huggingface-hub, wandb   present
+(the diff was largely distribution-vs-module name normalisation)
+genuinely absent: pin/pinocchio, hpp-fcl, cmeel-*, rl-games, gym
+   -> IsaacLab optional extras for OTHER robots and tasks; pick_orange
+      imports none of them
+```
+
+⇒ The fresh-install-versus-freeze choice does not appear to explain the gap.
+Recorded so it is not re-investigated.
