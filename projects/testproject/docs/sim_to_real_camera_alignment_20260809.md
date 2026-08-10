@@ -341,3 +341,112 @@ realCam HOLDS    -> H1 refuted. Geometry alone is not sufficient; H2 is live and
                     training IS justified, with the sweep telling you what to
                     randomise over.
 ```
+
+---
+
+# STEP 1 RESULT — 2026-08-10. Geometry is a LARGE factor but does NOT explain the hardware failure.
+
+Step 1 of the training-trigger decision tree
+(`sim_to_real_preflight_protocol_20260806.md`). Ran on kiran-AI90, one server,
+one session. 18 runs, 3,000 steps each, all `exit=0` (one retry after a
+SIGKILL).
+
+## Design
+
+**12 realCam + 6 canonical, INTERLEAVED 2:1** — realCam, realCam, canonical,
+repeated six times, seeds 7001-7052.
+
+The canonical arm is not redundant with the pooled n=22 baseline. It controls
+for *session* effects — GPU state, server instance, thermal drift. Running all
+of one arm then all of the other would put any drift entirely on the second
+half, where it would masquerade as the effect. Interleaving splits it evenly.
+
+```text
+realCam = --jitter-camera=0,0,-0.45 --rotate-camera=45
+```
+
+Verified applied, from the run log — flags silently not taking effect is a real
+failure mode here (`--policy_action_horizon` is inert on this path and nobody
+noticed for two batteries):
+
+```text
+[eval] jittered front camera: (0.0, -0.5, 0.6) -> (0.0, -0.5, 0.15)
+[eval] front camera pitched 45.0 deg
+```
+
+## Result
+
+```text
+                 n     placed        mean/run    sd
+canonical        6     16/18 = 89%   2.67        0.52
+realCam         12     16/36 = 44%   1.33        0.98
+
+drop 1.33 oranges/run   SE 0.35   t = 3.77   ~1.4 within-condition SDs
+per-run realCam:  [2,1,2,2,0,2,0,2,1,3,1,0]
+per-run canonical:[3,3,2,2,3,3]
+```
+
+**Moving the camera to the real rig's viewpoint HALVES performance.** That is a
+solid, significant effect, and it confirms viewpoint matters a great deal.
+
+## But the failure SIGNATURE does not match the hardware
+
+```text
+                       sim realCam                real arm (REALARM_RESULT_20260808)
+approaches the object  YES - d_grasp 0.4-3.8 cm   NO - never approached
+gripper closes         YES - up to +1.14          NO - stayed 45-59 (a close is
+                                                      single digits)
+lifts                  YES - up to 18.1 cm        NO
+places                 44% of oranges             ZERO, across two runs
+```
+
+Under real-rig geometry the policy still reaches, grasps, lifts and places -
+placing on **9 of 12 runs**, including one full 3/3. The arm showed **zero
+object-directedness for an entire run, twice**.
+
+⇒ These are **different failure modes, not different severities of the same
+one.**
+
+## Verdict — neither branch of the decision tree, which is more useful
+
+```text
+H1 PARTIALLY SUPPORTED   viewpoint is a genuine, large contributor. The mounting
+                         spec in section 1 stands and is worth acting on.
+                         But it is NOT SUFFICIENT to produce what the arm did.
+
+H2 STILL LIVE            something beyond camera geometry is also acting.
+
+=> TRAINING IS STILL NOT JUSTIFIED. Two known, mechanically fixable defects
+   remain in the observation channel. Fine-tuning now aims at a channel that is
+   still broken in at least two measurable ways.
+```
+
+### The remaining candidates, now narrower and rankable
+
+```text
+1. STALE WRIST STREAM   ~13% of run-2 wrist frames dead or stale (two fully
+                        black, 19/142 consecutive pairs identical). Untested in
+                        sim - needs --frame-drop, not yet implemented.
+2. EXPOSURE / CONTRAST  the rig ran "WB locked, exposure AUTO" against this
+                        protocol's own hard requirement to lock BOTH. Stage B
+                        measured gamma 1.35 -> 0/3 placed, the worst run of the
+                        entire preflight, and the run-2 frames measure at mean
+                        brightness 100/255. THE CLOSEST KNOWN ANALOGUE TO A
+                        TOTAL FAILURE.
+3. MISSING BACKGROUND   sim has no wall, socket, pole or speaker; they occupy a
+                        large share of the real ~67 deg frame. No flag reaches
+                        this - it is scene geometry.
+4. REAL PIXELS          the irreducible remainder.
+```
+
+Candidate 2 deserves priority: it is the only tested condition that ever
+produced a **total** failure in sim, and the rig demonstrably half-complied with
+the rule written to prevent it.
+
+## Incidental
+
+This session's canonical scored **89%** against the pooled 74% (n=22). Same
+server, same session, six runs. That makes the 44% contrast cleaner, and
+suggests the pooled figure is dragged down by runs taken under worse GPU
+conditions - which is an argument for always pairing a condition with
+same-session canonical runs rather than comparing against a stored number.
