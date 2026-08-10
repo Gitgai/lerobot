@@ -224,3 +224,110 @@ scattered 10 · tomatoRed 11 · paperPlate 5 · REALMIMIC 0
 Those results stand and should be scored — but note every one of them perturbs
 *within* the trained viewpoint, which is why they were all null. `camOff` is the
 closest to this line and moved the camera by only 5 cm and 5 deg.
+
+---
+
+# EXECUTION LOG — 2026-08-09/10, kiran-AI90
+
+## CORRECTION: FOV was never a mismatch. Position and pitch are.
+
+§0 of this document claimed sim's front camera is ~40 deg against a webcam's
+~65 deg. **That was wrong.** It assumed IsaacLab's *default* 20.955 mm aperture.
+`single_arm_env_cfg.py` sets it explicitly:
+
+```python
+front:  focal_length=28.7,  horizontal_aperture=38.11   # comment: "For a 78 deg FOV"
+wrist:  focal_length=36.5,  horizontal_aperture=36.83   # comment: "For a 75 deg FOV"
+```
+
+⇒ sim front is **~67 deg** (78 deg on the square-image basis the comment uses),
+squarely in laptop-webcam range. **Strike FOV from the list of differences.**
+
+What survives, and it is the large part:
+
+```text
+position   sim (0.0, -0.5, 0.6) m from the robot base   vs   webcam at table level
+pitch      161 deg about X, steeply DOWN                vs   near-horizontal
+mount      moves WITH the robot base                    vs   static on the table
+```
+
+The mount point matters independently of pose: the policy learned a
+**base-relative** view. A tripod that does not move with the robot is a
+different observation model even if the initial framing matches.
+
+## Flags implemented in `sim_policy_eval_instrumented.py`
+
+```text
+--rotate-wrist-camera N   pitch the WRIST about its local X. It could previously
+                          only be TRANSLATED; the real wrist differs in ANGLE.
+                          Mirrors the existing --rotate-camera quaternion compose.
+--camera-fov D            front FOV in degrees -> focal_length, computed against
+--wrist-fov  D            the cfg's OWN horizontal_aperture (do NOT hardcode
+                          20.955 - that is the bug that produced the wrong 40 deg)
+--snapshot-dir / --snapshot-at
+                          ported verbatim from sim_harness_positive_control.py.
+                          This is the only way to match a sim view to a photo:
+                          extrinsics cannot be derived from an image without
+                          calibration, so you iterate and look.
+```
+
+NOT implemented: `--frame-drop` (for the ~13% stale wrist stream). It touches
+the observation path rather than config, and the staleness hypothesis is
+independent of geometry — keep the two changes separable.
+
+## The snapshot sweep — what each configuration looks like
+
+Six 120-step runs, snapshot at step 60, saved to `logs/camshots/`. Pictures were
+the goal, not scores.
+
+```text
+A_baseline    (unmodified)                                    what N1.6 trained on
+B_fov65       --camera-fov=65                                 ~no visible change
+C_low         --jitter-camera=0,0,-0.45                       lowered, still pitched down
+D_low_pitch   --jitter-camera=0,0,-0.45 --rotate-camera=45    *** CLOSEST MATCH ***
+E_realcam     --jitter-camera=0,0,-0.55 --rotate-camera=70    overshoots - too low,
+                                                              objects loom
+F_realboth    E + --rotate-wrist-camera=-35 --wrist-fov=55    front overshoots as E
+```
+
+**The `realCam` condition, for reuse:**
+
+```bash
+--jitter-camera=0,0,-0.45 --rotate-camera=45
+```
+
+Judged against `logs/realarm_frames_run2_20260808/c0000_front.jpg`: both show the
+table receding, objects at natural scale, the robot standing behind, plate left,
+and background above the table edge. The baseline shows none of that.
+
+## Limits of this match — read before quoting any result from it
+
+```text
+VISUAL, NOT CALIBRATED   D means "looks like the photo", not "is the photo". No
+                         measurement of the real mount exists. When the rig is
+                         reconnected, MEASURE the mount and redo this properly.
+NO BACKGROUND            sim has no wall, socket, pole or speaker. In the real
+                         frame those occupy a large share of a ~67 deg view.
+                         Not reachable by any flag - it is scene geometry.
+WRIST NOT MATCHED YET    F pitched the wrist -35 deg but the front overshot in
+                         the same run, so the wrist match is unvalidated.
+```
+
+## Status and the next measurement
+
+```text
+DONE     flags implemented; sweep captured; realCam flag string identified
+NEXT     realCam at n=12 vs canonical 74% (n=22, 2.23 oranges/run, sd 0.97)
+         -> this is STEP 1 of the training-trigger decision tree in
+            sim_to_real_preflight_protocol_20260806.md
+```
+
+Reminder of what that measurement decides, because it is the whole point:
+
+```text
+realCam CRATERS  -> H1 supported. The hardware failure was an out-of-distribution
+                    observation. Fix the mount; retest hardware. NO training yet.
+realCam HOLDS    -> H1 refuted. Geometry alone is not sufficient; H2 is live and
+                    training IS justified, with the sweep telling you what to
+                    randomise over.
+```

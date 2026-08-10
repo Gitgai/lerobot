@@ -145,6 +145,27 @@ parser.add_argument("--jitter-wrist-camera", default=None,
                     help="B8: perturb the WRIST camera mount by \"dx,dy,dz\" metres - it was never perturbed at all.")
 parser.add_argument("--park-oranges", default=None,
                     help="C: comma-list of orange indices (e.g. \"2,3\") moved ~1 m out of the workspace, approximating removal. Score only the remaining orange(s).")
+# --- Stage 0 additions (2026-08-09): observation EQUIVALENCE, not just robustness.
+# B7/B8 tested 5 deg and 2 cm and passed; the real rig differed by ~0.6 m, ~70 deg
+# and 25 deg of FOV. See sim_to_real_camera_alignment_20260809.md.
+parser.add_argument("--rotate-wrist-camera", type=float, default=None,
+                    help="Pitch the WRIST camera by N degrees about its local X. The wrist could "
+                         "previously only be TRANSLATED (--jitter-wrist-camera), but the real "
+                         "rig's wrist view differs mostly in ANGLE.")
+parser.add_argument("--camera-fov", type=float, default=None,
+                    help="Override the FRONT camera horizontal FOV in degrees (sim default ~40; "
+                         "a stock laptop webcam is ~60-70, which is why the real frames include "
+                         "the wall). Converted to focal_length against the 20.955 mm aperture.")
+parser.add_argument("--wrist-fov", type=float, default=None,
+                    help="Same for the WRIST camera (sim default ~32 deg).")
+parser.add_argument("--snapshot-dir", default=None,
+                    help="Save FRONT and WRIST frames as PNGs here at --snapshot-at steps. Ported "
+                         "from sim_harness_positive_control.py. This is how a sim view is matched "
+                         "against a real photo - camera extrinsics cannot be derived from a "
+                         "photograph, so you iterate visually.")
+parser.add_argument("--snapshot-at", default="30,60",
+                    help="Comma list of steps at which to save snapshots.")
+
 args = parser.parse_args()
 
 from isaaclab.app import AppLauncher  # noqa: E402
@@ -291,6 +312,40 @@ def main() -> None:
             w1 * z2 + x1 * y2 - y1 * x2 + z1 * w2,
         )
         print(f"[eval] front camera pitched {args.rotate_camera} deg")
+
+    if args.rotate_wrist_camera:
+        import math
+
+        cam = getattr(env_cfg.scene, "wrist", None)
+        if cam is None:
+            raise RuntimeError("--rotate-wrist-camera: wrist camera not on scene cfg")
+        w1, x1, y1, z1 = cam.offset.rot
+        half = math.radians(args.rotate_wrist_camera) / 2.0
+        w2, x2, y2, z2 = math.cos(half), math.sin(half), 0.0, 0.0
+        cam.offset.rot = (
+            w1 * w2 - x1 * x2 - y1 * y2 - z1 * z2,
+            w1 * x2 + x1 * w2 + y1 * z2 - z1 * y2,
+            w1 * y2 - x1 * z2 + y1 * w2 + z1 * x2,
+            w1 * z2 + x1 * y2 - y1 * x2 + z1 * w2,
+        )
+        print(f"[eval] wrist camera pitched {args.rotate_wrist_camera} deg")
+
+    # FOV overrides. IsaacLab PinholeCameraCfg carries a horizontal aperture (mm);
+    # focal = aperture / (2 * tan(fov/2)). Sim ships front 28.7 mm (~40 deg) and
+    # wrist 36.5 mm (~32 deg); a laptop webcam is ~60-70 deg.
+    for _flag, _name in ((args.camera_fov, "front"), (args.wrist_fov, "wrist")):
+        if not _flag:
+            continue
+        import math
+
+        cam = getattr(env_cfg.scene, _name, None)
+        if cam is None:
+            raise RuntimeError(f"--{_name}-fov: {_name} camera not on scene cfg")
+        aperture = getattr(cam.spawn, "horizontal_aperture", 20.955)
+        old_f = cam.spawn.focal_length
+        cam.spawn.focal_length = aperture / (2.0 * math.tan(math.radians(_flag) / 2.0))
+        print(f"[eval] {_name} camera FOV -> {_flag} deg "
+              f"(focal {old_f:.1f} -> {cam.spawn.focal_length:.1f} mm)")
 
     if args.jitter_wrist_camera:
         dx, dy, dz = (float(v) for v in args.jitter_wrist_camera.split(","))
@@ -550,6 +605,8 @@ def main() -> None:
     fields += [f"o{i}_{a}" for i in (1, 2, 3) for a in ("x", "y", "z")]
     fields += [f"pick_{o.lower()}" for o in ORANGES] + [f"put_{o.lower()}_to_plate" for o in ORANGES]
 
+    _snapshot_steps = {int(v) for v in args.snapshot_at.split(",")} if args.snapshot_dir else set()
+
     step = 0
     with open(out_path, "w", newline="") as handle, torch.inference_mode():
         writer = csv.DictWriter(handle, fieldnames=fields)
@@ -654,6 +711,24 @@ def main() -> None:
                         int(bool(subtasks.get(place_key, torch.zeros(1))[0])) if place_key in subtasks else ""
                     )
                 writer.writerow(row)
+
+                if args.snapshot_dir and step in _snapshot_steps:
+                    import cv2
+
+                    Path(args.snapshot_dir).mkdir(parents=True, exist_ok=True)
+                    for _cam in ("front", "wrist"):
+                        _frame = obs_dict["policy"].get(_cam)
+                        if _frame is None:
+                            continue
+                        _a = _frame.cpu().numpy()
+                        if _a.ndim == 4:
+                            _a = _a[0]
+                        # sim frames are RGB; cv2 writes BGR
+                        cv2.imwrite(
+                            f"{args.snapshot_dir}/{Path(args.out).stem}_{_cam}_step{step}.png",
+                            cv2.cvtColor(_a, cv2.COLOR_RGB2BGR),
+                        )
+                    print(f"[eval] snapshots saved at step {step}")
 
                 if step % 100 == 0:
                     handle.flush()
