@@ -225,3 +225,184 @@ Where: image/delay mods wrap the observation dict in the eval loop (policy-side,
 mimicking camera artifacts AFTER rendering); camera-pose mods are env-cfg-side.
 Driver: scripts/n16_preflight_battery4.sh once flags exist.
 ```
+
+---
+
+# STAGE 0 — OBSERVATION EQUIVALENCE. Added 2026-08-09. **Run this FIRST.**
+
+## Why this stage exists: the 2026-08-08 hardware failure fell straight through
+
+Stages A-C are sound and were followed. The rig still failed with zero
+object-directedness. Comparing the run-2 evidence frames against sim renders
+afterwards showed why:
+
+```text
+                 SIM (trained on)                 REAL (given)
+front mount      Robot/base/front_camera          laptop webcam ON THE TABLE
+front position   (0.0, -0.5, 0.6) m from base     ~table level
+front pitch      161 deg about X, steeply DOWN    near-horizontal
+front FOV        ~40 deg (focal 28.7 mm)          ~60-70 deg (webcam)
+what fills it    the table, edge to edge          wall, socket, pole, speaker
+wrist view       plate fills the frame            2/3 robot's own white body
+```
+
+**The protocol tested camera ROBUSTNESS, never camera EQUIVALENCE.** B7 pitched
+the front camera **5 degrees** (verdict: mild). B8 jittered the wrist **2 cm**
+(verdict: free). Both passed, and cameras were treated as settled. The real gap
+was ~0.6 m of height, ~70 deg of pitch and 25 deg of FOV — one to two orders of
+magnitude beyond anything tested.
+
+Those are different questions:
+
+```text
+ROBUSTNESS   perturb the SIM camera, measure degradation
+             -> answers "how much slop does this policy tolerate?"
+EQUIVALENCE  compare the REAL rig's geometry against the sim config
+             -> answers "are we even inside that tolerance?"
+```
+
+B7/B8 answered the first. Everyone read them as answering the second. **A
+tolerance is meaningless until you have measured the deviation.**
+
+### The second miss, from this protocol's own rules
+
+Stage B found `gamma135` = **0/3 placed**, the worst run of the entire
+preflight, and wrote a hard rig requirement: *"LOCK the real cameras'
+auto-white-balance AND auto-exposure ... a drifting white balance is this
+policy's one proven kill switch."*
+
+`REALARM_RESULT_20260808.md` records the rig as *"WB locked, **exposure
+auto**"*. Half-complied. And the run-2 frames measure at mean brightness
+**100/255** — a dim, low-contrast image, which is the direction `gamma135`
+proved fatal. This is a live second hypothesis, independent of geometry.
+
+## Stage 0 checks — MANDATORY before any hardware run
+
+```text
+0A. CAMERA EXTRINSICS      For each camera, write down the REAL mount point,
+                           height, offset and angle. Compare against the sim
+                           cfg (single_arm_env_cfg.py). Record the DELTA.
+                           A delta you have not measured is not a tolerance.
+
+0B. CAMERA INTRINSICS      Real horizontal FOV vs sim (front ~40 deg,
+                           wrist ~32 deg). A stock webcam is 60-70 deg and
+                           will include the room. Crop+rescale or use a lens.
+
+0C. FRAMING PASS/FAIL      Put a real photo beside a sim render of the same
+                           task. FRONT: the table must fill the frame - if a
+                           wall, socket or floor is visible, the camera is
+                           wrong. WRIST: the robot's own body must be MINOR,
+                           not dominant.
+
+0D. EXPOSURE + WB LOCKED   Both, verified with v4l2-ctl / CAP_PROP_AUTO_WB=0
+                           and CAP_PROP_AUTO_EXPOSURE. Stage B proved contrast
+                           compression is this policy's kill switch.
+
+0E. STREAM INTEGRITY       Log N frames and check for black/duplicate frames
+                           BEFORE the policy runs. Run 2's wrist stream was
+                           ~13% dead or stale: c0059/c0060 fully black
+                           (mean 1.0, sd 0.0) and 19/142 consecutive pairs
+                           identical. The front stream was clean.
+
+0F. TOLERANCE CURVE        Run the sim camera sweep (height, pitch, FOV) to
+                           find where THIS policy breaks. Then 0A's delta can
+                           be judged against a number instead of a guess.
+                           See sim_to_real_camera_alignment_20260809.md.
+```
+
+**Stage 0 gates Stages A-C.** If 0A-0E fail, a hardware run measures the rig,
+not the policy.
+
+---
+
+# THE TRAINING-TRIGGER FRAMEWORK — standing guidance
+
+## The problem this solves
+
+A hardware failure has two very different explanations, and they demand
+opposite responses:
+
+```text
+H1  OBSERVATION MISMATCH   the policy is fine; the input was out of
+                           distribution. Fix the rig. Training is NOT justified.
+H2  TRANSFER FAILS         real pixels/dynamics break it even with matched
+                           observations. Training (domain randomisation, real
+                           fine-tune) IS justified.
+```
+
+Without discriminating them, every failure looks like "needs more training" —
+and if that is the default response, **the simulator has no value**: you end up
+training only on real data and testing only on real hardware, which is the
+expensive path sim was built to avoid.
+
+## The 2026-08-08 result does NOT establish H2
+
+`REALARM_RESULT_20260808.md` concludes "THE AS-IS TRANSFER FAILS". The failure
+is real and well-measured. The *attribution* is not yet supported.
+
+A transfer test asks: *given the kind of observation it trained on, does the
+policy act correctly in the real world?* What was run was: *given an observation
+from a viewpoint it has never seen, does the policy act correctly?* The second
+question answers itself and says nothing about the first.
+
+⇒ Treat "as-is transfer fails" as **provisional** until Stage 0 passes and the
+test is repeated.
+
+## The decision tree — do not train without landing on a branch
+
+```text
+STEP 1  Recreate the real camera geometry IN SIM (snapshot-matched).
+        Cost: GPU time only. No hardware.
+
+  FAILS in sim  -> H1 supported. The input was OOD.
+                   ACTION: fix the mount to match sim, retest hardware.
+                   DO NOT TRAIN YET - transfer has still never been tested.
+
+  WORKS in sim  -> H1 refuted. Geometry alone is not sufficient.
+                   ACTION: H2 is live. Training IS justified now, and the
+                   sweep tells you what to randomise over.
+
+STEP 2  (only if H1 supported) Retest hardware with the rig matched.
+
+  WORKS         -> sim-to-real transfer CONFIRMED. The simulator has value and
+                   the pipeline is real.
+
+  FAILS         -> NOW you have a clean transfer failure with the largest
+                   confound removed. THAT is the trigger for domain
+                   randomisation or real-data fine-tuning - and you know what
+                   to randomise, because Stage 0 measured the residual deltas.
+```
+
+## The standing rule
+
+```text
+No training run is justified by a hardware failure until Stage 0 passes and the
+failure has been reproduced with a matched observation channel.
+
+"Add more data" is not a diagnosis. If the observation channel is not
+calibrated, sim and real are not measuring the same quantity, and NO transfer
+result - positive or negative - carries information.
+```
+
+## What "a sim-real relation" concretely means
+
+Not an abstraction. A **calibrated observation channel**:
+
+```text
+extrinsics matched   mount point, height, offset, angle
+intrinsics matched   FOV, resolution
+pipeline matched     channel order, normalisation, latency, exposure/WB locked
+VERIFIED             a sim render and a real photo of the same scene look like
+                     the same picture
+```
+
+Until that holds, transfer cannot be measured. Once it holds, a negative result
+is genuinely informative — and *then* training is aimed at a diagnosed problem
+instead of a suspected one.
+
+## Honest downside
+
+If the channel is matched and transfer still fails, the "train in sim, deploy on
+real" path is closed for this rig. Sim's remaining value is narrower — varied
+data generation, eval harnesses, algorithm development. Worth knowing early, and
+another reason to establish the correspondence before spending GPU-months.
