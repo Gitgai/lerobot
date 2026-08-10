@@ -368,3 +368,28 @@ genuinely absent: pin/pinocchio, hpp-fcl, cmeel-*, rl-games, gym
 
 ⇒ The fresh-install-versus-freeze choice does not appear to explain the gap.
 Recorded so it is not re-investigated.
+
+---
+
+## R8. SUPERSEDED IN PART — see `sim_to_real_camera_alignment_20260809.md`
+
+Comparing the run-2 evidence frames against sim renders side by side showed the
+two "front" cameras share a name and nothing else: sim is mounted on the robot
+base 0.6 m up, pitched 161 deg down, 40 deg FOV, table filling the frame; the
+rig was a laptop webcam at table level looking horizontally at ~65 deg FOV with
+the wall, a socket and a pole in shot. The wrist pair diverges the same way.
+
+That reframes every null in this document. `bgrSwap` 67%, `movedPlate` 67%,
+`parkedOrange` 67%, `realLayout` 50% against canonical 74% — all of these
+perturb *within* the trained viewpoint. None of them move the camera. `camOff`
+came closest and moved it 5 cm and 5 deg, against a real discrepancy of tens of
+centimetres and tens of degrees.
+
+The battery was stopped mid-run. Banked and resumable: realLayout 12,
+movedPlate 12, parkedOrange 12, camOff 12, woodTable 12, scattered 10,
+tomatoRed 11, paperPlate 5, REALMIMIC 0.
+
+Also measured from the frames, and worth fixing independently of geometry:
+**~13% of the run-2 wrist stream was dead or stale** — two fully black frames
+(c0059, c0060: mean 1.0, sd 0.0) and 19 of 142 consecutive pairs identical. The
+front stream was clean.
