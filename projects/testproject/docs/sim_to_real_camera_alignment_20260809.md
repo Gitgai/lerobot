@@ -20,7 +20,12 @@ mount            Robot/base/front_camera          laptop webcam on the table
 position         (0.0, -0.5, 0.6) m from base     ~table level
                  i.e. 0.6 m ABOVE the base
 orientation      161 deg about X - steeply DOWN   near-horizontal, across the table
-FOV              ~40 deg  (focal 28.7 mm)         ~60-70 deg (typical webcam)
+FOV              ~67 deg (focal 28.7 mm,          ~60-70 deg (typical webcam)
+                 aperture 38.11 mm)                => NOT a difference. See the
+                                                      correction in the execution
+                                                      log; an earlier draft said
+                                                      40 deg by assuming the
+                                                      IsaacLab DEFAULT aperture.
 what fills it    the table, edge to edge          wall, power outlet, pole, speaker
 ```
 
@@ -56,20 +61,25 @@ cameras and easy to mirror.
 
 ```text
 sim config      pos=(0.0, -0.5, 0.6)  rot=(0.165, -0.986, 0, 0)  convention=ros
-                focal_length=28.7 mm, aperture 20.955 mm
+                focal_length=28.7 mm, horizontal_aperture=38.11 mm  -> ~67 deg
 
 REAL EQUIVALENT
   mount to      the robot BASE, not the table and not a tripod at table level.
                 It must move with the robot, because that is what the policy
                 learned - the view is base-relative, not world-relative.
+                *** This is a separate requirement from pose. A static tripod
+                that happens to match the initial framing is still a different
+                observation model the moment the robot moves. ***
   height        ~0.60 m above the base plane
   offset        ~0.50 m horizontally from the base
   aim           steeply DOWN at the workspace, roughly 60-70 deg below horizontal
-  lens          ~40 deg horizontal FOV. A stock laptop webcam is ~60-70 deg and
-                WILL include the room. Either use a narrower lens or crop the
-                centre and rescale to 640x480.
+  lens          ~67 deg horizontal FOV. A STOCK LAPTOP WEBCAM IS FINE - it is
+                already 60-70 deg. (An earlier draft of this file said to fit a
+                ~40 deg lens; that was wrong, and following it would have made
+                the mismatch worse.)
   framing test  the table should fill the frame edge to edge. If a wall, a
-                socket or a floor is visible, the camera is in the wrong place.
+                socket or a floor is visible, the camera is in the wrong PLACE -
+                and at this FOV that means pose, not lens.
 ```
 
 ### Wrist camera
