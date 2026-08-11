@@ -27,6 +27,13 @@ one plumbing defect stands between this and a production recipe. See §8.
 Full record and raw evidence: §8, and
 `results/pi05_fullft_5090_20260811/`.
 
+➡ **THIS DOC IS CLOSED. Continue in
+[`pi05_training_capability_plan_20260811.md`](pi05_training_capability_plan_20260811.md)**
+— phase 2 answers *"can we TRAIN here?"*, which this one does not: it fixes the
+checkpoint blocker, measures the largest batch that fits, and runs a sustained
+LIBERO capability run. It also carries the autonomy contract for unattended
+execution.
+
 ---
 
 *Original framing, kept because the reasoning is what made the answer
