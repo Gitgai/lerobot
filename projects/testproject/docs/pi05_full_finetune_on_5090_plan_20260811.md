@@ -496,6 +496,12 @@ STEP                                     CHECK IT WORKED                  COST
 
 7  the 100-step run + VRAM logging        §4 Gate A                      ~40 min
 
+7b bs1 EXPERT-ONLY reference run          the ONLY like-for-like slowdown ~5 min
+   same venv, same session, 100 steps,      denominator (§6). Without it,
+   train_expert_only=true                    "Nx slower" mixes batch size and
+   ⇒ gives peak VRAM AND steps/s for         trainable set and must not be
+     the recipe we already run                quoted.
+
 8  fill in §8 and apply §6 as written     the results block has no blanks
 ```
 
@@ -512,7 +518,21 @@ before the expensive step that depends on it, cheapest first.
 ### Gate A: it fits
 
 ```text
-peak VRAM < 31 GB, 100 steps complete, loss finite and decreasing
+peak VRAM < 31 GB, 100 steps complete, loss FINITE throughout
+```
+
+⛔ **"loss decreasing" was the wrong criterion and has been removed.** At
+**batch size 1** the per-step loss is dominated by per-sample variance; 100 steps
+is far too few for a trend to be visible. **A flat or noisy loss curve here is
+EXPECTED and is not a failure** — reading it as one would throw away a valid
+memory result.
+
+```text
+PASS   no NaN, no inf, at any step
+FAIL   NaN/inf  -> a real defect (bf16 overflow, or 8-bit optimizer instability).
+                   Investigate; do NOT record a VRAM number from that run.
+IGNORE whether the loss went down. This run is not learning anything and is not
+       meant to. See §0.-1: it is a memory probe, not a training run.
 ```
 
 Log with `nvidia-smi --query-gpu=memory.used --format=csv -l 1 > vram.csv`.
@@ -609,6 +629,24 @@ a solution.
 
 ## 6. Decision rule — written before the result
 
+⛔ **THE SLOWDOWN DENOMINATOR IS CONFOUNDED — fix it before applying this table.**
+The obvious baseline, `1.4 steps/s`, is **bs4 expert-only**. Comparing full-FT at
+**bs1** against it varies **two things at once** — batch size *and* which
+parameters train — so the resulting "Nx" is not a slowdown, it is a mixture.
+
+```text
+⇒ REQUIRED: a bs1 EXPERT-ONLY reference run, same venv, same session, ~5 min.
+  That is the only like-for-like denominator: same batch size, only the
+  trainable set differs. Added as runbook step 7b.
+⇒ AND report samples/s, not steps/s. bs4 at 1.4 steps/s is 5.6 samples/s;
+  bs1 at 1.4 steps/s is 1.4. Comparing steps/s across batch sizes overstates
+  the full-FT result by 4x in our favour.
+```
+
+⚠ If step 7b is skipped, **write "slowdown not measured" in §8 and apply the
+table on peak VRAM alone** — do not quote a confounded ratio. A fabricated 2x
+lands in a different row than a fabricated 5x, and that row is an $11K decision.
+
 ```text
 peak < 28 GB, <2x slowdown        the 5090 is clearly sufficient. No purchase.
 peak 28-31 GB, 2-4x slowdown      viable. Weigh the time cost against $11K.
@@ -670,8 +708,17 @@ GATE B (do first)
 GATE A
   peak VRAM                ____ GB   (nvidia-smi 1 Hz, vram.csv attached)
   steps completed          ____ / 100
-  steps/s                  ____      vs 1.4 expert-only baseline = ____x
-  loss finite + decreasing ____
+  steps/s                  ____      samples/s ____ (= steps/s x batch)
+  loss FINITE throughout   ____      ⚠ do NOT score whether it decreased
+                                        (§4 - meaningless at bs1)
+
+STEP 7b  bs1 expert-only reference       the like-for-like denominator
+  peak VRAM                ____ GB
+  steps/s                  ____
+  ⇒ SLOWDOWN               ____x    full-FT bs1 / expert-only bs1
+  if 7b was skipped        write "slowdown NOT MEASURED" and apply §6 on peak
+                           VRAM alone. ⛔ Do not quote the bs4 1.4 steps/s
+                           figure as a denominator - different batch size.
   if OOM, WHERE            load / optim init / forward / backward / optim step
 
 DECISION (§6 rule, applied without renegotiating it)   ____

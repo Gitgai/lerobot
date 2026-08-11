@@ -628,10 +628,19 @@ in this document that does not exclude them is contaminated by ~6%.**
 
 ## Also open — the project work that never depended on any of this
 
-The **N1.6 fine-tune on the 89 real-arm episodes**. Data restored, the 32 GB
-training ceiling already broken with `adamw_bnb_8bit`, and it needs no
-simulator. `REALARM_RESULT_20260808.md` called it "the strongest option, armed
+The **N1.6 fine-tune on the 89 real-arm episodes**. Data restored, and it needs
+no simulator. `REALARM_RESULT_20260808.md` called it "the strongest option, armed
 for exactly this moment".
+
+⚠ **2026-08-11 correction: "the 32 GB training ceiling already broken with
+`adamw_bnb_8bit`" is NOT currently supported.** `bitsandbytes` is absent from
+every venv on this machine and from the uv cache, so that result cannot be
+reproduced or confirmed — see the note at the head of
+`REALARM_RESULT_20260808.md`. **This does not block the N1.6 fine-tune** (N1.6 is
+~1.09B against π0.5's 4.14B, a different memory problem), but the ceiling should
+be treated as re-openable rather than broken until STEP −1 of
+`pi05_full_finetune_on_5090_plan_20260811.md` settles whether 8-bit optimizer
+states work on this Blackwell card at all.
 
 Note it also sidesteps the entire question above: training on real data from
 this table, this arm, these cameras does not require sim and real to correspond.

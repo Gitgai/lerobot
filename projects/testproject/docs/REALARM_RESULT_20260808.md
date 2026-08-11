@@ -66,10 +66,23 @@ on the arm are now one command.
 
 ## Same-day follow-through: both fine-tune tracks unblocked, Pi0.5 TRAINING
 
+> ⚠ **2026-08-11 — THE `adamw_bnb_8bit` RESULT BELOW IS NOT CURRENTLY
+> REPRODUCIBLE.** `bitsandbytes` is not present anywhere on this machine: not in
+> the GR00T venv, not in leisaac, not in testproject, not in the uv cache. The
+> only filesystem hits are `transformers/` and `diffusers/` integration shims
+> merely *named* bitsandbytes. Either this venv was rebuilt since (see
+> `N16_REBUILD_RUNBOOK.md`) or the claim is wrong.
+> ⇒ **Do not cite "8-bit Adam works on this card" as established.** It is being
+> tested from scratch as STEP −1 of
+> [`pi05_full_finetune_on_5090_plan_20260811.md`](pi05_full_finetune_on_5090_plan_20260811.md).
+> Correct this note when that settles.
+
 ```text
 GR00T ceiling BROKEN   adamw_bnb_8bit: 100 probe steps at 4.15 it/s, 23.1 GB,
                        zero OOM - the wall that blocked training for 3 days.
                        (patch in launch_finetune.py; update the patches file)
+                       ⚠ SEE THE NOTE ABOVE - bitsandbytes is not installed
+                         anywhere now, so this cannot currently be confirmed.
 
 PI05 LAUNCHED          pi05_sim_varied: from pi05_base on the 35-episode
                        varied corpus, 30k steps @ bs4, ~6 h, output
