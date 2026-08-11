@@ -277,17 +277,53 @@ why this is hopeless with FP32 Adam no matter how small the batch.
 
 **With 8-bit optimizer states (~2 bytes/param instead of 8):**
 
+### ⛔ Units, and the MEASURED ceiling — both were wrong above
+
+The GB figures above are **decimal** (bytes ÷ 1e9). `nvidia-smi` and PyTorch both
+report **GiB** (÷ 2^30). Mixing them is a **7 % error**, and at a ~6 GiB margin
+that is not ignorable. **Everything from here is GiB.**
+
+`nvidia-smi` on kiran-AI90, idle desktop, 2026-08-11 15:56:
+
 ```text
-BF16 weights             8.3 GB
-BF16 gradients           8.3 GB
-8-bit Adam m + v        ~8.3 GB
+total          32607 MiB   31.84 GiB      ← not 32; the marketed number is nominal
+used            1434 MiB    1.42 GiB      ← gnome-shell, Xwayland, remote-desktop
+                                             daemon, browser, ptyxis
+FREE           30673 MiB   29.93 GiB      ← ⭐ THE REAL CEILING
+driver         580.173.02  (CUDA 13.0 runtime available; we use torch cu128)
+```
+
+⚠ **The plan previously said "~31.35 GB usable". The real figure is 29.93 GiB** —
+about **1.4 GiB less** than assumed, because the desktop session is resident and
+~500 MiB more is reserved/unaddressable.
+
+### The arithmetic restated in GiB
+
+```text
+BF16 weights            7.71 GiB     4.14e9 x 2 bytes
+BF16 gradients          7.71 GiB
+8-bit Adam m + v        7.71 GiB     ~2 bytes/param
 ──────────────────────────────
-persistent              ~25 GB      against ~31.35 GB usable
-+ activations (bs1, checkpointed)
-+ CUDA/allocator workspace
+persistent             23.14 GiB     against 29.93 GiB free
+                                     ⇒ HEADROOM 6.79 GiB for activations
+                                       (bs1, checkpointed) + CUDA workspace
+                                       + allocator fragmentation
+
+for contrast, FP32 Adam:
+weights + grads        15.42 GiB
+FP32 Adam m + v        30.84 GiB
+──────────────────────────────
+persistent             46.26 GiB     ⇒ hopeless, and this is why an A6000 48 GB
+                                       OOMs (lerobot#2216)
 ```
 
 Tight, but not obviously impossible. **That is the whole experiment.**
+
+⇒ **A lever if the run lands at 29–30 GiB:** the 1.42 GiB of desktop overhead is
+recoverable by running headless. ⚠ **Not free** — `gnome-remote-desktop-daemon`
+is in that list, so stopping the session disconnects the operator. Treat it as a
+tie-breaker, not a default, and if it is used, **say so in §8** — it changes the
+ceiling the result was measured against.
 
 ---
 
@@ -518,7 +554,17 @@ before the expensive step that depends on it, cheapest first.
 ### Gate A: it fits
 
 ```text
-peak VRAM < 31 GB, 100 steps complete, loss FINITE throughout
+peak VRAM < 29.93 GiB free ceiling, 100 steps complete, loss FINITE throughout
+```
+
+⚠ **Re-measure `memory.free` at run time; do not reuse the number above.** It was
+29.93 GiB with an idle desktop on 2026-08-11 and moves with whatever else is on
+the display. **Record the baseline immediately before the run** and report peak
+against *that*, not against a remembered constant:
+
+```bash
+nvidia-smi --query-gpu=memory.total,memory.used,memory.free \
+           --format=csv,noheader   # ← baseline, into §8, BEFORE lerobot-train
 ```
 
 ⛔ **"loss decreasing" was the wrong criterion and has been removed.** At
@@ -647,10 +693,16 @@ parameters train — so the resulting "Nx" is not a slowdown, it is a mixture.
 table on peak VRAM alone** — do not quote a confounded ratio. A fabricated 2x
 lands in a different row than a fabricated 5x, and that row is an $11K decision.
 
+⚠ **Thresholds restated in GiB against the MEASURED 29.93 GiB free ceiling** —
+the old "28 / 31 / 32 GB" rows were decimal GB against a ceiling that does not
+exist on this machine.
+
 ```text
-peak < 28 GB, <2x slowdown        the 5090 is clearly sufficient. No purchase.
-peak 28-31 GB, 2-4x slowdown      viable. Weigh the time cost against $11K.
-peak 31-32 GB, >4x slowdown       marginal. Every run becomes a scheduling
+peak < 26 GiB, <2x slowdown       the 5090 is clearly sufficient. No purchase.
+                                  (~4 GiB of real headroom left)
+peak 26-29 GiB, 2-4x slowdown     viable. Weigh the time cost against $11K.
+peak 29-30 GiB, >4x slowdown      marginal - and it only fits with the desktop
+                                  killed. Every run becomes a scheduling
                                   problem; revisit.
 still OOM, or >10x, or unstable   a higher-VRAM card becomes a rational
                                   consideration - and NOW there is evidence for
@@ -706,7 +758,11 @@ GATE B (do first)
   VERDICT                  PASS / FAIL — if FAIL, stop, everything below is void
 
 GATE A
-  peak VRAM                ____ GB   (nvidia-smi 1 Hz, vram.csv attached)
+  BASELINE memory.free     ____ GiB  ⛔ taken BEFORE the run, not remembered
+                                        (29.93 GiB idle-desktop, 2026-08-11)
+  desktop killed?          ____      if yes, note it - it moves the ceiling
+  peak VRAM                ____ GiB  (nvidia-smi 1 Hz, vram.csv attached)
+  headroom left            ____ GiB  = baseline - peak
   steps completed          ____ / 100
   steps/s                  ____      samples/s ____ (= steps/s x batch)
   loss FINITE throughout   ____      ⚠ do NOT score whether it decreased
