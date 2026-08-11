@@ -171,17 +171,119 @@ version* from the run. It stays as context — it is what motivated the question
 but **it is no longer a valid quantitative comparator.** Step 7b is the
 comparator. Do not quote 26.3 GB against a 0.5.2 number.
 
+### ⛔ AND 0.5.2 IS ALSO WRONG — the CHECKPOINT dictates the version, not us
+
+0.5.2 got much further: **`All keys loaded successfully!`** — the 4.14B model
+loaded — then died building the processor pipeline:
+
+```text
+KeyError: Processor step 'relative_actions_processor' not found in registry
+```
+
+`lerobot/pi05_base`'s `policy_preprocessor.json` demands these steps:
+
+```text
+rename_observations_processor · to_batch_processor · relative_actions_processor
+normalizer_processor · pi05_prepare_state_tokenizer_processor_step
+tokenizer_processor · device_processor
+```
+
+0.5.2 has that exact class — `RelativeActionsProcessorStep` — but **registers it
+under a different key**, `delta_actions_processor`
+(`processor/relative_action_processor.py:84`). A pure **rename** between
+versions: the published checkpoint was serialised by a *newer* lerobot.
+
+⚠ **An alias would have "worked", and was the wrong move.** Registering
+`relative_actions_processor` as a second name for the 0.5.2 class would have let
+the run proceed — but if anything beyond the key changed, actions get silently
+mis-processed. **Match the version the artifact was written by; do not teach old
+code the new name.** For a *memory* probe the action semantics barely matter,
+which is exactly what would have made it an easy and invisible mistake.
+
+### ⇒ lerobot 0.6.1, matched to the published checkpoint
+
+`relative_actions_processor` **is** registered in 0.6.1 (verified). Requirements
+are unchanged from 0.5.2 — Python ≥3.12, transformers >=5.4.0,<5.6.0 — so the
+venv needed no rebuild.
+
+⚠ **Cost: the editable-install advantage is gone.** 0.6.1 comes from PyPI, so the
+patch lives in site-packages again and runbook step 4 (capture the `.patch`) is
+load-bearing rather than a formality. **The patch applied to this repo's `src/`
+has been reverted** — inert now that nothing imports from the repo, and leaving
+it would be a live modification to your lerobot source that does nothing.
+
+### The version chain, as a warning
+
+```text
+0.4.4   pinned to match the OOM ladder   BLOCKED - needs a forked transformers
+                                         that does not exist upstream
+0.5.2   this repo, editable              BLOCKED - processor registry predates
+                                         the published checkpoint
+0.6.1   matched to the CHECKPOINT        ✅ gets past model load AND processors
+```
+
+⇒ **We picked a version to match old measurements, and the checkpoint overruled
+us three times.** Step 7b is what makes that survivable: it re-measures the
+baseline in-session, so the comparison never depended on matching a historical
+version at all.
+
 **Final configuration:**
 
 ```text
 venv          /home/kiran/sim/pi05-fullft-probe/.venv312   (uv, python 3.12)
-torch         2.7.1+cu128        pinned FIRST, verified sm_120, never downgraded
-lerobot       0.5.2 EDITABLE from projects/git/nvidia/lerobot  [pi,dataset]
-transformers  5.5.4              (0.5.2 wants >=5.4.0,<5.6.0 - a MAJOR jump
-                                  from the 4.57.6 that 0.4.4 wanted)
+torch         2.7.1+cu128        pinned FIRST, verified sm_120, and re-checked
+                                 after EVERY subsequent install - a silent
+                                 downgrade would have invalidated STEP -1
+lerobot       0.6.1 from PyPI, extras [pi,dataset]   ← matched to the CHECKPOINT
+transformers  5.5.4
 accelerate    1.14.0
 bitsandbytes  0.50.0
+patch         site-packages, .orig files kept alongside, captured to patches/
 ```
+
+---
+
+## 0.05 ⛔⛔ BLOCKED ON A GATED HF REPO — NEEDS THE OPERATOR
+
+**This is the current stopping point, 2026-08-11 ~17:12.** Everything technical
+is resolved; the run cannot proceed without an account action.
+
+π0.5's tokenizer step pulls the PaliGemma tokenizer from a **gated** Google repo:
+
+```text
+ValueError: Failed to instantiate processor step 'tokenizer_processor'
+  tokenizer_name: 'google/paligemma-3b-pt-224'
+  Error: You are trying to access a gated repo.
+  401 Client Error. Access to model google/paligemma-3b-pt-224 is restricted.
+```
+
+Checked on this machine:
+
+```text
+~/.cache/huggingface/token          DOES NOT EXIST
+HF_TOKEN env                        NOT SET
+google/paligemma-* in any cache     NOT PRESENT
+```
+
+⇒ **Two operator actions, neither of which an agent should perform:**
+
+```text
+1  ACCEPT Google's licence at
+     https://huggingface.co/google/paligemma-3b-pt-224
+   Accepting terms on someone's behalf is not an agent action.
+
+2  AUTHENTICATE:  hf auth login      (or export HF_TOKEN=...)
+   Handling the operator's credentials is not an agent action.
+```
+
+⚠ **This is a CREDENTIAL/LICENCE blocker, not a technical one, and above all NOT
+a memory result.** Record it as such. The 4.14B model already loads
+(`All keys loaded successfully!`) and the optimizer patch already builds a real
+`bitsandbytes.optim.adamw.AdamW8bit` — nothing about the memory question has been
+answered or refuted yet.
+
+⇒ **Once authenticated, resume at runbook step 5** (smoke, 2 steps). Nothing
+before it needs redoing.
 
 **Why those exact pins** — both verified 2026-08-11:
 

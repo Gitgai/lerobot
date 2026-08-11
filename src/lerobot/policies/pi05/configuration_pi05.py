@@ -146,23 +146,13 @@ class PI05Config(PreTrainedConfig):
             self.output_features[ACTION] = action_feature
 
     def get_optimizer_preset(self) -> AdamWConfig:
-        # --- PROBE PATCH: pi05 full fine-tune on a 32 GB 5090 -------------
-        # TrainPipelineConfig.validate() OVERWRITES any --optimizer.type given
-        # on the CLI with this preset whenever use_policy_training_preset is
-        # True (its default). Patching here is the only route that cannot be
-        # silently discarded - a --optimizer.type=adamw_8bit flag alone is
-        # accepted, then thrown away, and the run OOMs on FP32 AdamW with no
-        # error. See docs/pi05_full_finetune_on_5090_plan_20260811.md §3.
-        from lerobot.optim.optimizers import AdamW8bitConfig
-
-        return AdamW8bitConfig(
+        return AdamWConfig(
             lr=self.optimizer_lr,
             betas=self.optimizer_betas,
             eps=self.optimizer_eps,
             weight_decay=self.optimizer_weight_decay,
             grad_clip_norm=self.optimizer_grad_clip_norm,
         )
-        # --- END PROBE PATCH ----------------------------------------------
 
     def get_scheduler_preset(self):
         return CosineDecayWithWarmupSchedulerConfig(
