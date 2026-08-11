@@ -7,14 +7,87 @@ purchase is discussed.
 > 32 GB 5090, by trading speed for memory — without silently becoming LoRA or
 > expert-only?
 
-**Status: NOT YET ATTEMPTED.** The enabling config was written down in
-`pi05_active_work_tracker.md` as "FIX READY TO TRY" and never run.
+**Status: NOT YET ATTEMPTED.** The enabling config was described but never run.
+
+---
+
+## 0.0 ⛔ VERIFIED ON DISK 2026-08-11 — read before executing §3
+
+This plan was written from memory of the tracker. Everything below was then
+checked against the filesystem. **The arithmetic survived; four claims did not,
+and one of them blocks §3 as written.**
+
+### ⛔ BLOCKER: the code change and the training run are in DIFFERENT lerobot installs
+
+```text
+WHERE THE PLAN EDITS          projects/git/nvidia/lerobot/src/lerobot/  v0.5.2
+  installed editable into     projects/testproject/.venv
+  but that venv has           NO accelerate, NO transformers  -> CANNOT train
+
+WHERE TRAINING CAN RUN        /home/kiran/sim/Isaac-GR00T-n16/.venv   lerobot 0.4.4
+                              /home/kiran/sim/leisaac-venv           lerobot 0.4.2
+  both are                    NON-EDITABLE site-packages COPIES
+                              (no __editable__.lerobot .pth in either)
+```
+
+⇒ **Editing this repo does not change what trains.** This is the `src/` vs
+`install/` trap. **Step 0 of the experiment is deciding where the change lands**
+— and the options are not equivalent:
+
+```text
+A  install THIS repo (0.5.2) editable into a venv with accelerate+transformers
+   ⇒ the edit takes effect, but it is a VERSION CHANGE on top of a
+     memory experiment. Two variables at once.
+B  patch the 0.4.x copy in the venv that produced the OOM ladder
+   ⇒ same version as the measurements, but the patch lives in site-packages
+     and must be captured in projects/testproject/patches/ or it is lost
+     on the next sync.
+```
+
+**B is the honest one** — it holds the version fixed against the numbers in §0.
+Take A only if 0.4.x turns out to lack something needed, and say so.
+
+⚠ Whichever is chosen, **re-check §2 and §3 against THAT tree** — the registry
+already differs between them (below).
+
+### Corrections to specific claims
+
+```text
+CLAIM                              ACTUAL                              IMPACT
+"registers only adam/adamw/sgd"    5 in 0.5.2 (+xvla-adamw,            none on the
+                                   +multi_adam), 5 in 0.4.4, 4 in      conclusion:
+                                   0.4.2 — and they DIFFER by venv     still no 8-bit
+"if the trainer exposes grad       IT DOES NOT. Accelerator() at       §3 needs a
+ accumulation"                     lerobot_train.py:198 takes no       SECOND code
+                                   gradient_accumulation_steps, and    change, not
+                                   update_policy() calls               an "if"
+                                   optimizer.step()+zero_grad() every
+                                   batch (checked in 0.5.2)
+"tracker section 13"               the OOM ladder is in                fix the
+                                   REALARM_RESULT_20260808.md ~L76-84  pointer
+"FIX READY TO TRY" in tracker      that string exists in NO doc but    drop the
+                                   this one                            citation
+bitsandbytes not installed         CONFIRMED — absent from all three   plan correct
+                                   venvs
+```
+
+⇒ **Two code changes, not one:** the 8-bit optimizer registration *and*
+gradient accumulation. Budget accordingly; measure them separately.
+
+### Unrelated but noticed
+
+`~/lerobot_assets/checkpoints/pi05_sim_varied` — the 30k-step run
+REALARM_RESULT_20260808 launched — **is not on disk anywhere** (searched
+/home/kiran, /mnt, /media to depth 9). Only `pi05_012000` remains. Either it was
+pruned or it never landed; the sim battery evaluated *something* under that name,
+so this should be resolved before any of those numbers are re-derived. **Not a
+blocker for this experiment** — LIBERO is the recommended dataset anyway.
 
 ---
 
 ## 0. What is already known — do not re-run these
 
-### Measured on THIS machine (tracker section 13)
+### Measured on THIS machine (`REALARM_RESULT_20260808.md`, "OOM ladder")
 
 ```text
 bs16 fp32                          OOM   (fp32 weights = 16.6 GB alone)
@@ -95,15 +168,23 @@ Tight, but not obviously impossible. **That is the whole experiment.**
 
 ## 2. The blocker: LeRobot has no 8-bit optimizer
 
-`src/lerobot/optim/optimizers.py` registers only:
+⚠ **Counts below are from this repo (0.5.2). Re-run the grep against whichever
+tree §0.0 selects — 0.4.2 has four registrations, not five.**
+
+`src/lerobot/optim/optimizers.py` registers five optimizers, none of them 8-bit:
 
 ```text
-@OptimizerConfig.register_subclass("adam")   -> torch.optim.Adam
-@OptimizerConfig.register_subclass("adamw")  -> torch.optim.AdamW
+@OptimizerConfig.register_subclass("adam")         -> torch.optim.Adam
+@OptimizerConfig.register_subclass("adamw")        -> torch.optim.AdamW
 @OptimizerConfig.register_subclass("sgd")
+@OptimizerConfig.register_subclass("xvla-adamw")
+@OptimizerConfig.register_subclass("multi_adam")
 ```
 
 and `configuration_pi05.py::get_optimizer_preset()` returns `AdamWConfig`.
+
+⇒ The two extra registrations are good news for effort: the subclass pattern is
+well-worn here, so mirroring it for `AdamW8bit` is routine rather than novel.
 
 The GR00T 8-bit result came from a **different stack** — HF Trainer's
 `--optim adamw_bnb_8bit` — which does not apply here. Also:
@@ -142,9 +223,16 @@ lerobot-train \
   --steps=100
 ```
 
-Plus gradient accumulation to recover an effective batch, if LeRobot's trainer
-exposes it; if not, that is a second small addition and should be treated as
-such rather than assumed.
+⛔ **Gradient accumulation is NOT available and there is no flag for it** —
+verified, §0.0. `Accelerator()` is constructed without
+`gradient_accumulation_steps` and `update_policy()` steps the optimizer on every
+batch. Recovering an effective batch is a **second code change**, and it should
+be landed and measured separately from the optimizer one so we know which bought
+what.
+
+⇒ **Gate A can be attempted without it** — bs1 with no accumulation is a valid
+memory measurement, it is just not a usable training recipe. Do that first: it
+answers the $11K question with one code change instead of two.
 
 Start on **LIBERO**, not the 89 real episodes. That separates a memory problem
 from a dataset problem — our real episodes still need v3.0 -> GR00T v2
@@ -188,7 +276,8 @@ In increasing order of performance cost. Do NOT skip ahead; each step should be
 measured separately so we know what bought what.
 
 ```text
-1. gradient accumulation      recover effective batch at bs1        ~free
+1. gradient accumulation      recover effective batch at bs1        ~free at
+                              ⚠ NOT free to BUILD - no flag exists    runtime
 2. 8-bit optimizer            33.1 GB -> ~8.3 GB of state           small
 3. paged 8-bit optimizer      bnb spills optimizer state to host    moderate
                               on pressure spikes
