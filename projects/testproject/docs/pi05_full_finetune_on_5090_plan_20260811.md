@@ -7,6 +7,31 @@ purchase is discussed.
 > 32 GB 5090, by trading speed for memory — without silently becoming LoRA or
 > expert-only?
 
+**STATUS: ✅ ANSWERED, 2026-08-11. YES — and with room to spare.**
+
+```text
+peak VRAM   24.74 GiB  < 26 GiB threshold     ✅   100/100 steps, no OOM
+slowdown    1.88x      < 2x threshold         ✅   vs bs1 expert-only, same session
+trainable   4,143,404,816 / 4,143,404,816     ratio 1.0000 — a real full FT
+⇒ §6 top row: "THE 5090 IS CLEARLY SUFFICIENT. NO PURCHASE."
+```
+
+**Achieved on FOUR baseline levers — bf16, 8-bit Adam, gradient checkpointing,
+batch size 1. §5's escalation ladder was never entered.** 8-bit Adam is the
+load-bearing one (~23 GiB saved; nothing else gets under 32 without it).
+
+⛔ **ONE CONDITION: checkpointing is BROKEN with 8-bit Adam** (`state/1/step` is
+an int, lerobot's safetensors saver wants a tensor). Memory and speed both pass;
+one plumbing defect stands between this and a production recipe. See §8.
+
+Full record and raw evidence: §8, and
+`results/pi05_fullft_5090_20260811/`.
+
+---
+
+*Original framing, kept because the reasoning is what made the answer
+trustworthy:*
+
 **Status: NOT YET ATTEMPTED.** The enabling config was described but never run.
 
 **⛔ THE WHOLE PLAN RESTS ON ONE UNVERIFIED ASSUMPTION: that `bitsandbytes`
@@ -878,6 +903,11 @@ $11K decision.**
 
 ## 5. Escalation ladder — only if Gate A fails
 
+# ✅ NOT NEEDED. Gate A passed at 24.74 GiB with 7.10 GiB to spare, on the
+# baseline four levers alone. **NOTHING BELOW WAS USED.** Steps 3–5 remain
+# untried reserve — relevant only if batch size is raised, a longer context is
+# needed, or a larger model is attempted later. Kept for that reason.
+
 ⚠ **Steps 1 and 2 of the old ladder are already spent.** The §3 baseline command
 *includes* the 8-bit optimizer — without it there is nothing to measure — and it
 *excludes* gradient accumulation deliberately. So the ladder below starts at what
@@ -1032,9 +1062,55 @@ GATE A   ✅ PASS — 2026-08-11 17:34, 100/100 steps, NO OOM
                            ⚠ it also DECREASED, which §4 says not to score.
                              Noted as incidental, NOT as evidence.
 
-  ★ THE ARITHMETIC WAS RIGHT. §1 predicted 23.14 GiB persistent; training used
-    ~23.33 GiB above desktop. Within 1%. The memory model is validated, not
-    merely un-refuted.
+  ★ THE ARITHMETIC HELD — accurate to a few percent, ERRING HIGH.
+
+    ⚠ An earlier revision of this line claimed "within 1%", comparing 23.33
+      against the predicted 23.14. That comparison is apples-to-oranges and
+      too flattering: the 23.33 figure INCLUDES CUDA context and activations,
+      which the §1 prediction did not cover.
+
+    predicted persistent      23.14 GiB   weights + grads + 8-bit states only
+    torch-allocated           22.34 GiB   persistent + activations
+    nvidia-smi minus desktop  23.32 GiB   the above + CUDA context + allocator
+
+    ⇒ True persistent is therefore somewhat BELOW 23.14 — §1 modestly
+      OVER-predicted. That is the safe direction to be wrong in, and it does
+      not move the verdict. State it as "accurate to a few percent, erring
+      high", not as a bullseye.
+
+WHICH MEMORY LEVERS WERE ACTUALLY USED — all four are BASELINE, not escalations
+Verified from the run's own config dump, not from what was typed on the CLI:
+
+    batch_size             1            activations
+    dtype                  bfloat16     weights + grads: 15.43 -> 7.71 GiB each
+    gradient_checkpointing True         activations (runtime-confirmed:
+                                        "Enabled gradient checkpointing")
+    optimizer type         adamw_8bit   Adam states: 30.86 -> 7.71 GiB
+    peft                   None         NOT LoRA
+    freeze_vision_encoder  False        }  full fine-tune
+    train_expert_only      False        }
+
+    naive fp32 + fp32 Adam   15.43 + 15.43 + 30.86  =  61.7 GiB   hopeless
+    + bf16                    7.71 +  7.71 + 30.86  =  46.3 GiB   still hopeless
+    + 8-bit Adam              7.71 +  7.71 +  7.71  =  23.1 GiB   ← what ran
+
+⇒ **8-bit Adam is the load-bearing lever** — ~23 GiB saved on its own, more than
+  bf16's ~15 GiB, and WITHOUT IT NOTHING ELSE GETS UNDER 32. Which is exactly
+  why STEP -1 was made the gate on the whole experiment.
+
+⇒ **§5's ESCALATION LADDER WAS NEVER ENTERED.** Still in reserve, untried:
+  paged 8-bit optimizer · CPU optimizer offload · CPU parameter offload.
+  Gradient accumulation is also unused, but that was not a choice — it is not
+  implemented in lerobot and needs code (§3).
+
+★ **THE §3 TRAP, CAUGHT LIVE.** The config dump shows
+  `use_policy_training_preset: True` AND `type: adamw_8bit` TOGETHER. With the
+  preset active, a CLI `--optimizer.type=adamw_8bit` would have been parsed,
+  accepted, and then silently overwritten with FP32 AdamW — a 46.3 GiB run that
+  OOMs and reads as *"the 5090 cannot do it"*, straight into an $11K purchase.
+  **Patching the preset is the only reason the 8-bit optimizer survived into the
+  actual run.** This is no longer a hypothesis about the code; it is visible in
+  the log of the run that produced the verdict.
 
 STEP 7b  bs1 expert-only reference   ✅ RUN, same session, same venv
   trainable                693,422,112 (693M) / 4,143,404,816 total
