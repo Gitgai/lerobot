@@ -539,3 +539,99 @@ its full 50-minute budget before the retry logic could act. **The harness was
 hardened against crashes, which are loud and fast, but not against hangs, which
 are silent and slow.** A healthy 3,000-step run takes ~2.5 minutes; the 3000 s
 timeout was inherited without thought and is ~20x too generous. Use ~600 s.
+
+---
+
+# STATE OF THE INVESTIGATION — 2026-08-11. Read this first.
+
+## The question
+
+Did the 2026-08-08 hardware failure happen because the RIG was set up wrong, or
+because sim-to-real transfer genuinely does not work for this policy? The two
+answers demand opposite responses — fix a camera mount, or spend months on new
+training — so guessing is expensive in both directions.
+
+## Answer so far: partly the rig, and the rest is not yet explained
+
+**Camera geometry is a real, measured factor.** Recreating the rig's viewpoint
+in sim halves performance: canonical 89% -> realCam 44%, t = 3.77. A hardware
+mounting spec derived from the sim config is in §1, with a pass/fail framing
+test.
+
+**But no sim condition reproduces the hardware failure.** Every condition
+tested, scored the same way, against a pooled canonical of 79% (n=34):
+
+```text
+condition               n     placed    mean   approach   gripper
+canonical (pooled)     34   81/102  79%    2.38     0.6 cm    +1.15
+movedPlate             15    32/45  71%    2.13     0.4 cm    +1.08
+parkedOrange*          15    10/15  67%    0.67     0.9 cm    +0.97
+bgrSwap                 2     4/6   67%    2.00     1.2 cm    +0.98
+camOff (5cm/5deg)      12    23/36  64%    1.92     1.1 cm    +1.15
+realLayout*            14     9/14  64%    0.64     1.1 cm    +1.11
+woodTable              12    22/36  61%    1.83     0.6 cm    +1.10
+gammaOnly               6    11/18  61%    1.83     0.5 cm    +1.16
+paperPlate              5     9/15  60%    1.80     0.6 cm    +1.06
+tomatoRed              11    18/33  55%    1.64     1.0 cm    +1.13
+realCam+gamma          12    17/36  47%    1.42     1.1 cm    +1.14
+realCam                12    16/36  44%    1.33     0.4 cm    +1.14
+scattered              10    12/30  40%    1.20     0.5 cm    +1.10
+
+* parked conditions are scored out of 1 orange, not 3
+```
+
+**Look at the last two columns.** In every single condition the policy still
+approaches to within ~1 cm and closes the gripper past +0.97. On the arm it
+never approached at all and the gripper never left 45-59.
+
+```text
+ALL SIM FAILURES     completion failures - sees the orange, mishandles the task
+THE HARDWARE FAILURE a perception failure - never engaged the object
+```
+
+⇒ The rig defects cost roughly half the success rate and are worth fixing on
+their own merits. **They do not explain 2026-08-08.** Something about that setup
+is still unmodelled.
+
+## Consequently: NO TRAINING IS JUSTIFIED YET
+
+Written into `sim_to_real_preflight_protocol_20260806.md` as a standing rule,
+with Stage 0 (observation *equivalence*, not just robustness) and the decision
+tree for when a training run is warranted. Two known, mechanically fixable
+defects still sit in the observation channel; training now aims at a channel
+that is broken in at least two measurable ways.
+
+## Open — the two remaining candidates both need real work
+
+```text
+STALE WRIST FEED     ~13% of run-2 wrist frames dead or frozen (two fully black,
+                     19/142 consecutive pairs identical). Needs --frame-drop
+                     written - it touches the observation path, not config.
+                     EFFORT: ~15 lines + one battery.
+
+BACKGROUND CLUTTER   wall, socket, pole, speaker fill much of the real ~67 deg
+                     view; sim has none of it. NO FLAG CAN REACH THIS - it is
+                     scene geometry and needs USD assets added to
+                     kitchen_with_orange.
+                     EFFORT: real asset work. This is the expensive one, and it
+                     is also the only untested candidate that could plausibly
+                     cause a PERCEPTION failure rather than a completion one.
+```
+
+## Open — one unexplained defect that contaminates every rate above
+
+A **physics instability** fires in roughly **6% of runs**, producing impossible
+displacements: 106 cm in `cb_comboRG`, 157 cm in `p1_movedPlate_5001`, 56 cm in
+`gate_seed2004`, against a task whose real lifts top out near 20 cm. Those runs
+are not scoring the policy at all. Cause unknown, nobody has looked. **Any rate
+in this document that does not exclude them is contaminated by ~6%.**
+
+## Also open — the project work that never depended on any of this
+
+The **N1.6 fine-tune on the 89 real-arm episodes**. Data restored, the 32 GB
+training ceiling already broken with `adamw_bnb_8bit`, and it needs no
+simulator. `REALARM_RESULT_20260808.md` called it "the strongest option, armed
+for exactly this moment".
+
+Note it also sidesteps the entire question above: training on real data from
+this table, this arm, these cameras does not require sim and real to correspond.
