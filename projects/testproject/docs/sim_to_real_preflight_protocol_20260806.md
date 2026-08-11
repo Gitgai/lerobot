@@ -406,3 +406,54 @@ If the channel is matched and transfer still fails, the "train in sim, deploy on
 real" path is closed for this rig. Sim's remaining value is narrower — varied
 data generation, eval harnesses, algorithm development. Worth knowing early, and
 another reason to establish the correspondence before spending GPU-months.
+
+---
+
+## Stage 0b — THE LINK AND THE SENSOR (added 2026-08-11, STANDING)
+
+Stage 0 asked whether sim and real *see the same scene*. It did not ask whether
+they see it **at the same rate** or **at the same quality**. Both were wrong on
+2026-08-08 and neither was checked.
+
+**The GPU is in New Jersey; the arm is in Pune.** Any policy served from the GPU
+to the arm crosses ~12,000 km. `192.168.194.x` is a ZeroTier overlay, not a LAN.
+
+### The rule sim cannot express
+
+```text
+In sim the client steps the world, so the world PAUSES during a policy call.
+On hardware it does not. Serving latency is free in sim and never free on the
+arm. No sim condition can reproduce a latency failure - do not try to.
+```
+
+⇒ **Latency must be measured on the arm, never inferred from a sim run.**
+
+### Before any hardware run, record these four numbers
+
+```text
+L1  round trip per policy call, n>=50, from the ARM machine
+L2  observation payload bytes on the wire (compressed? pi0.5 needed 14.6x JPEG)
+L3  actions RETURNED vs actions EXECUTED   (N1.6 client: 16 returned, 8 run)
+L4  duty cycle = exec_time / (exec_time + RTT)    <- below ~50%, stop and fix
+```
+
+Known-good reference from π0.5 on this same link: ~30 steps of latency, ~2 MB/s
+tunnel, fixed by RTC (exec horizon 35) + JPEG observations. **A client without
+those mitigations has not been shown to work over this link.**
+
+### And four sensor numbers, read back from the device
+
+Sim renders a pinhole camera — sharp, noiseless, fixed focus, fixed exposure.
+None of that is true of a real sensor, and a wrist camera on a moving arm is the
+worst case.
+
+```text
+S1  focus_automatic_continuous        MUST be off (AF hunts on every move)
+S2  white_balance_automatic           MUST be off (rig spec priority 2)
+S3  auto_exposure / exposure_time     MUST be locked
+S4  variance-of-Laplacian per frame   sharpness, from the evidence JPEGs
+```
+
+S1–S3 are `v4l2-ctl --list-ctrls` — free, no motion. S4 runs on JPEGs the client
+already writes. **A run whose camera controls were not read back is not
+reproducible**, because the auto-algorithms make each run a different sensor.
