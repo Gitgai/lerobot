@@ -18,10 +18,75 @@ five minutes of work instead of ninety.
 
 Dataset and venv are now pinned. Nothing else is outstanding.
 
-> **Reading order:** §0.0 (what was verified) → §3 (the trap) → §3.5 (the
-> runbook, start at STEP −1) → §4 (the gates) → §8 (record as you go). §1/§2 are
-> the reasoning; §5/§6/§7 are only needed if Gate A fails or when the decision is
-> made.
+> **Reading order:** **§0.–1 (what this experiment IS — start here if the setup
+> is not already familiar)** → §0.0 (what was verified) → §3 (the trap) → §3.5
+> (the runbook, start at STEP −1) → §4 (the gates) → §8 (record as you go).
+> §1/§2 are the reasoning; §5/§6/§7 are only needed if Gate A fails or when the
+> decision is made.
+
+---
+
+## 0.–1 What this experiment actually is, in plain terms
+
+**Everything below assumed this and never said it. Stated here so nobody has to
+infer it from the arithmetic.**
+
+### The model
+
+`lerobot/pi05_base` — Physical Intelligence's π0.5, via LeRobot's port. **4.14B
+parameters**, in two parts:
+
+```text
+VLM backbone            ~3.45B   sees the camera image, reads the instruction
+action expert + proj.    ~693M   turns that into robot joint commands
+                        ───────
+                         4.14B
+```
+
+We start from the **base** model, not from our own `pi05_012000` fine-tune.
+
+### Full fine-tuning — and NOT LoRA. The three modes are easy to blur
+
+```text
+MODE                  TRAINABLE   MEMORY        STATUS
+full fine-tune          4.14B     UNKNOWN       ← THE QUESTION. All 4.14B get
+                                                  gradients and get updated.
+expert-only (012000)     693M     26.3 GB       already works. VLM frozen
+                                                  entirely; only the action
+                                                  expert trains.
+LoRA / PEFT            ~1% adapt. >22.5 GB      would fit easily - NOT the
+                                                  question, not in dispute
+```
+
+⇒ **LoRA is not the answer here because it was never in doubt.** OpenPI lists it
+at >22.5 GB and it obviously fits in 32. The $11K question is specifically about
+**full-parameter** training. LeRobot's `peft` config field must stay `None`, and
+Gate B checks it.
+
+### ⇒ Therefore: what "693M" means at Gate B, and why the run stops
+
+**693M is the number you get when the whole VLM is frozen** — our existing,
+already-measured recipe. If the trainable counter reads 693M, the run is training
+**17% of the model**, will comfortably fit, and would be read as *"the 5090
+handles full fine-tuning"* — **when full fine-tuning was never tested.** That is
+re-measuring August's result and then declining an $11K purchase on it.
+
+⚠ **This is not paranoia.** `train_expert_only` and `freeze_vision_encoder` can
+arrive from the **pretrained checkpoint's own config**, not only from the command
+line. Passing `--policy.train_expert_only=false` states an *intention*; counting
+parameters is what confirms it **took effect**. Exactly the same shape as the
+optimizer trap in §3: flag accepted, value overridden, nothing warns you.
+
+### What this run is, and is not
+
+```text
+IS      a MEMORY PROBE. 100 steps, checkpointing off. The output is a VRAM
+        number, not a model. Nobody should expect a usable policy from it.
+IS NOT  proof that pi05 can be practically trained on this card. Gate A passing
+        means 4.14B params FIT - at batch size 1, with no gradient accumulation
+        available (§3). Whether that is fast enough to be a real recipe is a
+        SEPARATE question, which is why §6 scores slowdown alongside peak VRAM.
+```
 
 ---
 
@@ -479,10 +544,20 @@ print(f"{len(vlm)} trainable non-expert tensors; first: {vlm[:3]}")
 
 ```text
 PASS   trainable ~4.14B, total ~4.14B, ratio ~1.00, and vlm list NON-EMPTY
-FAIL   trainable ~0.69B (ratio ~0.17)  -> the 012000 recipe. Void the run.
-FAIL   vlm list EMPTY                  -> expert-only by another route
-FAIL   trainable << total but not 0.69B -> check cfg.peft is None (LoRA)
+       ⇒ the VLM backbone IS training. This is a real full fine-tune.
+
+FAIL   trainable ~0.69B (ratio ~0.17)   -> THE 012000 RECIPE. The VLM is frozen
+                                           and only the action expert trains.
+                                           This is the already-measured 26.3 GB
+                                           configuration - it WILL fit, and that
+                                           fact means nothing. VOID THE RUN.
+FAIL   vlm list EMPTY                   -> expert-only by another route
+FAIL   trainable << total, not 0.69B    -> check cfg.peft is None. LoRA also
+                                           fits, and also is not the question.
 ```
+
+⇒ **Why this runs BEFORE the 40-minute measurement:** it costs one model load,
+and it decides whether that measurement means anything at all. See §0.–1.
 
 **Weights must also MOVE, not just require grad.** Frozen-by-optimizer is not
 the same as frozen-by-`requires_grad`:
