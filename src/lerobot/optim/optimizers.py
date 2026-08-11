@@ -111,6 +111,33 @@ class AdamWConfig(OptimizerConfig):
         return torch.optim.AdamW(params, **kwargs)
 
 
+# --- PROBE PATCH: pi05 full fine-tune on a 32 GB 5090 ---------------------
+# projects/testproject/docs/pi05_full_finetune_on_5090_plan_20260811.md
+# FP32 AdamW holds m+v at 8 bytes/param = 30.8 GiB for pi05's 4.14B, which alone
+# exceeds the card. 8-bit blockwise states cut that to ~7.7 GiB, which is the
+# only reason a full-parameter fine-tune could fit in 32 GB at all.
+# bitsandbytes is an optional dep: imported inside build() so this registration
+# costs nothing when unused.
+@OptimizerConfig.register_subclass("adamw_8bit")
+@dataclass
+class AdamW8bitConfig(OptimizerConfig):
+    lr: float = 1e-3
+    betas: tuple[float, float] = (0.9, 0.999)
+    eps: float = 1e-8
+    weight_decay: float = 1e-2
+    grad_clip_norm: float = 10.0
+
+    def build(self, params: OptimizerParams) -> torch.optim.Optimizer:
+        import bitsandbytes as bnb
+
+        kwargs = asdict(self)
+        kwargs.pop("grad_clip_norm")
+        return bnb.optim.AdamW8bit(params, **kwargs)
+
+
+# --- END PROBE PATCH ------------------------------------------------------
+
+
 @OptimizerConfig.register_subclass("sgd")
 @dataclass
 class SGDConfig(OptimizerConfig):

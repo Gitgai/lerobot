@@ -115,14 +115,72 @@ WHERE TRAINING CAN RUN        /home/kiran/sim/Isaac-GR00T-n16/.venv   lerobot 0.
 ```text
 A  install THIS repo (0.5.2) editable into a venv with accelerate+transformers
    ⇒ the edit takes effect, but it is a VERSION CHANGE on top of a memory
-     experiment. Two variables at once. REJECTED.
+     experiment. Two variables at once. REJECTED... then ADOPTED, see below.
 B  patch the 0.4.4 copy inside sim/Isaac-GR00T-n16/.venv in place
    ⇒ version matches the OOM ladder, but it mutates the venv that produced the
      GR00T results, and `pip install bitsandbytes` into it could drag a torch
      reinstall. REJECTED - that venv is not disposable.
-C  ★ FRESH venv, pinned:  torch==2.7.1+cu128  +  lerobot==0.4.4  +  bitsandbytes
-   ⇒ same lerobot version as the OOM ladder, ZERO risk to the GR00T track,
-     and the patch has somewhere honest to live. CHOSEN.
+C  FRESH venv, pinned:  torch==2.7.1+cu128  +  lerobot==0.4.4  +  bitsandbytes
+   ⇒ chosen first, then BLOCKED. See below.
+```
+
+### ⛔ ROUTE C IS BLOCKED — 0.4.4 needs a patched transformers that does not exist
+
+Discovered 2026-08-11 while executing, after route C was built and the patch
+applied. **lerobot 0.4.4's π0.5 hard-requires a FORKED transformers:**
+
+```text
+modeling_pi05.py:577   from transformers.models.siglip import check
+                       check.check_whether_transformers_replace_is_installed_correctly()
+                       -> else ValueError("An incorrect transformer version is used")
+```
+
+`transformers.models.siglip.check` **does not exist in upstream transformers**,
+and there is **no `transformers_replace` directory at the v0.4.4 tag** on GitHub
+(checked). The stock `transformers-dep` extra resolves 4.57.6, which fails the
+guard. ⇒ **0.4.4 cannot run π0.5 without an artifact we do not have.**
+
+**The guard was REMOVED in 0.5.2** (`grep check_whether_transformers_replace
+src/lerobot/policies/pi05/` → no match). ⇒ The choice is not 0.4.4 vs 0.5.2. It
+is **0.5.2 or nothing.**
+
+### ⇒ REVERSED: route A is adopted. Why the original objection no longer holds
+
+The objection was *"a version change on top of a memory experiment — two
+variables at once."* Three things retire it:
+
+```text
+1  0.4.4 is BLOCKED, not merely less convenient. There is no version-matched
+   option to prefer over 0.5.2.
+2  ★ STEP 7b ALREADY REMOVED THE DEPENDENCY ON VERSION-MATCHING. The pin existed
+   to keep §0's OOM ladder valid as a comparison. 7b re-measures the bs1
+   expert-only baseline in the SAME session and SAME venv, so the denominator is
+   internally consistent at whatever version we run. That objection was
+   load-bearing before 7b existed; it is not now.
+3  Editable install is STRICTLY BETTER for the patch: it lands in the git repo
+   instead of stranded in site-packages, so runbook step 4 stops being a
+   workaround and becomes just "commit it".
+```
+
+⚠ **0.5.2 requires Python >= 3.12** (0.4.4 ran on 3.11). The probe venv is
+therefore `.venv312`. The 3.11 venv is left in place, unused — the failed 0.5.2
+install into it exited cleanly without touching torch.
+
+⚠ **§0's OOM ladder was measured on a 0.4.x stack** and is now a *different
+version* from the run. It stays as context — it is what motivated the question —
+but **it is no longer a valid quantitative comparator.** Step 7b is the
+comparator. Do not quote 26.3 GB against a 0.5.2 number.
+
+**Final configuration:**
+
+```text
+venv          /home/kiran/sim/pi05-fullft-probe/.venv312   (uv, python 3.12)
+torch         2.7.1+cu128        pinned FIRST, verified sm_120, never downgraded
+lerobot       0.5.2 EDITABLE from projects/git/nvidia/lerobot  [pi,dataset]
+transformers  5.5.4              (0.5.2 wants >=5.4.0,<5.6.0 - a MAJOR jump
+                                  from the 4.57.6 that 0.4.4 wanted)
+accelerate    1.14.0
+bitsandbytes  0.50.0
 ```
 
 **Why those exact pins** — both verified 2026-08-11:
