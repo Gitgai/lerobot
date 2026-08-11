@@ -644,3 +644,101 @@ states work on this Blackwell card at all.
 
 Note it also sidesteps the entire question above: training on real data from
 this table, this arm, these cameras does not require sim and real to correspond.
+
+---
+
+# NON-CAMERA FACTORS — 2026-08-11. One ruled out by inspection, one still live.
+
+The investigation treated cameras as the frontier because that is where the
+measurable effect was. Four non-camera factors had never been examined. Checked
+here; results below.
+
+## RULED OUT — state units in the real-arm client
+
+**Hypothesis.** Hours earlier we found a units bug in the sim corpus (actions in
+radians, state in motor units, ~57x). The real client passes robot state
+straight through with no conversion:
+
+```python
+state = np.array([obs[k] for k in self.robot_state_keys], dtype=np.float32)
+model_obs["state"] = {"single_arm": state[:5], "gripper": state[5:6]}
+```
+
+If the arm's units disagreed with the policy's, its proprioception would be
+nonsense — and a policy that cannot locate itself would never reach for
+anything while its motion priors kept producing smooth trajectories. That is
+the PERCEPTION-failure signature no camera condition reproduced.
+
+**Checked.** The client reads LeRobot `so_follower` keys
+(`shoulder_pan.pos` … `gripper.pos`). The checkpoint's own
+`statistics.json`, `new_embodiment` entry — the embodiment tag the server is
+launched with — expects:
+
+```text
+state.single_arm   min [-66.95, -99.35, -100.07, -7.24, -14.35]
+                   max [ 54.98,  94.01,   99.92, 100.18,  49.99]
+state.gripper      min [1.42]   max [72.83]
+```
+
+i.e. roughly **-100..100 for the arm and 0..100 for the gripper** — LeRobot's
+normalised motor convention (`RANGE_M100_100` / `RANGE_0_100`), which is exactly
+what `.pos` returns. **The ranges agree. No conversion is missing.**
+
+⇒ Not the cause. Recorded so it is not re-chased.
+
+## STILL LIVE — the language instruction was never tested
+
+GR00T is instruction-conditioned; the string goes into the model as
+`annotation.human.task_description`.
+
+```text
+REAL ARM   "Grab orange and place into plate"
+           (n16_realarm_client.py:184, the client default)
+SIM        "Pick three oranges and put them into the plate, then reset the arm
+           to rest state."   (the env's cfg.task_description)
+```
+
+**Every sim condition in this document used the env string. The hardware run
+used a different one. That difference has never been tested.**
+
+The two differ in object count (one vs three), verb, and the trailing reset
+clause. `sim_policy_eval_instrumented.py` already exposes
+`--policy_language_instruction`, and its help text warns to override it only
+for a deliberate instruction experiment — which this is.
+
+```text
+TEST   realInstr : --policy_language_instruction="Grab orange and place into plate"
+       n=12 against same-session canonical. ~45 min, one flag, no code.
+```
+
+This is the cheapest untested candidate remaining and the only one that needs
+neither new code nor USD assets.
+
+## NOT YET CHECKED
+
+```text
+CAMERA->CHANNEL MAP   the client sends camera_keys = ["front","wrist"]. WHICH
+                      physical device fed "front" on 2026-08-08 is taken from a
+                      doc line, not from the run's own config. The dataset
+                      carries THREE cameras (front/top/wrist) against a policy
+                      that takes two, so a mapping decision exists somewhere and
+                      is not written down.
+INITIAL POSE          sim resets to a defined rest pose; the real arm's starting
+                      configuration was never compared against it.
+RESOLUTION / PREPROC  sim TiledCamera render size vs the client's 640x480, and
+                      whatever resize/normalise happens between. Stage A checked
+                      channel order and layout; normalisation is not recorded as
+                      checked.
+CHUNK TIMING          the real loop's execution rate vs sim's. --obs-delay=2 was
+                      free in Stage B, but that tested staleness, not rate.
+```
+
+## Priority after this
+
+```text
+1. realInstr           one flag, 45 min, no code                    <- do first
+2. camera->channel map free, read the run's config not the prose
+3. --frame-drop        ~15 lines, tests the 13% stale wrist feed
+4. background clutter  USD assets; expensive, and still the only candidate that
+                       could plausibly cause a PERCEPTION failure
+```
