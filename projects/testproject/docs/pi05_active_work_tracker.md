@@ -1627,3 +1627,80 @@ CORPUS    fix pending: rewrite action column rad->motor IN the v3 dataset
           (raw HDF5 deleted; the affine fix needs only the corpus itself),
           then refresh the Orin nvidia_data archive at next milestone
 ```
+
+---
+
+## 14. APPENDED 2026-08-11 — the units bug is FIXED. Corpus rebuilt, stats regenerated.
+
+Section 13 recorded the bug and left the fix pending ("rewrite action column
+rad->motor IN the v3 dataset"). Done. Script:
+`scripts/fix_corpus_action_units.py`. Output:
+`~/.cache/huggingface/lerobot/local/varied_corpus_fixed`. **The original is
+untouched.**
+
+### Root cause, located in source
+
+`leisaac/tasks/template/single_arm_env_cfg.py::build_lerobot_frame`:
+
+```python
+action            = raw   UNLESS dataset_cfg.action_align is set
+observation.state = convert_leisaac_action_to_lerobot(joint_pos)   ALWAYS
+```
+
+The corpus was generated with `action_align` unset. One flag, and only the
+action column missed the conversion. Not a numerical subtlety.
+
+### The transform is per-joint affine, NOT a single scale
+
+rad -> deg, then per-joint remap from USD joint limits to motor limits. This is
+why the observed per-joint ratios ranged 33.7 to 60.4 rather than sitting at
+57.3. **A uniform 180/pi rescale would have been wrong on every joint.**
+
+### A false alarm worth recording, so it is not re-chased
+
+After conversion, `elbow_flex` and `wrist_flex` land OUTSIDE the motor range,
+and the first pass rejected the fix because of it. That was wrong:
+
+```text
+MEASURED (invert observation.state)   all six joints IN range
+COMMANDED (action)                    elbow_flex, wrist_flex OUT
+raw action BEFORE any conversion      already out (-2.73 rad = -156 deg vs -100)
+```
+
+The actions are **targets that exceed the joint stops**; the controller clamps,
+so measured positions stay legal. The conversion carries that property across -
+it does not create it. Out-of-range output is faithful, not corruption.
+
+The lead that prompted the doubt was also checked and cleared: the USD asset's
+joint limits match leisaac's hardcoded table **exactly** on all six joints
+(`scripts/read_usd_joint_limits.py`). That table can be trusted.
+
+### Both stats layers regenerated - this is the part that fails silently
+
+```text
+meta/stats.json          action.min was [-0.479 ...] in RADIANS
+meta/episodes/*.parquet  stats/action/{min,max,mean,std,q01..q99} likewise
+```
+
+Training normalises against these. Fixing the data alone would have trained on
+correct values scaled by radian statistics: no error raised, just a quietly bad
+policy. Both are now recomputed from the converted data and verified to match
+it, globally and per episode.
+
+### Verification
+
+```text
+GATE 1  mean |action - state| per joint  [5.3 8.7 10.7 22.8 5.1 7.8]
+        i.e. ordinary target-vs-measured tracking error, not a ~57x unit gap
+GATE 2  stats.json == data (True); per-episode ep0 meta == data
+GATE 3  original still radians, unmodified
+```
+
+### Deliberately NOT done
+
+Clamping the out-of-range targets. They exist in the raw data, the controller
+absorbs them, and clipping would change the dataset beyond a unit fix. That is
+a modelling decision - make it explicitly if wanted.
+
+⇒ `pi05_sim_varied` can now be retrained on a corpus whose actions and states
+agree. Section 13 estimated ~2.5 h.
