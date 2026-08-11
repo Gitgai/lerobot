@@ -9,13 +9,19 @@ purchase is discussed.
 
 **Status: NOT YET ATTEMPTED.** The enabling config was described but never run.
 
-**⛔ ONE THING BLOCKS EXECUTION: the LIBERO `repo_id` in §3 is not pinned.**
-Everything else is verified and ordered. Pick it, confirm it downloads, write it
-into §3, then follow §3.5 top to bottom.
+**⛔ THE WHOLE PLAN RESTS ON ONE UNVERIFIED ASSUMPTION: that `bitsandbytes`
+8-bit optimizer states work on this Blackwell (sm_120) card.** The precedent we
+believed we had does not survive checking (§0.0). ⇒ **STEP −1 of §3.5 tests
+exactly that, in ~5 minutes, and gates everything else.** If it fails, the ~25 GB
+arithmetic in §1 collapses and the answer is "not by this route" — reached for
+five minutes of work instead of ninety.
+
+Dataset and venv are now pinned. Nothing else is outstanding.
 
 > **Reading order:** §0.0 (what was verified) → §3 (the trap) → §3.5 (the
-> runbook) → §4 (the gates) → §8 (record as you go). §1/§2 are the reasoning;
-> §5/§6/§7 are only needed if Gate A fails or when the decision is made.
+> runbook, start at STEP −1) → §4 (the gates) → §8 (record as you go). §1/§2 are
+> the reasoning; §5/§6/§7 are only needed if Gate A fails or when the decision is
+> made.
 
 ---
 
@@ -39,24 +45,58 @@ WHERE TRAINING CAN RUN        /home/kiran/sim/Isaac-GR00T-n16/.venv   lerobot 0.
 ```
 
 ⇒ **Editing this repo does not change what trains.** This is the `src/` vs
-`install/` trap. **Step 0 of the experiment is deciding where the change lands**
-— and the options are not equivalent:
+`install/` trap. Three routes were considered:
 
 ```text
 A  install THIS repo (0.5.2) editable into a venv with accelerate+transformers
-   ⇒ the edit takes effect, but it is a VERSION CHANGE on top of a
-     memory experiment. Two variables at once.
-B  patch the 0.4.x copy in the venv that produced the OOM ladder
-   ⇒ same version as the measurements, but the patch lives in site-packages
-     and must be captured in projects/testproject/patches/ or it is lost
-     on the next sync.
+   ⇒ the edit takes effect, but it is a VERSION CHANGE on top of a memory
+     experiment. Two variables at once. REJECTED.
+B  patch the 0.4.4 copy inside sim/Isaac-GR00T-n16/.venv in place
+   ⇒ version matches the OOM ladder, but it mutates the venv that produced the
+     GR00T results, and `pip install bitsandbytes` into it could drag a torch
+     reinstall. REJECTED - that venv is not disposable.
+C  ★ FRESH venv, pinned:  torch==2.7.1+cu128  +  lerobot==0.4.4  +  bitsandbytes
+   ⇒ same lerobot version as the OOM ladder, ZERO risk to the GR00T track,
+     and the patch has somewhere honest to live. CHOSEN.
 ```
 
-**B is the honest one** — it holds the version fixed against the numbers in §0.
-Take A only if 0.4.x turns out to lack something needed, and say so.
+**Why those exact pins** — both verified 2026-08-11:
 
-⚠ Whichever is chosen, **re-check §2 and §3 against THAT tree** — the registry
-already differs between them (below).
+```text
+torch 2.7.1+cu128   the build in the GR00T venv. arch list includes sm_120 and
+                    compute_120; the GPU reports capability (12, 0). A default
+                    `pip install torch` may NOT carry Blackwell kernels, so this
+                    is pinned deliberately, not incidentally.
+lerobot 0.4.4       present on PyPI (checked), and the version that produced the
+                    §0 OOM ladder. Holds the version fixed against those numbers.
+```
+
+⚠ **Re-check §2 and §3 against the fresh tree once built** — the optimizer
+registry differs between 0.4.2 / 0.4.4 / 0.5.2 (below), so confirm what 0.4.4
+actually registers rather than trusting the count here.
+
+### ⛔ The 8-bit precedent does NOT exist — this is the real risk
+
+§0 previously cited the GR00T result — `adamw_bnb_8bit`, 23.1 GB, zero OOM — as
+proof that 8-bit Adam works on this card. **It is not reproducible from current
+machine state:**
+
+```text
+searched   all three venvs · /opt · /usr/lib/python3* · the uv cache
+found      NOTHING. The only hits are transformers/ and diffusers/ INTEGRATION
+           SHIMS that are merely named bitsandbytes - not the package.
+```
+
+Either the GR00T venv was rebuilt since (there is an `N16_REBUILD_RUNBOOK.md`,
+so this is plausible) or the claim is wrong. **Either way we cannot lean on it.**
+
+⇒ **`bitsandbytes` has never been demonstrated on this Blackwell card**, and the
+whole ~25 GB figure in §1 assumes it works. bnb's Blackwell support has
+historically lagged. **That is why §3.5 now opens with STEP −1**: prove one
+`AdamW8bit` step runs on sm_120 before spending anything else.
+
+⇒ **Correct the §0 wording when this is settled** — replace "proven on this card"
+with whatever STEP −1 actually measures.
 
 ### Corrections to specific claims
 
@@ -117,8 +157,20 @@ Reducing batch size alone does not and cannot fix this.
 ### Already validated on this GPU
 
 `gradient_checkpointing=true` and `dtype=bfloat16` are already in the working
-recipe. 8-bit Adam is proven on this card via the GR00T track:
-`adamw_bnb_8bit`, 100 probe steps, 4.15 it/s, **23.1 GB, zero OOM**.
+recipe.
+
+⚠ **The 8-bit claim below is UNDER DISPUTE — do not cite it until STEP −1
+settles it.** `REALARM_RESULT_20260808.md` records the GR00T track breaking its
+ceiling with `adamw_bnb_8bit`: 100 probe steps, 4.15 it/s, **23.1 GB, zero OOM**.
+**But `bitsandbytes` is nowhere on this machine** (§0.0), so that result cannot
+currently be reproduced or confirmed. Treat 8-bit-on-Blackwell as **unproven**,
+not as validated prior art.
+
+```text
+CONFIRMED on this GPU   torch 2.7.1+cu128 carries sm_120 / compute_120 kernels;
+                        device capability reads (12, 0)
+NOT CONFIRMED           that bitsandbytes has working sm_120 kernels here
+```
 
 ### External figures, and what they actually say
 
@@ -195,14 +247,14 @@ and `configuration_pi05.py::get_optimizer_preset()` returns `AdamWConfig`.
 well-worn here, so mirroring it for `AdamW8bit` is routine rather than novel.
 
 The GR00T 8-bit result came from a **different stack** — HF Trainer's
-`--optim adamw_bnb_8bit` — which does not apply here. Also:
-**`bitsandbytes` is not installed in any venv on this machine** (checked
-testproject, Isaac-GR00T-n16, leisaac).
+`--optim adamw_bnb_8bit` — which does not apply here. And **`bitsandbytes` is
+not present anywhere on this machine** — no venv, no uv cache (§0.0) — so that
+result is also **not currently reproducible**. STEP −1 exists because of this.
 
 So this needs a small code change, not a flag:
 
 ```text
-1. pip install bitsandbytes into the training venv
+1. pip install bitsandbytes into the fresh probe venv (§0.0 route C)
 2. add   @OptimizerConfig.register_subclass("adamw_8bit")
          class AdamW8bitConfig(OptimizerConfig)  -> bnb.optim.AdamW8bit
          ~15 lines, a direct mirror of AdamWConfig
@@ -253,11 +305,11 @@ quietly.
 ### The command
 
 ```bash
-# venv: see §0.0 step 0. Assumed here to be the 0.4.4 tree.
-source /home/kiran/sim/Isaac-GR00T-n16/.venv/bin/activate
+# the FRESH venv from §0.0 route C — NOT the GR00T venv
+source /home/kiran/sim/pi05-fullft-probe/.venv/bin/activate
 
 lerobot-train \
-  --dataset.repo_id=<LIBERO repo_id — FILL THIS IN, see below> \
+  --dataset.repo_id=lerobot/libero_spatial_image \
   --policy.type=pi05 \
   --policy.pretrained_path=lerobot/pi05_base \
   --policy.device=cuda \
@@ -293,12 +345,26 @@ Start on **LIBERO**, not the 89 real episodes — that separates a memory proble
 from a dataset problem. Our real episodes still need v3.0 → GR00T v2 conversion
 and a `top` camera drop.
 
-⚠ **The repo_id is not yet pinned and this plan cannot run until it is.** Pick
-one, confirm it downloads, and write it back into this file. Note also that
-`REALARM_RESULT_20260808.md` needed `--rename_map front->base_0_rgb,
-wrist->left_wrist_0_rgb` because `pi05_base` uses pi0 camera naming — **check
-whether the chosen LIBERO set needs its own rename_map before blaming memory for
-a startup failure.**
+**PINNED: `lerobot/libero_spatial_image`** — 6.60 GB, 75 files, from the LeRobot
+org itself. Sizes checked 2026-08-11 against 1.6 TB free:
+
+```text
+lerobot/libero_spatial_image    6.60 GB   ★ chosen - LeRobot org, pi05 docs
+                                            report 97.0% on Libero Spatial
+lerobot/libero_goal_image       6.31 GB     marginally smaller, equivalent
+lerobot/libero_object_image     9.25 GB
+physical-intelligence/libero   (the openpi-side set - different stack)
+```
+
+⚠ **`rename_map` is UNVERIFIED for this dataset and is the most likely cause of
+a step-5 smoke failure.** `pi05_base` uses pi0 camera naming, which is why the
+real-arm run needed `--rename_map front->base_0_rgb, wrist->left_wrist_0_rgb`.
+Inspect the LIBERO feature keys before the smoke run, and **do not let a startup
+failure here be misread as a memory result.**
+
+⚠ LeRobot's own `docs/source/pi05.mdx` shows the full-FT command with
+`--policy.compile_model=true`. **We use `false`** — compile adds its own memory
+and time overhead and would confound a memory measurement. Note it, don't copy it.
 
 ### Gradient accumulation is out of scope for this run
 
@@ -318,53 +384,61 @@ silently for someone.** Record each result in the results file (§8) as you go �
 not at the end.
 
 ```text
-STEP                                    CHECK IT WORKED
-─────────────────────────────────────────────────────────────────────────────
-0  choose the tree (§0.0). Default: the  python -c "import lerobot; print(
-   0.4.4 venv at sim/Isaac-GR00T-n16       lerobot.__version__, lerobot.__file__)"
-                                          -> must print 0.4.4 and a path under
-                                             THAT venv's site-packages
+STEP                                     CHECK IT WORKED                  COST
+──────────────────────────────────────────────────────────────────────────────
+-1 ⭐ DOES bitsandbytes WORK ON sm_120?   a real AdamW8bit step completes  ~5 min
+   THE GATE ON EVERYTHING ELSE (§0.0).    and the param CHANGES:
+   Fresh venv, torch==2.7.1+cu128,
+   bitsandbytes. Toy model, one step:       import torch, bitsandbytes as bnb
+                                            m = torch.nn.Linear(4096, 4096).cuda()
+   ⛔ IF THIS FAILS, STOP AND REPORT.       o = bnb.optim.AdamW8bit(m.parameters())
+   §1's ~25 GB assumes 8-bit states.        m(torch.randn(8,4096,device='cuda')
+   No 8-bit -> persistent stays 49.7 GB       ).sum().backward(); o.step()
+   -> 32 GB is hopeless -> the answer
+   is "not by this route", for 5 min      ⚠ a CUDA kernel/arch error here is
+   instead of 90.                            THE RESULT, not a setup bug.
 
-0b SNAPSHOT before touching anything.     the .orig files exist
-   cp optimizers.py{,.orig}               ⚠ this venv produced the 23.1 GB GR00T
-   cp configuration_pi05.py{,.orig}          result. It is not disposable.
-                                             Revert = cp back from .orig.
+0  finish the venv: lerobot==0.4.4        python -c "import lerobot,torch;print(
+   (§0.0 route C, at                        lerobot.__version__, torch.__version__)"
+   /home/kiran/sim/pi05-fullft-probe)     -> 0.4.4 and 2.7.1+cu128
+   ⇒ NOTHING here touches the GR00T       ⚠ if installing lerobot DOWNGRADES
+     venv. No snapshot, no revert.           torch off 2.7.1+cu128, reinstall the
+     That whole hazard is designed out.      pin and re-run STEP -1.
 
-1  pip install bitsandbytes               python -c "import bitsandbytes as b;
-                                            print(b.__version__)"
-                                          ⚠ additive, but if it drags a torch
-                                            reinstall, STOP and revert - that
-                                            breaks the GR00T track.
+1  confirm what 0.4.4 registers          grep register_subclass on the FRESH
+                                          tree - the count differs by version
 
-2  add AdamW8bitConfig (§2)               grep register_subclass optimizers.py
-                                          -> adamw_8bit now listed (6 total)
+2  add AdamW8bitConfig (§2)               adamw_8bit now listed
 
-3  point get_optimizer_preset at it       read the file back; one line changed
+3  point get_optimizer_preset at it       one line changed
+   ⛔ NOT the CLI flag - see §3 trap
 
-4  capture BOTH edits as a patch into     the .patch file exists and applies
-   projects/testproject/patches/          clean to the .orig files
+4  capture 2+3 as a patch into            the .patch file exists and applies
+   projects/testproject/patches/          clean
    ⛔ site-packages is NOT version
       controlled. Skip this and the
       work is lost on the next sync.
 
-5  smoke: 2 steps, not 100                it starts, loss prints, no OOM.
-   --steps=2                              Catches dataset/rename_map/output_dir
-                                          problems in 3 min instead of 40.
+5  dataset: inspect feature keys,         key names known BEFORE the run
+   then smoke at --steps=2                it starts, loss prints, no OOM
+                                          ⚠ a rename_map failure here is NOT a
+                                            memory result. See §3.       ~15 min
+                                            (6.6 GB + pi05_base download)
 
-6  GATE B FIRST, before the real run      trainable ~4.14B (§4). If this says
-   (it is cheap and it invalidates          693M, everything after it is void.
-    everything if it fails)
+6  GATE B, before the real run            trainable ~4.14B (§4). If 693M,
+   cheap, and it voids everything           STOP - everything after is void.
+   downstream if it fails
 
-7  the 100-step run + VRAM logging        §4 Gate A
+7  the 100-step run + VRAM logging        §4 Gate A                      ~40 min
 
-8  revert: cp the .orig files back        the GR00T venv trains again.
-                                          ⛔ Do not leave the venv patched.
+8  fill in §8 and apply §6 as written     the results block has no blanks
 ```
 
-⇒ **Steps 5 and 6 before step 7 is the whole discipline here.** The two ways
-this experiment produces a confidently wrong number are a silently-ignored
-optimizer (§3) and a silently-partial fine-tune (Gate B). Both are cheap to
-check and neither announces itself.
+⇒ **The ordering is the point.** Three things can each make this experiment
+produce a confident wrong number, and **none of them announces itself**: 8-bit
+silently unavailable on Blackwell (STEP −1), the optimizer silently overridden by
+the preset (§3), and the fine-tune silently partial (Gate B). Each is checked
+before the expensive step that depends on it, cheapest first.
 
 ---
 
@@ -492,10 +566,23 @@ which is the only form of evidence that should justify that purchase.
 
 ```text
 date / operator            ____
-tree used (§0.0 A or B)    ____   lerobot.__version__ ____  __file__ ____
+
+STEP -1  bitsandbytes on Blackwell sm_120   ⭐ gates everything
+  bitsandbytes version     ____
+  AdamW8bit step ran       PASS / FAIL
+  param actually changed   ____
+  if FAIL, the error       ____
+  VERDICT                  if FAIL: §1's 25 GB is void, persistent stays
+                           49.7 GB, answer is "not by this route". STOP HERE
+                           and record it - that IS the deliverable.
+
+tree used                  fresh probe venv (§0.0 route C)
+  lerobot.__version__      ____   expected 0.4.4
+  torch.__version__        ____   expected 2.7.1+cu128
+  __file__                 ____
 8-bit route                ____   preset-patch | CLI flag  (§3 trap)
-bitsandbytes version       ____
-dataset repo_id            ____   rename_map needed? ____
+dataset repo_id            lerobot/libero_spatial_image
+  rename_map needed?       ____   feature keys seen: ____
 patch captured at          projects/testproject/patches/____
 
 GATE B (do first)
