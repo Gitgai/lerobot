@@ -742,3 +742,152 @@ CHUNK TIMING          the real loop's execution rate vs sim's. --obs-delay=2 was
 4. background clutter  USD assets; expensive, and still the only candidate that
                        could plausibly cause a PERCEPTION failure
 ```
+
+---
+
+# THE LINK — 2026-08-11. The investigation had the topology wrong.
+
+**The GPU is in New Jersey. The arm is in Pune. Every policy call crosses
+~12,000 km.** I read `192.168.194.x` as a LAN; it is a ZeroTier overlay. Every
+sim condition in this document was designed against an assumed local link.
+
+This reframes the whole investigation, and it explains the thing that has been
+unexplained for three days: *why all 13 sim conditions failed to reproduce the
+hardware signature.*
+
+## Why sim CANNOT reproduce a latency failure, by construction
+
+```text
+SIM   the client steps the environment. When the policy call takes 1 s, the
+      world does not advance - physics, objects and cameras all pause with it.
+      Serving latency is INVISIBLE. It costs wall clock, never task time.
+
+REAL  the world keeps running. The arm sits frozen mid-reach for the whole
+      round trip while gravity, the object and the cameras carry on.
+```
+
+No `--obs-delay` value fixes this. That flag makes observations *stale*; it
+cannot make the arm *stop*. The two are different failures, and the one the
+hardware has is the one sim structurally cannot show.
+
+Stage B's `--obs-delay=2` was 67 ms at 30 Hz. Against a round trip of ~1 s that
+is **15x too small** — which is why it came back "free".
+
+## What the code actually does — verified, not inferred
+
+```python
+model_obs["video"] = {k: obs[k] for k in self.camera_keys}   # raw uint8 arrays
+np.save(output, obj, allow_pickle=False)                     # NO compression
+...
+action_horizon: int = 8
+for action_dict in actions[: cfg.action_horizon]:            # 8 of 16 executed
+    robot.send_action(action_dict)
+    time.sleep(1.0 / 30 - (toc - tic))                       # 30 Hz
+```
+
+* **1.76 MiB per policy call**, uncompressed, NJ↔Pune, every call.
+* **8 actions execute = 267 ms of motion**, then the loop blocks on the next call.
+* **Half of every chunk is discarded.** The policy plans 16 steps; 8 run.
+
+Duty cycle as a function of round trip:
+
+```text
+    RTT     moving    frozen
+   0.1 s     72.7%     27.3%
+   0.3 s     47.1%     52.9%
+   1.0 s     21.1%     78.9%      <- the pi0.5-measured regime
+   2.0 s     11.8%     88.2%
+```
+
+## This rig has failed this exact way before, and it was solved
+
+`agent_handoff_pi05_20260803.md`, ERA 3 (Jul 29–Aug 1), on **this same link**:
+
+> "The arm moved too fast: latency ate ~60% of each 50-action chunk, so the
+> client fast-forwarded through the remainder... RTC_ENABLE=1 with
+> RTC_EXEC_HORIZON=35 (default 10 is too small — horizon must exceed the
+> ~30-step latency) produced the first grasp -> lift -> CARRY."
+
+and earlier:
+
+> "JPEG-compressed observations (2.77 MB -> ~190 KB, 14.6x; the bottleneck was
+> gRPC over the SSH tunnel, ~2 MB/s, NOT the uplink)"
+
+**~30 steps of latency and a ~2 MB/s tunnel were MEASURED on this rig.** At
+2 MB/s, N1.6's 1.76 MiB payload is ~0.92 s of upload alone.
+
+Does the N1.6 client carry any of the mitigations that made π0.5 work?
+
+```text
+  RTC                    ABSENT
+  chunk_size_threshold   ABSENT
+  JPEG / compression     ABSENT
+  async / decoupled obs  ABSENT
+```
+
+**None of them.** The N1.6 real-arm client was written as if the server were
+local. π0.5 needed all four to grasp anything over this link.
+
+⇒ A policy stopping every 267 ms for ~1 s, acting on truncated chunks, would
+produce *coherent motion that never converges on the object* — the Aug 8
+signature — and would do it regardless of camera geometry.
+
+## NOT MEASURED — do this first, it is one command
+
+The round trip has **never been measured**. Everything above is anchored on the
+π0.5 numbers, not on N1.6's own. Pune was unreachable on 2026-08-11 (100% loss,
+"No route to host"), so it could not be taken then.
+
+```text
+T0  measure RTT + payload time from the ARM machine, n=50 calls.
+    Gates everything else. Until this exists the duty-cycle row is an estimate.
+T1  JPEG the observations (14.6x on pi0.5). ~10 lines.
+T2  action_horizon 8 -> 16, or RTC. Stop discarding half of every chunk.
+T3  re-run the arm with T1+T2. If it engages, the link was the cause.
+```
+
+## Camera blur / autofocus / exposure — the other thing sim cannot render
+
+Sim renders a pinhole camera: perfectly sharp, noise-free, fixed focus, fixed
+exposure, no rolling shutter, no compression. **Every condition in this document
+compared geometry between a pristine render and a real sensor**, and never
+compared image *quality* at all.
+
+The client's own docstring already lists this as rig spec priority (2):
+
+> "(2) LOCK white balance+exposure (v4l2-ctl)"
+
+**Whether that was done on Aug 8 is not recorded anywhere.** And autofocus is
+not mentioned in any document — the wrist camera is a Raspberry Pi module on a
+*moving arm*; if AF is enabled it hunts on every move.
+
+There is a nasty interaction with the duty cycle above: the client captures its
+observation **immediately after the 8-step motion burst** — i.e. at the moment
+of maximum motion blur and maximum AF hunt, then freezes for the round trip.
+
+```text
+T4  read back the actual v4l2 controls on both cameras: focus_auto,
+    white_balance_temperature_auto, exposure_auto, exposure_absolute.
+    Free, no robot motion needed. Records what Aug 8 could not tell us.
+T5  sharpness on the captured frames: variance-of-Laplacian per frame across a
+    run. Blurred frames are measurable after the fact from evidence JPEGs the
+    client already writes (c%04d_{front,wrist}.jpg).
+T6  sim degradation battery: gaussian blur / exposure shift / JPEG artifacts on
+    the render before it reaches the policy. This is the FIRST condition class
+    that could plausibly cause a PERCEPTION failure rather than a completion one.
+```
+
+## Revised priority
+
+```text
+1. T0 measure the round trip          gates everything, one command
+2. T4 read back v4l2 controls         free, answers a 3-day-old unknown
+3. T1+T2 JPEG + full chunk            ~10 lines, mirrors the pi0.5 fix
+4. T5 sharpness on existing frames    free, uses evidence already on disk
+5. realInstr (language string)        one flag, still untested
+6. T6 sim degradation battery         new code
+7. background clutter                 USD assets, expensive
+```
+
+Camera geometry remains a real measured effect (89%→44%). It is no longer the
+leading explanation for Aug 8.
