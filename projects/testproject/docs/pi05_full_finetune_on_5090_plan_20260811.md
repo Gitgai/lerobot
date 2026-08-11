@@ -319,10 +319,48 @@ persistent             46.26 GiB     ⇒ hopeless, and this is why an A6000 48 G
 
 Tight, but not obviously impossible. **That is the whole experiment.**
 
-⇒ **A lever if the run lands at 29–30 GiB:** the 1.42 GiB of desktop overhead is
-recoverable by running headless. ⚠ **Not free** — `gnome-remote-desktop-daemon`
-is in that list, so stopping the session disconnects the operator. Treat it as a
-tie-breaker, not a default, and if it is used, **say so in §8** — it changes the
+### ★ Recovering the 1.42 GiB: move the display to the AMD iGPU
+
+**Operator's proposal, 2026-08-11, and it is the right call — but not as a
+blocker on this experiment.** The hardware is already present and driven:
+
+```text
+01:00.0   NVIDIA GB202 [RTX 5090]              currently drives the display
+79:00.0   AMD Granite Ridge [Radeon Graphics]  the 9950X iGPU - ALREADY
+                                               enumerated, amdgpu ALREADY loaded
+```
+
+⇒ This is a **monitor-cable move to the motherboard output + a display-config
+change**, not a purchase and not a driver install. Two DRM cards are already
+present.
+
+```text
+WHAT IT BUYS
+  +1.42 GiB          headroom 6.79 -> 8.21 GiB, about 21% more
+  ★ A STABLE CEILING  this is the bigger win. memory.free currently DRIFTS with
+                      browser tabs and desktop activity, which is why Gate A has
+                      to re-measure it every run. On the iGPU the NVIDIA ceiling
+                      becomes ~31.3 GiB and essentially constant - runs become
+                      comparable across sessions.
+  ★ KILLS A TRADEOFF  "run headless for the last GiB" currently means
+                      disconnecting the operator. That choice disappears.
+  PERMANENT           every future training run gets it, not just this one.
+
+WHAT IT DOES NOT BUY
+  ⛔ it does NOT change the answer to the $11K question. 23.14 GiB persistent
+     against 29.93 vs 31.3 free is the difference between comfortable and
+     slightly-more-comfortable. It only becomes DECISIVE if the run lands in
+     §6's marginal 29-30 GiB band.
+```
+
+⚠ **Do NOT block STEP −1 on this.** It likely needs a BIOS change — many boards
+default the iGPU to "off" or "auto" when a discrete card is present — and a
+reboot. STEP −1 is five minutes and may make the whole question moot. **Run the
+experiment on today's 29.93 GiB ceiling; do the iGPU switch on its own schedule.**
+
+⇒ If the display *does* move before the run, nothing in this plan breaks: Gate A
+already requires re-measuring `memory.free` at run time rather than trusting a
+recorded constant. **Record which GPU drove the display in §8** — it changes the
 ceiling the result was measured against.
 
 ---
@@ -760,7 +798,8 @@ GATE B (do first)
 GATE A
   BASELINE memory.free     ____ GiB  ⛔ taken BEFORE the run, not remembered
                                         (29.93 GiB idle-desktop, 2026-08-11)
-  desktop killed?          ____      if yes, note it - it moves the ceiling
+  display driven by        NVIDIA 5090 / AMD iGPU / headless
+                                     ⛔ required - it sets the ceiling. See §1.
   peak VRAM                ____ GiB  (nvidia-smi 1 Hz, vram.csv attached)
   headroom left            ____ GiB  = baseline - peak
   steps completed          ____ / 100
