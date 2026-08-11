@@ -322,26 +322,58 @@ Tight, but not obviously impossible. **That is the whole experiment.**
 ### ★ Recovering the 1.42 GiB: move the display to the AMD iGPU
 
 **Operator's proposal, 2026-08-11, and it is the right call — but not as a
-blocker on this experiment.** The hardware is already present and driven:
+blocker on this experiment.** State of the machine, checked rather than assumed:
 
 ```text
-01:00.0   NVIDIA GB202 [RTX 5090]              currently drives the display
-79:00.0   AMD Granite Ridge [Radeon Graphics]  the 9950X iGPU - ALREADY
-                                               enumerated, amdgpu ALREADY loaded
+card0  amdgpu   0000:79:00.0   DP-4, DP-5, HDMI-A-2      ← connectors LIVE
+card1  nvidia   0000:01:00.0   DP-1..3, HDMI-A-1
+
+CONNECTED: card1-HDMI-A-1      ← the monitor, on the 5090's HDMI port
+
+session   Wayland / GNOME
+/etc/X11/xorg.conf             DOES NOT EXIST
+/etc/X11/xorg.conf.d/          EMPTY          ⇒ nothing pins display to NVIDIA
 ```
 
-⇒ This is a **monitor-cable move to the motherboard output + a display-config
-change**, not a purchase and not a driver install. Two DRM cards are already
-present.
+⛔ **CORRECTION to an earlier claim in this doc: no BIOS change is needed.** The
+iGPU is *already* enabled — its connectors are enumerated and live, and `amdgpu`
+is loaded. An earlier revision said this "likely needs a BIOS change"; that was
+written before checking and is **false**.
+
+⇒ **The procedure is: move the HDMI cable from the 5090 to the motherboard
+output, and reboot.** That is the whole change. GNOME/Wayland assigns the display
+to whichever GPU has a connected output, and nothing in this system's config
+overrides that.
+
+⚠ **What stays in place, and why the +1.42 GiB is a HOPE not a guarantee:**
+
+```text
+/etc/modprobe.d/nvidia-graphics-drivers-kms.conf
+    options nvidia_drm modeset=1        stock Ubuntu driver packaging. It lets
+                                        the NVIDIA card drive a display; it does
+                                        not force it to.
+```
+
+With modeset still enabled the card **may retain a small allocation even with no
+monitor attached**. Whether `memory.used` drops to ~0 MiB or holds a couple
+hundred is **measurable, not predictable**. ⇒ **The "~31.3 GiB free" figure below
+is the ideal case.** One `nvidia-smi` after the reboot settles it — take that
+number before quoting any new ceiling.
+
+⚠ Also worth watching: if `gnome-remote-desktop` is using NVENC on the 5090 to
+encode the remote stream, that shifts to the AMD side or to CPU. Probably fine,
+possibly noticeable on the remote session.
 
 ```text
 WHAT IT BUYS
-  +1.42 GiB          headroom 6.79 -> 8.21 GiB, about 21% more
-  ★ A STABLE CEILING  this is the bigger win. memory.free currently DRIFTS with
-                      browser tabs and desktop activity, which is why Gate A has
-                      to re-measure it every run. On the iGPU the NVIDIA ceiling
-                      becomes ~31.3 GiB and essentially constant - runs become
-                      comparable across sessions.
+  up to +1.42 GiB    headroom 6.79 -> up to 8.21 GiB, ~21% more
+                     ⚠ UP TO - see the modeset=1 caveat above. Measure it.
+  ★ A STABLE CEILING  this is the bigger win, and it does NOT depend on the
+                      1.42 GiB landing in full. memory.free currently DRIFTS
+                      with browser tabs and desktop activity, which is why Gate
+                      A has to re-measure it every run. With no display clients
+                      on the NVIDIA card the ceiling becomes near-constant, and
+                      runs become comparable ACROSS SESSIONS.
   ★ KILLS A TRADEOFF  "run headless for the last GiB" currently means
                       disconnecting the operator. That choice disappears.
   PERMANENT           every future training run gets it, not just this one.
@@ -353,10 +385,11 @@ WHAT IT DOES NOT BUY
      §6's marginal 29-30 GiB band.
 ```
 
-⚠ **Do NOT block STEP −1 on this.** It likely needs a BIOS change — many boards
-default the iGPU to "off" or "auto" when a discrete card is present — and a
-reboot. STEP −1 is five minutes and may make the whole question moot. **Run the
-experiment on today's 29.93 GiB ceiling; do the iGPU switch on its own schedule.**
+⚠ **Still: do NOT block STEP −1 on this.** It needs physical access to the cable
+and a reboot, while STEP −1 is five minutes and may make the whole question moot.
+**Run the experiment on today's 29.93 GiB ceiling; do the iGPU switch on its own
+schedule.** The switch is now known to be cheap, which is an argument for doing
+it soon — not for doing it first.
 
 ⇒ If the display *does* move before the run, nothing in this plan breaks: Gate A
 already requires re-measuring `memory.free` at run time rather than trusting a
