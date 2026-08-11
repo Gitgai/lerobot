@@ -1,0 +1,79 @@
+# lerobot 0.6.1 -> checkpointing with bnb 8-bit optimizer state
+# TWO stacked defects: python-int step counter, and shared qmap tensors.
+# See docs/pi05_training_capability_plan_20260811.md STEP 1
+
+--- /home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/lerobot/optim/optimizers.py	2026-08-11 17:10:06.994721385 -0400
++++ /home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/lerobot/optim/optimizers.py	2026-08-11 18:04:47.277968319 -0400
+@@ -111,6 +111,30 @@
+         return torch.optim.AdamW(params, **kwargs)
+ 
+ 
++# --- PROBE PATCH: pi05 full fine-tune on a 32 GB 5090 ---------------------
++# docs/pi05_full_finetune_on_5090_plan_20260811.md
++# FP32 AdamW holds m+v at 8 bytes/param = 30.8 GiB for pi05's 4.14B, which alone
++# exceeds the card. 8-bit blockwise states cut that to ~7.7 GiB.
++@OptimizerConfig.register_subclass("adamw_8bit")
++@dataclass
++class AdamW8bitConfig(OptimizerConfig):
++    lr: float = 1e-3
++    betas: tuple[float, float] = (0.9, 0.999)
++    eps: float = 1e-8
++    weight_decay: float = 1e-2
++    grad_clip_norm: float = 10.0
++
++    def build(self, params: OptimizerParams) -> torch.optim.Optimizer:
++        import bitsandbytes as bnb
++
++        kwargs = asdict(self)
++        kwargs.pop("grad_clip_norm")
++        return bnb.optim.AdamW8bit(params, **kwargs)
++
++
++# --- END PROBE PATCH ------------------------------------------------------
++
++
+ @OptimizerConfig.register_subclass("sgd")
+ @dataclass
+ class SGDConfig(OptimizerConfig):
+@@ -314,6 +338,41 @@
+     state = dict(optim_state_dict) if optim_state_dict is not None else optimizer.state_dict()
+     param_groups = state.pop("param_groups")
+     flat_state = flatten_dict(state)
++
++    # --- PROBE PATCH: 8-bit optimizer state is not safetensors-shaped ------
++    # docs/pi05_training_capability_plan_20260811.md STEP 1
++    # TWO stacked defects stop adamw_8bit from checkpointing. Training runs
++    # fine; both fire only when WRITING.
++    #
++    #   (a) bnb.optim.AdamW8bit keeps its step counter as a python int, but
++    #       safetensors.save_file takes tensors only:
++    #         ValueError: Key `state/1/step` is invalid, expected torch.Tensor
++    #                     but received <class 'int'>
++    #   (b) its quantisation maps (qmap1/qmap2) are ONE shared tensor aliased
++    #       by every parameter's state, and safetensors refuses aliased
++    #       storage:
++    #         RuntimeError: Some tensors share memory ...
++    #
++    # Fix (a) by coercing scalars to 0-d tensors — narrow, so anything that is
++    # neither tensor nor scalar still raises rather than being swallowed.
++    # Fix (b) by cloning ONLY the duplicates, detected via storage pointer.
++    # Cloning everything would transiently double ~7.7 GiB of optimizer state;
++    # the actual aliases here are 256-element qmaps, so this is negligible.
++    _seen: dict[int, str] = {}
++    _out = {}
++    for _k, _v in flat_state.items():
++        if not torch.is_tensor(_v):
++            _v = torch.tensor(_v)
++        _ptr = _v.untyped_storage().data_ptr() if _v.numel() else None
++        if _ptr is not None:
++            if _ptr in _seen:
++                _v = _v.clone()
++            else:
++                _seen[_ptr] = _k
++        _out[_k] = _v
++    flat_state = _out
++    # --- END PROBE PATCH ---------------------------------------------------
++
+     save_file(flat_state, save_dir / OPTIMIZER_STATE)
+     write_json(param_groups, save_dir / OPTIMIZER_PARAM_GROUPS)
+ 

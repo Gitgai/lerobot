@@ -191,16 +191,36 @@ end-to-end here as of phase 1. Spending the real episodes on a hardware question
 mixes two investigations, which is the failure mode this whole lane has been
 avoiding.
 
-## Configuration
+## Configuration — ⚠ RECOMMEND bs8, NOT the bs16 maximum
 
 ```text
-batch size    the STEP 2 maximum
-steps         enough for ~96k samples - LeRobot's own pi05 example is
-              --batch_size=32 --steps=3000 (docs/source/pi05.mdx)
-              ⇒ at bs8 that is 12,000 steps; at bs1, 96,000
-save_freq     2000, and NOT save_checkpoint=false - checkpointing is the point
+batch size    8      NOT 16, deliberately. See below.
+steps         12,000 ⇒ 96,000 samples, matching LeRobot's own pi05 example
+                     (--batch_size=32 --steps=3000, docs/source/pi05.mdx)
+est. wall     ~3.5 h at 7.63 samples/s   (bs16 would be ~3.1 h)
+save_freq     2000, and NOT save_checkpoint=false - checkpointing is the point,
+                     and STEP 1 made it possible
 log_freq      100
 ```
+
+**Why bs8 rather than the bs16 that fits:**
+
+```text
+bs16  28.05 GiB training, 29.49 total  ⇒ only 2.35 GiB headroom
+bs8   25.53 GiB training, 26.97 total  ⇒ 4.87 GiB headroom
+cost of choosing bs8:  8.51 -> 7.63 samples/s, about 10%. ~25 min on a 3.5 h run.
+```
+
+⇒ **The sweep measured 30 steps. STEP 3 runs 12,000.** Allocator fragmentation
+over hours is exactly the kind of drift this run exists to detect, and starting
+2.35 GiB from the ceiling invites an OOM at hour two that destroys the run and
+answers nothing. **Buy the margin with 10% throughput.** If bs8 proves stable
+across a full run, bs16 can be used afterwards with evidence rather than hope.
+
+⚠ **bs16 is HALF LeRobot's reference batch of 32.** Effective 32 would need
+2-step gradient accumulation — the code change STEP 2 just made unnecessary for
+*fitting*. Whether it matters for *convergence* is a training-quality question
+this plan does not answer, and it should not be smuggled into a capability run.
 
 ## Instrument beyond phase 1 — long runs fail differently
 
@@ -252,21 +272,58 @@ throughput turn out to be available.
 # §B RESULTS — fill in DURING, not after
 
 ```text
-STEP 1  checkpoint fix
-  patch applied / captured    ____
-  checkpoint WRITES           ____
-  RESUME works, loss finite   ____
-  ★ VLM tensor norm  base ____ → step-10 ____   MOVED? ____
-  ⇒ closes phase 1's open weights-moved gap    ____
+STEP 1  checkpoint fix   ✅ DONE 2026-08-11 18:08
+  checkpoint WRITES           ✅ optimizer_state.safetensors, 6.2 GiB
+  RESUME works, loss finite   ✅ "Resuming at epoch 0, sample 10", 5 more steps
+                                 to step 15, loss 0.418, EXIT=0
+  ★ VLM backbone MOVED        ✅ 595/603 tensors changed vs pi05_base
+                                 (expert/proj: 208/209). Deepest movers are
+                                 vision_tower.vision_model.encoder.layers.
+                                 ⚠ 595 of 603, NOT all 603 - 8 unchanged after
+                                   10 steps, likely zero-init biases with zero
+                                   grad. Does not undermine the verdict; the
+                                   honest number is 595/603.
+  ⇒ closes phase 1's open weights-moved gap    ✅ trainable==total said the
+     backbone was ALLOWED to train; this says it DID.
 
-STEP 2  batch sweep          (samples/s, NOT steps/s)
-  bs   peak GiB   mem_gb   steps/s   samples/s   result
-   1   ______     ______   ______    ______      (phase 1: 24.74 / 22.34 / 3.22)
-   2   ______     ______   ______    ______
-   4   ______     ______   ______    ______
-   8   ______     ______   ______    ______
-  MAX BATCH THAT FITS        ____
-  grad accumulation needed?  ____   (per the rule above, not renegotiated)
+  ⚠ THE "~30 min / a few lines" ESTIMATE IN THIS PLAN WAS WRONG. It took five
+    runs. TWO stacked defects, not one:
+      (a) state/1/step is a python int, safetensors wants tensors
+      (b) qmap1/qmap2 is ONE shared tensor aliased across ~800 param states;
+          safetensors refuses aliased storage
+    plus two self-inflicted errors worth recording because both failed QUIETLY:
+      · telemetry dir created inside --output_dir -> lerobot refuses to start
+      · the VLM filter excluded any key containing "expert", but the module is
+        named `paligemma_with_expert`, so EVERY key matched and the check
+        reported "0 VLM tensors" as a naming mystery rather than an error.
+        Correct split: paligemma_with_expert.paligemma.* (VLM) vs
+        paligemma_with_expert.gemma_expert.* (action expert).
+
+STEP 2  batch sweep   ✅ DONE 2026-08-11 18:15   (samples/s, NOT steps/s)
+  bs   train peak   total     mem_gb   updt_s   samples/s
+   1   23.35 GiB    24.79     22.34    0.309    3.24
+   2   23.76        25.19     22.68    0.421    4.75
+   4   24.21        25.64     23.26    0.638    6.27
+   8   25.53        26.97     24.47    1.049    7.63
+  16   28.05        29.49     26.82    1.880    8.51   ← best throughput
+  32   OOM          —         —        —        —      ← ceiling
+
+  MAX BATCH THAT FITS        16
+  grad accumulation needed?  NO — rule was "max batch >= 8 ⇒ not needed", and
+                             16 >= 8. The second code change is OFF THE TABLE.
+
+  ⚠ THE ORIGINAL SWEEP (1/2/4/8) FOUND NO OOM — it ran out of MY LIST, not out
+    of memory. Reporting "max batch = 8" would have been an artefact of how the
+    arms were chosen. Extended to 16/32 to find the real ceiling. Worth
+    remembering as a design error: a sweep that stops at the first OOM must
+    include an arm that actually OOMs, or it has measured nothing about the top.
+
+  ★ ACTIVATIONS ARE CHEAP, THROUGHPUT SATURATES:
+      8x the batch costs only +2.18 GiB (bs1 -> bs8) with checkpointing on
+      but samples/s gains flatten: 3.24 -> 4.75 -> 6.27 -> 7.63 -> 8.51
+      bs8 -> bs16 buys just +11.5% throughput for +2.5 GiB
+  ⇒ per-sample cost ~0.31 GiB. bs32 needs ~+5 GiB over bs16: consistent with
+    the observed OOM.
 
 STEP 3  LIBERO capability run
   batch / steps / samples     ____ / ____ / ____
