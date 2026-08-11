@@ -325,7 +325,13 @@ STEP 2  batch sweep   ✅ DONE 2026-08-11 18:15   (samples/s, NOT steps/s)
   ⇒ per-sample cost ~0.31 GiB. bs32 needs ~+5 GiB over bs16: consistent with
     the observed OOM.
 
-STEP 3  LIBERO capability run
+STEP 3  LIBERO capability run   🔄 LAUNCHED 2026-08-11 18:23
+  config                      bs8 · 12,000 steps · 96,000 samples
+                              save_freq 2000 (6 checkpoints, ~15 GiB each,
+                              ~96 GiB total against 1.5 TB free)
+                              log_freq 100 · telemetry 5 s
+  baseline before start       32607 total / 1433 used / 30674 free MiB, 37 C
+  est. wall clock             ~3.5 h at 7.63 samples/s
   batch / steps / samples     ____ / ____ / ____
   wall clock                  ____
   peak VRAM  start → end      ____ → ____   drift? ____
@@ -333,6 +339,11 @@ STEP 3  LIBERO capability run
   loss  first → last          ____ → ____   finite throughout? ____
   checkpoint reloads          ____   finite actions? ____
   ⇒ VERDICT                   ____
+
+  ⚠ DISK: ~88 GiB consumed today already (231 GiB used, up from 143 GiB) by
+    datasets, pi05_base, and probe checkpoints. This run adds ~96 GiB. Old
+    probe dirs under ~/lerobot_assets/probes/ are candidates for cleanup —
+    ⛔ but deleting checkpoints is RED (§A). Ask first.
 
 STEP 4  corpus decision       DEFERRED TO OPERATOR — see above
 ```
