@@ -803,14 +803,26 @@ which is the only form of evidence that should justify that purchase.
 ```text
 date / operator            ____
 
-STEP -1  bitsandbytes on Blackwell sm_120   ⭐ gates everything
-  bitsandbytes version     ____
-  AdamW8bit step ran       PASS / FAIL
-  param actually changed   ____
-  if FAIL, the error       ____
-  VERDICT                  if FAIL: §1's 25 GB is void, persistent stays
-                           49.7 GB, answer is "not by this route". STOP HERE
-                           and record it - that IS the deliverable.
+STEP -1  bitsandbytes on Blackwell sm_120   ✅ RUN 2026-08-11 ~16:10 — PASS
+  bitsandbytes version     0.50.0
+  torch / cuda             2.7.1+cu128 / 12.8
+  device / capability      RTX 5090 / sm_120  (arch list has sm_120, compute_120)
+  AdamW8bit step ran       PASS   4096x4096 MLP, real forward/backward/step
+  param actually changed   YES    "0.weight" norm 36.955448 -> 37.103436
+                                  delta 1.480e-01
+  loss finite              YES    0.038368
+  state GENUINELY 8-bit    YES    state1: uint8, state2: uint8
+                                  (+ qmap1/qmap2 fp32, absmax1/absmax2 fp32 —
+                                   the blockwise-quantisation scaffolding)
+                                  ⇒ NOT a silent fp32 fallback. Checked
+                                    explicitly because a fallback would have
+                                    passed every other criterion.
+
+  ⇒ VERDICT: PASS. §1's ~23.14 GiB persistent arithmetic HOLDS, and the
+    experiment is worth running. The disputed GR00T precedent (§0.0) turned out
+    not to matter: 8-bit-on-Blackwell is now measured here directly rather than
+    inherited from a claim that could not be reproduced.
+  ⇒ Repro: /home/kiran/sim/pi05-fullft-probe/step_minus1_bnb_blackwell.py
 
 tree used                  fresh probe venv (§0.0 route C)
   lerobot.__version__      ____   expected 0.4.4
