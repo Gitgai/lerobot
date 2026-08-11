@@ -9,6 +9,14 @@ purchase is discussed.
 
 **Status: NOT YET ATTEMPTED.** The enabling config was described but never run.
 
+**⛔ ONE THING BLOCKS EXECUTION: the LIBERO `repo_id` in §3 is not pinned.**
+Everything else is verified and ordered. Pick it, confirm it downloads, write it
+into §3, then follow §3.5 top to bottom.
+
+> **Reading order:** §0.0 (what was verified) → §3 (the trap) → §3.5 (the
+> runbook) → §4 (the gates) → §8 (record as you go). §1/§2 are the reasoning;
+> §5/§6/§7 are only needed if Gate A fails or when the decision is made.
+
 ---
 
 ## 0.0 ⛔ VERIFIED ON DISK 2026-08-11 — read before executing §3
@@ -206,37 +214,157 @@ So this needs a small code change, not a flag:
 
 ## 3. The experiment — ONE run, not eleven phases
 
+### ⛔⛔ THE SILENT-OVERRIDE TRAP — read this or the run answers the wrong question
+
+`--optimizer.type=adamw_8bit` **is silently discarded by default.** Verified in
+the 0.4.4 tree, `lerobot/configs/train.py`:
+
+```python
+use_policy_training_preset: bool = True          # L63, the DEFAULT
+...
+elif self.use_policy_training_preset and not self.resume:   # L134
+    self.optimizer = self.policy.get_optimizer_preset()     # -> AdamWConfig, FP32
+    self.scheduler = self.policy.get_scheduler_preset()
+```
+
+⇒ Pass `--optimizer.type=adamw_8bit` alone and the preset **overwrites it after
+parsing**. The run proceeds on FP32 AdamW, OOMs at ~49.7 GB, and the conclusion
+is *"the 5090 cannot do it"* — **on a bug, not a measurement.** That is an $11K
+mistake and there is no error message.
+
+⇒ **Disabling the preset requires BOTH optimizer and scheduler**, or L132 raises
+`ValueError: Optimizer and Scheduler must be set when the policy presets are not
+used.` The preset values must therefore be reproduced by hand:
+
+```text
+optimizer  AdamWConfig(lr, betas, eps, weight_decay, grad_clip_norm)
+           <- from policy.optimizer_* fields
+scheduler  CosineDecayWithWarmupSchedulerConfig(peak_lr, decay_lr,
+             num_warmup_steps, num_decay_steps)
+```
+
+⚠ **Simplest correct route: do not fight the CLI — change the preset.** Edit
+`configuration_pi05.py::get_optimizer_preset()` to return the 8-bit config while
+the probe runs. It is one line, it cannot be silently overridden, and it is
+reverted with the same patch file. **Record which route was used in the results
+file** — they are not equivalent and the flag route is the one that fails
+quietly.
+
+### The command
+
 ```bash
+# venv: see §0.0 step 0. Assumed here to be the 0.4.4 tree.
+source /home/kiran/sim/Isaac-GR00T-n16/.venv/bin/activate
+
 lerobot-train \
-  --dataset.repo_id=<the 89 real-arm episodes or LIBERO for a clean first try> \
+  --dataset.repo_id=<LIBERO repo_id — FILL THIS IN, see below> \
   --policy.type=pi05 \
   --policy.pretrained_path=lerobot/pi05_base \
   --policy.device=cuda \
   --policy.dtype=bfloat16 \
   --policy.gradient_checkpointing=true \
   --policy.compile_model=false \
-  --policy.freeze_vision_encoder=false \      # FULL - not the 012000 recipe
-  --policy.train_expert_only=false \          # FULL
+  --policy.freeze_vision_encoder=false \
+  --policy.train_expert_only=false \
   --policy.push_to_hub=false \
-  --optimizer.type=adamw_8bit \               # the new registration
   --batch_size=1 \
-  --steps=100
+  --steps=100 \
+  --save_checkpoint=false \
+  --wandb.enable=false \
+  --output_dir=/home/kiran/lerobot_assets/probes/pi05_fullft_5090_20260811
 ```
 
-⛔ **Gradient accumulation is NOT available and there is no flag for it** —
-verified, §0.0. `Accelerator()` is constructed without
-`gradient_accumulation_steps` and `update_policy()` steps the optimizer on every
-batch. Recovering an effective batch is a **second code change**, and it should
-be landed and measured separately from the optimizer one so we know which bought
-what.
+```text
+--save_checkpoint=false   save_freq defaults to 20_000 but a checkpoint is also
+                          written at the LAST step. At 100 steps that is a
+                          ~16 GB write for a memory probe. Turn it off.
+--wandb.enable=false      no run should be logged upstream for a probe
+--output_dir              must not exist, or the run refuses to start
+```
 
-⇒ **Gate A can be attempted without it** — bs1 with no accumulation is a valid
-memory measurement, it is just not a usable training recipe. Do that first: it
-answers the $11K question with one code change instead of two.
+⛔ **`--optimizer.type` is deliberately absent above** — per the trap section,
+the 8-bit optimizer comes from the patched preset, not the CLI. If the flag
+route is taken instead, `--use_policy_training_preset=false` **and** an explicit
+`--scheduler.type` are both mandatory.
 
-Start on **LIBERO**, not the 89 real episodes. That separates a memory problem
-from a dataset problem — our real episodes still need v3.0 -> GR00T v2
-conversion and a `top` camera drop, per the tracker's parked-work list.
+### Dataset
+
+Start on **LIBERO**, not the 89 real episodes — that separates a memory problem
+from a dataset problem. Our real episodes still need v3.0 → GR00T v2 conversion
+and a `top` camera drop.
+
+⚠ **The repo_id is not yet pinned and this plan cannot run until it is.** Pick
+one, confirm it downloads, and write it back into this file. Note also that
+`REALARM_RESULT_20260808.md` needed `--rename_map front->base_0_rgb,
+wrist->left_wrist_0_rgb` because `pi05_base` uses pi0 camera naming — **check
+whether the chosen LIBERO set needs its own rename_map before blaming memory for
+a startup failure.**
+
+### Gradient accumulation is out of scope for this run
+
+⛔ Not available, no flag, verified §0.0. `Accelerator()` is built without
+`gradient_accumulation_steps` and `update_policy()` steps every batch.
+
+⇒ **Gate A does not need it.** bs1 without accumulation is a valid *memory*
+measurement even though it is not a usable *training recipe*. That is the whole
+point: it answers the $11K question with one code change instead of two.
+
+---
+
+## 3.5 RUNBOOK — the ordered steps, each with its own check
+
+**Do these in order. Every step has a check because every step has failed
+silently for someone.** Record each result in the results file (§8) as you go —
+not at the end.
+
+```text
+STEP                                    CHECK IT WORKED
+─────────────────────────────────────────────────────────────────────────────
+0  choose the tree (§0.0). Default: the  python -c "import lerobot; print(
+   0.4.4 venv at sim/Isaac-GR00T-n16       lerobot.__version__, lerobot.__file__)"
+                                          -> must print 0.4.4 and a path under
+                                             THAT venv's site-packages
+
+0b SNAPSHOT before touching anything.     the .orig files exist
+   cp optimizers.py{,.orig}               ⚠ this venv produced the 23.1 GB GR00T
+   cp configuration_pi05.py{,.orig}          result. It is not disposable.
+                                             Revert = cp back from .orig.
+
+1  pip install bitsandbytes               python -c "import bitsandbytes as b;
+                                            print(b.__version__)"
+                                          ⚠ additive, but if it drags a torch
+                                            reinstall, STOP and revert - that
+                                            breaks the GR00T track.
+
+2  add AdamW8bitConfig (§2)               grep register_subclass optimizers.py
+                                          -> adamw_8bit now listed (6 total)
+
+3  point get_optimizer_preset at it       read the file back; one line changed
+
+4  capture BOTH edits as a patch into     the .patch file exists and applies
+   projects/testproject/patches/          clean to the .orig files
+   ⛔ site-packages is NOT version
+      controlled. Skip this and the
+      work is lost on the next sync.
+
+5  smoke: 2 steps, not 100                it starts, loss prints, no OOM.
+   --steps=2                              Catches dataset/rename_map/output_dir
+                                          problems in 3 min instead of 40.
+
+6  GATE B FIRST, before the real run      trainable ~4.14B (§4). If this says
+   (it is cheap and it invalidates          693M, everything after it is void.
+    everything if it fails)
+
+7  the 100-step run + VRAM logging        §4 Gate A
+
+8  revert: cp the .orig files back        the GR00T venv trains again.
+                                          ⛔ Do not leave the venv patched.
+```
+
+⇒ **Steps 5 and 6 before step 7 is the whole discipline here.** The two ways
+this experiment produces a confidently wrong number are a silently-ignored
+optimizer (§3) and a silently-partial fine-tune (Gate B). Both are cheap to
+check and neither announces itself.
 
 ---
 
@@ -257,28 +385,64 @@ backward / optimizer step. Those need different fixes.
 **This gate is the one most likely to be skipped, and skipping it makes Gate A
 meaningless.**
 
-```text
-count trainable params   must be ~4.14B, NOT 693M and NOT adapter-only
-                         model.num_parameters(only_trainable=True)
-verify weights MOVE      hash or norm a VLM backbone tensor before training and
-                         after 100 steps. If only the action expert changed, we
-                         have reproduced the 012000 recipe by accident.
+⛔ **The snippet previously written here does not exist.**
+`num_parameters(only_trainable=True)` is a *transformers* `PreTrainedModel`
+method; LeRobot's `PreTrainedPolicy` does not define it (verified — grep in
+`lerobot/policies/pretrained.py` returns nothing). It would have raised
+`AttributeError` and, in a hurry, been skipped. Use plain PyTorch:
+
+```python
+# run against the constructed policy, before step 1 of training
+trainable = sum(p.numel() for p in policy.parameters() if p.requires_grad)
+total     = sum(p.numel() for p in policy.parameters())
+print(f"{trainable/1e9:.2f}B trainable / {total/1e9:.2f}B total")
+
+# name the VLM tensors explicitly so "the backbone" is not a guess
+vlm = [n for n, p in policy.named_parameters()
+       if p.requires_grad and "expert" not in n and "action" not in n]
+print(f"{len(vlm)} trainable non-expert tensors; first: {vlm[:3]}")
 ```
 
-Our existing 26.3 GB run passes Gate A trivially and fails Gate B. That is
-exactly the trap.
+```text
+PASS   trainable ~4.14B, total ~4.14B, ratio ~1.00, and vlm list NON-EMPTY
+FAIL   trainable ~0.69B (ratio ~0.17)  -> the 012000 recipe. Void the run.
+FAIL   vlm list EMPTY                  -> expert-only by another route
+FAIL   trainable << total but not 0.69B -> check cfg.peft is None (LoRA)
+```
+
+**Weights must also MOVE, not just require grad.** Frozen-by-optimizer is not
+the same as frozen-by-`requires_grad`:
+
+```python
+import torch
+before = policy.state_dict()[SOME_VLM_KEY].detach().float().norm().item()
+# ... 100 steps ...
+after  = policy.state_dict()[SOME_VLM_KEY].detach().float().norm().item()
+assert abs(after - before) > 0, "VLM backbone did not move - not a full FT"
+```
+
+Pick `SOME_VLM_KEY` from the `vlm` list printed above and **write the actual key
+into the results file** — "a VLM tensor" is not a record.
+
+⇒ Our existing 26.3 GB run passes Gate A trivially and fails Gate B. **That is
+exactly the trap, and Gate B is the only thing standing between it and an
+$11K decision.**
 
 ---
 
 ## 5. Escalation ladder — only if Gate A fails
 
-In increasing order of performance cost. Do NOT skip ahead; each step should be
-measured separately so we know what bought what.
+⚠ **Steps 1 and 2 of the old ladder are already spent.** The §3 baseline command
+*includes* the 8-bit optimizer — without it there is nothing to measure — and it
+*excludes* gradient accumulation deliberately. So the ladder below starts at what
+used to be step 3. Left in place with strikethrough numbering so the ordering is
+not silently re-derived later.
 
 ```text
-1. gradient accumulation      recover effective batch at bs1        ~free at
-                              ⚠ NOT free to BUILD - no flag exists    runtime
-2. 8-bit optimizer            33.1 GB -> ~8.3 GB of state           small
+~~1. gradient accumulation~~   NOT an escalation - it does not save memory at
+                               bs1, it recovers effective batch. Build it AFTER
+                               Gate A passes, if a real recipe is wanted.
+~~2. 8-bit optimizer~~         ALREADY IN THE BASELINE. 33.1 -> ~8.3 GB.
 3. paged 8-bit optimizer      bnb spills optimizer state to host    moderate
                               on pressure spikes
 4. CPU optimizer offload      m/v live in the 59 GB of system RAM;  significant
@@ -319,3 +483,38 @@ The alternative under discussion is an RTX PRO 6000 at ~$11K. The experiment
 costs a few hours. Even a negative result is worth having, because it converts
 "the docs say 80 GB" into "we measured our own configuration and it needs X" —
 which is the only form of evidence that should justify that purchase.
+
+---
+
+## 8. Results — fill this in DURING the run, not after
+
+**Empty means not run.** A blank row is information; a remembered row is not.
+
+```text
+date / operator            ____
+tree used (§0.0 A or B)    ____   lerobot.__version__ ____  __file__ ____
+8-bit route                ____   preset-patch | CLI flag  (§3 trap)
+bitsandbytes version       ____
+dataset repo_id            ____   rename_map needed? ____
+patch captured at          projects/testproject/patches/____
+
+GATE B (do first)
+  trainable / total        ____B / ____B    ratio ____
+  vlm tensor count         ____
+  SOME_VLM_KEY used        ____
+  norm before / after      ____ / ____      moved? ____
+  VERDICT                  PASS / FAIL — if FAIL, stop, everything below is void
+
+GATE A
+  peak VRAM                ____ GB   (nvidia-smi 1 Hz, vram.csv attached)
+  steps completed          ____ / 100
+  steps/s                  ____      vs 1.4 expert-only baseline = ____x
+  loss finite + decreasing ____
+  if OOM, WHERE            load / optim init / forward / backward / optim step
+
+DECISION (§6 rule, applied without renegotiating it)   ____
+venv reverted (step 8)     ____
+```
+
+⇒ **Write the decision from the §6 table as-is.** The rule was fixed before the
+result specifically so the $11K call is not re-argued once a number is in hand.
