@@ -450,3 +450,92 @@ server, same session, six runs. That makes the 44% contrast cleaner, and
 suggests the pooled figure is dragged down by runs taken under worse GPU
 conditions - which is an argument for always pairing a condition with
 same-session canonical runs rather than comparing against a stored number.
+
+---
+
+# COMBINATION TEST — 2026-08-11. Both rig defects together STILL do not reproduce the failure.
+
+Step 1 showed camera geometry halves performance but the policy keeps grasping.
+`gamma135` (Stage B, G485, n=1) scored 0/3 but also kept grasping. The rig had
+**both** defects at once — wrong camera pose AND exposure left on auto. Does the
+combination produce the perception failure the arm showed?
+
+24 runs, three arms interleaved so session drift hits all equally. One run hung
+(exit 124) and retried clean.
+
+## Result
+
+```text
+                 n     placed          mean   sd     vs canonical
+canonical        6     16/18 =  89%    2.67   0.52       —
+gammaOnly        6     11/18 =  61%    1.83   0.98    -0.83   t=1.84
+comboRG         12     17/36 =  47%    1.42   1.00    -1.25   t=3.51
+realCam (Step 1) 12    16/36 =  44%    1.33   0.98    -1.34   t=3.77
+
+per-run canonical  [3,3,2,3,3,2]
+per-run gammaOnly  [0,3,2,2,2,2]
+per-run comboRG    [0,1,1,2,1,3,3,2,2,0,1,1]
+```
+
+**The combination is no worse than the camera alone** — 47% vs 44%, well inside
+noise. Camera geometry dominates; adding a washed-out image on top adds nothing
+measurable. Not the interaction that was hypothesised.
+
+## Answer to the question: NO
+
+```text
+                     approach       gripper      lifts    places
+comboRG              1.1 cm         +1.14        yes      47%
+gammaOnly            0.5 cm         +1.16        yes      61%
+realCam              0.4-3.8 cm     +1.14        yes      44%
+REAL ARM             never          never        no       0
+```
+
+Four sim conditions now degrade performance substantially and **not one
+reproduces the hardware signature.** Every simulated failure is a COMPLETION
+failure — the policy sees the orange, reaches it, grasps it, and mishandles the
+task. The arm's failure was a PERCEPTION failure: it never engaged the object
+at all.
+
+⇒ Something about that rig is still not modelled. The two untested candidates
+are also the two that are hard to test:
+
+```text
+STALE WRIST FEED    ~13% of run-2 frames dead or frozen. Needs --frame-drop,
+                    deliberately not implemented (touches the obs path).
+BACKGROUND CLUTTER  wall, socket, pole, speaker fill much of the real ~67 deg
+                    view. NO FLAG CAN PRODUCE THIS - it is scene geometry and
+                    needs USD assets added to kitchen_with_orange.
+```
+
+## CORRECTION to a standing rig requirement
+
+`sim_to_real_preflight_protocol_20260806.md` Stage B recorded `gamma135` = 0/3,
+called it *"the one hardware-gap killer"*, and wrote a hard rig requirement on
+that basis. **That was n=1.**
+
+At n=6 here, gamma scores **61% (mean 1.83)** with one zero run, and does not
+clear significance against canonical (t=1.84). The single 0/3 on G485 looks like
+an unlucky draw from a wide distribution, not a reliable kill switch.
+
+The requirement to lock auto-exposure and auto-white-balance is still worth
+keeping — it costs nothing and the effect is real if not fatal. But it should
+not be described as *the* killer, and the exposure-left-on-auto violation on the
+2026-08-08 rig is **not** a sufficient explanation for that failure.
+
+## Unresolved: the physics instability
+
+`comboRG` produced a **106 cm "lift"** — an orange displaced further than the
+table is tall. Same signature as `gate_seed2004` (56 cm) and
+`p1_movedPlate_5001` (157 cm); roughly **6% of runs** across the session.
+
+Those runs are not scoring the policy at all. Cause unknown. Any rate computed
+without excluding them is contaminated, and nobody has looked at why it happens.
+
+## Method note worth keeping
+
+One run hung rather than crashed (`exit=124`, the `timeout` firing) and burned
+its full 50-minute budget before the retry logic could act. **The harness was
+hardened against crashes, which are loud and fast, but not against hangs, which
+are silent and slow.** A healthy 3,000-step run takes ~2.5 minutes; the 3000 s
+timeout was inherited without thought and is ~20x too generous. Use ~600 s.
