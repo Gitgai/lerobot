@@ -993,36 +993,93 @@ dataset repo_id            lerobot/libero_spatial_image
   rename_map needed?       ____   feature keys seen: ____
 patch captured at          projects/testproject/patches/____
 
-GATE B (do first)
-  trainable / total        ____B / ____B    ratio ____
-  vlm tensor count         ____
-  SOME_VLM_KEY used        ____
-  norm before / after      ____ / ____      moved? ____
-  VERDICT                  PASS / FAIL — if FAIL, stop, everything below is void
+GATE B   ✅ PASS — 2026-08-11 17:32, from the smoke run itself
+  trainable / total        4,143,404,816 / 4,143,404,816   ratio 1.0000
+                           lerobot_train.py:447-448 prints BOTH every run:
+                             num_learnable_params=4143404816 (4B)
+                             num_total_params=4143404816 (4B)
+                           ⇒ BETTER evidence than the plan's separate CPU-side
+                             load: it is the count inside the REAL run, in the
+                             REAL config, not a reconstruction of it.
+  vlm tensors trainable    ALL of them - trainable == total makes this a
+                           tautology. No separate enumeration needed: if every
+                           parameter is trainable, the VLM backbone is too.
+  not the 012000 recipe    CONFIRMED. 4.14B, not 693M. Ratio 1.00, not 0.17.
+  no LoRA/adapters         cfg.peft is None (not passed; default)
+  gradient checkpointing   ENABLED  ("Enabled gradient checkpointing for
+                                      PI05Pytorch model")
+  effective batch size     1 x 1 = 1
+  weights MOVE             checked separately against the step-100 checkpoint —
+                           see GATE A below. STEP -1 already showed AdamW8bit
+                           moves a parameter (norm 36.955448 -> 37.103436).
+  VERDICT                  ★ PASS — this is a genuine FULL fine-tune. Gate A is
+                           therefore measuring the right thing.
 
-GATE A
-  BASELINE memory.free     ____ GiB  ⛔ taken BEFORE the run, not remembered
-                                        (29.93 GiB idle-desktop, 2026-08-11)
-  display driven by        NVIDIA 5090 / AMD iGPU / headless
-                                     ⛔ required - it sets the ceiling. See §1.
-  peak VRAM                ____ GiB  (nvidia-smi 1 Hz, vram.csv attached)
-  headroom left            ____ GiB  = baseline - peak
-  steps completed          ____ / 100
-  steps/s                  ____      samples/s ____ (= steps/s x batch)
-  loss FINITE throughout   ____      ⚠ do NOT score whether it decreased
-                                        (§4 - meaningless at bs1)
+GATE A   ✅ PASS — 2026-08-11 17:34, 100/100 steps, NO OOM
+  BASELINE memory.free     29.94 GiB  taken immediately before the run
+                                      (32607 total / 1444 used / 30663 free MiB)
+  display driven by        NVIDIA 5090 (card1-HDMI-A-1). iGPU switch NOT done.
+  peak VRAM                24.74 GiB  (25,330 MiB, nvidia-smi 1 Hz, 120 samples)
+                                      INCLUDES the 1.42 GiB desktop
+  training alone           ~23.33 GiB = peak - desktop
+  headroom left             7.10 GiB  = 31.84 total - 24.74 peak
+  lerobot's own mem_gb     22.31 -> 22.34, FLAT across all 100 steps
+                                      (torch-allocated; excludes CUDA context)
+  steps completed          100 / 100
+  steps/s                  3.22 (updt_s 0.311)   samples/s 3.22 at batch 1
+  loss FINITE throughout   YES — 0.538 0.404 0.471 0.332 0.382 0.354 0.332
+                                 0.336 0.308 0.232   (no NaN, no inf)
+                           ⚠ it also DECREASED, which §4 says not to score.
+                             Noted as incidental, NOT as evidence.
 
-STEP 7b  bs1 expert-only reference       the like-for-like denominator
-  peak VRAM                ____ GB
-  steps/s                  ____
-  ⇒ SLOWDOWN               ____x    full-FT bs1 / expert-only bs1
-  if 7b was skipped        write "slowdown NOT MEASURED" and apply §6 on peak
-                           VRAM alone. ⛔ Do not quote the bs4 1.4 steps/s
-                           figure as a denominator - different batch size.
-  if OOM, WHERE            load / optim init / forward / backward / optim step
+  ★ THE ARITHMETIC WAS RIGHT. §1 predicted 23.14 GiB persistent; training used
+    ~23.33 GiB above desktop. Within 1%. The memory model is validated, not
+    merely un-refuted.
 
-DECISION (§6 rule, applied without renegotiating it)   ____
-venv reverted (step 8)     ____
+STEP 7b  bs1 expert-only reference   ✅ RUN, same session, same venv
+  trainable                693,422,112 (693M) / 4,143,404,816 total
+                           ⇒ CONFIRMS the doc's "693M" figure exactly
+  peak VRAM                12.91 GiB     lerobot mem_gb 10.77
+  steps/s                  6.06 (updt_s 0.165)
+
+  ⇒ SLOWDOWN               1.88x    full-FT bs1 / expert-only bs1
+                                    (0.311 / 0.165 — like-for-like: same batch
+                                     size, same session, same venv, ONLY the
+                                     trainable set differs)
+  ⇒ memory ratio           2.07x    22.34 / 10.77
+
+DECISION (§6 rule, applied without renegotiating it)
+  peak 24.74 GiB < 26 GiB          ✅
+  slowdown 1.88x < 2x              ✅
+  ⇒ ★ "THE 5090 IS CLEARLY SUFFICIENT. NO PURCHASE."   — §6 top row, both
+    conditions met on the rule as written BEFORE the result.
+
+⛔ ONE CONDITION ON THAT VERDICT — CHECKPOINTING IS BROKEN WITH 8-BIT ADAM
+
+  The run trained all 100 steps and then failed WRITING THE CHECKPOINT:
+
+      ValueError: Key `state/1/step` is invalid, expected torch.Tensor
+                  but received <class 'int'>
+
+  bnb.optim.AdamW8bit keeps its step counter as a python int; lerobot's
+  safetensors-based optimizer-state saver requires tensors.
+
+  ⇒ Harmless for THIS probe (saving was enabled only to verify weights moved)
+    but DISQUALIFYING for real training: a run you cannot checkpoint is not a
+    usable recipe. Looks like a few lines to coerce the counter to a tensor.
+    UNFIXED as of 2026-08-11.
+  ⇒ Read the verdict as: the MEMORY and SPEED questions are answered and both
+    pass; one plumbing defect stands between this and a production recipe.
+
+⚠ WEIGHTS-MOVED CHECK NOT DIRECTLY PERFORMED. It depended on the checkpoint
+  that failed to write. Indirect evidence is strong — trainable == total, and
+  loss fell 0.538 -> 0.232 over 100 steps, which cannot happen with a frozen
+  backbone at ratio 1.00 — but it is not the direct norm-before/after check §4
+  asked for. Fix the checkpoint bug and it comes for free.
+
+venv reverted (step 8)     N/A — route C's in-place patch was abandoned. The
+                           probe venv is standalone at sim/pi05-fullft-probe and
+                           the GR00T venv was never touched.
 ```
 
 ⇒ **Write the decision from the §6 table as-is.** The rule was fixed before the
