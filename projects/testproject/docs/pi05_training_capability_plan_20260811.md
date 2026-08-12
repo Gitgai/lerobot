@@ -584,10 +584,50 @@ can interpret.
 from            lerobot/pi05_base       (same start as the 12k run)
 batch size      8
 steps           24,000  ⇒ 192,000 examples = EXACTLY the reference's data volume
-save_freq       4,000   (6 checkpoints — extends the learning curve to 8 points)
+save_freq       2,000   12 checkpoints, ~15 GiB each ≈ 180 GiB
+                        ⇒ operator's call: fine-grained STOP/RESUME points, and
+                          it extends the learning curve to 12 points for free
 telemetry       gpu_monitor.sh at 5 s
 est. wall       ~6.8 h at 7.63 samples/s
 ```
+
+### Storage — ⛔ I WAS WRONG ABOUT THE SECOND DRIVE. Retracted and measured.
+
+```text
+/dev/nvme0n1p2   1.8 T   1.4 T free   ext4    /
+/dev/nvme1n1p2   3.7 T   3.7 T free   ntfs3   /run/media/kiran/New Volume
+```
+
+**An earlier revision said: "do NOT put training output there — NTFS-over-FUSE
+handles symlinks poorly and is markedly slower." BOTH CLAIMS ARE FALSE.**
+
+```text
+CLAIM                          MEASURED
+mounted via ntfs-3g (FUSE)     NO - mounted with `ntfs3`, the IN-KERNEL driver
+                               (Linux 5.15+). Options: rw,acl,uid=1000,gid=1000,
+                               prealloc,uhelper=udisks2
+symlinks fail                  NO - `ln -s` works. lrwxrwxrwx+ created fine.
+                               lerobot's checkpoints/last would be fine.
+markedly slower                NO - it is FASTER:
+                                 NTFS  7.8 GB/s
+                                 ext4  5.3 GB/s     (dd 1 GiB, oflag=direct)
+                               Almost certainly a newer/faster NVMe than the
+                               boot drive; not a filesystem effect.
+```
+
+⚠ **THE ONE GENUINE CAVEAT** — and it is operational, not performance:
+the mount lives under `/run/media/kiran/` via **udisks2**, i.e. it is
+auto-mounted on desktop login, **not at boot**. A training job started by cron,
+systemd, or an SSH session before login would find the path missing and fail.
+⇒ Add an `/etc/fstab` entry before putting anything long-running there.
+
+**Why is it NTFS at all?** `nvme1n1p1` is a 16 MB partition with no filesystem —
+the signature of a Microsoft Reserved Partition. The disk was almost certainly
+partitioned by Windows or shipped preformatted. *(Inference from the layout, not
+verified.)*
+
+⇒ **Either drive works for this run.** Root has 1.4 TB free, ample for the
+~180 GiB of checkpoints.
 
 ## What it can and cannot settle
 
