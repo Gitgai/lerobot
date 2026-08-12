@@ -417,6 +417,70 @@ licence, STOP** (§A).
 
 ---
 
+# STEP 3c — HOW MUCH DOES FULL FINE-TUNING FORGET?  `[~10 min]` 🟢
+
+**Operator's question: "would it learn to pick oranges, fold laundry and
+whatever LIBERO is doing? Or will it forget one task while learning another?"**
+This turns the textbook answer into a number measured on this hardware.
+
+## Why there is reason to expect forgetting — we already saw the mechanism
+
+STEP 1's weights check: **595/603 VLM BACKBONE tensors changed.** Full
+fine-tuning moved the vision-language backbone itself, not just the action head.
+That backbone is where general world understanding lives, so reshaping it toward
+simulated tabletop bowls is exactly the mechanism of catastrophic forgetting.
+
+⇒ **This also reframes the 012000 recipe.** `train_expert_only=true` +
+`freeze_vision_encoder=true` (693M) is precisely the ANTI-FORGETTING
+configuration — it preserves the VLM and adapts only the action head:
+
+```text
+expert-only  693M trainable   VLM PRESERVED     less adaptation capacity
+full FT     4.14B trainable   VLM OVERWRITTEN   max adaptation, max forgetting
+```
+
+We spent the day proving the 5090 *can* do the second. Whether you *want* it
+depends on whether the goal is a specialist or a generalist.
+
+## The measurement
+
+We trained on **libero_spatial ONLY** (96k examples). LIBERO ships four suites.
+Evaluating the same checkpoint on suites it never saw measures transfer directly.
+
+```text
+suite            trained on?   what a score means
+libero_spatial   YES           our 70% - the in-distribution reference
+libero_object    no            different OBJECTS, same robot/cameras/scene type
+libero_goal      no            different GOALS
+libero_10        no            long-horizon; hardest, expect least transfer
+```
+
+⚠ **Confound to state up front: we do not have a "before" number.** The honest
+baseline for "did it forget?" would be `pi05_base` evaluated on `libero_object`
+*before* our training — but `pi05_base` has the wrong camera keys and action
+dims for LIBERO, and `pi05_libero_base` scores **0%** on everything (STEP 3b.0).
+⇒ **So this measures TRANSFER, not FORGETTING.** Both start from zero
+competence, so any score above 0 on an unseen suite is capability our training
+*created* and that generalised — not capability it destroyed. Do not report this
+as a forgetting number.
+
+## Interpretation, written before the result
+
+```text
+object/goal ≈ spatial's 70%   the model learned LIBERO-general manipulation, not
+                              ten memorised routines. Encouraging for transfer.
+object/goal well below 70%    it specialised hard to the trained suite. Supports
+                              the forgetting concern and argues for expert-only
+                              / LoRA when generality matters.
+object/goal ≈ 0%              near-total specialisation. Strongest possible
+                              argument against sequential full fine-tuning.
+```
+
+⚠ n=40 per suite ⇒ roughly ±14 points at 95% confidence. Read gaps of 20+
+points, not 5.
+
+---
+
 # STEP 4 — our own data  🔴 NEEDS A HUMAN DECISION
 
 **Do not start this unattended.** Not for technical reasons — the corpus
