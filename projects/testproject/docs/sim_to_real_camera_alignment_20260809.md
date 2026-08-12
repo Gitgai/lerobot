@@ -1347,3 +1347,74 @@ independent, individually-serious defects running at once:
 ```
 
 Fixing the mount without fixing the link would leave the second one intact.
+
+---
+
+# CORRECTION — 2026-08-12. The Aug 8 front camera was RIGHT. My advice was wrong.
+
+Asked whether N1.6 was fine-tuned on the 89 real episodes. Answer: **no** — and
+checking exposed a bad recommendation.
+
+## What the checkpoint actually trained on
+
+`experiment_cfg/conf.yaml` of the served checkpoint:
+
+```text
+  dataset_paths:   dataset/so101_pick_orange_v2.1
+  dataset_type:    physical_embodiment          <- REAL arm data
+  embodiment_tag:  new_embodiment
+  max_steps: 10000   global_batch_size: 32   episode_sampling_rate: 0.1
+```
+
+Two things follow:
+
+1. **The directory name `gr00t_n16_leisaac_orange` is MISLEADING.** "leisaac" is
+   the simulator; the checkpoint was fine-tuned on REAL SO-101 data.
+2. **`so101_pick_orange_v2.1` is not on this machine at all.** The 89-episode set
+   that IS here (`so101_orange_49_plus_grasp_pick_move_focus`, 89 eps / 40,712
+   frames / 3 cameras) has **never been used to fine-tune N1.6**.
+
+## The recommendation that was wrong
+
+The 89-episode dataset carries THREE cameras — `front`, `top`, `wrist` — while
+the policy consumes only two. Extracting frames:
+
+```text
+  observation.images.front   LOW, SIDE-ON  - arm from the side, table edge-on, wall behind
+  observation.images.top     overhead
+  observation.images.wrist   on the gripper
+```
+
+`docs/evidence_aug8/front_channel_truth.jpg` puts the training `front` next to
+the Aug 8 client `front`: **same low side-on geometry, same room, same wall, same
+stand.** The laptop webcam was feeding the `front` channel a view that matches
+the training distribution.
+
+⇒ **My advice to route the C270 into `front` was WRONG.** It would have replaced
+  an in-distribution view with an out-of-distribution overhead one. The overhead
+  view belongs in `top`, a channel this policy does not consume.
+
+⇒ The Aug 8 front camera was **not** a defect. Remove it from the fix list.
+
+## What this does to the 89% -> 44% result
+
+That number measured sensitivity to moving the SIM camera. But sim's `front` is
+overhead while the TRAINING `front` is side-on — so sim's canonical view was
+already out of distribution, and the realCam condition moved it TOWARD the real
+geometry, not away. The 45-point drop therefore does not mean "the real rig's
+camera pose is wrong". It means the sim scene is easier from overhead.
+
+**The whole "front camera geometry" thread rested on assuming sim's camera pose
+was the training pose. It was not.** The C270 pose battery is accordingly
+withdrawn as the wrong question.
+
+## What SURVIVES this correction
+
+```text
+STANDS   wrist off-workspace: 83% -> 0%, p=2.9e-07. The wrist camera is on the
+         gripper in BOTH sim and training data, so its geometry IS comparable.
+STANDS   arm frozen 73.5% of the Aug 8 run (measured from frame mtimes).
+STANDS   wrist blur / dark room / dead proxy - all real, all measured.
+FALLS    "the front camera was the wrong one" - it was the right one.
+FALLS    the 44%->89% lever as a claim about hardware.
+```
