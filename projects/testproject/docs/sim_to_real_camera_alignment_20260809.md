@@ -1288,3 +1288,62 @@ no gripper, no table, no target in any of them.
 board and cable. The defensible claim is narrower and is what the sim battery
 tested: **from c0077 the workspace is not in the wrist view at all**, for the
 final 66 of 143 chunks (46% of the run). The plate measurement gives 0/66.
+
+---
+
+# T0 MEASURED — from the Aug 8 frames' own timestamps, 2026-08-12
+
+Asked whether more images existed from the failed run. They do not: the arm
+machine holds exactly one set, `~/run_frames`, 286 frames, checksum-identical to
+the local copy. c0000..c0142, nothing else on the host.
+
+But the file mtimes are a record of the loop, and nobody had read them.
+
+```text
+  143 chunks, first -> last = 143 s
+  mean per chunk           = 1.007 s
+  gap histogram: 0s x4   1s x133   2s x5      <- metronomic
+```
+
+Combined with the client executing `actions[:8]` at 30 Hz:
+
+```text
+  per chunk              1007 ms
+  arm actually moving     267 ms    (8 actions @ 30 Hz)
+  blocked on the policy   740 ms
+  DUTY CYCLE              26.5% moving, 73.5% FROZEN
+```
+
+**The arm spent 73.5% of the Aug 8 run motionless, waiting for New Jersey.**
+
+This is T0. It was called unmeasured on 2026-08-11 and treated as blocking; it
+was in the file timestamps the whole time. The earlier estimate (21% moving at a
+1.0 s round trip) was close — the real figure is 26.5%.
+
+## Where the 740 ms goes
+
+```text
+  ping RTT to Pune, measured today       331 ms
+  remainder                              409 ms   <- payload transfer
+```
+
+409 ms for 1.76 MiB uncompressed ≈ 4.3 MiB/s. Consistent with the π0.5 finding
+that the tunnel, not the uplink, was the bottleneck — and with the fact that the
+N1.6 client sends raw `np.save` arrays with no compression.
+
+⇒ **JPEG would remove most of the 409 ms.** π0.5 measured 14.6x on this link.
+⇒ B12 is now exactly parameterised: 740 ms at 30 Hz = **`--policy-stall 22`**.
+  No longer a guess.
+
+## Standing against the wrist result
+
+The wrist battery proved a misaimed wrist camera is SUFFICIENT to take the task
+from 83% to 0%. This does not displace that. It does mean the Aug 8 run had two
+independent, individually-serious defects running at once:
+
+```text
+  wrist camera off the workspace for 46% of the run   -> sufficient alone (measured)
+  arm frozen 73.5% of the run                         -> untested in sim (B12 exists)
+```
+
+Fixing the mount without fixing the link would leave the second one intact.
