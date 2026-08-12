@@ -1115,3 +1115,72 @@ varying with motion, which is exactly this and NOT fixed misfocus.
 **RTT NJ -> Pune over ZeroTier: min 249 ms, mean 331 ms, max 568 ms (n=4).**
 This is T0, previously unmeasured. At 30 Hz that is ~10 env-steps of dead time
 per policy call, before the 1.76 MiB uncompressed payload transfer is counted.
+
+---
+
+# TOP CAMERA (Logitech C270) — 2026-08-12. It works, and it is the right camera.
+
+## CORRECTION: "the C270 returns pure black" was WRONG
+
+That conclusion came from captures that never gave the sensor time to wake up.
+Raw YUYV straight off the device settles it:
+
+```text
+  frame  0: luma min=16 max=16  mean=16.00   std=0.00   distinct=1     <- uniform black
+  frame 19: luma min=16 max=235 mean=169.19  std=33.16  distinct=206   <- real image
+```
+
+**The C270 needs ~20-60 warm-up frames.** Every earlier capture used
+`ffmpeg -frames:v 12` and kept a frame from inside the blank window. The camera
+was never faulty.
+
+⇒ **This is a trap for the client too.** Anything that opens the C270 and starts
+immediately gets black frames. Whatever consumes it must discard warm-up frames.
+
+With a proper 60-frame warm-up: **sharpness 304.9, brightness 73.2, std 49.3** —
+sharper than the Aug 8 front camera (median 183) and well exposed.
+
+## It is the geometry match for sim's `front`
+
+`docs/evidence_aug8/topcam_warm.jpg` is a steep overhead view: table filling the
+frame, arm seen from above. That is sim's `front` camera (0.60 m up, 71 deg
+depression), NOT the laptop webcam's low side-on view that fed the channel on
+Aug 8.
+
+⇒ Route the C270 into the policy's `front` channel. This is the 89%-vs-44% lever
+and it is a config change, not a hardware move.
+
+## Its controls are all wrong — the Stage 0b readback, finally taken
+
+```text
+  white_balance_automatic       1  AUTO      <- rig spec (2) says LOCK. never done.
+  auto_exposure                 3  AUTO      <- Aperture Priority. never locked.
+  exposure_dynamic_framerate    1  ON        <- camera SILENTLY DROPS FPS in low light
+  power_line_frequency         60 Hz         <- INDIA IS 50 Hz -> flicker banding
+  white_balance_temperature     inactive     (masked by auto WB)
+  exposure_time_absolute        inactive     (masked by auto exposure)
+```
+
+Two of these are worse than cosmetic:
+
+**`exposure_dynamic_framerate`** — the stream was measured at **12.36 fps, not
+30**. The camera silently more than halves its rate in dim light. Every staleness
+assumption in this investigation used 30 Hz. At 12.36 fps each frame is 81 ms
+old, not 33 ms.
+
+**`power_line_frequency=60`** in a 50 Hz country produces rolling brightness
+bands under artificial lighting. It is a one-line fix and nobody has ever set it.
+
+## Actions
+
+```text
+1. power_line_frequency = 1 (50 Hz)      one line, removes flicker banding
+2. auto_exposure = 1 + exposure_time_absolute = fixed
+3. white_balance_automatic = 0 + white_balance_temperature = fixed
+4. exposure_dynamic_framerate = 0        stop the silent 30 -> 12 fps collapse
+5. discard >=30 warm-up frames on open   or the first frames are black
+6. route C270 -> the policy's `front` channel
+```
+
+Same caveat as the wrist: locking exposure only works once the room has enough
+light. Set these AFTER the lighting is fixed, not before.
