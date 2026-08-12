@@ -721,9 +721,25 @@ STEP 2  batch sweep   ✅ DONE 2026-08-11 18:15   (samples/s, NOT steps/s)
   16   28.05        29.49     26.82    1.880    8.51   ← best throughput
   32   OOM          —         —        —        —      ← ceiling
 
-  MAX BATCH THAT FITS        16
+  MAX BATCH THAT FITS        16   ⚠ ON A FRESH RUN. See the resume caveat below.
   grad accumulation needed?  NO — rule was "max batch >= 8 ⇒ not needed", and
                              16 >= 8. The second code change is OFF THE TABLE.
+
+  ⛔ RESUME COSTS ~1 GiB MORE THAN A FRESH RUN — discovered 2026-08-12 only
+    because the operator paused and continued STEP 3d:
+
+        bs8 FRESH    peak 27.11 GiB
+        bs8 RESUMED  peak 28.15 GiB      +1.04 GiB
+
+    Loading optimizer state from a 6.2 GiB checkpoint leaves a larger allocation
+    footprint than building it from scratch.
+
+    ⇒ **"bs16 fits" is true for a FRESH run and MARGINAL for a resumed one.**
+      bs16 peaked at 28.05 GiB fresh; +1 GiB of resume overhead puts it near
+      29 GiB with under 3 GiB spare. The sweep could not have caught this — it
+      never resumed anything.
+    ⇒ If long runs need stop/resume (they do — that is why save_freq is 2000),
+      treat bs8 as the practical ceiling, not bs16.
 
   ⚠ THE ORIGINAL SWEEP (1/2/4/8) FOUND NO OOM — it ran out of MY LIST, not out
     of memory. Reporting "max batch = 8" would have been an artefact of how the
