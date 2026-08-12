@@ -326,20 +326,64 @@ it is generic boilerplate, identical in framing to `pi05_base`. The LIBERO-shape
 config is strong evidence but **config is not weights**. Do not assert it was
 pre-trained on LIBERO without measuring.
 
-### ⇒ STEP 3b.0 — settle it cheaply FIRST: zero-shot eval of pi05_libero_base
+### ⇒ STEP 3b.0 — RUN, and it settled the question: **0.0%**
 
 ```text
-eval pi05_libero_base on LIBERO Spatial with NO training. ~3 min, no GPU-hours.
-  scores HIGH (say >70%)   it WAS trained on LIBERO ⇒ the reference had a head
-                           start we did not, and our 70% from a generic base is
-                           not a quality failure at all
-  scores NEAR ZERO         it is only CONFIG-adapted ⇒ the reference's advantage
-                           is smaller than assumed and the gap needs another
-                           explanation
+pi05_libero_base, ZERO-SHOT on LIBERO Spatial, no training:  0.0%  (0/40)
 ```
 
-⇒ Either way it **calibrates our 70%**, and it costs nothing. Do it before
-spending 1.7 h on a matched fine-tune.
+⇒ **`pi05_libero_base` was NOT trained to solve LIBERO.** It is a base model
+*shaped* for LIBERO's observation and action space (`image`/`image2`, state[8],
+action[7] = Franka Panda 7-DoF + gripper) with **no task competence at all**.
+"libero base" means *base model FOR libero*, not *trained ON libero*.
+
+⇒ **My earlier claim that the reference had a capability head start is WRONG and
+is retracted.** Both runs started from zero ability. Config was not weights, and
+the zero-shot test was the right way to find that out — 3 minutes, no training.
+
+★ **AND IT CALIBRATES OUR RESULT: our pipeline took a model from 0% → 70%.**
+That is entirely our training, and it validates the whole stack end to end.
+
+### ⛔ BUT THE REAL CONFOUND IS DATA VOLUME, AND I HAD THE ARITHMETIC WRONG
+
+```text
+batch size          how many examples the model sees before ONE weight update
+step                one weight update
+examples seen       steps × batch size          ← the number that matters
+
+reference    6,000 steps × batch 32  =  192,000 examples   → 97.0%
+ours        12,000 steps × batch  8  =   96,000 examples   → 70.0%
+```
+
+⇒ We did **more updates** but each saw far fewer examples. **They trained on
+TWICE the data.** That is a far more mundane explanation for the 27-point gap
+than any of our memory levers, and it must be controlled before quantisation is
+even discussed.
+
+⚠ **My planned "matched run: 6k steps at bs8" was wrong** — that is 48,000
+examples, a **QUARTER** of the reference. It would have scored badly and proved
+nothing, while looking like evidence against our levers.
+
+### ⇒ A MATCHED RUN MUST MATCH EXAMPLES, NOT STEPS
+
+```text
+option              steps × batch   examples   est. wall   notes
+match at bs8        24,000 ×  8     192,000    ~7.0 h      true control; batch
+                                                           stays the variable
+                                                           under test
+match at bs16       12,000 × 16     192,000    ~6.3 h      same data, batch
+                                                           closer to the
+                                                           reference's 32; bs16
+                                                           measured to fit
+cheap probe bs8      6,000 ×  8      48,000    ~1.7 h      NOT comparable to
+                                                           97%; shows the curve
+                                                           only
+```
+
+⚠ **The capability question is ALREADY ANSWERED — yes.** STEP 3 proved the 5090
+trains π0.5 sustained and stable; 0%→70% proved the pipeline produces a working
+policy. A matched run answers only the narrower follow-up: *did the memory
+levers cost accuracy?* Scope it accordingly; it is not on the critical path.
 
 ## Corrected decision rule — for the MATCHED run
 
@@ -508,7 +552,18 @@ STEP 3  LIBERO capability run   🔄 LAUNCHED 2026-08-11 18:23
     probe dirs under ~/lerobot_assets/probes/ are candidates for cleanup —
     ⛔ but deleting checkpoints is RED (§A). Ask first.
 
+STEP 3b.0  zero-shot pi05_libero_base   ✅ RUN 2026-08-11 22:2x
+  LIBERO Spatial, no training  0.0%  (0/40)
+  ⇒ NOT trained on LIBERO. Base model SHAPED for LIBERO's spaces only.
+  ⇒ retracts the "reference had a head start" claim
+  ⇒ ★ our pipeline took a model 0% → 70%. That is entirely our training.
+
 STEP 3b  quality — did the levers cost anything?
+  ⛔ NOT ANSWERED. The 70% vs 97% comparison is confounded by DATA VOLUME:
+     reference 6,000 × 32 = 192,000 examples
+     ours     12,000 ×  8 =  96,000 examples   ← HALF
+     A matched run must equalise EXAMPLES, not steps. Untaken; ~6-7 h.
+     Not on the critical path — the capability question is already answered.
   precision layout measured   BF16 3.610B (87.1%) / F32 0.534B (12.9%)
                               ⇒ NOT naive bf16; the sensitive 13% stays fp32
   fp32 master weights         NONE — bf16 tensors ARE the weights (confirmed:

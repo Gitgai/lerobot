@@ -1,0 +1,5 @@
+# pi05_libero_base ZERO-SHOT on LIBERO Spatial (no training) — 2026-08-11
+# Settles whether the 97% reference had a capability head start. It did not.
+'avg_sum_reward': 0.0
+'pc_success': 0.0
+'n_episodes': 40
