@@ -654,6 +654,71 @@ naive extrapolation of the decelerating curve  ≈ 78%
 
 ---
 
+## ✅ RESULT 2026-08-12 — **85.0%**. Prediction beaten; the gap collapses to 12 points.
+
+```text
+  step   examples   24k-sched   12k-sched
+  4,000    32,000      25.0%      27.5%
+  8,000    64,000      40.0%      57.5%
+ 12,000    96,000      60.0%      70.0%   ← matched point, schedule differs ONLY
+ 16,000   128,000      65.0%         —
+ 20,000   160,000      77.5%         —
+ 24,000   192,000    ★ 85.0%        —
+
+reference (LeRobot, bs32 × 6k = 192,000 examples)   97.0%
+ours      (bs8  × 24k = 192,000 examples)           85.0%
+⇒ gap                                               12.0 points
+⇒ gap at the OLD unmatched comparison (96k)         27.0 points
+```
+
+### ★ DATA VOLUME WAS MOST OF THE GAP — 27 points → 12
+
+Doubling the examples took us 70% → 85%. **The original 27-point deficit was
+majority a data-volume artefact of my own arithmetic error, not evidence against
+8-bit Adam or bf16.** Had we stopped at the unmatched comparison and blamed
+quantisation, we would have been wrong by more than half.
+
+### ★ THE PREDICTION WAS BEATEN, AND THE REASONING BEHIND IT HELD
+
+Predicted ~78% by naive extrapolation of the decelerating curve, while arguing
+the deceleration was **schedule-induced rather than saturation**. It landed at
+**85%** — above the extrapolation, exactly as that reasoning implied. The curve
+is also **still rising at 24k** (+7.5 in the final 4,000 steps), so it has not
+saturated even now.
+
+### ★ THE SCHEDULE COMPARISON AT STEP 12,000 — a clean single-variable result
+
+Same data, same batch, same starting weights. Only the cosine length differs:
+
+```text
+12k-schedule (finished, LR decayed to 2.7e-6)   70.0%
+24k-schedule (mid-flight, LR still 1.1e-5)      60.0%
+```
+
+⇒ **At a given step, a schedule that is FINISHING beats one that is mid-flight** —
+by 10 points. The decayed run has "landed"; the other is still moving. But the
+longer schedule ends far higher (85% vs 70%).
+
+⚠ **Consequence for stopping early: do NOT read a mid-run checkpoint as
+representative.** A 24k run halted at 12k scores worse than a 12k run that
+completed, at identical cost. **Match the schedule to the budget you intend to
+spend.**
+
+### What is left, and what it is worth
+
+```text
+REMAINING CONFOUND   batch 8 (ours) vs 32 (reference). Still one variable.
+IS 12 POINTS REAL?   n=40 ⇒ 85% has a 95% CI of roughly [70%, 94%]. 97% sits
+                     outside it, so probably real — but marginal, and a larger n
+                     would be needed to call it confidently.
+TO ISOLATE THE LEVERS a bs16 run with a scaled LR, matched data. ~6 h.
+⇒ VERDICT ON THE ORIGINAL QUESTION: the memory levers cost AT MOST ~12 points,
+  and plausibly less once batch size is accounted for. They did NOT cost the 27
+  points the first comparison suggested.
+```
+
+---
+
 # STEP 4 — our own data  🔴 NEEDS A HUMAN DECISION
 
 **Do not start this unattended.** Not for technical reasons — the corpus

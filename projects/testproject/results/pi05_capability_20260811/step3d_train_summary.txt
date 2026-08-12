@@ -1,0 +1,15 @@
+INFO 2026-08-12 00:30:01 ot_train.py:447 num_learnable_params=4143404816 (4B)
+INFO 2026-08-12 01:05:21 ot_train.py:687 Checkpoint policy after step 2000
+INFO 2026-08-12 01:40:43 ot_train.py:687 Checkpoint policy after step 4000
+INFO 2026-08-12 02:16:08 ot_train.py:687 Checkpoint policy after step 6000
+INFO 2026-08-12 02:51:33 ot_train.py:687 Checkpoint policy after step 8000
+INFO 2026-08-12 03:26:57 ot_train.py:687 Checkpoint policy after step 10000
+INFO 2026-08-12 04:02:22 ot_train.py:687 Checkpoint policy after step 12000
+INFO 2026-08-12 04:37:46 ot_train.py:687 Checkpoint policy after step 14000
+INFO 2026-08-12 12:40:25 ot_train.py:489 Resuming data order at epoch 2, sample 6048
+INFO 2026-08-12 13:16:40 ot_train.py:687 Checkpoint policy after step 16000
+INFO 2026-08-12 13:54:21 ot_train.py:687 Checkpoint policy after step 18000
+INFO 2026-08-12 14:31:09 ot_train.py:687 Checkpoint policy after step 20000
+INFO 2026-08-12 15:07:52 ot_train.py:687 Checkpoint policy after step 22000
+INFO 2026-08-12 15:44:50 ot_train.py:687 Checkpoint policy after step 24000
+INFO 2026-08-12 15:44:55 ot_train.py:770 End of training

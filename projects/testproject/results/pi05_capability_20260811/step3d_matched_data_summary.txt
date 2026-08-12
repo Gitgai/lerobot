@@ -1,0 +1,17 @@
+# STEP 3d — matched-data run. bs8 x 24,000 steps = 192,000 examples.
+# Two runs, same data and batch, differing ONLY in cosine LR schedule length.
+
+    step   examples   24k-sched   12k-sched
+    4000      32000       25.0%       27.5%
+    8000      64000       40.0%       57.5%
+   12000      96000       60.0%       70.0%
+   16000     128000       65.0%           -
+   20000     160000       77.5%           -
+   24000     192000       85.0%           -
+
+reference (LeRobot bs32 x 6k = 192,000 examples)  97.0%
+ours      (bs8 x 24k        = 192,000 examples)   85.0%   gap 12.0 pts
+gap at the earlier UNMATCHED comparison (96k)             27.0 pts
+
+# n=40 per eval; 85% has a 95% CI of roughly [70%, 94%].
+# Remaining confound: batch 8 vs the reference's 32.
