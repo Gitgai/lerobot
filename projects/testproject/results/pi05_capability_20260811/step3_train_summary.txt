@@ -1,0 +1,10 @@
+INFO 2026-08-11 18:24:25 ot_train.py:446 Effective batch size: 8 x 1 = 8
+INFO 2026-08-11 18:24:25 ot_train.py:447 num_learnable_params=4143404816 (4B)
+INFO 2026-08-11 18:24:25 ot_train.py:448 num_total_params=4143404816 (4B)
+INFO 2026-08-11 18:58:27 ot_train.py:687 Checkpoint policy after step 2000
+INFO 2026-08-11 19:32:35 ot_train.py:687 Checkpoint policy after step 4000
+INFO 2026-08-11 20:05:46 ot_train.py:687 Checkpoint policy after step 6000
+INFO 2026-08-11 20:38:55 ot_train.py:687 Checkpoint policy after step 8000
+INFO 2026-08-11 21:11:50 ot_train.py:687 Checkpoint policy after step 10000
+INFO 2026-08-11 21:44:59 ot_train.py:687 Checkpoint policy after step 12000
+INFO 2026-08-11 21:45:03 ot_train.py:770 End of training

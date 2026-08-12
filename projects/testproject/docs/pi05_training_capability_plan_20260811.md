@@ -297,19 +297,71 @@ LeRobot publishes **97.0% on Libero Spatial** for `pi05_base` on this dataset
 lerobot-eval --policy.path=<step-12000 checkpoint> ...   # LIBERO Spatial
 ```
 
-## Decision rule — written before the result
+## ⛔ THE RULE BELOW WAS ANCHORED TO THE WRONG BASELINE — corrected 2026-08-11
+
+**First result: 70.0% (28/40) from `pi05_base` + 12k steps @ bs8. Against 97.0%
+that looks like a 27-point gap. IT IS NOT A VALID COMPARISON.**
+
+`docs/source/pi05.mdx` says: *"we finetuned **the libero base model** for an
+additional 6k steps"*. There is a separate Hub checkpoint,
+`lerobot/pi05_libero_base`, and its config is LIBERO-shaped where `pi05_base` is
+generic:
 
 ```text
+pi05_base         3 cameras: base_0_rgb, left_wrist_0_rgb, right_wrist_0_rgb
+                  state[32]  action[32]        ← generic pi0 space
+pi05_libero_base  2 cameras: image, image2     ← EXACTLY the LIBERO env keys
+                  state[8]   action[7]         ← Franka Panda: 7-DoF + gripper
+```
+
+⇒ **We started from a different, less specialised checkpoint than the reference
+did.** Different starting weights dwarf any of our memory levers, so the gap
+cannot be attributed to 8-bit Adam, bf16, or batch size until this is controlled.
+
+⚠ **This was my error in writing the rule** — pre-committing before seeing the
+number was right; anchoring to an unmatched baseline was not.
+
+⚠ **AND `pi05_libero_base`'s model card does NOT say it was trained on LIBERO** —
+it is generic boilerplate, identical in framing to `pi05_base`. The LIBERO-shaped
+config is strong evidence but **config is not weights**. Do not assert it was
+pre-trained on LIBERO without measuring.
+
+### ⇒ STEP 3b.0 — settle it cheaply FIRST: zero-shot eval of pi05_libero_base
+
+```text
+eval pi05_libero_base on LIBERO Spatial with NO training. ~3 min, no GPU-hours.
+  scores HIGH (say >70%)   it WAS trained on LIBERO ⇒ the reference had a head
+                           start we did not, and our 70% from a generic base is
+                           not a quality failure at all
+  scores NEAR ZERO         it is only CONFIG-adapted ⇒ the reference's advantage
+                           is smaller than assumed and the gap needs another
+                           explanation
+```
+
+⇒ Either way it **calibrates our 70%**, and it costs nothing. Do it before
+spending 1.7 h on a matched fine-tune.
+
+## Corrected decision rule — for the MATCHED run
+
+```text
+MATCHED RUN = finetune FROM pi05_libero_base, 6k steps, bs8, then eval.
+              Same protocol as the reference except BATCH SIZE, which is
+              exactly the variable we want isolated.
+
 within a few points of 97%     the whole lever stack is vindicated EMPIRICALLY,
                                not by argument. Done.
 well short of 97%              the batch-size/LR deviation is FIRST SUSPECT,
-                               not the quantisation. Test it by re-running at
-                               bs16 WITH a scaled LR - one variable, the one
-                               that is ours.
+                               not the quantisation. Test by re-running at bs16
+                               WITH a scaled LR - one variable, the one that is
+                               ours.
 short AND bs16 does not fix it then interrogate bf16 / 8-bit Adam. Do NOT start
                                here: it is the best-supported lever and the
                                least likely cause.
 ```
+
+⚠ **n=40 gives roughly ±14 points at 95% confidence.** Even a matched run needs
+more episodes to separate "slightly worse" from "the same". Scale n before
+reading anything into a single-digit difference.
 
 ⚠ **Do not attribute a quality gap to quantisation before testing batch size.**
 8-bit Adam is the lever with published evidence behind it; batch-8-with-an-
@@ -489,3 +541,42 @@ Not a training issue, but it has cost real time and will recur.
 live run through `tail`/`head`. Put `stdbuf -oL` on any producer whose output is
 redirected. Put `tr '\r' '\n'` before any grep that reads a progress bar. And
 treat *silence* as unknown, never as healthy — check the process table.
+
+⚠ **A fifth case, different mechanism, same symptom:** LIBERO prompts on first
+import (`Do you want to specify a custom path for the dataset folder?`) and
+**blocks on stdin**. With output redirected that is indistinguishable from a
+hang. ⇒ **Run unattended jobs with `< /dev/null`** so a prompt fails fast
+instead of waiting forever.
+
+---
+
+# §D WHAT BELONGS IN `results/` — and what does not
+
+**Corrected 2026-08-11 after the operator asked why logs were going into git.**
+
+I hit `.gitignore:84` (`*.log`) silently swallowing archived logs, and **renamed
+them to `.txt` to defeat the rule.** That was the wrong instinct — the rule is
+correct, and fighting it committed 1.8 MB of near-pure noise.
+
+```text
+WHAT WAS ACTUALLY IN THOSE FILES
+  eval log        657 KB   83 repeated robosuite warnings + a config dump
+  gpu_procs.csv   706 KB   16,980 rows logging the SAME SIX PIDs every 5 s,
+                           when only the peak matters and it is in the report
+  sweep logs      18 KB ea mostly config dumps
+⇒ 1.8 MB -> 88 KB after distillation. Almost none of it was evidence.
+```
+
+⇒ **Commit distillates, not raw logs.**
+
+```text
+COMMIT      metric summaries · step/checkpoint lines · downsampled telemetry
+            (5 s -> 30 s is plenty for a multi-hour run) · scripts · reports
+DO NOT      raw training/eval logs · per-process telemetry · config dumps
+            ⇒ these live untracked in ~/lerobot_assets/probes/
+```
+
+⚠ **`git add -A` succeeding is NOT evidence a file was added.** It skips ignored
+paths without a word. Two earlier commits here claimed artefacts were archived
+when the logs never landed. **Verify with `git ls-files` or
+`git status --ignored`.**

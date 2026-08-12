@@ -1,0 +1,5 @@
+# LIBERO Spatial eval — pi05_base + 12k steps @ bs8, 2026-08-11
+# Full raw log kept untracked at ~/lerobot_assets/probes/ ; this is the distillate.
+
+ 'output_dir': PosixPath('/home/kiran/lerobot_assets/probes/eval_smoke_220255'),
+INFO 2026-08-11 22:02:58 bot_eval.py:750 Output dir: /home/kiran/lerobot_assets/probes/eval_smoke_220255
