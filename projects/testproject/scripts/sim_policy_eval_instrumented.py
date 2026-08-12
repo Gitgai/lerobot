@@ -139,6 +139,42 @@ parser.add_argument("--img-gamma", type=float, default=None,
                     help="B5: gamma shift (1.35 = washed out) - a white-balance stand-in.")
 parser.add_argument("--obs-delay", type=int, default=0,
                     help="B6: policy sees the observation from K env-steps ago. On hardware the world moves ~100-200 ms during capture+inference; this isolates that staleness.")
+# --- Stage 0b additions (2026-08-11): MOTION-COUPLED artifacts. -------------
+# B2-B5 are static and per-run constant. Every real artifact on this rig is
+# neither: the wrist camera is bolted to a MOVING arm (prim_path .../gripper)
+# while the front camera is on the STATIC base (.../base). So --img-blur is the
+# wrong shape twice over - it blurs the static camera's static table, which
+# never happens, and it does not blur the wrist camera harder when the arm moves
+# fast, which always happens. These flags couple the artifact to actual motion.
+parser.add_argument("--img-motion-blur", type=float, default=None,
+                    help="B9: EXPOSURE TIME in ms (e.g. 16.7 = 1/60 s). Blur length is "
+                         "computed from the camera's ACTUAL measured motion each step - "
+                         "directional, not isotropic - and applies only to cameras that "
+                         "physically move. This is the artifact a wrist camera on a "
+                         "moving arm actually produces; --img-blur is not.")
+parser.add_argument("--img-motion-blur-depth", type=float, default=0.25,
+                    help="Scene depth in metres used for the translation term of B9 "
+                         "(rotation is depth-independent). 0.25 ~ wrist-to-table.")
+parser.add_argument("--img-af-hunt", default=None,
+                    help='B10: autofocus hunting as "speed_thresh,max_sigma,decay". Above '
+                         'speed_thresh (m/s) focus is lost and defocus ramps to max_sigma px; '
+                         'it decays by `decay` per settled step. Models a Pi camera with AF '
+                         'left ON, which hunts on every move. NO static flag expresses this: '
+                         'the blur must VARY over the run, keyed to motion.')
+parser.add_argument("--policy-stall", type=int, default=0,
+                    help="B12: the world ADVANCES for K env-steps while the policy call is "
+                         "outstanding, with no fresh action - the arm holds its last command. "
+                         "THIS IS THE ONE CONDITION SIM OTHERWISE CANNOT EXPRESS: normally the "
+                         "client steps the env, so a slow policy call pauses physics too and "
+                         "latency is FREE. On hardware the world keeps running while the arm "
+                         "sits frozen. GPU is in NJ, arm is in Pune - ~12,000 km per call. "
+                         "K = round_trip_seconds * 30. Pair with --obs-delay K: staleness and "
+                         "stall are different halves of the same latency, and B6 only had one.")
+parser.add_argument("--img-ae-lag", type=float, default=None,
+                    help="B11: auto-exposure first-order lag, 0<a<=1 (0.15 = sluggish). Real "
+                         "AE ramps over ~0.5-2 s after a scene change, so frames just after a "
+                         "move are mis-exposed and then recover. --img-gamma is a FIXED shift "
+                         "and cannot show this.")
 parser.add_argument("--rotate-camera", type=float, default=None,
                     help="B7: pitch the FRONT camera by DEG degrees. Position jitter was tested in the campaign; ANGLE was not, and degrees move the image more than centimetres.")
 parser.add_argument("--jitter-wrist-camera", default=None,
@@ -544,14 +580,95 @@ def main() -> None:
         )
 
     # ---- PREFLIGHT: image perturbations + observation staleness ----
-    _img_mods_on = any([args.img_bgr_swap, args.img_noise, args.img_blur, args.img_jpeg, args.img_gamma])
+    _img_mods_on = any([args.img_bgr_swap, args.img_noise, args.img_blur, args.img_jpeg,
+                        args.img_gamma, args.img_motion_blur, args.img_af_hunt, args.img_ae_lag])
     if _img_mods_on or args.obs_delay:
         import numpy as _np
 
-        if args.img_blur or args.img_jpeg:
+        if any([args.img_blur, args.img_jpeg, args.img_motion_blur, args.img_af_hunt]):
             import cv2 as _cv2
 
-        def _perturb_frame(t: torch.Tensor) -> torch.Tensor:
+        # ---- B9-B11 state: motion-coupled artifacts need memory across steps ----
+        # Per-camera previous world pose, so image-plane smear is computed from
+        # MEASURED motion rather than assumed. Front is base-mounted and comes out
+        # ~0 by construction; wrist is gripper-mounted and does not.
+        _cam_prev: dict = {}
+        _af_defocus: dict = {}
+        _ae_level: dict = {}
+        _DT = 1.0 / 30.0
+
+        if args.img_af_hunt:
+            _af_thresh, _af_max, _af_decay = (float(v) for v in args.img_af_hunt.split(","))
+
+        def _quat_to_mat(q):
+            """wxyz -> 3x3. IsaacLab reports camera orientation as wxyz."""
+            w, x, y, z = q
+            return _np.array([
+                [1 - 2 * (y * y + z * z), 2 * (x * y - w * z), 2 * (x * z + w * y)],
+                [2 * (x * y + w * z), 1 - 2 * (x * x + z * z), 2 * (y * z - w * x)],
+                [2 * (x * z - w * y), 2 * (y * z + w * x), 1 - 2 * (x * x + y * y)],
+            ])
+
+        def _image_smear(cam_key: str, width: int):
+            """Image-plane displacement (dx, dy) in px during one exposure.
+
+            Pinhole: a point at depth Z shifts by f*v/Z from camera TRANSLATION and
+            by f*omega from camera ROTATION (depth-independent, and dominant for a
+            wrist camera - wrist_roll/wrist_flex swing the lens hard).
+            Returns (0,0) for a camera that did not move, which is the correct and
+            physically meaningful answer for the base-mounted front camera.
+            """
+            try:
+                sensor = env.scene[cam_key]
+                pos = sensor.data.pos_w[0].cpu().numpy().astype(float)
+                quat = sensor.data.quat_w_world[0].cpu().numpy().astype(float)
+            except Exception:
+                return 0.0, 0.0, 0.0
+            prev = _cam_prev.get(cam_key)
+            _cam_prev[cam_key] = (pos, quat)
+            if prev is None:
+                return 0.0, 0.0, 0.0
+            p0, q0 = prev
+            R0, R1 = _quat_to_mat(q0), _quat_to_mat(quat)
+            v_world = (pos - p0) / _DT                       # m/s
+            v_cam = R1.T @ v_world
+            dR = R0.T @ R1                                   # relative rotation
+            omega = _np.array([dR[2, 1] - dR[1, 2],
+                               dR[0, 2] - dR[2, 0],
+                               dR[1, 0] - dR[0, 1]]) / (2.0 * _DT)   # rad/s, camera frame
+            # f in px from the camera's OWN cfg (never assume the 20.955 default -
+            # this scene overrides horizontal_aperture and that already burned us).
+            try:
+                spawn = sensor.cfg.spawn
+                f_px = width * float(spawn.focal_length) / float(spawn.horizontal_aperture)
+            except Exception:
+                f_px = width  # ~53 deg fallback
+            T = args.img_motion_blur / 1000.0
+            Z = max(args.img_motion_blur_depth, 1e-3)
+            dx = f_px * T * (-v_cam[0] / Z + omega[1])
+            dy = f_px * T * (-v_cam[1] / Z - omega[0])
+            return float(dx), float(dy), float(_np.linalg.norm(v_world))
+
+        def _directional_kernel(dx: float, dy: float):
+            """Line kernel of length hypot(dx,dy) px oriented along (dx,dy)."""
+            L = int(round(math.hypot(dx, dy)))
+            if L < 2:
+                return None
+            L = min(L, 99)
+            k = _np.zeros((L, L), _np.float32)
+            ang = math.atan2(dy, dx)
+            c, s = math.cos(ang), math.sin(ang)
+            half = (L - 1) / 2.0
+            for i in range(L):
+                t_ = i - half
+                xx = int(round(half + t_ * c))
+                yy = int(round(half + t_ * s))
+                if 0 <= xx < L and 0 <= yy < L:
+                    k[yy, xx] = 1.0
+            tot = k.sum()
+            return k / tot if tot > 0 else None
+
+        def _perturb_frame(t: torch.Tensor, cam_key: str = "") -> torch.Tensor:
             """Apply camera-artifact mods to one uint8 frame tensor.
 
             Sim frames arrive as [B,H,W,C] (B=1), NOT [H,W,C] - cv2.blur/imencode
@@ -564,6 +681,23 @@ def main() -> None:
                 a = a[0]
             if args.img_bgr_swap:
                 a = a[..., ::-1].copy()
+            # B9: velocity-coupled DIRECTIONAL motion blur. Applied before the
+            # static mods so noise/JPEG land on the blurred image, as on a sensor.
+            speed = 0.0
+            if args.img_motion_blur:
+                dx, dy, speed = _image_smear(cam_key, a.shape[1])
+                kern = _directional_kernel(dx, dy)
+                if kern is not None:
+                    a = _cv2.filter2D(a, -1, kern)
+            # B10: autofocus hunting - defocus RAMPS on motion, decays when settled.
+            if args.img_af_hunt:
+                if args.img_motion_blur is None:
+                    _, _, speed = _image_smear(cam_key, a.shape[1])
+                lvl = _af_defocus.get(cam_key, 0.0)
+                lvl = _af_max if speed > _af_thresh else max(0.0, lvl - _af_decay)
+                _af_defocus[cam_key] = lvl
+                if lvl > 0.3:
+                    a = _cv2.GaussianBlur(a, (0, 0), sigmaX=lvl)
             if args.img_noise:
                 a = _np.clip(
                     a.astype(_np.float32) + _np.random.normal(0, args.img_noise, a.shape), 0, 255
@@ -576,12 +710,25 @@ def main() -> None:
                 a = _cv2.imdecode(enc, _cv2.IMREAD_COLOR)
             if args.img_gamma:
                 a = (255.0 * (a.astype(_np.float32) / 255.0) ** (1.0 / args.img_gamma)).astype(_np.uint8)
+            # B11: auto-exposure LAG. Real AE chases a brightness target with a
+            # first-order response, so a frame right after a scene change is
+            # mis-exposed and then recovers. Gain is the ratio of the lagging
+            # level to the true one - >1 brightens, <1 darkens.
+            if args.img_ae_lag:
+                cur = float(a.mean())
+                lvl = _ae_level.get(cam_key)
+                lvl = cur if lvl is None else lvl + args.img_ae_lag * (cur - lvl)
+                _ae_level[cam_key] = lvl
+                if lvl > 1.0:
+                    a = _np.clip(a.astype(_np.float32) * (cur / lvl), 0, 255).astype(_np.uint8)
             if batched:
                 a = a[None]
             return torch.from_numpy(_np.ascontiguousarray(a)).to(t.device)
 
         print(f"[eval] PREFLIGHT mods: bgr={args.img_bgr_swap} noise={args.img_noise} "
               f"blur={args.img_blur} jpeg={args.img_jpeg} gamma={args.img_gamma} delay={args.obs_delay}")
+        print(f"[eval] MOTION-COUPLED: motion_blur={args.img_motion_blur}ms "
+              f"af_hunt={args.img_af_hunt} ae_lag={args.img_ae_lag} stall={args.policy_stall}")
 
     # obs_history[k] = the policy-facing observation as of k env-steps ago.
     from collections import deque as _deque
@@ -608,6 +755,10 @@ def main() -> None:
     _snapshot_steps = {int(v) for v in args.snapshot_at.split(",")} if args.snapshot_dir else set()
 
     step = 0
+    # B12: the action the arm HOLDS while a policy call is outstanding. On
+    # hardware the arm keeps its last command and the world keeps moving; in sim
+    # the world would otherwise pause with the call and latency would be free.
+    _last_action = None
     with open(out_path, "w", newline="") as handle, torch.inference_mode():
         writer = csv.DictWriter(handle, fieldnames=fields)
         writer.writeheader()
@@ -627,7 +778,7 @@ def main() -> None:
             if _img_mods_on:
                 for _k in camera_infos:
                     if _k in policy_obs:
-                        policy_obs[_k] = _perturb_frame(policy_obs[_k])
+                        policy_obs[_k] = _perturb_frame(policy_obs[_k], _k)
             actions = policy.get_action(policy_obs).to(env.device)
             if args.radian_actions:
                 import numpy as _np
@@ -645,10 +796,20 @@ def main() -> None:
                 dof = env.action_space.shape[-1]
                 actions = actions.reshape(-1, dof).unsqueeze(1)
 
-            for i in range(min(args.policy_action_horizon, actions.shape[0])):
+            # B12: the round trip, paid in TASK time. Prepending hold-actions
+            # makes the world advance for K steps with no fresh command, which is
+            # what the arm in Pune actually does while the GPU in NJ is thinking.
+            # Prepended (not a separate loop) so every stalled step still gets a
+            # full ground-truth row - the freeze must be visible in the CSV.
+            _n_fresh = min(args.policy_action_horizon, actions.shape[0])
+            if args.policy_stall:
+                _hold = _last_action if _last_action is not None else actions[0:1]
+                actions = torch.cat([_hold.repeat(args.policy_stall, 1, 1), actions], dim=0)
+            for i in range(min(_n_fresh + args.policy_stall, actions.shape[0])):
                 if step >= args.max_steps:
                     break
                 action = actions[i, :, :]
+                _last_action = action.unsqueeze(0)
                 if env.cfg.dynamic_reset_gripper_effort_limit:
                     dynamic_reset_gripper_effort_limit_sim(env, task_type)
                 obs_dict, _, terminated, timed_out, _ = env.step(action)

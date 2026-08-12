@@ -891,3 +891,65 @@ T6  sim degradation battery: gaussian blur / exposure shift / JPEG artifacts on
 
 Camera geometry remains a real measured effect (89%→44%). It is no longer the
 leading explanation for Aug 8.
+
+---
+
+# B9-B12 — recreating the artifacts, 2026-08-11
+
+Correction to the previous section: image quality was **not** untested. B2 noise,
+B3 blur, B4 JPEG and B5 gamma already existed, and noise/gamma/bgrSwap were run.
+What is missing is not the axis, it is the **shape**: B2-B5 are static and
+per-run constant, and every real artifact on this rig is motion-coupled.
+
+The mount asymmetry that makes `--img-blur` wrong twice over:
+
+```text
+wrist_camera  prim_path .../Robot/gripper   MOVES with the arm
+front_camera  prim_path .../Robot/base      STATIC
+```
+
+`--img-blur 3` is isotropic, whole-frame, both cameras, constant. So it blurs the
+static camera's static table (never happens) and fails to blur the wrist camera
+harder when the arm moves fast (always happens).
+
+```text
+B9   --img-motion-blur MS       EXPOSURE TIME. Smear length computed from the
+                                camera's MEASURED per-step motion, directional,
+                                zero for a camera that did not move.
+B10  --img-af-hunt t,max,decay  defocus RAMPS on motion, decays when settled.
+B11  --img-ae-lag ALPHA         first-order exposure lag; gamma is a fixed shift.
+B12  --policy-stall K           the world advances K steps with NO fresh action.
+```
+
+Verified smear for the wrist camera (f_px = 640·36.5/36.83 = 634, from the cfg's
+own aperture — never the 20.955 default, that assumption already burned us once):
+
+```text
+   exposure     fast reach    slow approach   settled
+    1/250 s        6.6 px          1.8 px      0.0 px
+    1/60  s       27.5 px          7.4 px      0.0 px
+    1/30  s       54.9 px         14.8 px      0.0 px
+```
+
+**At 1/30 s the smear is wider than the orange.** And the real client captures
+its observation *immediately after* the 8-step motion burst — peak smear, peak
+AF hunt. B3's 3 px box blur is not the same experiment.
+
+## B12 is the important one
+
+It is the only flag here that addresses the leading candidate, and it exists
+because of a structural fact:
+
+> In sim the client steps the world, so a slow policy call pauses physics too and
+> latency is FREE. On hardware the world keeps running while the arm sits frozen.
+
+B12 pays the round trip in **task time** instead of wall clock, by prepending K
+hold-actions to each chunk — so every stalled step still writes a full
+ground-truth row and the freeze is visible in the CSV. `K = RTT_seconds × 30`.
+
+Pair it with `--obs-delay K`: staleness and stall are two halves of the same
+latency and B6 only ever modelled one of them.
+
+**B12's K is not known yet** — the round trip has never been measured (T0). Until
+it is, run a sweep (K = 3, 10, 30, 60) and find where success collapses; if it
+collapses below the K implied by any plausible RTT, the link is the cause.
