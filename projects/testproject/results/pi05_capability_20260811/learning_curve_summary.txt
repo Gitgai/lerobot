@@ -1,0 +1,12 @@
+# Learning curve — pi05_base full fine-tune @ bs8, LIBERO Spatial, n=40 each
+# From saved checkpoints. ~7 min total; decided whether a 6.8 h run was worth it.
+
+STEPS      EXAMPLES      SUCCESS  DELTA
+4000       32000           27.5%  
+8000       64000           57.5%  +30.0
+12000      96000           70.0%  +12.5
+
+# Still climbing. Deceleration is CONFOUNDED by cosine LR decay scaled to
+# 12k steps (LR 2.5e-5 peak -> 2.7e-6 at the end), not proof of saturation.
+# NOTE: loss plateaued ~0.098 from step 11K while success rose 57.5 -> 70.
+#       Loss is not a proxy for capability here.

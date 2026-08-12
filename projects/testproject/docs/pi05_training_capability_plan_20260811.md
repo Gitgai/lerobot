@@ -530,6 +530,90 @@ want it is now a design decision with a number attached rather than a hunch.
 
 ---
 
+# STEP 3d — THE MATCHED-DATA RUN  `[~6.8 h, overnight]` 🟢
+
+**The run that finally isolates the operator's original question: did 8-bit Adam
+and bf16 cost accuracy?**
+
+## What the learning curve settled first
+
+Evaluating saved checkpoints (~7 min) instead of assuming — the cheapest step in
+this plan and it decided the shape of everything after:
+
+```text
+CHECKPOINT   EXAMPLES   SUCCESS    delta
+ 4,000        32,000     27.5%
+ 8,000        64,000     57.5%     +30.0
+12,000        96,000     70.0%     +12.5
+```
+
+⇒ **Still climbing. Not saturated. The gap to 97% is substantially DATA.**
+
+★ **And it proved loss is not a proxy for capability here.** Loss plateaued at
+~0.098 from step 11K, while success rose 57.5% → 70% between 8k and 12k. Anyone
+reading the loss curve would have concluded "converged, more steps are wasted"
+and been wrong. **Do not judge these runs by loss.**
+
+⚠ **The deceleration (+30 then +12.5) is CONFOUNDED, not evidence of
+saturation.** The run used cosine LR decay scaled to 12,000 steps, so learning
+rate had already fallen to 2.7e-6 — 10× below peak — by the end. The model
+slowed because the schedule told it to.
+
+## Why a FRESH run, not a resume
+
+```text
+RESUME from 12k     3.4 h   Cheaper - keeps the work already done. But resuming
+                            with --steps=24000 RESCALES the schedule: at step
+                            12,000 of 24,000 the scheduler thinks it is halfway,
+                            so LR JUMPS BACK UP from 2.7e-6 to ~2e-5. The model
+                            had settled; this shoves it again mid-run.
+FRESH 24k @ bs8     6.8 h   ★ CHOSEN. One coherent cosine schedule spanning all
+                            24,000 steps. LR stays high longer, decays smoothly
+                            to near-zero at the end.
+```
+
+⇒ **The reference ran a clean schedule. If ours has a mid-run jolt, a difference
+in the final score has TWO possible causes — the memory levers or the weird
+schedule — and they cannot be separated.** That defeats the entire purpose of
+the run. 3.4 extra hours of overnight GPU time is cheap against a result nobody
+can interpret.
+
+## Configuration
+
+```text
+from            lerobot/pi05_base       (same start as the 12k run)
+batch size      8
+steps           24,000  ⇒ 192,000 examples = EXACTLY the reference's data volume
+save_freq       4,000   (6 checkpoints — extends the learning curve to 8 points)
+telemetry       gpu_monitor.sh at 5 s
+est. wall       ~6.8 h at 7.63 samples/s
+```
+
+## What it can and cannot settle
+
+```text
+CAN    whether 96k examples was the limiter. At matched data volume, the
+       remaining gap to 97% belongs to batch size and/or the memory levers.
+CANNOT isolate the levers alone. Batch 8 vs the reference's 32 is STILL a
+       difference. This narrows the confound from TWO variables to ONE.
+       A clean answer needs a further bs16 + scaled-LR run.
+```
+
+## Prediction, written before the result
+
+```text
+naive extrapolation of the decelerating curve  ≈ 78%
+  lands WELL ABOVE ~78%   the LR schedule was the limiter, not data volume
+  lands NEAR ~78%         the remaining ~19 points vs 97% belong to batch size
+                          and/or the levers — the first real signal on the
+                          original question
+  lands NEAR 97%          the lever stack is vindicated; nothing was lost
+```
+
+⚠ n=40 per eval ⇒ roughly ±14 points. Read 20-point gaps, not 5.
+
+---
+
 # STEP 4 — our own data  🔴 NEEDS A HUMAN DECISION
 
 **Do not start this unattended.** Not for technical reasons — the corpus
@@ -675,8 +759,32 @@ STEP 3b  quality — did the levers cost anything?
   ⛔ NOT ANSWERED. The 70% vs 97% comparison is confounded by DATA VOLUME:
      reference 6,000 × 32 = 192,000 examples
      ours     12,000 ×  8 =  96,000 examples   ← HALF
-     A matched run must equalise EXAMPLES, not steps. Untaken; ~6-7 h.
-     Not on the critical path — the capability question is already answered.
+     A matched run must equalise EXAMPLES, not steps. → STEP 3d.
+
+STEP 3c  transfer to unseen suites   ✅ RUN — near-total specialisation
+  libero_spatial (trained)   70.0%   n=40
+  libero_object  (unseen)     0.0%   n=40
+  libero_goal    (unseen)     0.0%   n=40
+  verified not an artefact: same ckpt still 70% on spatial · rollouts ran the
+  full 280 steps · avg_MAX_reward 0.0 (never even partial credit)
+  ⚠ measures TRANSFER not forgetting, and includes normaliser specialisation
+
+LEARNING CURVE (from saved checkpoints, ~7 min)   ✅ RUN
+   4,000 →  32k examples → 27.5%
+   8,000 →  64k examples → 57.5%   +30.0
+  12,000 →  96k examples → 70.0%   +12.5
+  ⇒ still climbing; the gap to 97% is substantially DATA
+  ★ loss plateaued ~0.098 from 11K while success rose 57.5 → 70. LOSS IS NOT A
+    PROXY FOR CAPABILITY HERE.
+
+STEP 3d  matched-data run   🔄 LAUNCHED
+  24,000 steps × bs8 = 192,000 examples, fresh (clean LR schedule)
+  batch / steps / examples    ____ / ____ / ____
+  wall clock                  ____
+  peak VRAM · drift           ____ · ____
+  throttled?                  ____
+  success @ 24k               ____ %   (prediction: ~78% by naive extrapolation)
+  ⇒ VERDICT vs the levers     ____
   precision layout measured   BF16 3.610B (87.1%) / F32 0.534B (12.9%)
                               ⇒ NOT naive bf16; the sensitive 13% stays fp32
   fp32 master weights         NONE — bf16 tensors ARE the weights (confirmed:
