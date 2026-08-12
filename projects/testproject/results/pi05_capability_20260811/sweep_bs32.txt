@@ -1,0 +1,415 @@
+WARNING:lerobot.utils.import_utils:Could not load libtorchcodec. Likely causes:
+          1. FFmpeg is not properly installed in your environment. We support
+             versions 4, 5, 6, 7, and 8, and we attempt to load libtorchcodec
+             for each of those versions. Errors for versions not installed on
+             your system are expected; only the error for your installed FFmpeg
+             version is relevant. On Windows, ensure you've installed the
+             "full-shared" version which ships DLLs.
+          2. The PyTorch version (2.7.1+cu128) is not compatible with
+             this version of TorchCodec. Refer to the version compatibility
+             table:
+             https://github.com/pytorch/torchcodec?tab=readme-ov-file#installing-torchcodec.
+          3. Another runtime dependency; see exceptions below.
+
+        The following exceptions were raised as we tried to load libtorchcodec:
+        
+[start of libtorchcodec loading traceback]
+FFmpeg version 8:
+Traceback (most recent call last):
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torchcodec/_core/ops.py", line 57, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torch/_ops.py", line 1392, in load_library
+    ctypes.CDLL(path)
+  File "/home/kiran/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: /home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torchcodec/libtorchcodec_core8.so: undefined symbol: _ZN3c1013MessageLogger6streamB5cxx11Ev
+
+FFmpeg version 7:
+Traceback (most recent call last):
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torchcodec/_core/ops.py", line 57, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torch/_ops.py", line 1392, in load_library
+    ctypes.CDLL(path)
+  File "/home/kiran/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.59: cannot open shared object file: No such file or directory
+
+FFmpeg version 6:
+Traceback (most recent call last):
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torchcodec/_core/ops.py", line 57, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torch/_ops.py", line 1392, in load_library
+    ctypes.CDLL(path)
+  File "/home/kiran/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.58: cannot open shared object file: No such file or directory
+
+FFmpeg version 5:
+Traceback (most recent call last):
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torchcodec/_core/ops.py", line 57, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torch/_ops.py", line 1392, in load_library
+    ctypes.CDLL(path)
+  File "/home/kiran/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.57: cannot open shared object file: No such file or directory
+
+FFmpeg version 4:
+Traceback (most recent call last):
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torchcodec/_core/ops.py", line 57, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torch/_ops.py", line 1392, in load_library
+    ctypes.CDLL(path)
+  File "/home/kiran/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.56: cannot open shared object file: No such file or directory
+[end of libtorchcodec loading traceback].
+'torchcodec' is installed but cannot be loaded (see the error above). Falling back to 'pyav' as a default decoder.
+WARNING:lerobot.utils.import_utils:Could not load libtorchcodec. Likely causes:
+          1. FFmpeg is not properly installed in your environment. We support
+             versions 4, 5, 6, 7, and 8, and we attempt to load libtorchcodec
+             for each of those versions. Errors for versions not installed on
+             your system are expected; only the error for your installed FFmpeg
+             version is relevant. On Windows, ensure you've installed the
+             "full-shared" version which ships DLLs.
+          2. The PyTorch version (2.7.1+cu128) is not compatible with
+             this version of TorchCodec. Refer to the version compatibility
+             table:
+             https://github.com/pytorch/torchcodec?tab=readme-ov-file#installing-torchcodec.
+          3. Another runtime dependency; see exceptions below.
+
+        The following exceptions were raised as we tried to load libtorchcodec:
+        
+[start of libtorchcodec loading traceback]
+FFmpeg version 8:
+Traceback (most recent call last):
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torchcodec/_core/ops.py", line 57, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torch/_ops.py", line 1392, in load_library
+    ctypes.CDLL(path)
+  File "/home/kiran/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: /home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torchcodec/libtorchcodec_core8.so: undefined symbol: _ZN3c1013MessageLogger6streamB5cxx11Ev
+
+FFmpeg version 7:
+Traceback (most recent call last):
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torchcodec/_core/ops.py", line 57, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torch/_ops.py", line 1392, in load_library
+    ctypes.CDLL(path)
+  File "/home/kiran/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.59: cannot open shared object file: No such file or directory
+
+FFmpeg version 6:
+Traceback (most recent call last):
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torchcodec/_core/ops.py", line 57, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torch/_ops.py", line 1392, in load_library
+    ctypes.CDLL(path)
+  File "/home/kiran/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.58: cannot open shared object file: No such file or directory
+
+FFmpeg version 5:
+Traceback (most recent call last):
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torchcodec/_core/ops.py", line 57, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torch/_ops.py", line 1392, in load_library
+    ctypes.CDLL(path)
+  File "/home/kiran/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.57: cannot open shared object file: No such file or directory
+
+FFmpeg version 4:
+Traceback (most recent call last):
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torchcodec/_core/ops.py", line 57, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torch/_ops.py", line 1392, in load_library
+    ctypes.CDLL(path)
+  File "/home/kiran/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.56: cannot open shared object file: No such file or directory
+[end of libtorchcodec loading traceback].
+'torchcodec' is installed but cannot be loaded (see the error above). Falling back to 'pyav' as a default decoder.
+INFO 2026-08-11 18:18:50 ot_train.py:272 {'batch_size': 32,
+ 'checkpoint_path': None,
+ 'cudnn_deterministic': False,
+ 'dataloader_multiprocessing_context': 'spawn',
+ 'dataset': {'depth_output_unit': 'mm',
+             'episodes': None,
+             'eval_split': 0.0,
+             'image_transforms': {'enable': False,
+                                  'max_num_transforms': 3,
+                                  'random_order': False,
+                                  'tfs': {'affine': {'kwargs': {'degrees': [-5.0,
+                                                                            5.0],
+                                                                'translate': [0.05,
+                                                                              0.05]},
+                                                     'type': 'RandomAffine',
+                                                     'weight': 1.0},
+                                          'brightness': {'kwargs': {'brightness': [0.8,
+                                                                                   1.2]},
+                                                         'type': 'ColorJitter',
+                                                         'weight': 1.0},
+                                          'contrast': {'kwargs': {'contrast': [0.8,
+                                                                               1.2]},
+                                                       'type': 'ColorJitter',
+                                                       'weight': 1.0},
+                                          'hue': {'kwargs': {'hue': [-0.05,
+                                                                     0.05]},
+                                                  'type': 'ColorJitter',
+                                                  'weight': 1.0},
+                                          'saturation': {'kwargs': {'saturation': [0.5,
+                                                                                   1.5]},
+                                                         'type': 'ColorJitter',
+                                                         'weight': 1.0},
+                                          'sharpness': {'kwargs': {'sharpness': [0.5,
+                                                                                 1.5]},
+                                                        'type': 'SharpnessJitter',
+                                                        'weight': 1.0}}},
+             'repo_id': 'lerobot/libero_spatial_image',
+             'repo_type': 'dataset',
+             'return_uint8': False,
+             'revision': None,
+             'root': None,
+             'streaming': False,
+             'use_imagenet_stats': True,
+             'video_backend': 'pyav'},
+ 'env': None,
+ 'env_eval_freq': 20000,
+ 'eval': {'batch_size': 22,
+          'n_episodes': 50,
+          'recording': False,
+          'recording_private': False,
+          'recording_repo_id': None,
+          'use_async_envs': True},
+ 'eval_steps': 0,
+ 'job': {'detach': False,
+         'image': 'huggingface/lerobot-gpu:latest',
+         'tags': [],
+         'target': None,
+         'timeout': '2d'},
+ 'job_name': 'pi05',
+ 'log_freq': 10,
+ 'max_eval_samples': 0,
+ 'num_workers': 4,
+ 'optimizer': {'betas': [0.9, 0.95],
+               'eps': 1e-08,
+               'grad_clip_norm': 1.0,
+               'lr': 2.5e-05,
+               'type': 'adamw_8bit',
+               'weight_decay': 0.01},
+ 'output_dir': '/home/kiran/lerobot_assets/probes/pi05_sweep_bs32_181847',
+ 'peft': None,
+ 'persistent_workers': True,
+ 'policy': {'action_expert_variant': 'gemma_300m',
+            'action_feature_names': None,
+            'chunk_size': 50,
+            'compile_mode': 'max-autotune',
+            'compile_model': False,
+            'device': 'cuda',
+            'dtype': 'bfloat16',
+            'empty_cameras': 0,
+            'freeze_vision_encoder': False,
+            'gradient_checkpointing': True,
+            'image_resolution': [224, 224],
+            'input_features': {},
+            'license': None,
+            'max_action_dim': 32,
+            'max_period': 4.0,
+            'max_state_dim': 32,
+            'min_period': 0.004,
+            'n_action_steps': 50,
+            'n_obs_steps': 1,
+            'normalization_mapping': {'ACTION': <NormalizationMode.QUANTILES: 'QUANTILES'>,
+                                      'STATE': <NormalizationMode.QUANTILES: 'QUANTILES'>,
+                                      'VISUAL': <NormalizationMode.IDENTITY: 'IDENTITY'>},
+            'num_inference_steps': 10,
+            'optimizer_betas': [0.9, 0.95],
+            'optimizer_eps': 1e-08,
+            'optimizer_grad_clip_norm': 1.0,
+            'optimizer_lr': 2.5e-05,
+            'optimizer_weight_decay': 0.01,
+            'output_features': {},
+            'paligemma_variant': 'gemma_2b',
+            'pretrained_path': 'lerobot/pi05_base',
+            'pretrained_revision': None,
+            'private': None,
+            'push_to_hub': False,
+            'relative_exclude_joints': ['gripper'],
+            'repo_id': None,
+            'rtc_config': None,
+            'scheduler_decay_lr': 2.5e-06,
+            'scheduler_decay_steps': 30000,
+            'scheduler_warmup_steps': 1000,
+            'tags': None,
+            'time_sampling_beta_alpha': 1.5,
+            'time_sampling_beta_beta': 1.0,
+            'time_sampling_offset': 0.001,
+            'time_sampling_scale': 0.999,
+            'tokenizer_max_length': 200,
+            'train_expert_only': False,
+            'type': 'pi05',
+            'use_amp': False,
+            'use_peft': False,
+            'use_relative_actions': False},
+ 'prefetch_factor': 4,
+ 'rename_map': {},
+ 'resume': False,
+ 'reward_model': None,
+ 'sample_weighting': None,
+ 'save_checkpoint': False,
+ 'save_checkpoint_to_hub': False,
+ 'save_freq': 20000,
+ 'scheduler': {'decay_lr': 2.5e-06,
+               'num_decay_steps': 30000,
+               'num_warmup_steps': 1000,
+               'peak_lr': 2.5e-05,
+               'type': 'cosine_decay_with_warmup'},
+ 'seed': 1000,
+ 'steps': 30,
+ 'tolerance_s': 0.0001,
+ 'use_policy_training_preset': True,
+ 'wandb': {'add_tags': True,
+           'disable_artifact': False,
+           'enable': False,
+           'entity': None,
+           'mode': None,
+           'notes': None,
+           'project': 'lerobot',
+           'run_id': None}}
+INFO 2026-08-11 18:18:50 ot_train.py:280 Logs will be saved locally.
+INFO 2026-08-11 18:18:50 ot_train.py:298 Creating dataset
+INFO 2026-08-11 18:18:50 ot_train.py:324 Creating policy
+INFO 2026-08-11 18:19:45 ing_pi05.py:449 Enabled gradient checkpointing for PI05Pytorch model
+WARNING 2026-08-11 18:19:45 ing_pi05.py:912 Vision embedding key might need handling: paligemma_with_expert.paligemma.model.vision_tower.vision_model.embeddings.patch_embedding.bias
+WARNING 2026-08-11 18:19:45 ing_pi05.py:912 Vision embedding key might need handling: paligemma_with_expert.paligemma.model.vision_tower.vision_model.embeddings.patch_embedding.weight
+INFO 2026-08-11 18:19:47 ot_train.py:402 Creating optimizer and scheduler
+INFO 2026-08-11 18:19:48 hedulers.py:155 Auto-scaling LR scheduler: num_training_steps (30) < num_decay_steps (30000). Scaling warmup: 1000 → 1, decay: 30000 → 30 (scale factor: 0.001)
+INFO 2026-08-11 18:19:48 ot_train.py:434 Output dir: /home/kiran/lerobot_assets/probes/pi05_sweep_bs32_181847
+INFO 2026-08-11 18:19:48 ot_train.py:441 cfg.steps=30 (30)
+INFO 2026-08-11 18:19:48 ot_train.py:442 dataset.num_frames=52970 (53K)
+INFO 2026-08-11 18:19:48 ot_train.py:443 dataset.num_episodes=432
+INFO 2026-08-11 18:19:48 ot_train.py:446 Effective batch size: 32 x 1 = 32
+INFO 2026-08-11 18:19:48 ot_train.py:447 num_learnable_params=4143404816 (4B)
+INFO 2026-08-11 18:19:48 ot_train.py:448 num_total_params=4143404816 (4B)
+The PI05 model is a direct port of the OpenPI implementation. 
+This implementation follows the original OpenPI structure for compatibility. 
+Original implementation: https://github.com/Physical-Intelligence/openpi
+Loading model from: lerobot/pi05_base
+✓ Loaded state dict from model.safetensors
+Remapped 812 state dict keys
+All keys loaded successfully!
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/bin/lerobot-train", line 10, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/lerobot/scripts/lerobot_train.py", line 806, in main
+    train()
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/lerobot/configs/parser.py", line 436, in wrapper_inner
+    response = fn(cfg, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/lerobot/scripts/lerobot_train.py", line 610, in train
+    train_tracker, _ = update_policy(
+                       ^^^^^^^^^^^^^^
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/lerobot/scripts/lerobot_train.py", line 175, in update_policy
+    accelerator.backward(loss)
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/accelerate/accelerator.py", line 2850, in backward
+    loss.backward(**kwargs)
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torch/_tensor.py", line 648, in backward
+    torch.autograd.backward(
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torch/autograd/__init__.py", line 353, in backward
+    _engine_run_backward(
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torch/autograd/graph.py", line 824, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torch/utils/checkpoint.py", line 1124, in unpack_hook
+    frame.recompute_fn(*args)
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torch/utils/checkpoint.py", line 1518, in recompute_fn
+    fn(*args, **kwargs)
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/lerobot/policies/pi05/modeling_pi05.py", line 495, in image_embed_func
+    return self.paligemma_with_expert.embed_image(img)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/lerobot/policies/pi05/modeling_pi05.py", line 289, in embed_image
+    image_outputs = self.paligemma.model.get_image_features(image)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/transformers/utils/generic.py", line 876, in wrapper
+    output = func(self, *args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/transformers/models/paligemma/modeling_paligemma.py", line 252, in get_image_features
+    image_outputs = self.vision_tower(pixel_values, **kwargs)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/transformers/utils/generic.py", line 952, in wrapper
+    output = func(self, *args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/transformers/utils/output_capturing.py", line 248, in wrapper
+    outputs = func(self, *args, **kwargs)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/transformers/models/siglip/modeling_siglip.py", line 702, in forward
+    return self.vision_model(
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/transformers/models/siglip/modeling_siglip.py", line 609, in forward
+    encoder_outputs: BaseModelOutput = self.encoder(
+                                       ^^^^^^^^^^^^^
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/transformers/models/siglip/modeling_siglip.py", line 461, in forward
+    hidden_states = encoder_layer(
+                    ^^^^^^^^^^^^^^
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/transformers/modeling_layers.py", line 93, in __call__
+    return super().__call__(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/transformers/models/siglip/modeling_siglip.py", line 346, in forward
+    hidden_states, _ = self.self_attn(
+                       ^^^^^^^^^^^^^^^
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/transformers/models/siglip/modeling_siglip.py", line 287, in forward
+    keys = self.k_proj(hidden_states).view(hidden_shape).transpose(1, 2)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kiran/sim/pi05-fullft-probe/.venv312/lib/python3.12/site-packages/torch/nn/modules/linear.py", line 125, in forward
+    return F.linear(input, self.weight, self.bias)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 18.00 MiB. GPU 0 has a total capacity of 31.35 GiB of which 122.62 MiB is free. Process 6325 has 38.09 MiB memory in use. Process 6429 has 156.18 MiB memory in use. Process 9153 has 52.34 MiB memory in use. Process 9341 has 107.24 MiB memory in use. Process 3173 has 544.26 MiB memory in use. Process 712028 has 28.09 MiB memory in use. Including non-PyTorch memory, this process has 29.83 GiB memory in use. Of the allocated memory 28.35 GiB is allocated by PyTorch, and 893.84 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
