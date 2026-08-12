@@ -1254,3 +1254,37 @@ harmless for three days.
   the same as sufficient-to-fix. The link latency and the front-camera pose are
   still real and still unmeasured on hardware.
 ```
+
+---
+
+## Evidence for the "c0077+ shows no workspace" claim (challenged 2026-08-12)
+
+The claim was originally an EYEBALL judgement off a 12-frame sample. Challenged,
+so here is what actually supports it — including a metric that failed.
+
+**A metric that FAILED.** "Fraction of white-ish pixels" (plate and gripper are
+white, wood is not) gives 46.8% early and 70.2% LATE — the opposite of the claim.
+It fails because the washed-out pale wall and overexposed floor in the late
+frames read as low-saturation-high-value, i.e. as "white". It measures
+exposure, not workspace. Recorded so nobody re-derives it.
+
+**A metric that WORKS.** The plate carries a distinctive BLUE radial pattern.
+Wood floor, wood table and a pale green wall contain no blue.
+
+```text
+                    mean blue    frames with the plate in view
+  c0000-c0024         0.72%                 12%
+  c0025-c0054         0.21%                  0%
+  c0055-c0076         0.29%                  9%
+  c0077-c0142         0.37%                  0%     <- never, across 66 frames
+```
+
+**The direct evidence.** `docs/evidence_aug8/aug8_late_wrist.jpg` — 12 frames
+spread across c0077-c0132. Every one shows blurred wood floor filling most of the
+frame, a pale wall along the top edge, a skirting board and a cable. No plate,
+no gripper, no table, no target in any of them.
+
+**Calibration.** "Nothing but floor" was loose — there is floor, wall, skirting
+board and cable. The defensible claim is narrower and is what the sim battery
+tested: **from c0077 the workspace is not in the wrist view at all**, for the
+final 66 of 143 chunks (46% of the run). The plate measurement gives 0/66.
