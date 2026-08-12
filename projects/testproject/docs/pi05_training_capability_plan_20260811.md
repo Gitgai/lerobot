@@ -412,13 +412,44 @@ STEP 3  LIBERO capability run   🔄 LAUNCHED 2026-08-11 18:23
                               log_freq 100 · telemetry 5 s
   baseline before start       32607 total / 1433 used / 30674 free MiB, 37 C
   est. wall clock             ~3.5 h at 7.63 samples/s
-  batch / steps / samples     ____ / ____ / ____
-  wall clock                  ____
-  peak VRAM  start → end      ____ → ____   drift? ____
-  temp / clocks  max → end    ____ → ____   throttled? ____
-  loss  first → last          ____ → ____   finite throughout? ____
-  checkpoint reloads          ____   finite actions? ____
-  ⇒ VERDICT                   ____
+  ✅ COMPLETED 2026-08-11 21:45 — "End of training"
+  batch / steps / samples     8 / 12,000 / 96,000  (1.80 epochs)
+  wall clock                  3 h 22 m   (est. was ~3.5 h)
+  GPU utilisation             mean 93.9 %, max 99 %
+  peak VRAM                   27.09 GiB total · 25.53 GiB training-process only
+  ⇒ memory drift              +0.16 GiB   26.93 (Q1) → 27.09 (Q4)
+                              ⚠ NOT zero. I reported 0.00 at the halfway mark;
+                                the drift appeared in the final quarter. 0.6% of
+                                peak, against 4.75 GiB headroom — safe, but a
+                                SLOPE not a flat line. Naive extrapolation:
+                                ~0.5 GiB over 12 h. Know this before running a
+                                day-long job.
+  temperature                 mean 81.1  MAX 85 C  — plateaued early, no climb
+  power                       mean 545.0  MAX 569.4 W  of a 575 W limit
+  clocks                      sustained 2785 of 3090 MHz
+  ⇒ THROTTLED?                NO. 0/2438 thermal, 0/2438 power-cap.
+                              ★ Three and a half hours at 85 C and ~545 W with
+                                zero lost clocks. This is the question a
+                                34-second probe cannot answer, and it passes.
+  loss  first → last          0.432 → 0.100, finite throughout
+                              ⚠ PLATEAUED ~0.096-0.100 from step 11K. Converged,
+                                or batch-size-limited? STEP 3b decides.
+  checkpoints written         6/6 — 2000/4000/6000/8000/10000/12000, ~15 GiB ea
+                              ★ The STEP 1 fix survives repeated use deep into a
+                                run with a warmed-up allocator, not just once at
+                                step 10 on a fresh one.
+  checkpoint RELOADS          ✅ 4.143B params, 4.143B trainable, 0 non-finite
+                                 weight tensors
+  weights still moved @12k    ✅ VLM 595/603, expert 208/209 — identical counts
+                                 to step 10, so the same 8 tensors are
+                                 persistently unchanged (consistent with
+                                 zero-init biases carrying zero gradient)
+  ⚠ "finite ACTIONS" NOT YET VERIFIED. Reload + finite WEIGHTS were checked; a
+    forward pass was not. STEP 3b's eval exercises real inference and closes it.
+
+  ⇒ VERDICT  ★ WE CAN TRAIN π0.5 ON THIS 5090. Sustained, thermally stable,
+    memory-stable, checkpointable, resumable. What remains unproven is the
+    QUALITY of what it produces — STEP 3b.
 
   ⚠ DISK: ~88 GiB consumed today already (231 GiB used, up from 143 GiB) by
     datasets, pi05_base, and probe checkpoints. This run adds ~96 GiB. Old

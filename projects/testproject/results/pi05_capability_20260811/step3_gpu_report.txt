@@ -1,0 +1,18 @@
+samples 2438   span 2026/08/11 18:23:24.889 -> 2026/08/11 21:46:34.693
+  memory.used            min 1.40 GiB  mean 26.60 GiB  MAX 27.09 GiB
+  temperature            min 37.0 C  mean 81.1 C  MAX 85.0 C
+  clocks.sm              min 412.0 MHz  mean 2784.8 MHz  MAX 2872.0 MHz
+  power.draw             min 34.6 W  mean 545.0 W  MAX 569.4 W
+  utilization.gpu        min 0.0 %  mean 93.9 %  MAX 99.0 %
+  memory drift           first quarter peak 26.93 GiB -> last quarter peak 27.09 GiB  (+0.16 GiB)
+  THERMAL throttle       0/2438 samples  (none)
+  power-cap throttle     0/2438 samples  (none)
+  clock headroom         sustained 2785 of 3090 MHz max
+
+  per-process PEAK (separates training from desktop):
+    pid  1020771  25.53 GiB
+    pid     3173  0.53 GiB
+    pid     9341  0.23 GiB
+    pid     6429  0.15 GiB
+    pid     9153  0.05 GiB
+    pid     6325  0.04 GiB
