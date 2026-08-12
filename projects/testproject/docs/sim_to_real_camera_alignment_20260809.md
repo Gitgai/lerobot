@@ -973,7 +973,7 @@ sim's object-displacement column:
   chunk 36-142  21.1 -> 20.7 px      stable at the NEW position, never touched again
 ```
 
-Confirmed visually (`logs/aug8_orange_moved.jpg`): the gripper closes in at c0024,
+Confirmed visually (`docs/evidence_aug8/aug8_orange_moved.jpg`): the gripper closes in at c0024,
 is on the object at c0030, and the object has visibly shifted off the start marker
 by c0036. Then the gripper withdraws and never comes back.
 
@@ -998,7 +998,7 @@ this" dissolves — sim was never failing to reproduce it.
 ```
 
 The front camera was healthy for the entire run. The wrist camera was not, and
-`logs/aug8_wrist_sweep.jpg` shows why it is worse than a sharpness number:
+`docs/evidence_aug8/aug8_wrist_sweep.jpg` shows why it is worse than a sharpness number:
 
 ```text
   c0000-c0022   looks DOWN at the table - plate and surface visible. Correct.
@@ -1018,7 +1018,7 @@ far too gently.
 
 ## Also: the target is not an orange
 
-`logs/aug8_orange_moved.jpg` — the object is smooth, glossy and slightly
+`docs/evidence_aug8/aug8_orange_moved.jpg` — the object is smooth, glossy and slightly
 flattened, with a stem indent. It reads as a **tomato** (or persimmon), not an
 orange. Sim oranges are spherical with pebbled skin. Worth confirming with the
 user; if the real runs used a tomato, that is a domain gap nobody recorded, and
