@@ -953,3 +953,87 @@ latency and B6 only ever modelled one of them.
 **B12's K is not known yet** — the round trip has never been measured (T0). Until
 it is, run a sweep (K = 3, 10, 30, 60) and find where success collapses; if it
 collapses below the K implied by any plausible RTT, the link is the cause.
+
+---
+
+# 2026-08-11 — THE AUG 8 RUN WAS NOT A PERCEPTION FAILURE. Premise corrected.
+
+The 143 evidence frames from run 2 were sitting in `logs/realarm_frames_run2_20260808/`
+the whole time. Nothing had ever looked at them. Measured, not inferred:
+
+## The object MOVED. The policy made contact.
+
+Tracked the target by colour in the STATIC front view — the real-arm twin of
+sim's object-displacement column:
+
+```text
+  detected in 143/143 front frames
+  chunk  0-24    0.0 ->  4.5 px      approach
+  chunk 24-36    4.5 -> 21.1 px      CONTACT - object displaced
+  chunk 36-142  21.1 -> 20.7 px      stable at the NEW position, never touched again
+```
+
+Confirmed visually (`logs/aug8_orange_moved.jpg`): the gripper closes in at c0024,
+is on the object at c0030, and the object has visibly shifted off the start marker
+by c0036. Then the gripper withdraws and never comes back.
+
+**This is a FAILED GRASP followed by non-re-engagement — not an absence of
+object-directedness.** The policy found the target, reached it, touched it,
+failed to close on it, and then did not try again for 106 more chunks.
+
+⇒ **The founding premise of this document was wrong.** "Coherent motion, zero
+object-directedness" is not what the data shows. And the consequence is large:
+the 13 sim conditions that produced *completion* failures were reproducing the
+**correct class** all along. The three-day puzzle of "why can't sim reproduce
+this" dissolves — sim was never failing to reproduce it.
+
+## Why it never re-engaged: the wrist camera lost the workspace
+
+```text
+                  front (static, base)      wrist (Pi, on the gripper)
+  median sharp          183.0                      27.0
+  CV of sharpness        0.10  steady              0.68  VARYING
+  frames >= 100          143/143                     1/143
+  totally flat frames        0                         2
+```
+
+The front camera was healthy for the entire run. The wrist camera was not, and
+`logs/aug8_wrist_sweep.jpg` shows why it is worse than a sharpness number:
+
+```text
+  c0000-c0022   looks DOWN at the table - plate and surface visible. Correct.
+  c0033-c0066   looks at the WALL and skirting board.
+  c0077-c0142   looks at the FLOOR. No table, no plate, no target. ~46% of the run.
+```
+
+The camera drifts off the workspace at roughly the same time the failed grasp
+happens, and never recovers. From a floor-only wrist view the policy has one
+useful camera instead of two, which is a plausible mechanism for why it never
+re-engaged an object the front camera could still see perfectly.
+
+**This is testable in sim and was never tested.** `--rotate-wrist-camera` exists
+but the campaign only ever tried 5°; this is the camera ending up somewhere
+between 45° and 90° off task. The geometry axis that measured 89%→44% was tested
+far too gently.
+
+## Also: the target is not an orange
+
+`logs/aug8_orange_moved.jpg` — the object is smooth, glossy and slightly
+flattened, with a stem indent. It reads as a **tomato** (or persimmon), not an
+orange. Sim oranges are spherical with pebbled skin. Worth confirming with the
+user; if the real runs used a tomato, that is a domain gap nobody recorded, and
+it bears directly on a grasp that closed and slipped.
+
+## Corrections this forces
+
+```text
+1. "zero object-directedness"     WRONG - contact at chunk 24-36, 21 px displaced
+2. "perception failure"           WRONG - it is a grasp failure + camera drift
+3. "sim cannot reproduce it"      DISSOLVED - sim's completion failures were right
+4. wrist camera "13% stale"       UNDERSTATED - 142/143 frames below sharp threshold
+```
+
+The latency finding earlier today stands on its own (the client genuinely has no
+compression, no RTC, and executes 8 of 16 actions) but it is no longer needed to
+explain a perception failure that did not happen. It remains a real defect and a
+plausible contributor to the failed grasp.

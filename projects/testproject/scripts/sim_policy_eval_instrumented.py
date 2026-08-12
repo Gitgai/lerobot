@@ -621,9 +621,20 @@ def main() -> None:
             try:
                 sensor = env.scene[cam_key]
                 pos = sensor.data.pos_w[0].cpu().numpy().astype(float)
-                quat = sensor.data.quat_w_world[0].cpu().numpy().astype(float)
-            except Exception:
-                return 0.0, 0.0, 0.0
+                # ROS convention: +X right, +Y down, +Z along the optical axis -
+                # the image plane IS (x,y) here. quat_w_world is +X forward and
+                # would smear along the wrong axis entirely. The env cfg declares
+                # convention="ros" for these cameras.
+                quat = sensor.data.quat_w_ros[0].cpu().numpy().astype(float)
+            except Exception as exc:
+                # NEVER silently return "no motion" - that is indistinguishable
+                # from a real settled camera and would turn a broken accessor
+                # into a clean-looking negative result.
+                raise RuntimeError(
+                    f"B9/B10 cannot read pose for camera {cam_key!r}: {exc}. "
+                    "Refusing to run - a silent zero here would report 'blur had "
+                    "no effect' when the blur was never applied."
+                ) from exc
             prev = _cam_prev.get(cam_key)
             _cam_prev[cam_key] = (pos, quat)
             if prev is None:
@@ -641,8 +652,12 @@ def main() -> None:
             try:
                 spawn = sensor.cfg.spawn
                 f_px = width * float(spawn.focal_length) / float(spawn.horizontal_aperture)
-            except Exception:
-                f_px = width  # ~53 deg fallback
+            except Exception as exc:
+                raise RuntimeError(
+                    f"B9: cannot read focal_length/horizontal_aperture for {cam_key!r}: "
+                    f"{exc}. Assuming a default aperture already caused one wrong "
+                    "conclusion in this investigation - refusing to guess again."
+                ) from exc
             T = args.img_motion_blur / 1000.0
             Z = max(args.img_motion_blur_depth, 1e-3)
             dx = f_px * T * (-v_cam[0] / Z + omega[1])
