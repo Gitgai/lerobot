@@ -241,6 +241,86 @@ loss finite and trending down · checkpoint RELOADS and produces finite actions
 
 ---
 
+# STEP 3b — DID THE MEMORY LEVERS COST QUALITY?  `[~30 min]` 🟢
+
+**Operator's question: "Adam 8 vs 32, f32 vs f16 — are we compromising quality
+or just training speed?" We do not know, because NOTHING SO FAR MEASURES
+QUALITY.** Loss fell 0.248 → 0.132, which shows learning and says nothing about
+task success. This step makes the question empirical.
+
+## The four levers, ranked by actual quality risk
+
+```text
+LEVER                    RISK    WHOSE CHOICE   WHY
+─────────────────────────────────────────────────────────────────────────────
+batch 8 vs reference 32  ★HIGH   OURS           noisier gradients AND the LR
+                                                was NOT scaled - we run the
+                                                preset lr=2.5e-5, tuned by
+                                                upstream for a larger batch.
+                                                A bs32 LR at bs8 takes steps
+                                                too large for the gradient
+                                                noise. UNTESTED.
+bf16 without fp32 master MEDIUM  UPSTREAM'S     8-bit mantissa: when lr*grad is
+                                                small vs weight magnitude the
+                                                update rounds AWAY. Worst late
+                                                in training. But this IS
+                                                LeRobot's own recipe and their
+                                                97.0% was measured with it.
+8-bit Adam vs fp32 Adam  LOW     OURS           quantises ONLY optimiser state
+                                                (m,v), blockwise, dequantised
+                                                to fp32 for the update.
+                                                Weights and grads keep full
+                                                precision. Dettmers et al.
+                                                ICLR 2022 matched fp32 across
+                                                GLUE/ImageNet/LM.
+gradient checkpointing   NONE    BOTH           mathematically identical;
+                                                recompute, not approximation.
+```
+
+⚠ **The precision layout is NOT naive bf16 casting** — measured from the
+step-6000 checkpoint:
+
+```text
+BF16   3.610B (87.1%)  255 tensors   mlp/attn projections, lm_head - big matmuls
+F32    0.534B (12.9%)  558 tensors   action projections, biases, norms
+```
+
+⇒ The precision-sensitive 13% is deliberately kept in fp32. That is the
+mitigation for the mantissa concern, and it is upstream's design, not ours.
+
+## The measurement
+
+LeRobot publishes **97.0% on Libero Spatial** for `pi05_base` on this dataset
+(`docs/source/pi05.mdx`). That is a reference number **on the same axis**.
+
+```bash
+lerobot-eval --policy.path=<step-12000 checkpoint> ...   # LIBERO Spatial
+```
+
+## Decision rule — written before the result
+
+```text
+within a few points of 97%     the whole lever stack is vindicated EMPIRICALLY,
+                               not by argument. Done.
+well short of 97%              the batch-size/LR deviation is FIRST SUSPECT,
+                               not the quantisation. Test it by re-running at
+                               bs16 WITH a scaled LR - one variable, the one
+                               that is ours.
+short AND bs16 does not fix it then interrogate bf16 / 8-bit Adam. Do NOT start
+                               here: it is the best-supported lever and the
+                               least likely cause.
+```
+
+⚠ **Do not attribute a quality gap to quantisation before testing batch size.**
+8-bit Adam is the lever with published evidence behind it; batch-8-with-an-
+unscaled-LR is the one with none.
+
+⚠ A LIBERO eval needs the LIBERO **simulator**, not just the dataset. If it is
+not installed, that is a setup task — and 🔴 **if it needs a new gated repo or a
+licence, STOP** (§A).
+
+---
+
 # STEP 4 — our own data  🔴 NEEDS A HUMAN DECISION
 
 **Do not start this unattended.** Not for technical reasons — the corpus
@@ -345,5 +425,36 @@ STEP 3  LIBERO capability run   🔄 LAUNCHED 2026-08-11 18:23
     probe dirs under ~/lerobot_assets/probes/ are candidates for cleanup —
     ⛔ but deleting checkpoints is RED (§A). Ask first.
 
+STEP 3b  quality — did the levers cost anything?
+  precision layout measured   BF16 3.610B (87.1%) / F32 0.534B (12.9%)
+                              ⇒ NOT naive bf16; the sensitive 13% stays fp32
+  fp32 master weights         NONE — bf16 tensors ARE the weights (confirmed:
+                              23.14 GiB persistent has no room for a 15.4 GiB
+                              fp32 copy, and the checkpoint dtypes agree)
+  LIBERO Spatial success      ____ %     reference: 97.0% (LeRobot pi05 docs)
+  gap                         ____
+  ⇒ VERDICT                   ____   apply the §STEP 3b rule as written:
+                                     a gap implicates BATCH SIZE / LR first,
+                                     NOT quantisation
+
 STEP 4  corpus decision       DEFERRED TO OPERATOR — see above
 ```
+
+---
+
+# §C STANDING NOTE — line-buffering has produced four false readings today
+
+Not a training issue, but it has cost real time and will recur.
+
+```text
+1  smoke run piped through `tail`      → empty log read as a HANG
+2  nvidia-smi -l > file                → 1 sample; a killed monitor looked idle
+3  tqdm progress bars (\r, not \n)     → grep saw ONE huge accumulating line and
+                                          fired a false milestone match
+4  (earlier lane) DYNUS -O3 "hang at dynus_node.cpp:1250" — same root cause
+```
+
+⇒ **Rules.** Write long-run output to a FILE and read the file; never pipe a
+live run through `tail`/`head`. Put `stdbuf -oL` on any producer whose output is
+redirected. Put `tr '\r' '\n'` before any grep that reads a progress bar. And
+treat *silence* as unknown, never as healthy — check the process table.
