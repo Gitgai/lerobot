@@ -1184,3 +1184,73 @@ bands under artificial lighting. It is a one-line fix and nobody has ever set it
 
 Same caveat as the wrist: locking exposure only works once the room has enough
 light. Set these AFTER the lighting is fixed, not before.
+
+---
+
+# WRIST-OFF-TASK BATTERY — RESULT, 2026-08-12. 83% -> 0%. Decisive.
+
+24 runs, four arms interleaved, same session, n=6 each.
+
+```text
+condition     n   closest approach   placed/18   rate   vs canonical
+canonical     6        0.015 m          15/18     83%   -
+wrist45       6        0.033 m           0/18      0%   p = 2.9e-07
+wrist70       6        0.101 m           0/18      0%   p = 2.9e-07
+wrist90       6        0.090 m           0/18      0%   p = 2.9e-07
+```
+
+**Misaiming the wrist camera alone takes the task from 83% to zero.** Nothing
+else was changed - same scene, same lighting, same policy, same session. The
+front camera stayed perfect throughout.
+
+## The battery tested the real defect, not just "an angle"
+
+`docs/evidence_aug8/wrist_angles_rendered.jpg` — the rendered wrist view at each
+setting:
+
+```text
+  canonical  plate, gripper and table clearly in frame
+  45 / 70 / 90 deg   BARE TABLE ONLY. no plate, no gripper, no target.
+```
+
+That is the c0077+ regime from the Aug 8 run, where the real wrist camera showed
+nothing but floor. The script carried an explicit instruction to check this
+before believing the numbers; it passes.
+
+## It reproduces the Aug 8 SHAPE, not just the score
+
+```text
+  AUG 8 REAL   approached, contacted (target displaced 21 px), failed the
+               grasp, never re-engaged for 106 more chunks
+  wrist45 SIM  approaches to 0.033 m, grasp predicate fires 4 times, places
+               ZERO, does not recover
+```
+
+Same signature: reach, touch, fail, never come back. wrist70/90 do not even
+approach (0.09-0.10 m vs canonical's 0.015 m) — consistent with the later half
+of the Aug 8 run after the camera had fully drifted.
+
+## What this settles
+
+**The wrist camera drifting off the workspace is SUFFICIENT, on its own, to
+cause total task failure.** It is not a contributing factor to be weighed
+against latency or instruction strings — it is a complete explanation for a 0%
+run.
+
+The campaign's earlier B8 test (`--rotate-wrist-camera=5`, "passed") was
+testing 5 degrees against a real offset of 45-90. That is why the axis looked
+harmless for three days.
+
+⇒ FIX THE WRIST CAMERA MOUNT. This now outranks every other open item,
+  including the 331 ms link and the instruction string.
+
+## What it does NOT settle
+
+```text
+- whether the mount DRIFTED during the run or was wrong from the start.
+  The Aug 8 frames show the view changing over time (table -> wall -> floor),
+  which suggests drift, i.e. a mechanical looseness rather than a bad setup.
+- whether fixing it is SUFFICIENT for the real arm. Sufficient-to-break is not
+  the same as sufficient-to-fix. The link latency and the front-camera pose are
+  still real and still unmeasured on hardware.
+```
