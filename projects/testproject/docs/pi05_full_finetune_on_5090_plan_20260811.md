@@ -1167,3 +1167,60 @@ venv reverted (step 8)     N/A — route C's in-place patch was abandoned. The
 
 ⇒ **Write the decision from the §6 table as-is.** The rule was fixed before the
 result specifically so the $11K call is not re-argued once a number is in hand.
+
+---
+
+# RESULT — 2026-08-12. Full fine-tune of pi0.5 FITS on the 5090. Measured, running.
+
+Not a projection. A run in flight, started 00:28:59, observed at step 14,000/24,000.
+
+```text
+  policy.type=pi05    pretrained_path=lerobot/pi05_base
+  freeze_vision_encoder = FALSE     <- vision encoder IS training
+  train_expert_only     = FALSE     <- not the expert-only shortcut
+  dtype=bfloat16   gradient_checkpointing=true   compile_model=false
+  batch_size=8     steps=24000      dataset=lerobot/libero_spatial_image
+```
+
+Both freeze flags false is what makes this a **full** fine-tune rather than the
+partial variants the plan listed as fallbacks. The 8.8 GB checkpoint is full
+weights, not an adapter.
+
+## The numbers
+
+```text
+  VRAM              27,649 / 32,607 MiB      ~5.0 GB headroom
+  throughput        49.8 steps/min           (batch 8)
+  checkpoint 2000   01:05:23
+  checkpoint 6000   02:16:11    +70m48s
+  checkpoint 10000  03:27:00    +70m49s
+  checkpoint 14000  04:37:49    +70m49s
+  ETA 24000         ~07:35
+```
+
+**The cadence is constant to one second across four intervals.** That matters more
+than the headline: no thermal throttling, no memory-pressure stalls, no host
+swapping. A run that was marginal on VRAM would show drift here, and it does not.
+
+## What this settles, and what it does not
+
+```text
+SETTLED   full fine-tune of pi0.5 on a single 32 GB 5090 - bf16 + gradient
+          checkpointing, batch 8 - runs stably at ~50 steps/min with 5 GB spare.
+          The plan's blockers (8-bit optimizer registration, gradient
+          accumulation) were NOT needed to get here.
+
+NOT YET   whether the resulting checkpoint is any GOOD. Throughput is not
+          quality. LIBERO-spatial is also not the SO-101 orange task, so this
+          proves the FEASIBILITY the question asked about, not transfer.
+
+NOT YET   whether batch 8 is the max. 5 GB spare suggests batch 12-16 might fit,
+          but nothing has tested it and this run should not be disturbed to find
+          out.
+```
+
+## Operational note
+
+With ~5 GB free, **do not launch Isaac Sim against this GPU while it runs.** Sim
+needs several GB and an OOM would cost the whole 4.7-hour run. The wrist-camera
+battery waits for ~07:35.
