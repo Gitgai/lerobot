@@ -481,6 +481,55 @@ points, not 5.
 
 ---
 
+## ✅ RESULT 2026-08-11 — the third branch. NEAR-TOTAL SPECIALISATION.
+
+```text
+SUITE            TRAINED ON?   SUCCESS   n
+libero_spatial   YES            70.0%    40    ← the same checkpoint
+libero_object    no              0.0%    40
+libero_goal      no              0.0%    40
+```
+
+**Verified not an artefact**, because an exact 0.0% on both deserves suspicion:
+
+```text
+same checkpoint still scores 70% on spatial   ⇒ the model is not broken
+rollouts ran the FULL 280 steps               ⇒ it acted; it did not crash out
+eval_s 136 s / 146 s vs spatial's 141 s       ⇒ comparable real compute
+avg_MAX_reward = 0.0                          ⇒ never even PARTIAL credit. Not
+                                                 "nearly succeeded" — zero.
+```
+
+⇒ **A full fine-tune on one LIBERO suite produces a model that can do that suite
+and NOTHING ELSE** — not even neighbouring suites with the same robot, same
+cameras, same scene type, same action space. Only the objects and goals differ.
+
+⚠ **Caveat on mechanism.** This is specialisation of the *whole checkpoint*, and
+that includes the **normalisation statistics**, which were fit on
+`libero_spatial` and ship inside the checkpoint. Different suites have different
+state/action distributions. So the 0% is not purely "the network forgot" — some
+of it is a normaliser pointed at the wrong distribution. Both are consequences of
+specialising, but they are different mechanisms and only a separate experiment
+(re-fitting stats, or freezing the VLM) would separate them.
+
+### ⇒ What this means for the project
+
+```text
+FULL FINE-TUNE      you get a SPECIALIST. Sequential full fine-tuning on task A
+                    then task B does not accumulate - B overwrites A. Consistent
+                    with STEP 1's finding that 595/603 VLM BACKBONE tensors moved.
+EXPERT-ONLY (012000) freezes the VLM, adapts only the action head. The
+                    anti-forgetting configuration, and already your working
+                    recipe at 26.3 GB.
+```
+
+⇒ **For one arm doing one task, full fine-tuning is likely the right call** — a
+specialist is what you want. **For a robot expected to retain broad capability,
+this result argues against it.** The 5090 can do full fine-tuning; whether you
+want it is now a design decision with a number attached rather than a hunch.
+
+---
+
 # STEP 4 — our own data  🔴 NEEDS A HUMAN DECISION
 
 **Do not start this unattended.** Not for technical reasons — the corpus

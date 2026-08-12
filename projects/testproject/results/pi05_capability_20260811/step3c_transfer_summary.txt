@@ -1,0 +1,10 @@
+# STEP 3c — transfer of a libero_spatial-only fine-tune to unseen suites
+# Same checkpoint (pi05_base + 12k steps @ bs8) evaluated on three suites.
+
+SUITE            TRAINED ON?   SUCCESS  n
+libero_spatial   YES             70.0%  40
+libero_object    no               0.0%  40
+libero_goal      no               0.0%  40
+
+# Not an artefact: same ckpt still 70% on spatial; rollouts ran the full 280
+# steps; eval_s 136/146 vs spatial 141; avg_max_reward 0.0 (no partial credit).
