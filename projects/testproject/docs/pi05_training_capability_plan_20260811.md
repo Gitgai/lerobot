@@ -704,6 +704,32 @@ representative.** A 24k run halted at 12k scores worse than a 12k run that
 completed, at identical cost. **Match the schedule to the budget you intend to
 spend.**
 
+### ⛔ CORRECTION 2026-08-12 — the real number is **80.0%**, not 85%
+
+Re-ran the 24k checkpoint at **n=200** instead of n=40, precisely because the
+small sample was flagged as marginal. **It moved the answer, and not in our
+favour:**
+
+```text
+measurement       successes    rate     95% interval
+n=40  (headline)   34/40      85.0%    [70.9%, 92.9%]
+n=200 (correct)   160/200     80.0%    [73.9%, 85.0%]
+
+reference                     97.0%    ⇒ now CLEARLY EXCLUDED
+gap                           17 points   (was 12 at n=40, 27 unmatched)
+```
+
+⚠ **85% was a lucky sample and I committed it as the headline.** It sits at the
+very edge of the n=200 interval. **Quote 80%.**
+
+⚠ **AND THE SAME CAVEAT APPLIES TO EVERY OTHER POINT ON BOTH CURVES** — they are
+all n=40, so each carries roughly ±11 points. The 70% from the 12k run has an
+interval of about [55%, 82%], which **overlaps** the 80% measured here. So even
+"doubling the data helped" is not airtight from those two numbers alone.
+⇒ **What supports it is the SHAPE of the full curve** — six rising points
+(25 → 40 → 60 → 65 → 77.5 → 85 at n=40) — not any single comparison. A trend
+across many noisy points is stronger evidence than two noisy points.
+
 ### What is left, and what it is worth
 
 ```text

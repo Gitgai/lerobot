@@ -1,0 +1,13 @@
+# n=200 re-measurement of the STEP 3d 24k checkpoint (LIBERO Spatial)
+# Run because n=40 was flagged as marginal. It MOVED the answer.
+
+measurement        successes      rate   95% interval
+n=40  (headline)   34/40         85.0%   [70.9%, 92.9%]
+n=200 (correct)    160/200       80.0%   [73.9%, 85.0%]
+
+reference                          97.0%   -> clearly EXCLUDED
+gap                                17 points (was 12 at n=40, 27 unmatched)
+
+# 85% was a lucky sample. Quote 80%.
+# Every other curve point is still n=40 (+/- ~11 points) - read the SHAPE,
+# not individual values.
