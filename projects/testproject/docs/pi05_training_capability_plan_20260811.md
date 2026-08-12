@@ -745,6 +745,94 @@ TO ISOLATE THE LEVERS a bs16 run with a scaled LR, matched data. ~6 h.
 
 ---
 
+# STEP 3e — IS THE 5090'S TRAINING ACTUALLY INFERIOR?  `[~15 lines + ~7 h]` 🟢
+
+**Operator: *"inferior training on the 5090 is still inferior, right?"* Yes — and
+an earlier revision of this plan called that gap "a confound that answers nothing
+you need". THAT WAS WRONG.** If this card yields 80% where an 80 GB card yields
+97%, the mechanism is academic and the deficit is the whole question. Framing a
+real cost as bookkeeping was a mistake, and this step exists to correct it.
+
+## The 17 points have three candidate causes, and they are NOT equal
+
+```text
+CAUSE                  HARDWARE-IMPOSED?   FIX
+batch 8 vs 32          NO                  gradient accumulation, ~15 lines.
+                                           bs8 × 4 accum = EFFECTIVE batch 32,
+                                           identical to the reference. Trades
+                                           wall-clock for memory.
+LR not scaled for bs8  NO                  our own tuning error. We ran the
+                                           preset 2.5e-5, tuned upstream for a
+                                           LARGE batch. At bs8 that is steps too
+                                           large for the gradient noise. Free.
+8-bit Adam + bf16      YES                 the only genuinely hardware-imposed
+                                           candidate. Cannot be removed at 32 GB
+                                           — FP32 Adam needs 46.3 GiB persistent.
+```
+
+⇒ **The 5090 is not fundamentally limited to small batches. lerobot's missing
+gradient accumulation is.** Those are very different claims, and only one of them
+argues for buying hardware.
+
+## The experiment
+
+Reproduce the reference recipe exactly **except** the two quantisation levers:
+
+```text
+batch size            8   (memory-safe for resume — see the STEP 2 caveat)
+accumulation steps    4   ⇒ EFFECTIVE BATCH 32, matching the reference
+LR                    scaled for the effective batch, not left at the preset
+steps                 6,000 optimiser updates × 32 = 192,000 examples
+                      ⇒ same data AND same effective batch as the reference
+est. wall             ~7 h (24,000 forward/backward passes, as before)
+```
+
+⇒ **Whatever gap survives THAT is the genuine, hardware-imposed cost of training
+π0.5 on a 32 GB card.**
+
+## ⇒ WHY THIS IS A PURCHASE DECISION, NOT CURIOSITY
+
+```text
+GAP CLOSES     a 96 GB card (RTX PRO 6000) buys SPEED, not quality — it avoids
+               accumulation overhead. $11K for wall-clock. Weak case.
+GAP SURVIVES   a 96 GB card buys QUALITY: at 96 GB you can run FP32 Adam
+               (46.3 GiB persistent) and drop quantisation entirely. That is a
+               capability the 5090 cannot match AT ANY SPEED. Strong case.
+```
+
+⚠ **Consider renting before buying.** `scripts/runpod/` already exists in this
+repo. If quality runs are occasional rather than daily, an 80 GB card rented per
+run costs a tiny fraction of $11K, while the 5090 absorbs all the iteration.
+**That is the two-tier strategy without the capital outlay** — and it is the
+option a "buy vs not" framing tends to hide.
+
+## Implementation notes
+
+```text
+lerobot_train.py  Accelerator(...) is built WITHOUT gradient_accumulation_steps
+                  update_policy() calls optimizer.step() + zero_grad() EVERY batch
+                  ⇒ wrap the forward/backward in accelerator.accumulate(policy)
+                    and let Accelerate gate the optimiser step
+config            add gradient_accumulation_steps to TrainPipelineConfig
+⚠ VERIFY IT TOOK EFFECT — the same trap as the optimizer preset (§3). Count
+  optimiser steps vs batches consumed; do not trust the flag.
+```
+
+## Prediction, written before the result
+
+```text
+lands ≈ 97%        levers are free; the 5090 is NOT inferior. Purchase case
+                   collapses to speed alone.
+lands ≈ 88-93%     levers cost ~5-10 points. Judgement call.
+lands ≈ 80%        batch size was NOT the cause; the levers are. Strongest case
+                   for a 96 GB card, and now with evidence.
+```
+
+⚠ Evaluate at **n=200**, not n=40 — n=40 already produced one 5-point error
+(§ the 85% → 80% correction).
+
+---
+
 # STEP 4 — our own data  🔴 NEEDS A HUMAN DECISION
 
 **Do not start this unattended.** Not for technical reasons — the corpus
