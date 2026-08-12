@@ -1037,3 +1037,81 @@ The latency finding earlier today stands on its own (the client genuinely has no
 compression, no RTC, and executes 8 of 16 actions) but it is no longer needed to
 explain a perception failure that did not happen. It remains a real defect and a
 plausible contributor to the failed grasp.
+
+---
+
+# WRIST CAMERA — diagnosed and partly fixed, 2026-08-12
+
+## Fixed: the proxy was pointed at a dead address and failed SILENTLY
+
+`pi_wrist_proxy.py` was launched Aug 8 13:00 with `--pi-host raspi@192.168.1.18`.
+The Pi now lives at **192.168.1.12** (hostname `raspberryw`, also on ZeroTier at
+192.168.194.203). ARP for .18 was INCOMPLETE — nothing there.
+
+**The proxy kept returning HTTP 200 with a valid, decodable JPEG.** Three pulls
+3 s apart were byte-identical, and identical to a capture hours earlier: one
+frozen BLACK frame. A client cannot tell this from a working feed.
+
+⇒ Restarted against .12; verified serving live frames (3 pulls, 3 distinct MD5s).
+⇒ **The proxy must fail loudly.** Serving a stale frame with 200 is the worst
+   possible behaviour and would silently poison any run.
+
+Note the Aug 8 wrist frames DID change content, so the feed was live then. This
+freeze is a LATER fault, not the Aug 8 cause.
+
+## The real problem is LIGHT, and it explains the Aug 8 blur exactly
+
+Sensor is **OV5647 = Camera Module v1: FIXED FOCUS, no AF motor.** So the earlier
+autofocus-hunting hypothesis is dead — B10 does not model this rig.
+
+Live measurements, arm parked:
+
+```text
+  config                      brightness   sharpness
+  current (no flags)               17.9        103
+  --ev 2.0                         19.5        118
+  --ev 2.0 --gain 8                16.7        153
+  --shutter 40ms --gain 12         30.3        333
+  front camera, for reference     102.0        183
+```
+
+`--ev` barely moves brightness because **auto-exposure is already maxed out.**
+Only an explicit long shutter helps, and even at 40 ms the frame is still **3x
+darker than the front camera.** The room is simply too dark.
+
+And that is the whole Aug 8 mechanism:
+
+```text
+  dark room -> AE lengthens the shutter -> motion blur during the reach
+```
+
+Smear during a reach at the shutter speeds darkness forces (f_px=634):
+
+```text
+     1/125 s     13 px
+     1/60  s     28 px
+     1/30  s     54 px
+     40 ms       66 px      <- what the test above needed
+```
+
+**The orange is only 40-80 px across in the wrist view.** At 1/30 s the smear is
+wider than the object. Aug 8 measured median sharpness 27 with CV 0.68 — low AND
+varying with motion, which is exactly this and NOT fixed misfocus.
+
+## Actions
+
+```text
+1. ADD LIGHT to the workspace.        <- dominant. No setting substitutes for photons.
+   Then the shutter can be short and frames stay sharp DURING motion.
+2. Lock shutter/gain/AWB explicitly in the proxy's rpicam-vid command. It
+   currently passes NO exposure flags at all - rig spec priority (2), never done.
+3. Check the OV5647 lens focus for ~15-25 cm working distance. It is a manual
+   twist-thread lens; nobody has recorded ever setting it.
+4. Make the proxy fail loudly instead of serving a frozen frame with HTTP 200.
+```
+
+## Measured in passing: the link
+
+**RTT NJ -> Pune over ZeroTier: min 249 ms, mean 331 ms, max 568 ms (n=4).**
+This is T0, previously unmeasured. At 30 Hz that is ~10 env-steps of dead time
+per policy call, before the 1.76 MiB uncompressed payload transfer is counted.
