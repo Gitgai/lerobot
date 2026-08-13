@@ -1612,3 +1612,80 @@ via `np.save` per call. π0.5 measured 14.6x from JPEG on this same link.
 softer than K=22 implies (smoke test: a 22-step hold yields ~6 fully-still steps,
 because the arm keeps converging toward the held target). What the battery shows
 is that of the two latency effects, staleness is the one that matters.
+
+---
+
+# WRIST CAMERA — STATUS, 2026-08-13
+
+## The proxy's hard-coded IP has now broken the feed TWICE in five days
+
+```text
+  Aug 8   proxy configured for raspi@192.168.1.18
+  Aug 12  Pi had moved to .12  -> feed dead. Proxy served a frozen BLACK frame
+          at HTTP 200 for days. Nothing noticed.
+  Aug 13  local wifi path to .12 broken -> frozen again, same silent failure,
+          within 24 h of the previous fix.
+```
+
+**This is the recurring fault, not a one-off.** A hard-coded DHCP address on a
+device whose lease rotates, behind a proxy that reports success while serving
+stale bytes.
+
+⇒ Repointed at the Pi's **ZeroTier address, 192.168.194.203**, which is assigned
+  per-member and persists. Verified serving live frames (3 pulls, 3 distinct
+  MD5s). This survives both DHCP rotation and the current local-wifi breakage.
+⇒ The proxy should still be made to FAIL LOUDLY. Serving a stale frame with a
+  200 is the worst possible behaviour and is what hid this for four days.
+
+## Image quality: FIXED
+
+```text
+              sharpness   brightness
+  Aug 8 run        27.0        (varied)     1 of 143 frames above threshold
+  Aug 13 dark      36.2          17.8
+  Aug 13 now      160.3          94.2       <- above the 100 threshold
+  front camera    183.0         102.0       reference
+```
+
+Lighting was the cause and lighting was the fix, exactly as the
+dark-room -> long-shutter -> motion-blur mechanism predicted.
+
+## Geometry: the tolerance is TIGHT
+
+168-image sweep, 7 angles:
+
+```text
+   0 deg  placed 2/3     20 deg  placed 1/3
+  10 deg  placed 2/3     30 deg  placed 0/3   <- cliff between 20 and 30
+                         45/60/90 deg  0/3
+```
+
+n=6 confirmation at the endpoints: 83% at 0 deg, 0% at 45/70/90 (p=2.9e-07).
+
+**The mount must hold well inside 20 deg for a whole run.**
+
+## UNRESOLVED: why the view drifted on Aug 8
+
+Two candidates needing opposite fixes:
+
+```text
+  A  the camera MOVED on its mount        -> mechanical
+  B  the camera is RIGID and the ARM drove to poses where it correctly
+     sees the floor                       -> behavioural, mount needs nothing
+```
+
+Two attempts to settle this from the Aug 8 data both failed: the arm never
+returns to its early pose, so no matched-pose pair exists in the 143 chunks.
+**Still open.** Blocked on the physical test (capture, move, RETURN TO THE SAME
+POSE, capture).
+
+## Still not done
+
+```text
+  - Pi exposure/WB: the proxy launches rpicam-vid with NO flags at all. The ACER
+    measurement showed auto can be the right answer (gain, not shutter), so this
+    needs measuring on the Pi before locking anything.
+  - lens focus: OV5647 is a manual twist lens, currently 160 vs the front's 183.
+    Never recorded as having been set.
+  - the mount test itself.
+```
