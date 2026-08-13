@@ -1689,3 +1689,65 @@ POSE, capture).
     Never recorded as having been set.
   - the mount test itself.
 ```
+
+---
+
+# RESOLVED — 2026-08-13. The camera did NOT move. The ARM drove off-task.
+
+The question that had been open since the correction: did the wrist camera move
+on its mount, or did the arm drive to poses where a rigid camera correctly sees
+the floor? Two earlier attempts failed because the arm never returns to its early
+pose, so no matched-pose pair exists in the data.
+
+## The test that works, and why the earlier ones could not
+
+**The gripper fingers are bolted to the same body as the camera.** So their
+position in the wrist frame depends ONLY on the camera's pose relative to the
+gripper — never on where the arm is in the room. It does not need a matched pose,
+which is exactly what the data lacks.
+
+## Result on the Aug 8 run
+
+```text
+  gripper detected in 140 / 143 wrist frames
+  centroid EARLY (c0000-c0030, n=31)   (250.7, 162.3)
+  centroid LATE  (c0090-c0142, n=53)   (266.5, 172.3)
+  SHIFT = 18.6 px  =  ~1.6 deg
+  tolerance before the task dies       ~240 px = 20 deg
+```
+
+**1.6 degrees over the whole run.** The mount held.
+
+Confirmed independently on the bench today: after the arm was moved by hand and
+returned, the gripper silhouette overlapped at IoU 65.4% with a centroid shift of
+34 px (~3 deg).
+
+## What this means
+
+```text
+  A  the camera MOVED on its mount     -> RULED OUT
+  B  the camera is RIGID and the ARM drove to poses where it correctly
+     points at the floor                -> CONFIRMED
+```
+
+⇒ **The mount needs nothing.** Strain-relief, fasteners, re-aiming — all off the
+  list. The earlier advice to fix the mount was aimed at a fault that does not
+  exist.
+
+⇒ The real fault is **behavioural**: the policy walked itself into poses where its
+  own wrist camera could not see the workspace, and then could not recover
+  because it had lost the camera it needed to recover with.
+
+This fits the staleness result. Acting on 740 ms old observations, the policy
+failed the grasp at chunks 24-36, then drifted into a pose with no workspace in
+the wrist view, and from there had one useful camera instead of two for the
+remaining 106 chunks.
+
+## What is still worth doing about the wrist camera
+
+```text
+  - NOT the mount.
+  - The Pi's rpicam-vid still runs with no exposure flags; needs measuring.
+  - The proxy must fail loudly instead of serving stale frames at HTTP 200.
+  - Lens focus (160 vs the front camera's 183) has never been set.
+```
