@@ -1418,3 +1418,66 @@ STANDS   wrist blur / dark room / dead proxy - all real, all measured.
 FALLS    "the front camera was the wrong one" - it was the right one.
 FALLS    the 44%->89% lever as a claim about hardware.
 ```
+
+---
+
+# WRIST MOUNT — what to actually fix, 2026-08-13
+
+## The aim is already close. The problem is rigidity.
+
+`docs/evidence_aug8/wrist_aim_target.jpg` puts three TRAINING wrist frames above
+three live frames from the rig. Both show the gripper fingers entering from the
+upper left with the table below, at a similar perspective. **The current aim is
+approximately right.**
+
+That matters because it narrows the fix. On Aug 8 the view was correct for the
+first ~22 chunks and then drifted to wall and floor. A camera that starts right
+and ends wrong is not mis-aimed — **it moved during the run.**
+
+## What the mount photo shows
+
+`docs/evidence_aug8/wrist_mount_closeup.jpg`, from the overhead camera:
+
+```text
+- the green PCB appears to REST against the assembly rather than be fastened
+- the orange CSI ribbon is long, unsupported, and arcs out under its own
+  stiffness. It is the stiffest thing attached to the camera.
+- the camera module sits on a small black bracket at roughly 30-45 deg
+```
+
+**The ribbon cable is the prime suspect.** A CSI ribbon is springy; every wrist
+roll and flex feeds force straight into the camera board. Over a 143-chunk run
+that is hundreds of tugs in the same direction — exactly the slow one-way drift
+the Aug 8 frames show (table -> wall -> floor, never back).
+
+## The tolerance it has to hold
+
+From the 168-image sweep: the task survives to ~20 deg and is dead by 30 deg.
+So the mount must hold the camera to **well inside 20 deg for a whole run**, not
+merely be pointed correctly at the start.
+
+## Fix, in order of likely payoff
+
+```text
+1. STRAIN-RELIEF THE RIBBON. Tie or tape it to the arm link a few cm back from
+   the camera, so cable motion is absorbed by the link and never reaches the
+   board. Leave a service loop. This alone may be the whole fix.
+2. FASTEN THE BOARD. It should not be possible to move the camera by hand
+   without loosening a fastener. Screws or a printed clamp, not friction.
+3. RE-CHECK AIM against wrist_aim_target.jpg once it is rigid - aim last, since
+   fastening will shift it.
+```
+
+## Verification, and it must be a MOVING test
+
+Aiming it once and photographing it proves nothing — Aug 8 passed that test.
+
+```text
+  capture a wrist frame
+  run the arm through its full range (or a full episode)
+  capture again
+  the two frames must show the same view
+```
+
+If they differ, the mount is still moving. That is the test Aug 8 would have
+failed, and no static check would have caught it.
