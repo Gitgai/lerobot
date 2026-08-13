@@ -28,3 +28,16 @@ Paged 8-bit optimiser (rung 3) — A/B at bs32
 #   rung 4 (explicit, NOT run)  pinned buffers + bulk cudaMemcpy. THIS is what
 #                               the 56.6 GB/s and +28% figures above describe.
 # ⇒ Do not apply the 3f.1 bandwidth numbers to the 3f.2 result.
+
+3f.3 / RUNG 4 — CPU optimiser offload MECHANISM, measured 2026-08-13
+  8-bit state  8.3 GB   transfer 0.296 s · update 0.013 s · total +0.309 s
+                        = +29.4% on a 1.05 s step   (predicted +28%)
+                        a 7 h run becomes ~9.1 h. VIABLE.
+  fp32 state  33.1 GB   ALLOC FAILED - exceeds the ~30 GB free on a 32 GB card.
+                        Cannot be staged in one piece; a real implementation
+                        must chunk it. The +112% figure is a floor assuming a
+                        transfer this hardware cannot perform.
+  # Measures transfer+update only. NOT integration overhead, scheduling or
+  # transfer/compute overlap. Literature reports 1.93-4.28x for full
+  # ZeRO-Offload; this isolated mechanism is 1.29x. Do not quote +29.4% as the
+  # cost of a production implementation.

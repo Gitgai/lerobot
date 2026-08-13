@@ -1503,9 +1503,33 @@ STEP 3f  capability ladder
        as a blanket statement. bitsandbytes deliberately does not pin — unified
        memory is what lets paging work automatically.
 
-  3f.3 CPU optimiser offload  ____ (not run — half-day job, only if a larger
-                              model is actually being planned)
-  3f.4 extrapolation          ____ (not run)
+  3f.3 CPU optimiser offload (rung 4)  ✅ MECHANISM MEASURED 2026-08-13
+         8-bit state (8.3 GB)   transfer 0.296 s · update 0.013 s
+                                total +0.309 s on a 1.05 s step = +29.4%
+                                ⇒ predicted +28% from 3f.1's bandwidth. The
+                                  arithmetic was RIGHT.
+                                ⇒ a 7 h run becomes ~9.1 h. VIABLE.
+         fp32 state (33.1 GB)   ⛔ ALLOC FAILED — CUDA out of memory.
+                                33.1 GB exceeds the ~30 GB free on a 32 GB card,
+                                so the state cannot be staged to the GPU IN ONE
+                                PIECE AT ALL. A real implementation must CHUNK
+                                it: more, smaller transfers, further from the
+                                bulk rate.
+                                ⇒ the +112% figure is a FLOOR that assumes a
+                                  transfer this hardware cannot perform.
+       ⚠ WHAT THIS MEASURES: transfer + update cost per optimiser step, at
+         pi05's real state sizes, with pinned memory.
+         WHAT IT DOES NOT: integration overhead, scheduling, transfer/compute
+         OVERLAP. A real ZeRO-Offload does BETTER on overlap and WORSE on
+         bookkeeping — which is why the literature reports 1.93-4.28× while this
+         isolated mechanism costs 1.29×. **Do not quote +29.4% as the cost of a
+         production offload implementation.** It is the floor for the transfer
+         itself.
+       ⇒ DeepSpeed is NOT installed and lerobot's trainer has NO offload hook,
+         so a full integration remains a half-day job. This measurement was the
+         cheap way to find out whether it is worth starting: it is.
+
+  3f.4 extrapolation          ____ (not run — desk work, ~1 h)
 
 STEP 4  corpus decision       DEFERRED TO OPERATOR — see above
 ```
