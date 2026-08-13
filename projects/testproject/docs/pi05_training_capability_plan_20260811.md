@@ -892,6 +892,47 @@ not all, and batch size explained nothing and made things worse.
 
 ---
 
+# ⚠ WHICH RUNGS WERE ACTUALLY USED IN WHICH RUN — read before quoting any of it
+
+**Rungs are TECHNIQUES, not runs. Several are active at once.** Operator asked
+which fine-tunes used which, and an earlier summary line here was misleading.
+
+```text
+run          rungs active        config           result
+STEP 3       rung 2              bs8              70.0% (n=40)
+STEP 3d      rung 2              bs8              80.0% (n=200)
+STEP 3e      rung 2 + rung 1     bs8 × accum4     64.5% (n=200)
+3f.2 probe   rung 2 + rung 3     bs32, 20 steps   no quality measurement
+```
+
+```text
+rung 1  accumulation   used in ONE full run (3e)
+rung 2  8-bit Adam     IN EVERY RUN — load-bearing. π0.5 needs 46 GiB without
+                       it and simply does not fit. Every result we have was
+                       produced with it.
+rung 3  paged Adam     20-STEP PROBE ONLY. Proved bs32 survives with it and
+                       OOMs without. NO quality data, and none implied.
+rung 4  CPU offload    NEVER RUN
+rung 5  param offload  NEVER RUN
+```
+
+⛔ **CORRECTION — an earlier line here said "rung 1 hurt quality (64.5% vs 80%)".
+That is wrong.** Gradient accumulation is a *mechanism*; what hurt was what we
+used it *for*:
+
+```text
+3d  bs8, no accumulation   → effective batch 8  → 24,000 updates → 80.0%
+3e  bs8 × accum 4          → effective batch 32 →  6,000 updates → 64.5%
+```
+
+⇒ **Accumulation degraded nothing by itself.** It enabled effective batch 32, and
+the bigger batch — 4× fewer optimiser updates at the same data — cost the 15.5
+points. Used to *hold* effective batch at 8 while halving activation memory
+(e.g. bs2 × accum 4) it should be quality-neutral. **The technique is fine; the
+configuration we chose with it was not.**
+
+---
+
 # STEP 3g — ⭐ THE STARTING CHECKPOINT. The hypothesis the numbers point at.
 
 **Found by laying the update counts side by side, at the operator's prompting
