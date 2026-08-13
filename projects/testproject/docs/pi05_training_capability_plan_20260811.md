@@ -925,6 +925,20 @@ measured step time with NO offload: 1.05 s
 overhead and transfer patterns are counted, so the true penalties are worse than
 that table. **Measure it; do not plan against it.**
 
+⚠ **CHECK THE GPU IS ACTUALLY FREE FIRST — `nvidia-smi` alone is not enough.**
+On 2026-08-13 the GPU looked idle by habit but was running a GR00T N1.6 eval
+started seconds earlier (`n16-stall-smoke.sh` → `run_gr00t_server` +
+`sim_policy_eval_instrumented.py`, ~15 GiB, 54% util). **A `pgrep` for
+`lerobot-train|lerobot-eval` returned NOTHING** — other stacks on this machine do
+not match those names.
+
+```bash
+nvidia-smi --query-compute-apps=pid,used_memory --format=csv   # ← the real check
+```
+
+⇒ **Query compute-apps, not just utilisation, and not a name pattern.** Starting
+a probe against a live eval would contend for GPU *and* CPU and corrupt both.
+
 ## 3f.1 — Measure real PCIe bandwidth  `[~2 min]` 🟢
 
 Replaces the 63 GB/s spec figure with a number. Host→device, device→host, and
@@ -979,6 +993,33 @@ RTX PRO 6000 96 GB + 128 GB RAM          ~12B (arithmetic)   ?
 
 ⇒ **The interesting question is not "does the bigger card fit a bigger model" —
 it is "how much bigger, and does offload extend that usefully or ruin it?"**
+
+## ⇒ INTERRUPTIBILITY — all four are safe to stop mid-way, unlike STEP 3d/3e
+
+**Operator asked whether the half-day rungs can be stopped if needed. Yes, and
+for a structural reason worth recording:**
+
+```text
+3f.1  PCIe bandwidth      ~2 min total. Nothing to interrupt.
+3f.2  paged optimiser     short runs, minutes each. Stop between runs, free.
+3f.3  CPU offload         HALF A DAY OF ELAPSED EFFORT, but composed entirely of
+                          SMALL pieces:
+                            integration  ~2-3 h — writing the DeepSpeed/Accelerate
+                                         plumbing. Pure code; lands in patches/
+                                         as it goes. Stop/start freely.
+                            measurement  ~1-2 h — a few hundred steps per config.
+                                         The LONGEST single action is MINUTES.
+3f.4  extrapolation       desk work, no GPU at all. Stop anywhere.
+```
+
+⚠ **There is no mid-run checkpoint in 3f.3 — and none is needed.** That is the
+structural difference from STEP 3d/3e, where stopping cost a rewind to the last
+save (~35 min). Here **the unit of work is small by construction**, so the most
+that can ever be lost is one short measurement run.
+
+⇒ **Do it across several sittings without penalty.** Only start 3f.3/3f.4 if a
+larger model is actually being planned; they answer nothing about the current
+one.
 
 ## The deliverable
 
