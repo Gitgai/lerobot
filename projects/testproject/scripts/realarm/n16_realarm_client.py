@@ -257,12 +257,42 @@ def main() -> None:
 
         _fdir = _Path.home() / "run_frames"
         _fdir.mkdir(exist_ok=True)
+
+        # ---- INSTRUMENTATION (added 2026-08-13) --------------------------
+        # The Aug 8 post-mortem recovered everything it could from 286 JPEGs and
+        # their FILE MTIMES, because nothing else was written down. The action
+        # trace went to a terminal nobody captured; the round trip had to be
+        # inferred from timestamps; measured joint state was never saved at all.
+        # Four days of analysis for facts a 30-line trace would have handed over
+        # in an hour. Everything below exists so that never repeats.
+        import json as _json
+        import numpy as _np
+        _trace = open(_Path.home() / "run_trace.jsonl", "w", buffering=1)
+
+        def _wrist_health(_img):
+            """Is the wrist camera still looking at the workspace?
+
+            Aug 8 failed because the wrist view drifted onto the floor for the
+            final 46% of the run and NOTHING NOTICED. Sim says that condition
+            alone takes the task from 83% to 0%, so it is worth a warning.
+            sharpness = variance of Laplacian; below ~100 is blurred at 640x480.
+            """
+            g = _cv2.cvtColor(_img, _cv2.COLOR_RGB2GRAY)
+            return {
+                "sharpness": round(float(_cv2.Laplacian(g, _cv2.CV_64F).var()), 1),
+                "brightness": round(float(g.mean()), 1),
+                "contrast": round(float(g.std()), 1),
+            }
+
         _chunk = 0
         try:
             while True:
+                _t_obs = time.time()
                 obs = robot.get_observation()
                 obs["lang"] = cfg.lang_instruction
+                _t_call = time.time()
                 actions = policy.get_action(obs)
+                _rtt_ms = round((time.time() - _t_call) * 1000, 1)
                 # EVIDENCE: what the policy saw + what it commanded, per chunk.
                 # (sim rule, applied to hardware: never diagnose blind)
                 for _cam in ("front", "wrist"):
@@ -270,8 +300,27 @@ def main() -> None:
                         _cv2.imwrite(str(_fdir / f"c{_chunk:04d}_{_cam}.jpg"),
                                      _cv2.cvtColor(obs[_cam], _cv2.COLOR_RGB2BGR))
                 _a0 = actions[0]
+                _health = _wrist_health(obs["wrist"]) if "wrist" in obs else {}
+                # LOUD, not buried in a file: a wrist camera that has lost the
+                # workspace is the single failure mode we know breaks the task.
+                if _health and _health["sharpness"] < 60:
+                    print(f"[real] *** WRIST DEGRADED chunk {_chunk}: "
+                          f"sharpness={_health['sharpness']} "
+                          f"brightness={_health['brightness']} *** ", flush=True)
+                _trace.write(_json.dumps({
+                    "chunk": _chunk,
+                    "t": round(_t_obs, 3),
+                    "rtt_ms": _rtt_ms,                     # the round trip, MEASURED
+                    "state": {k: round(float(obs[k]), 2)   # what the arm actually IS
+                              for k in policy.robot_state_keys if k in obs},
+                    "action0": {k: round(float(v), 2) for k, v in _a0.items()},
+                    "chunk_len": len(actions),             # returned vs executed
+                    "executed": min(cfg.action_horizon, len(actions)),
+                    "wrist": _health,
+                }) + "\n")
                 print(f"[real] chunk {_chunk}: pan={_a0['shoulder_pan.pos']:+.1f} "
-                      f"lift={_a0['shoulder_lift.pos']:+.1f} grip={_a0['gripper.pos']:+.1f}",
+                      f"lift={_a0['shoulder_lift.pos']:+.1f} grip={_a0['gripper.pos']:+.1f} "
+                      f"rtt={_rtt_ms:.0f}ms wrist_sharp={_health.get('sharpness', '?')}",
                       flush=True)
                 _chunk += 1
                 for action_dict in actions[: cfg.action_horizon]:
@@ -283,7 +332,29 @@ def main() -> None:
         except KeyboardInterrupt:
             print("\n[real] stopping")
         finally:
+            _trace.close()
             robot.disconnect()
+            # Print the summary the Aug 8 run could not give, so the operator
+            # knows whether the run is worth analysing BEFORE walking away.
+            try:
+                import json as _j
+                rows = [_j.loads(l) for l in open(_Path.home() / "run_trace.jsonl")]
+                if rows:
+                    rtt = sorted(r["rtt_ms"] for r in rows)
+                    sh = [r["wrist"].get("sharpness", 0) for r in rows if r.get("wrist")]
+                    bad = sum(1 for v in sh if v < 60)
+                    print(f"[real] {len(rows)} chunks | round trip median "
+                          f"{rtt[len(rtt)//2]:.0f} ms, max {rtt[-1]:.0f} ms")
+                    if sh:
+                        print(f"[real] wrist sharpness median {sorted(sh)[len(sh)//2]:.0f}, "
+                              f"{bad}/{len(sh)} chunks degraded "
+                              f"({100*bad/len(sh):.0f}%)")
+                        if bad > len(sh) * 0.2:
+                            print("[real] *** WRIST CAMERA WAS DEGRADED FOR MUCH OF THIS "
+                                  "RUN - the Aug 8 failure mode. Check the mount. ***")
+                    print(f"[real] trace: {_Path.home() / 'run_trace.jsonl'}")
+            except Exception as _e:
+                print(f"[real] (summary unavailable: {_e})")
             print("[real] robot disconnected")
 
     _real()
