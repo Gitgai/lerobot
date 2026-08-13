@@ -1,0 +1,13 @@
+# STEP 3e — effective batch 32 via gradient accumulation (bs8 x accum4)
+# 24,000 batches = 6,000 optimiser updates = 192,000 examples
+
+config (all 192,000 examples)      successes    rate   95% CI
+eff batch 8  (24,000 updates)      160/200     80.0%   [73.9%, 85.0%]
+eff batch 32 ( 6,000 updates)      129/200     64.5%   [57.7%, 70.8%]
+reference (LeRobot, bs32)          -           97.0%
+
+# Intervals do NOT overlap -> the 15.5-point drop is real.
+# MATCHING THE REFERENCE'S BATCH SIZE MADE IT WORSE. Batch size was never
+# the cause of the gap.
+# Peak VRAM 29.5 GiB (accumulation costs +2.18 GiB vs no accumulation).
+# 7h04m, zero throttling, final loss 0.062.

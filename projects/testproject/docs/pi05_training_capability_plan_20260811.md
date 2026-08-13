@@ -828,6 +828,65 @@ lands ≈ 80%        batch size was NOT the cause; the levers are. Strongest cas
                    for a 96 GB card, and now with evidence.
 ```
 
+---
+
+## ⛔ RESULT 2026-08-13 — **64.5%. WORSE, and off the bottom of every predicted branch.**
+
+```text
+ALL at 192,000 examples · n=200 eval · same data · same starting weights
+
+eff batch 8   (24,000 optimiser updates)   160/200   80.0%   [73.9%, 85.0%]
+eff batch 32  ( 6,000 optimiser updates)   129/200   64.5%   [57.7%, 70.8%]
+reference (LeRobot, bs32)                        —   97.0%
+
+intervals do NOT overlap ⇒ the difference is REAL, not sampling noise
+```
+
+### ★ MATCHING THE REFERENCE'S BATCH SIZE MADE IT 15.5 POINTS WORSE
+
+**The experiment's premise was wrong.** Batch size was never the cause of the
+gap — correcting it moved us *away* from 97%, and the gap widened from 17 to
+32.5 points.
+
+⇒ **This is the strongest possible answer to the purchase question, and it is the
+opposite of what the framing assumed.** More VRAM buys bigger native batches.
+**Bigger batches make this task WORSE.** So a 96 GB card would not buy quality
+here — it would buy the ability to do the thing that hurt.
+
+### Why — the most likely mechanism, stated as a hypothesis not a fact
+
+At a **fixed data budget**, batch size trades against **number of optimiser
+updates**:
+
+```text
+eff batch 8   192,000 examples ÷  8 = 24,000 weight updates
+eff batch 32  192,000 examples ÷ 32 =  6,000 weight updates   ← 4× fewer
+```
+
+⇒ For this task and this budget, **more updates beats bigger batches.** Small-batch
+gradient noise may also act as regularisation. Both are standard effects; neither
+was measured here, so treat the mechanism as unconfirmed.
+
+### ⚠ WHAT THIS DOES NOT SETTLE — and a confound worth chasing
+
+**We still cannot reproduce 97% at any batch size.** Remaining candidates:
+
+```text
+the levers (8-bit Adam + bf16)   still possible, still unisolated
+★ THE REFERENCE MAY USE MORE DATA   docs/source/pi05.mdx says they finetuned
+  "on the Libero dataset" — LIBERO ships FOUR suites (spatial, object, goal, 10).
+  WE TRAINED ON libero_spatial ONLY. If they trained on all four, that is ~4×
+  the data AND far more diverse, and would plausibly explain the entire residual.
+  ⇒ This is now the leading hypothesis and it is CHEAPER to test than another
+    batch-size variant.
+unknown hyperparameters          their exact recipe is not published beyond the
+                                 command in the docs
+```
+
+⇒ **Do not attribute the remaining 32.5 points to quantisation.** Two hypotheses
+that looked obvious have now been wrong in a row: data volume explained part but
+not all, and batch size explained nothing and made things worse.
+
 ⚠ Evaluate at **n=200**, not n=40 — n=40 already produced one 5-point error
 (§ the 85% → 80% correction).
 

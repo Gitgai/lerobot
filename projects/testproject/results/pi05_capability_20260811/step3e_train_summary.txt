@@ -1,0 +1,15 @@
+INFO 2026-08-12 17:33:07 m/factory.py:58 PROBE PATCH: scheduler sized for 6000 optimiser steps (24000 batches / accum 4)
+INFO 2026-08-12 17:33:07 ot_train.py:477 num_learnable_params=4143404816 (4B)
+INFO 2026-08-12 18:06:09 ot_train.py:717 Checkpoint policy after step 2000
+INFO 2026-08-12 18:40:25 ot_train.py:717 Checkpoint policy after step 4000
+INFO 2026-08-12 19:14:13 ot_train.py:717 Checkpoint policy after step 6000
+INFO 2026-08-12 19:48:55 ot_train.py:717 Checkpoint policy after step 8000
+INFO 2026-08-12 20:22:33 ot_train.py:717 Checkpoint policy after step 10000
+INFO 2026-08-12 20:55:44 ot_train.py:717 Checkpoint policy after step 12000
+INFO 2026-08-12 21:30:35 ot_train.py:717 Checkpoint policy after step 14000
+INFO 2026-08-12 22:03:57 ot_train.py:717 Checkpoint policy after step 16000
+INFO 2026-08-12 22:39:39 ot_train.py:717 Checkpoint policy after step 18000
+INFO 2026-08-12 23:14:42 ot_train.py:717 Checkpoint policy after step 20000
+INFO 2026-08-12 23:49:58 ot_train.py:717 Checkpoint policy after step 22000
+INFO 2026-08-13 00:25:05 ot_train.py:717 Checkpoint policy after step 24000
+INFO 2026-08-13 00:25:10 ot_train.py:800 End of training
