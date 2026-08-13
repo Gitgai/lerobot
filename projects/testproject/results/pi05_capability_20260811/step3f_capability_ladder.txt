@@ -1,0 +1,22 @@
+# STEP 3f.1/3f.2 — capability ladder, measured 2026-08-13
+
+PCIe bandwidth (1 GiB transfers, 20 iters, idle bus)
+  direction                 pageable      pinned
+  host -> device         26.7 GB/s     56.6 GB/s
+  device -> host         20.0 GB/s     55.8 GB/s
+  Gen5 x16 theoretical 63.0 GB/s -> pinned achieves 89%
+
+Escalation-ladder cost, recomputed from MEASURED bandwidth
+  8-bit Adam state  8.3 GB  +0.29 s/step  = +28%   VIABLE
+  FP32 Adam state  33.1 GB  +1.18 s/step  = +112%  doubles step time
+
+Paged 8-bit optimiser (rung 3) — A/B at bs32
+  config           batch   s/step  samples/s  torch GiB
+  bs8  non-paged       8    1.049       7.63      24.47
+  bs16 non-paged      16    1.880       8.51      26.82
+  bs32 non-paged      32      OOM          -          -
+  bs32 PAGED          32    3.747       8.54      25.48
+
+# bs32 OOMs without paging, SURVIVES with it -> rung 3 works on Blackwell.
+# bs32 paged uses LESS torch memory than bs16 non-paged -> state really offloads.
+# Paging penalty CANNOT be isolated: the clean control (bs32 non-paged) OOMs.

@@ -1263,13 +1263,44 @@ STEP 3e  effective batch 32 via accumulation   🔄 RUNNING
   success @ 24k (n=200)       ____ %
   ⇒ VERDICT on the levers     ____
 
-STEP 3f  capability ladder — rungs 3-5, currently UNMEASURED
-  3f.1 real PCIe bandwidth    ____ GB/s H2D · ____ D2H (spec says 63; expect
-                              50-80% of that)
-  3f.2 paged 8-bit optimiser  step ____ s (vs 1.05 baseline) · peak ____ GiB
-                              ⚠ must be memory-PRESSURED or paging never engages
-  3f.3 CPU optimiser offload  step ____ s · peak VRAM ____ · peak host RAM ____
-  3f.4 extrapolation          largest model on 96 GB + 128 GB RAM: ____
+STEP 3f  capability ladder
+  3f.1 real PCIe bandwidth    ✅ MEASURED 2026-08-13
+         pinned    H2D 56.6 GB/s · D2H 55.8 GB/s   = 89% of the 63.0 spec
+         pageable  H2D 26.7 GB/s · D2H 20.0 GB/s   = ~42%, roughly HALF
+       ⇒ my "expect 50-80%" was too pessimistic for the BEST case and about
+         right for the typical one. Pinned+large+uncontended ≈ 89%; anything
+         less careful lands in the 40-60% band — both measured on this machine
+         in the same minute. Offload implementations PIN, so use 56 GB/s.
+       ⇒ ESCALATION LADDER COSTS, recomputed from measurement not spec:
+           8-bit Adam state (8.3 GB)   +0.29 s/step  = +28%   ← VIABLE
+           FP32 Adam state (33.1 GB)   +1.18 s/step  = +112%  ← doubles it
+         A 7 h run becomes ~9 h with 8-bit offload. Annoying, not prohibitive.
+
+  3f.2 paged 8-bit optimiser  ✅ MEASURED 2026-08-13 — ★ RUNG 3 WORKS
+         config           batch   s/step  samples/s  torch GiB
+         bs8  non-paged       8    1.049      7.63      24.47
+         bs16 non-paged      16    1.880      8.51      26.82
+         bs32 non-paged      32      OOM         —          —
+         bs32 PAGED          32    3.747      8.54      25.48
+       ★ THE A/B IS DECISIVE: bs32 OOMs without paging and SURVIVES with it.
+         Same batch, same everything else. Paging is real and works on Blackwell
+         — which STEP −1 passing did NOT imply, since it is a different bnb code
+         path.
+       ★ AND IT DEMONSTRABLY OFFLOADS: bs32 paged uses LESS torch memory than
+         bs16 non-paged (25.48 vs 26.82 GiB) while holding 4× the batch. The
+         optimiser state genuinely left the card.
+       ⚠ CANNOT ISOLATE THE PAGING PENALTY. The clean comparison would be bs32
+         paged vs bs32 non-paged — but the latter OOMs, which is the whole point.
+         So 3.747 s/step mixes "bigger batch" with "paging overhead" and the two
+         cannot be separated from this data.
+       ⇒ Net throughput 8.54 samples/s ≈ bs16 non-paged's 8.51. Paging buys a
+         LARGER BATCH AT NO THROUGHPUT COST — but per STEP 3e larger batches are
+         WORSE for quality here, so the value is capability for a bigger MODEL,
+         not a better recipe for this one.
+
+  3f.3 CPU optimiser offload  ____ (not run — half-day job, only if a larger
+                              model is actually being planned)
+  3f.4 extrapolation          ____ (not run)
 
 STEP 4  corpus decision       DEFERRED TO OPERATOR — see above
 ```
