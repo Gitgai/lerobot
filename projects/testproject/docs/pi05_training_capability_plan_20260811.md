@@ -1182,16 +1182,45 @@ one.
 
 ## The deliverable
 
-A table that can be planned against rather than argued about:
+A table that can be planned against rather than argued about. **Three of five
+rungs are now measured on this machine:**
 
 ```text
-config                        max params   step time   slowdown   status
-in-VRAM, 8-bit Adam            ~4.14B       1.05 s      1.0×      ✅ measured
-paged 8-bit (rung 3)           ?            ?           ?         3f.2
-CPU optimiser offload (rung 4) ?            ?           ?         3f.3
-CPU parameter offload (rung 5) ?            ?           ?         ⛔ likely a
-                                                                   failure mode
+config                          step time   slowdown   status
+in-VRAM, 8-bit Adam (rung 2)     1.05 s      1.00×     ✅ MEASURED — the baseline.
+                                                          Load-bearing: pi05 needs
+                                                          46 GiB without it.
+paged 8-bit (rung 3)             3.75 s @    —         ✅ MEASURED — works on
+                                 bs32                     Blackwell; rescued bs32,
+                                                          which OOMs without it.
+                                                          ⚠ penalty NOT isolable:
+                                                          the control OOMs.
+CPU optimiser offload (rung 4)   +0.309 s    1.29×     ✅ MECHANISM MEASURED
+                                                          8-bit state only. fp32
+                                                          state (33.1 GB) CANNOT
+                                                          be staged at all on a
+                                                          32 GB card.
+                                                          ⚠ transfer+update only;
+                                                          a production
+                                                          ZeRO-Offload is
+                                                          1.93-4.28× per the
+                                                          literature.
+CPU parameter offload (rung 5)   ?           ?         ⛔ NEVER RUN. +42% floor by
+                                                          arithmetic, but weights
+                                                          cross ~3× per step in
+                                                          many small per-layer
+                                                          transfers. Expected far
+                                                          worse. No step assigned.
 ```
+
+**Practical reading:** rung 2 is free and mandatory. Rung 3 is a one-word change
+that buys headroom when something won't fit. **Rung 4 costs ~30% and is the real
+fallback for a model too big for 32 GB** — an overnight run becomes a long
+overnight run. Rung 5 is the untested floor.
+
+⚠ **Rung 5 has no plan step.** It is described in §5 and here, but nobody
+scheduled measuring it. That is a genuine gap if the floor ever needs
+establishing.
 
 ## Two cautions worth recording
 
