@@ -1751,3 +1751,79 @@ remaining 106 chunks.
   - The proxy must fail loudly instead of serving stale frames at HTTP 200.
   - Lens focus (160 vs the front camera's 183) has never been set.
 ```
+
+---
+
+# RETRACTION — 2026-08-13. "The policy reached and touched the orange" was WRONG.
+
+The operator, who watched the Aug 8 run, states: **the arm did not try to reach
+toward the orange, and never picked one.** That contradicts the 2026-08-12 claim
+in this document that the run was "a failed grasp, not a perception failure".
+
+## The claim, and why it does not hold
+
+It rested on ONE measurement: colour-tracking the orange in the static front view
+showed a 21 px centroid shift between chunks 24 and 36, read as contact.
+
+Problems, found on re-examination:
+
+```text
+1. The camera was on AUTO exposure and AUTO white balance that day. The whole
+   image's brightness and colour drifted during the run, which moves a
+   colour-threshold centroid without anything physically moving.
+2. The detected orange AREA changed ~20% (2095 -> 2536 px) over the same
+   period. A rigid object at constant distance does not change size; the
+   threshold was catching a different extent of it.
+3. The gripper carries YELLOW parts. A yellow end effector arriving next to an
+   orange target can contaminate an orange-hue mask directly.
+4. 21 px is 3% of frame width, against a target ~51 px across.
+```
+
+An attempt to check it by also tracking the gripper failed too: the white-pixel
+mask locked onto the arm's white UPPER BODY, not the end effector, so the
+resulting "gripper never got within 230 px" figure measures nothing useful.
+
+## What the frames DO support
+
+`docs/evidence_aug8/table_closeup.jpg` — full-resolution crops, no detection
+overlay:
+
+```text
+  c0000  orange alone, arm not in frame
+  c0024  end effector enters at the top, above and right of the orange
+  c0030  end effector beside the orange, approaching from the right
+  c0036  still beside it, to the right
+  c0060  moved away, right and down
+  c0120  far away, up and right
+```
+
+The gripper was **adjacent** to the orange for roughly ten chunks, then left and
+never came back. **Whether that was an attempt to grasp or incidental passage
+through that space is not determinable from these images.**
+
+## Status
+
+```text
+  "the arm reached, contacted and failed the grasp"   RETRACTED
+  "the arm did not meaningfully engage the orange"    stands - operator observation
+```
+
+⇒ The ORIGINAL characterisation of the run was right, and the 2026-08-12
+  "premise correction" in this document was itself the error.
+
+## Method note
+
+Three automated analyses of these frames have now failed:
+
+```text
+  whole-frame descriptor matching   background dominates, matched unlike poses
+  silhouette matching               same failure, arm never returns to a pose
+  orange colour tracking            auto-exposure drift, area change, yellow gripper
+```
+
+Only the gripper-in-WRIST-frame measurement survived scrutiny, because the
+gripper and camera are rigidly coupled so nothing else can explain a shift.
+
+**These 286 JPEGs, from an auto-exposure camera with no telemetry, do not support
+fine-grained inference about intent.** Stop trying to extract it. The instrumented
+client now records joint state per chunk, which answers such questions directly.
