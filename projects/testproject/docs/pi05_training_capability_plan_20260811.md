@@ -833,6 +833,125 @@ lands ≈ 80%        batch size was NOT the cause; the levers are. Strongest cas
 
 ---
 
+# STEP 3f — THE CAPABILITY LADDER: what CAN this machine train, and at what cost?
+
+**Operator's framing, and it is better than "curiosity":** *"slower training 24/7
+for a few days is better than nothing, or not having a solution at all... that
+way we are ready even if we have a 96 GB RTX PRO 6000 and 128 GB RAM, we could
+try even bigger models."*
+
+⇒ **Knowing the fallbacks BEFORE they are needed changes the answer from "we
+cannot train that" to "we can, at 3× slower".** Those lead to completely
+different project decisions. This step converts §5's escalation ladder from
+untested theory into a measured table.
+
+## Why the ladder is currently theory
+
+§5 lists paged optimizers, CPU optimizer offload and CPU parameter offload — and
+**none of it was ever entered.** 8-bit Adam alone brought us under the ceiling
+(§STEP 2), so rungs 3–5 remain unmeasured guesses. The cost estimates in this doc
+are arithmetic from PCIe link *specifications*, not measurements:
+
+```text
+link         theoretical BW    8-bit state offload    fp32 state offload
+Gen3 x16      15.8 GB/s        +1.05 s  (100%)        +4.20 s  (400%)
+Gen4 x16      31.5 GB/s        +0.53 s   (50%)        +2.10 s  (200%)
+Gen5 x16 ←us  63.0 GB/s        +0.26 s   (25%)        +1.05 s  (100%)
+
+measured step time with NO offload: 1.05 s
+5090 VRAM bandwidth ~1792 GB/s = 28× faster than even Gen5 x16
+```
+
+⚠ **Real achievable PCIe bandwidth is typically 50–80% of spec** once protocol
+overhead and transfer patterns are counted, so the true penalties are worse than
+that table. **Measure it; do not plan against it.**
+
+## 3f.1 — Measure real PCIe bandwidth  `[~2 min]` 🟢
+
+Replaces the 63 GB/s spec figure with a number. Host→device, device→host, and
+pinned vs pageable memory (pinned is typically 2× faster and is what offload
+implementations use).
+
+```text
+record   H2D and D2H GB/s, pinned and pageable
+⇒ then RECOMPUTE the table above with the measured figure
+```
+
+## 3f.2 — Paged 8-bit optimizer (rung 3)  `[~20 min]` 🟢
+
+**Nearly free to try.** bitsandbytes ships `PagedAdamW8bit`, which spills
+optimiser state to host RAM automatically under memory pressure. Our existing
+patch already registers `AdamW8bitConfig` — this is a **one-word change** to
+`bnb.optim.PagedAdamW8bit`.
+
+```text
+measure   step time vs the 1.05 s baseline · peak VRAM · does paging engage at
+          all, or does it sit unused because we already fit?
+⚠ TO ACTUALLY EXERCISE PAGING it must be memory-PRESSURED. If it fits in VRAM
+  the pages never spill and the test measures nothing. Force pressure by raising
+  batch size until it would otherwise OOM (bs32 OOMed at §STEP 2 — that is the
+  natural probe).
+⚠ UNPROVEN ON BLACKWELL. bnb's Blackwell support was the whole reason STEP −1
+  existed. Paging is a different code path from the 8-bit optimiser itself, so
+  STEP −1 passing does NOT imply this passes.
+```
+
+## 3f.3 — Explicit CPU optimizer offload (rung 4)  `[~half a day]` 🟡
+
+Real integration work — DeepSpeed ZeRO-Offload or Accelerate's offload plumbing,
+not a one-liner. **Do this only if 3f.1 and 3f.2 look promising.**
+
+```text
+measure   step time · peak VRAM · peak host RAM · largest model that then fits
+⚠ 59 GB of host RAM is itself a ceiling. fp32 Adam state for a 4.14B model is
+  33.1 GB — offloading that leaves ~26 GB for everything else. A 10B model's
+  fp32 state (80 GB) would NOT fit in this machine's RAM at all.
+```
+
+## 3f.4 — Extrapolate to hypothetical hardware  `[~1 h, desk work]` 🟢
+
+With 3f.1–3f.3 measured, project onto configurations under consideration:
+
+```text
+CONFIG                                   what fits in VRAM   with CPU offload
+5090 32 GB + 59 GB RAM  (today)          ~4B  (measured)     ?
+RTX PRO 6000 96 GB + 128 GB RAM          ~12B (arithmetic)   ?
+```
+
+⇒ **The interesting question is not "does the bigger card fit a bigger model" —
+it is "how much bigger, and does offload extend that usefully or ruin it?"**
+
+## The deliverable
+
+A table that can be planned against rather than argued about:
+
+```text
+config                        max params   step time   slowdown   status
+in-VRAM, 8-bit Adam            ~4.14B       1.05 s      1.0×      ✅ measured
+paged 8-bit (rung 3)           ?            ?           ?         3f.2
+CPU optimiser offload (rung 4) ?            ?           ?         3f.3
+CPU parameter offload (rung 5) ?            ?           ?         ⛔ likely a
+                                                                   failure mode
+```
+
+## Two cautions worth recording
+
+⚠ **On the warranty argument** (*"3 years, free replacement, why not utilise
+it"*) — agreed in substance: 575 W and 85 °C sustained are within spec, and 3.5 h
+runs with zero throttling say the cooling is not marginal. **But a warranty
+replaces HARDWARE, not TIME.** If the card dies mid-project the RMA costs weeks,
+and every result in this document lives on this one machine. ⇒ That argues for
+keeping `DYNUS_ASIS_BACKUP_MANIFEST.md`-style discipline over the probe outputs,
+not for running the card gentler.
+
+⚠ **Rung 5 (parameter offload) is expected to be useless, and that is a result
+too.** Weights are touched every layer of every forward AND backward pass, not
+once per step like optimiser state. At 28× slower than VRAM it should be
+catastrophic rather than merely slow. **Measure it once to establish the floor,
+then never use it.**
+
+---
+
 # STEP 4 — our own data  🔴 NEEDS A HUMAN DECISION
 
 **Do not start this unattended.** Not for technical reasons — the corpus
@@ -1030,6 +1149,27 @@ STEP 3d  matched-data run   🔄 LAUNCHED
   ⇒ VERDICT                   ____   apply the §STEP 3b rule as written:
                                      a gap implicates BATCH SIZE / LR first,
                                      NOT quantisation
+
+STEP 3e  effective batch 32 via accumulation   🔄 RUNNING
+  config                      bs8 × accum4 · 24,000 batches · 6,000 optimiser
+                              updates · 192,000 examples · LR preset 2.5e-5
+                              (correct unscaled: effective batch IS 32)
+  ⚠ accumulation costs +2.18 GiB   25.53 → 27.71 GiB training process.
+    NOT memory-neutral, contrary to what I predicted. Mechanism: zero_grad's
+    set_to_none normally FREES ~7.7 GiB of gradients between steps; with
+    accumulation they must persist across the window, so gradient and
+    activation storage coexist instead of alternating.
+    ⇒ peak 29.5 GiB of 31.84 — effective batch 32 FITS but is at the ceiling.
+  success @ 24k (n=200)       ____ %
+  ⇒ VERDICT on the levers     ____
+
+STEP 3f  capability ladder — rungs 3-5, currently UNMEASURED
+  3f.1 real PCIe bandwidth    ____ GB/s H2D · ____ D2H (spec says 63; expect
+                              50-80% of that)
+  3f.2 paged 8-bit optimiser  step ____ s (vs 1.05 baseline) · peak ____ GiB
+                              ⚠ must be memory-PRESSURED or paging never engages
+  3f.3 CPU optimiser offload  step ____ s · peak VRAM ____ · peak host RAM ____
+  3f.4 extrapolation          largest model on 96 GB + 128 GB RAM: ____
 
 STEP 4  corpus decision       DEFERRED TO OPERATOR — see above
 ```
