@@ -1,0 +1,13 @@
+# Update counts across every run — the comparison that reframed STEP 3e
+
+run                         eff batch  updates  batches  examples   result
+STEP 3   bs8                        8    12000    12000     96000   70.0% (n=40)
+STEP 3d  bs8                        8    24000    24000    192000   80.0% (n=200)
+STEP 3e  bs8 x accum4              32     6000    24000    192000   64.5% (n=200)
+REFERENCE bs32 (LeRobot)           32     6000     6000    192000   97.0%
+
+# STEP 3e and the REFERENCE are IDENTICAL on effective batch, optimiser
+# updates AND examples - and differ by 32.5 points.
+# => 'more updates beat bigger batches' explains OUR runs but NOT the
+#    reference gap. Leading remaining hypothesis: the STARTING CHECKPOINT
+#    (pi05_base generic vs pi05_libero_base, already LIBERO-shaped).

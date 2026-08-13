@@ -892,6 +892,93 @@ not all, and batch size explained nothing and made things worse.
 
 ---
 
+# STEP 3g — ⭐ THE STARTING CHECKPOINT. The hypothesis the numbers point at.
+
+**Found by laying the update counts side by side, at the operator's prompting
+("how many updates in baseline?"). It reframes everything after STEP 3e.**
+
+```text
+run                     eff batch  updates  batches  examples   result
+STEP 3   bs8                   8   12,000   12,000    96,000   70.0% (n=40)
+STEP 3d  bs8                   8   24,000   24,000   192,000   80.0% (n=200)
+STEP 3e  bs8 × accum4         32    6,000   24,000   192,000   64.5% (n=200)
+REFERENCE bs32 (LeRobot)      32    6,000    6,000   192,000   97.0%
+```
+
+⇒ **STEP 3e and the REFERENCE are IDENTICAL on every axis** — same effective
+batch (32), same optimiser updates (6,000), same examples (192,000) — **and
+differ by 32.5 points.**
+
+## ⛔ This kills the "updates vs batch size" explanation for the reference gap
+
+"More updates beat bigger batches" is real **for our own two runs** (24,000
+updates → 80%, 6,000 → 64.5%). It **cannot** explain the reference, which got
+97% from the *same* 6,000 updates that gave us 64.5%.
+
+⇒ Something else is different, and it must be worth ~30 points.
+
+## ⇒ THE LEADING HYPOTHESIS: we started from the WRONG CHECKPOINT
+
+```text
+pi05_base          3 cameras: base_0_rgb, left_wrist_0_rgb, right_wrist_0_rgb
+                   state[32]  action[32]      ← GENERIC, padded pi0 space
+pi05_libero_base   2 cameras: image, image2   ← exactly the LIBERO env keys
+                   state[8]   action[7]       ← Franka Panda 7-DoF + gripper
+```
+
+**We used `pi05_base`. The reference used "the libero base model".**
+
+⇒ Starting generic, our model had to learn **the space adaptation** — different
+camera count, different action dimensionality — **as well as the task**, inside
+6,000 updates. The reference began with that plumbing already correct.
+
+⚠ **I RETRACTED THIS HYPOTHESIS EARLIER FOR A BAD REASON.** STEP 3b.0 measured
+`pi05_libero_base` at **0.0% zero-shot** and I concluded "no head start". That
+proves no *task competence* head start. It says **nothing** about an
+*architectural* one. Config is not capability, but config is not *nothing*
+either — and I over-corrected.
+
+⇒ It also explains the rest of the pattern: **more updates helped US** (we had
+more to learn) **while the reference did not need them.**
+
+## The experiment
+
+```text
+from            lerobot/pi05_libero_base   ← THE ONLY CHANGE
+batch size      8 × accum 4 = effective 32
+steps           24,000 batches = 6,000 optimiser updates = 192,000 examples
+everything else identical to STEP 3e
+est. wall       ~7 h
+eval            n=200, NOT n=40
+```
+
+⇒ This is a genuine like-for-like reproduction of the reference recipe. **The
+only remaining differences would be 8-bit Adam and bf16** — which is the question
+the whole lane exists to answer.
+
+⚠ **Check the camera keys first.** `pi05_libero_base` natively expects
+`image`/`image2` — the LIBERO env's own names — so the `--rename_map` that STEP
+3e needed may be unnecessary or *inverted*. Inspect before launching; a silent
+key mismatch would waste 7 hours.
+
+## Prediction, written before the result
+
+```text
+lands ≈ 97%      the starting checkpoint was the whole gap. Levers are FREE, the
+                 5090 is not inferior in any respect, and the lane closes.
+lands ≈ 80-90%   the checkpoint explains most of it; a residual belongs to the
+                 levers and/or batch size.
+lands ≈ 64%      the checkpoint is NOT the cause either. Three hypotheses dead,
+                 and the remaining suspects are the levers or an unknown in
+                 their recipe (e.g. training on ALL FOUR LIBERO suites).
+```
+
+⚠ **Two obvious hypotheses have already failed** — data volume explained part
+but not all, batch size explained nothing and made things worse. **Do not treat
+this one as settled before it runs.**
+
+---
+
 # STEP 3f — THE CAPABILITY LADDER: what CAN this machine train, and at what cost?
 
 **Operator's framing, and it is better than "curiosity":** *"slower training 24/7
@@ -1262,6 +1349,24 @@ STEP 3e  effective batch 32 via accumulation   🔄 RUNNING
     ⇒ peak 29.5 GiB of 31.84 — effective batch 32 FITS but is at the ceiling.
   success @ 24k (n=200)       ____ %
   ⇒ VERDICT on the levers     ____
+
+STEP 3g  starting checkpoint — ⭐ THE LEADING HYPOTHESIS, NOT YET RUN
+  the observation   STEP 3e and the REFERENCE match on effective batch (32),
+                    optimiser updates (6,000) AND examples (192,000) — and
+                    differ by 32.5 points. So "updates vs batch size" explains
+                    our own runs but NOT the reference gap.
+  hypothesis        we started from pi05_base (generic: 3 cameras, state[32],
+                    action[32]); the reference started from the LIBERO-shaped
+                    base (2 cameras, state[8], action[7]). We had to learn the
+                    SPACE ADAPTATION as well as the task in 6,000 updates.
+  ⚠ retracted this earlier for a bad reason — 0% zero-shot proves no TASK
+    competence head start, not the absence of an ARCHITECTURAL one.
+  config            from pi05_libero_base · bs8 × accum4 · 24,000 batches
+                    · everything else identical to 3e · ~7 h · eval at n=200
+  ⚠ check camera keys first — pi05_libero_base natively wants image/image2, so
+    3e's --rename_map may be unnecessary or inverted
+  success @ 24k     ____ %   (prediction: ~97% ⇒ checkpoint was the whole gap)
+  ⇒ VERDICT         ____
 
 STEP 3f  capability ladder
   3f.1 real PCIe bandwidth    ✅ MEASURED 2026-08-13
