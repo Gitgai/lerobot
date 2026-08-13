@@ -898,12 +898,17 @@ not all, and batch size explained nothing and made things worse.
 which fine-tunes used which, and an earlier summary line here was misleading.
 
 ```text
-run          rungs active        config           result
-STEP 3       rung 2              bs8              70.0% (n=40)
-STEP 3d      rung 2              bs8              80.0% (n=200)
-STEP 3e      rung 2 + rung 1     bs8 × accum4     64.5% (n=200)
-3f.2 probe   rung 2 + rung 3     bs32, 20 steps   no quality measurement
+run          FROM              rungs active        config         result
+STEP 3       pi05_base         rung 2              bs8            70.0% (n=40)
+STEP 3d      pi05_base         rung 2              bs8            80.0% (n=200)
+STEP 3e      pi05_base         rung 2 + rung 1     bs8 × accum4   64.5% (n=200)
+3f.2 probe   pi05_base         rung 2 + rung 3     bs32, 20 steps  no quality
+3b.0 eval    pi05_libero_base  — NO TRAINING —     zero-shot       0.0% (n=40)
+STEP 3g      pi05_libero_base  rung 2 + rung 1     bs8 × accum4   NOT RUN
 ```
+
+⚠ **Every trained result came from `pi05_base`.** `pi05_libero_base` has only
+ever been *evaluated*, never trained from — see the verification below.
 
 ```text
 rung 1  accumulation   used in ONE full run (3e)
@@ -957,6 +962,32 @@ updates → 80%, 6,000 → 64.5%). It **cannot** explain the reference, which go
 97% from the *same* 6,000 updates that gave us 64.5%.
 
 ⇒ Something else is different, and it must be worth ~30 points.
+
+## ⛔ WHICH CHECKPOINT EACH RUN ACTUALLY STARTED FROM — verified, not remembered
+
+**Operator asked "we've been using pi05_libero_base for the last 2 full
+finetunes, or did we not?" We did NOT. Verified from the run configs:**
+
+```text
+step3.log    'pretrained_path': 'lerobot/pi05_base'
+step3d.log   'pretrained_path': 'lerobot/pi05_base'
+step3e.log   'pretrained_path': 'lerobot/pi05_base'
+```
+
+```text
+pi05_base          used for ALL THREE full fine-tunes
+                   3 cameras · state[32] · action[32]   ← generic, padded
+pi05_libero_base   EVALUATED ONCE (STEP 3b.0, 0.0% zero-shot). NEVER TRAINED
+                   FROM. 2 cameras (image/image2) · state[8] · action[7]
+```
+
+⚠ **This confusion is partly my fault.** When the zero-shot came back 0% I wrote
+that it "retracts the head-start claim" and moved on — which reads as though the
+checkpoint had been *dealt with*. It had only been **evaluated**.
+
+⇒ **STEP 3g would be the FIRST time we train from the LIBERO-shaped checkpoint.**
+Every result on record — 70%, 80%, 64.5% — came from a model that had to learn
+LIBERO's camera layout and 7-DoF action space **on top of** the task itself.
 
 ## ⇒ THE LEADING HYPOTHESIS: we started from the WRONG CHECKPOINT
 

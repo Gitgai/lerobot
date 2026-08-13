@@ -1,0 +1,15 @@
+# Which checkpoint and which rungs, per run — VERIFIED from run configs
+# (grep "'pretrained_path'" on each training log, not from memory)
+
+run          FROM               rungs active         config          result
+STEP 3       pi05_base          rung 2               bs8             70.0% (n=40)
+STEP 3d      pi05_base          rung 2               bs8             80.0% (n=200)
+STEP 3e      pi05_base          rung 2 + rung 1      bs8 x accum4    64.5% (n=200)
+3f.2 probe   pi05_base          rung 2 + rung 3      bs32, 20 steps  no quality
+3b.0 eval    pi05_libero_base   NO TRAINING          zero-shot       0.0% (n=40)
+STEP 3g      pi05_libero_base   rung 2 + rung 1      bs8 x accum4    NOT RUN
+
+# EVERY trained result came from pi05_base (generic: 3 cameras,
+# state[32], action[32]). pi05_libero_base (2 cameras, state[8],
+# action[7]) has ONLY ever been evaluated, never trained from.
+# => STEP 3g would be the FIRST training run from the LIBERO-shaped base.
