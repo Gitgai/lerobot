@@ -20,3 +20,11 @@ Paged 8-bit optimiser (rung 3) — A/B at bs32
 # bs32 OOMs without paging, SURVIVES with it -> rung 3 works on Blackwell.
 # bs32 paged uses LESS torch memory than bs16 non-paged -> state really offloads.
 # Paging penalty CANNOT be isolated: the clean control (bs32 non-paged) OOMs.
+
+# ⛔ CORRECTION: rungs 3 and 4 use DIFFERENT transfer mechanisms.
+#   rung 3 (paged, measured)    CUDA unified/managed memory (cudaMallocManaged).
+#                               Driver migrates pages on demand, per-page,
+#                               fault-driven. Does NOT reach the bulk pinned rate.
+#   rung 4 (explicit, NOT run)  pinned buffers + bulk cudaMemcpy. THIS is what
+#                               the 56.6 GB/s and +28% figures above describe.
+# ⇒ Do not apply the 3f.1 bandwidth numbers to the 3f.2 result.

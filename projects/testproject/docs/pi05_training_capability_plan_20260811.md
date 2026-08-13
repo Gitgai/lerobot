@@ -1298,6 +1298,34 @@ STEP 3f  capability ladder
          WORSE for quality here, so the value is capability for a bigger MODEL,
          not a better recipe for this one.
 
+  ⛔ RUNG 3 AND RUNG 4 USE DIFFERENT TRANSFER MECHANISMS — do NOT apply 3f.1's
+     numbers to 3f.2. Operator caught this; the source confirms it:
+
+       bitsandbytes/functional.py:93   lib.cget_managed_ptr(...)  ← cudaMallocManaged
+                                 :97   out.is_paged = True
+                                 :102  def prefetch_tensor(...)
+
+       RUNG 3 (paged, MEASURED)    CUDA UNIFIED/MANAGED memory. One address
+                                   space; the DRIVER migrates pages on demand
+                                   under VRAM pressure. Per-page, fault-driven,
+                                   not under your control ⇒ does NOT reach the
+                                   bulk pinned rate.
+       RUNG 4 (explicit, NOT RUN)  you allocate PINNED buffers and cudaMemcpy
+                                   the state in bulk when you choose ⇒ this is
+                                   what 3f.1's 56.6 GB/s and the +28% estimate
+                                   describe.
+
+     ⇒ **The +28% figure belongs to rung 4, which has not been run.** The
+       3.747 s/step measured here is rung 3 on a slower path — and cannot be
+       cleanly attributed to paging anyway, since the bs32 non-paged control
+       OOMs.
+     ⇒ The trade is CONVENIENCE vs SPEED: paging is a one-word change that just
+       works; explicit pinned offload is real integration work on the faster
+       path. That is exactly why they are separate rungs.
+     ⚠ "Offload implementations pin" was right about EXPLICIT offload and wrong
+       as a blanket statement. bitsandbytes deliberately does not pin — unified
+       memory is what lets paging work automatically.
+
   3f.3 CPU optimiser offload  ____ (not run — half-day job, only if a larger
                               model is actually being planned)
   3f.4 extrapolation          ____ (not run)
