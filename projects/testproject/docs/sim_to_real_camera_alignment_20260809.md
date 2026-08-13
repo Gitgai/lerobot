@@ -1481,3 +1481,64 @@ Aiming it once and photographing it proves nothing — Aug 8 passed that test.
 
 If they differ, the mount is still moving. That is the test Aug 8 would have
 failed, and no static check would have caught it.
+
+---
+
+# UNRESOLVED: did the camera move, or did the ARM? 2026-08-13
+
+Told that the ribbon is already secured, which removes the leading mechanical
+suspect. That raises an alternative never tested:
+
+```text
+  A. the camera MOVED on its mount           -> mechanical fix
+  B. the camera is RIGID and the ARM drove to poses where it correctly
+     points at the floor                     -> not a mount problem at all
+```
+
+These need completely different responses, so it matters.
+
+## Two attempts to settle it from the Aug 8 data. Both failed.
+
+**Attempt 1** — match early/late chunks by whole-frame front-camera similarity,
+then compare wrist views. Reported a 5.03x ratio and "the camera MOVED".
+**Wrong.** The static background (table, wall, plate) dominates the pixel
+difference, so a large arm movement barely registers. The "matched" pairs
+(c0011 vs c0139) are an upright compact arm against a fully extended one.
+
+**Attempt 2** — isolate the arm by differencing against a per-pixel median
+background, match on silhouette. Gave a clean-looking control (late-vs-late
+wrist diff 5.6, early-vs-late 34.6). **Also unusable.** The best match found,
+c0013 vs c0135, is again visibly two different poses.
+
+**Why both failed, and the actual finding:** *the arm never returns to its early
+pose.* In the second half of the run it occupies a different region of the
+workspace entirely. With no matched-pose pair anywhere in the 143 chunks, this
+question is **not answerable from this dataset**, by any descriptor.
+
+⇒ No claim either way. "The camera moved on its mount" is UNSUPPORTED.
+
+## What still stands regardless of cause
+
+The wrist view carried no workspace content for the final 66 chunks (plate
+visible in 0/66), and the sim battery shows that condition alone takes the task
+from 83% to 0%. **That holds under both A and B.** Only the FIX differs.
+
+## The physical test that does settle it
+
+Needs the arm returned to the SAME pose - the exact thing the data lacks:
+
+```text
+  1. capture a wrist frame, note the arm pose
+  2. run the arm through its full range of motion
+  3. RETURN IT TO THE SAME POSE   <- the step that makes this a test
+  4. capture again
+  same pose + different view  -> A, the mount moved
+  same pose + same view       -> B, the mount is fine, the policy drove off-task
+```
+
+"Before" frames captured 2026-08-13 into `logs/mount_test_20260813/`. The
+"after" capture is pending the arm being moved and returned.
+
+If it comes out B, the mount needs nothing and the real problem is that the
+policy walks itself into poses where its own wrist camera is useless - which is
+a training/behaviour issue, not a screwdriver one.
