@@ -1542,3 +1542,73 @@ Needs the arm returned to the SAME pose - the exact thing the data lacks:
 If it comes out B, the mount needs nothing and the real problem is that the
 policy walks itself into poses where its own wrist camera is useless - which is
 a training/behaviour issue, not a screwdriver one.
+
+---
+
+# STALL BATTERY — RESULT, 2026-08-13. It is the STALENESS, not the freezing.
+
+24 runs, four arms interleaved, same session, n=6 each. K=22 from the Aug 8
+frame mtimes (740 ms blocked at 30 Hz).
+
+```text
+condition     n   closest   placed    rate    vs control
+canonical     6   0.019 m   16/18      89%    -
+stall22       6   0.015 m   11/18      61%    p = 0.121   NOT significant
+delay22       6   0.016 m    4/18      22%    p < 0.001
+both22        6   0.016 m    2/18      11%    p < 0.001
+```
+
+## The finding
+
+**The arm being motionless is survivable. The policy acting on a stale image is
+not.**
+
+- `stall22` — world advances, arm holds, no fresh command: **61%, p=0.121.**
+  Costs performance but does not reliably break the task.
+- `delay22` — policy sees a 740 ms old observation: **22%, p<0.001.** Destroys it.
+
+These were treated as two halves of one problem for three days. They are not
+equal halves: staleness does nearly all the damage.
+
+⇒ **The fix is to reduce observation AGE, not to smooth out the freezing.**
+
+## And it reproduces the Aug 8 signature exactly
+
+Closest approach is 0.015-0.019 m in EVERY arm, including the ones scoring 11%.
+The policy still reaches the object; it fails to complete.
+
+```text
+  AUG 8 REAL   reached, contacted (target displaced 21 px), failed the grasp
+  delay22 SIM  reaches to 0.016 m, places 4/18
+```
+
+That is a *completion* failure, and it is a different signature from the wrist
+result, where the policy never approached at all (0.09-0.10 m).
+
+## The two causes explain DIFFERENT HALVES of Aug 8
+
+```text
+  observed on Aug 8                          reproduced by
+  reached, touched, failed the grasp    ->   delay22   (22%, approaches but cannot finish)
+  never re-engaged for 106 chunks       ->   wrist off-task (0%, never approaches)
+```
+
+Neither alone accounts for the whole run. Together they do, and the timeline
+fits: the grasp failed early (chunk 24-36, staleness), and the wrist camera had
+left the workspace by c0077, removing any chance of recovery.
+
+## What to do about it
+
+409 ms of the measured 740 ms is payload transfer — 1.76 MiB sent uncompressed
+via `np.save` per call. π0.5 measured 14.6x from JPEG on this same link.
+
+```text
+  JPEG the observations   -> removes most of 409 ms   ~10 lines, highest payoff
+  execute 16 of 16        -> currently 8; halves the calls needed
+  RTC                     -> the pi0.5 fix, heavier
+```
+
+**Do NOT read `stall22` p=0.121 as "latency is harmless".** The stall is also
+softer than K=22 implies (smoke test: a 22-step hold yields ~6 fully-still steps,
+because the arm keeps converging toward the held target). What the battery shows
+is that of the two latency effects, staleness is the one that matters.
