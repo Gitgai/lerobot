@@ -1827,3 +1827,86 @@ gripper and camera are rigidly coupled so nothing else can explain a shift.
 **These 286 JPEGs, from an auto-exposure camera with no telemetry, do not support
 fine-grained inference about intent.** Stop trying to extract it. The instrumented
 client now records joint state per chunk, which answers such questions directly.
+
+---
+
+# LIVE RUN, 2026-08-14 — the failure captured with instrumentation
+
+First run with the instrumented client. 187 chunks, ~3 min, bounded by `timeout`.
+Workspace correct: plate left, three targets clustered right, lights on.
+
+## It reproduced the operator's description exactly
+
+`docs/evidence_aug8/live_run_frames.jpg`: the arm starts upright, swings steadily
+up and to the RIGHT, away from the fruit, which sits untouched throughout. The
+wrist view has lost the workspace by chunk 60.
+
+**"Moves but does not try to reach" — reproduced, and now measured.**
+
+## What the trace shows
+
+```text
+  ROUND TRIP    median 615 ms   min 586   max 2078
+                (Aug 8, inferred from file mtimes: 740 ms - close)
+  WRIST SHARP   median 58, below threshold in 56% of chunks
+                (Aug 8: median 27. Better, still marginal.)
+```
+
+The mechanism, which no amount of image analysis could have shown:
+
+```text
+  joint              start      end      min      max    range
+  shoulder_pan.pos   -11.7   -116.4   -116.4    -11.7    104.7
+```
+
+**The policy commands a monotonic leftward pan of ~1 deg per chunk, from chunk 0,
+and never corrects.**
+
+```text
+  chunk    measured   commanded   delta
+      0       -11.7       -12.7    -1.0
+     60       -67.9       -68.9    -1.0
+    120      -116.2      -117.8    -1.6
+    186      -116.4      -117.1    -0.7
+```
+
+It walks 105 degrees across the run, hits a limit at -116, and sits there for the
+final ~65 chunks still commanding "further left". It leaves the policy's own
+training range (-66.9 .. 55.0) at **chunk 59** and spends **68% of the run
+outside it**.
+
+## Ruled out by this run
+
+**The starting pose is correct.** Measured against 25 training episodes:
+
+```text
+  joint            training start (mean+/-sd)    live run start
+  shoulder_pan          -8.3 +/- 5.1                 -11.7   ok
+  shoulder_lift       -103.3 +/- 2.4                -104.7   ok
+  elbow_flex            96.8 +/- 0.2                  96.8   ok
+  wrist_flex            78.7 +/- 1.5                  79.7   ok
+  wrist_roll            -2.4 +/- 8.7                   7.6   ok
+  gripper               38.2 +/- 12.3                 50.0   ok
+```
+
+Every joint inside one standard deviation. **NOTE:** an earlier reading of this
+run claimed shoulder_lift started out of distribution. That used the checkpoint's
+`statistics.json`, which describes a DIFFERENT dataset
+(`so101_pick_orange_v2.1`). Against the actual task's own episodes the start pose
+is right. Retracted.
+
+## What this does NOT yet explain
+
+**Why** the policy commands a constant leftward pan from the very first chunk. A
+steady ~1 deg/chunk bias for 120 consecutive chunks is not a decision — it is a
+systematic offset. Candidates, none tested:
+
+```text
+  - the policy does not recognise the scene and is emitting a prior/default
+  - the targets are TOMATOES; the training data used oranges
+  - the scene is 67% of training brightness, the fruit 49%
+  - a sign or frame convention error on shoulder_pan specifically
+```
+
+The last is worth checking first because it is the only one that would produce a
+*monotonic* drift rather than degraded reaching, and it is checkable in code.
