@@ -1207,6 +1207,70 @@ fails at 24 or 33 GB       fp32 offload is chunked-only ⇒ +785% ⇒ effectivel
 ⚠ **This only affects fp32 offload.** The 8-bit path (8.3 GB) already pins
 comfortably and was measured in 3f.3. Nothing here changes the 8-bit numbers.
 
+## 3f.3d — PROVE fp32 OFFLOAD IN A REAL TRAINING LOOP  `[~2 h + 30 min run]` 🟡
+
+**Operator: "is there a way to test this at least for a few checkpoints, or does
+it need work before training?"** It needs work — but far less than the DeepSpeed
+route, because 3f.3c already proved the mechanism.
+
+### Why this is now tractable
+
+```text
+PROVEN by 3f.3c   33.1 GB of fp32 state pins in <5 s and streams to the GPU in
+                  1 GB chunks at 55.9 GB/s — full bulk rate, no degradation
+⇒ the design is simply: PIN ONCE at startup, STREAM SLICES per step
+⇒ NOT DeepSpeed: no CUDA-op compilation, no Blackwell-support risk, no
+  lerobot integration hook required
+```
+
+### The implementation, ~80 lines
+
+```text
+at init    flatten all params → allocate m, v as two PINNED CPU tensors (33.1 GB)
+at step()  for each ~4 GB slice:
+             copy m,v slice → GPU
+             apply the Adam update against that slice of gradients
+             copy m,v slice back
+plug in    via the OptimizerConfig registry — the SAME machinery already patched
+           and tested for adamw_8bit (§3, §3e)
+```
+
+### ⚠ Where it will actually be hard
+
+**Not the transfer — that is measured. The plumbing around it:**
+
+```text
+· lerobot's checkpoint saver will need the same scalar / shared-tensor handling
+  we had to add for bitsandbytes (STEP 1 — two stacked defects, five runs, after
+  being estimated at "a few lines")
+· the flat-parameter view must survive accelerate's model preparation
+· grad_clip_norm operates on live gradients; interaction with a flat view is
+  untested
+```
+
+⚠ **Treat any estimate here with suspicion.** STEP 1 was "~30 min, a few lines"
+and took five runs. STEP 3g's pre-flight looked complete and still wasted 7 hours.
+
+### Scope — deliberately small
+
+```text
+1  implement the optimiser + register it
+2  ⛔ RUN GATE E1 (preflight_batch_check.py) — non-negotiable
+3  200 steps only. Measure step time against the 1.05 s baseline.
+   TARGET: ~2.2 s/step (+112%). Anything near 8 s means the pinning did not
+   take effect and it fell back to a pageable path.
+4  save ONE checkpoint, reload it, confirm finite weights
+```
+
+⇒ **That is enough to validate +112% in practice.** Do NOT extend it into a full
+training run: fp32 Adam is not needed for π0.5, which fits in VRAM with 8-bit.
+
+### ⚠ What this is FOR, stated plainly
+
+**A model we do not have yet.** π0.5 trains fine without any of this and the
+purchase decision is settled. This is capability reference for a future larger
+model — worth building deliberately, not on momentum.
+
 ## 3f.4 — Extrapolate to hypothetical hardware  `[~1 h, desk work]` 🟢
 
 With 3f.1–3f.3 measured, project onto configurations under consideration:
@@ -1681,15 +1745,48 @@ STEP 3f  capability ladder
          ⚠ swap is currently 8 GB, 100% USED (residue from the training runs),
            so there is no swap headroom for such a test.
 
-  3f.3c full-pin test  ⏳ PLANNED — can 33.1 GB of fp32 state be PINNED?
-         decides +112% (bulk) vs +785% (chunked) for fp32 offload — a 7× swing
-         MemAvailable 43 GB · 33.1 GB is 77% of it · swap 100% used, no headroom
-         ⛔ PREREQ (operator, sudo): swapoff -a && swapon -a to clear stale swap
-         method: pin 16 → 24 → 33.1 GB, freeing between each, abort if
-                 MemAvailable < ~6 GB or the desktop stalls
-         if it FAILS: fp32 offload is chunked-only ⇒ not viable here ⇒ a concrete
-                 argument for the 128 GB RAM spec
-         16 GB   ____ GB/s      24 GB   ____ GB/s      33.1 GB  ____ GB/s
+  3f.3c full-pin test  ✅ MEASURED 2026-08-14 — IT PINS, AT FULL RATE
+         target    pin time   bulk rate   avail during
+         16.0 GB     2.6 s    56.3 GB/s     23.3 GB   ✅
+         24.0 GB     5.6 s    55.2 GB/s     15.2 GB   ✅
+         33.1 GB     4.6 s    55.9 GB/s     15.2 GB   ✅
+         (swap cleared by the operator first: SwapFree 0 → 8 GB, which moved
+          MemAvailable 48 → 40 GB as swapped pages faulted back in — the right
+          trade, since pinned memory is unswappable)
+         ⚠ test design flaw found and fixed mid-run: torch CACHES pinned host
+           allocations and does not return them to the OS, so sequential sizes in
+           ONE process measure garbage (39.7 → 23.3 GB and stayed). Redone with a
+           FRESH PROCESS per size; memory recovered to ~48 GB after each exit.
+
+       ★★ AND IT REFRAMES 3f.3b. `pin_one.py` copied to the GPU 1 GB AT A TIME
+          out of the pinned 33.1 GB buffer — that IS chunked transfer, and it ran
+          at 55.9 GB/s.
+
+            3f.3b  pageable state → pinned staging → GPU    8.0 GB/s
+            3f.3c  pinned state   → GPU, in chunks         55.9 GB/s
+
+          ⇒ **"chunked is 7× slower" was the wrong framing.** Chunking from
+            PAGEABLE memory is slow (two CPU memcpys per chunk). Chunking from
+            PINNED memory runs at full rate — and it MUST be chunked anyway,
+            since 30.8 GiB of fp32 state cannot sit on the GPU beside weights
+            and gradients.
+          ⇒ **+112% therefore needs no clever engineering.** Pin once at startup,
+            stream slices per step. The two designs I had treated as alternatives
+            are the same design.
+
+       ⇒ ALSO WEAKENS THE 128 GB RAM ARGUMENT: 59 GB already holds the full fp32
+         state for a ~4B model with 15 GB to spare and no swapping. §3f.4's
+         "RAM-bound at 7.3B" stands, but you would hit the VRAM wall for weights
+         and gradients first on a 32 GB card.
+
+  3f.3d fp32 offload in a REAL loop  ⏳ PLANNED — ~2 h + a 30 min run
+         tractable now that 3f.3c proved pin-once/stream-slices at 55.9 GB/s.
+         ~80 lines, NOT DeepSpeed. Scope: 200 steps, target ~2.2 s/step (+112%);
+         ~8 s/step would mean it fell back to a pageable path. One checkpoint
+         round-trip. ⚠ the hard part is the plumbing (checkpoint saver, flat
+         view vs accelerate, grad clipping), not the transfer.
+         ⚠ FOR A MODEL WE DO NOT HAVE YET — pi05 needs none of this.
+         step time ____ s   checkpoint reloads ____
 
   3f.4 extrapolation  ✅ DONE 2026-08-14 — desk work, no GPU
 

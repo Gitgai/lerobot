@@ -1,0 +1,21 @@
+# 3f.3c — CAN 33.1 GB OF fp32 STATE BE PINNED? Yes, at full rate.
+#   (operator cleared swap first: SwapFree 0 -> 8 GB)
+
+  target       pin time    bulk rate   avail during
+  16.0 GB          2.6s   56.3 GB/s         23.3 GB  OK
+  24.0 GB          5.6s   55.2 GB/s         15.2 GB  OK
+  33.1 GB          4.6s   55.9 GB/s         15.2 GB  OK
+
+# ⚠ TEST DESIGN FLAW found mid-run: torch CACHES pinned host allocations and
+#   does not return them to the OS, so sequential sizes in ONE process measure
+#   garbage (39.7 -> 23.3 GB and stayed). Redone with a FRESH PROCESS per size.
+
+# ★★ REFRAMES 3f.3b. pin_one.py copied to the GPU 1 GB AT A TIME out of the
+#    pinned 33.1 GB buffer - that IS chunked transfer, at 55.9 GB/s.
+#      3f.3b  pageable -> pinned staging -> GPU     8.0 GB/s
+#      3f.3c  pinned   -> GPU, in chunks           55.9 GB/s
+#    => 'chunked is 7x slower' was the WRONG FRAMING. Chunking from PAGEABLE
+#       memory is slow; chunking from PINNED memory runs at full rate - and it
+#       MUST be chunked anyway, since 30.8 GiB cannot sit on the GPU beside
+#       weights and gradients.
+#    => +112% needs no clever engineering: pin once, stream slices.
