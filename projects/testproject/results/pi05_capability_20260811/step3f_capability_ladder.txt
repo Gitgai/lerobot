@@ -41,3 +41,13 @@ Paged 8-bit optimiser (rung 3) — A/B at bs32
   # transfer/compute overlap. Literature reports 1.93-4.28x for full
   # ZeRO-Offload; this isolated mechanism is 1.29x. Do not quote +29.4% as the
   # cost of a production implementation.
+
+# ⛔ CORRECTION 2026-08-14 to the 3f.2 memory claim:
+#   bs32 PAGED   torch mem_gb 25.47   TRUE nvidia-smi peak 27.71 GiB
+#   bs32 nonpaged  OOM
+#   torch UNDERCOUNTS by 2.24 GiB - mem_gb is torch.cuda.max_memory_allocated(),
+#   which misses bnb's cudaMallocManaged tensors entirely.
+#   "bs32 paged uses LESS memory than bs16 non-paged" compared an undercount
+#   against a full count. The true peak is HIGHER than bs16's, not lower.
+#   Paging does not proactively offload; it lets an otherwise-OOM allocation
+#   succeed at the margin (111 MiB free VRAM observed mid-run).

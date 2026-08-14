@@ -1561,9 +1561,28 @@ STEP 3f  capability ladder
          Same batch, same everything else. Paging is real and works on Blackwell
          — which STEP −1 passing did NOT imply, since it is a different bnb code
          path.
-       ★ AND IT DEMONSTRABLY OFFLOADS: bs32 paged uses LESS torch memory than
-         bs16 non-paged (25.48 vs 26.82 GiB) while holding 4× the batch. The
-         optimiser state genuinely left the card.
+       ⛔ CORRECTED 2026-08-14 — "it demonstrably offloads" WAS WRONG.
+         An earlier revision said bs32 paged uses LESS memory than bs16
+         non-paged (25.48 vs 26.82 GiB) and concluded the state "genuinely left
+         the card". Re-measured with nvidia-smi telemetry:
+
+           bs32 PAGED   torch mem_gb 25.47   TRUE per-process peak 27.71 GiB
+           bs32 nonpaged  OOM
+
+         ⇒ torch UNDERCOUNTS BY 2.24 GiB. `mem_gb` is
+           torch.cuda.max_memory_allocated(), which tracks torch's allocator
+           only; bnb's paged tensors come from cudaMallocManaged OUTSIDE it.
+         ⇒ The original claim compared an UNDERCOUNT against a FULL COUNT, and
+           the true peak (27.71 GiB) is HIGHER than bs16's, not lower.
+
+       ★ WHAT PAGING ACTUALLY DOES: state does NOT proactively move off-card.
+         CUDA managed memory keeps pages resident and migrates them to host ONLY
+         UNDER GENUINE PRESSURE. What it buys is that an allocation which would
+         otherwise OOM instead SUCCEEDS, at the margin. Observed mid-run: 111 MiB
+         of free VRAM — paging engages exactly at the edge, letting the run sit
+         against the ceiling instead of falling off it.
+         That is still valuable, but it is a different mechanism from
+         "offloading state", which is how I described it.
        ⚠ CANNOT ISOLATE THE PAGING PENALTY. The clean comparison would be bs32
          paged vs bs32 non-paged — but the latter OOMs, which is the whole point.
          So 3.747 s/step mixes "bigger batch" with "paging overhead" and the two
