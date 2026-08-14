@@ -241,6 +241,13 @@ def main() -> None:
         policy_port: int = 5556
         action_horizon: int = 8
         lang_instruction: str = "Grab orange and place into plate"
+        # The wrist camera is a Raspberry Pi served by pi_wrist_proxy.py over
+        # HTTP. It CANNOT go through --robot.cameras: /frame returns ONE JPEG per
+        # request, not a stream, so LeRobot's camera read loop dies with
+        # "exceeded maximum consecutive read failures" (verified 2026-08-14).
+        # Set this to fetch it directly instead; leave empty to use whatever
+        # --robot.cameras provides.
+        wrist_url: str = ""
 
     @draccus.wrap()
     def _real(cfg: RealConfig):
@@ -269,6 +276,28 @@ def main() -> None:
         import numpy as _np
         _trace = open(_Path.home() / "run_trace.jsonl", "w", buffering=1)
 
+        def _fetch_wrist(url):
+            """Pull one JPEG from the wrist proxy and decode it to RGB.
+
+            Returns (frame, age_seconds). The proxy reports X-Frame-Age-Seconds,
+            which is how stale ITS cached frame is - distinct from the network
+            round trip and worth recording separately, since a frozen proxy
+            serving HTTP 200 is a failure mode this rig has hit twice.
+            """
+            import urllib.request
+            try:
+                with urllib.request.urlopen(url, timeout=2.0) as r:
+                    raw = r.read()
+                    age = float(r.headers.get("X-Frame-Age-Seconds", "nan"))
+                buf = _np.frombuffer(raw, dtype=_np.uint8)
+                bgr = _cv2.imdecode(buf, _cv2.IMREAD_COLOR)
+                if bgr is None:
+                    return None, age
+                return _cv2.cvtColor(bgr, _cv2.COLOR_BGR2RGB), age
+            except Exception as exc:
+                print(f"[real] wrist fetch failed: {exc}", flush=True)
+                return None, float("nan")
+
         def _wrist_health(_img):
             """Is the wrist camera still looking at the workspace?
 
@@ -289,6 +318,13 @@ def main() -> None:
             while True:
                 _t_obs = time.time()
                 obs = robot.get_observation()
+                if cfg.wrist_url:
+                    _w, _age = _fetch_wrist(cfg.wrist_url)
+                    if _w is not None:
+                        obs["wrist"] = _w
+                    _wrist_age_s = _age
+                else:
+                    _wrist_age_s = None
                 obs["lang"] = cfg.lang_instruction
                 _t_call = time.time()
                 actions = policy.get_action(obs)
@@ -317,6 +353,7 @@ def main() -> None:
                     "chunk_len": len(actions),             # returned vs executed
                     "executed": min(cfg.action_horizon, len(actions)),
                     "wrist": _health,
+                    "wrist_age_s": None if _wrist_age_s is None else round(_wrist_age_s, 3),
                 }) + "\n")
                 print(f"[real] chunk {_chunk}: pan={_a0['shoulder_pan.pos']:+.1f} "
                       f"lift={_a0['shoulder_lift.pos']:+.1f} grip={_a0['gripper.pos']:+.1f} "
