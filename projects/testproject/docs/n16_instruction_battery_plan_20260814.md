@@ -1,6 +1,8 @@
 # Plan: does the client's instruction string stop the policy finding the orange?
 
-Created 2026-08-14. Status: **not started, awaiting go-ahead.** ~30 min, no hardware.
+Created 2026-08-14. Status: **CANCELLED — the hypothesis was already ruled out.**
+See section 5. The battery was launched, found invalid within two minutes, and
+killed. No runs were kept.
 
 ---
 
@@ -122,3 +124,73 @@ Carry the harness lessons already paid for:
   interleave       cross-session comparison has produced a wrong conclusion here
   n=6, not n=1     a single run produced a wrong conclusion here
 ```
+
+
+---
+
+## 5. CANCELLED — the two arms were the same string
+
+Launched 2026-08-14, killed immediately. `sim_policy_eval_instrumented.py:228`:
+
+```python
+DATASET_TASK_STRINGS = {
+    "LeIsaac-SO101-PickOrange-v0": "Grab orange and place into plate",
+    ...
+}
+```
+
+and at line 271, when `--policy_language_instruction` is not passed:
+
+```python
+args.policy_language_instruction = DATASET_TASK_STRINGS.get(args.task) or ...
+```
+
+**The eval script's DEFAULT is already the client's exact sentence.** Confirmed
+in the run logs of every battery:
+
+```text
+  [eval] instruction: 'Grab orange and place into plate'
+```
+
+So `canonical` and `realInstr` would have been byte-identical, and this plan's
+central premise — "the arm's exact string has never been through the simulator" —
+was **wrong**. It has been through it in every single run.
+
+### The result, obtained for free
+
+**The instruction is ruled out as the sim-vs-real difference.** The 86% baseline
+was achieved *using the client's sentence*. It cannot explain why the same
+sentence yields 0% on hardware.
+
+The script had already reasoned this out and left the reasoning in a comment: the
+env string and the dataset string differ, the dataset one is what a trained model
+saw, and a measurement on N1.7 showed the dataset string gave the closest
+approach while an invented string moved the orange 0.000 m. Someone had solved
+this and written it down; I proposed re-testing it without reading four lines
+above the flag I was about to use.
+
+### Cost and lesson
+
+Two minutes of compute, and it would have been thirty. **Read the default before
+building an experiment around overriding it.** The same discipline that caught
+the `--policy_action_horizon` flag never reaching the GR00T client, on 2026-08-10,
+applies here and was not applied.
+
+### What remains for "moves but does not reach"
+
+```text
+  instruction            RULED OUT (here)
+  wrist camera off-task  RULED OUT for the real rig - mount moved 1.6 deg
+  staleness              does not match - still reaches to 0.016 m
+  BGR channel swap       tested, 67%, does not break it
+  darkness               object at brightness 91 vs 219 in training. UNTESTED,
+                         but the lighting has since been fixed.
+  object appearance      training orange vs the Aug 8 object look different in
+                         texture and shape; hue is similar. UNRESOLVED.
+```
+
+⇒ The simulator is no longer generating hypotheses that survive contact with the
+  operator's observation. **The next real information comes from a hardware run
+  with the instrumented client**, which records joint state, round trip and
+  camera health per chunk — turning "did it reach for the orange" from an
+  inference into a column in a file.
