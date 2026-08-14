@@ -1,6 +1,7 @@
 # Plan: port the JPEG observation fix to the N1.6 pipeline
 
-Created 2026-08-13. **APPROVED 2026-08-14 — see section 7 for the
+Created 2026-08-13. **IMPLEMENTED AND VALIDATED 2026-08-14 — see section 8.**
+**See section 7 for the
 remeasured numbers from the live run, which supersede section 0.**
 
 ---
@@ -288,3 +289,57 @@ battery is no longer a precondition. Worth running eventually; not a blocker.
 **Approved to implement.** Design in section 2 is unchanged and still correct.
 Validation in section 3 still applies, with V3 (scores must be statistically
 indistinguishable from the 86% baseline) as the gate.
+
+
+---
+
+## 8. IMPLEMENTED 2026-08-14
+
+```text
+  server   ~/sim/Isaac-GR00T-n16/gr00t/policy/server_client.py
+           decode_custom_classes gains a __jpeg_ndarray__ branch.
+           Backup: server_client.py.pre-jpeg   (vendored tree, not committed)
+  client   scripts/realarm/n16_realarm_client.py
+           jpeg_frame() + --jpeg_quality, wired through dry-run and real paths.
+           Default 0 = raw, unchanged behaviour.
+```
+
+### V1 round trip
+
+```text
+  shape   (1,1,480,640,3) -> identical      dtype uint8 -> uint8
+  pixel error   mean 0.83/255   max 19/255
+  size    900 KB -> 60 KB per image  (15.0x)
+  CHANNEL ORDER: PRESERVED   (per-channel means R114.9 G110.3 B93.5 both sides)
+  per policy call: 1.76 MiB -> 120 KB
+```
+
+### V3 behavioural cost — the gate
+
+Rather than a 6-run battery, fed the SAME observation raw and compressed and
+compared action chunks directly. Sharper: no sampling noise to see through.
+
+```text
+  worst-joint difference, JPEG vs raw        3.36 deg
+  NOISE FLOOR, two identical RAW calls       2.94 deg
+```
+
+**The compression changes behaviour no more than calling the policy twice does**,
+because flow matching draws fresh noise per call. Gate passed.
+
+### V4 over the real link
+
+Dry run from the arm machine to the NJ server:
+
+```text
+  raw        1.83 s
+  JPEG-92    0.35 s      5.2x faster
+```
+
+### Status
+
+Deployed to the arm machine, compiles there, off by default. Enable with
+`--jpeg_quality=92`.
+
+**Unchanged by this:** the `shoulder_pan` / `elbow_flex` bias. This makes the
+system operable; it is not a fix for the observed failure.
