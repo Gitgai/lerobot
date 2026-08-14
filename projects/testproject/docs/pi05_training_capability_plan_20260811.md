@@ -1779,7 +1779,41 @@ STEP 3f  capability ladder
          "RAM-bound at 7.3B" stands, but you would hit the VRAM wall for weights
          and gradients first on a 32 GB card.
 
-  3f.3d fp32 offload in a REAL loop  ⏳ PLANNED — ~2 h + a 30 min run
+  3f.3d fp32 offload — ✅ IMPLEMENTED AND MEASURED 2026-08-14
+         CPUOffloadAdamW: exp_avg / exp_avg_sq held as PINNED fp32 CPU tensors,
+         DMA'd to the GPU per parameter for the update and back. ~70 lines.
+         Per-parameter, not one flat buffer: pi05's 812 tensors average ~20 MB
+         of state each — large enough for good DMA rates, and no gather/scatter.
+
+         ★ CORRECTNESS  max |offload − torch.optim.AdamW| after 10 steps
+                        = 2.6e-08 → float32 rounding. IT MATCHES.
+                        (checked FIRST — an offloaded optimiser that quietly
+                         computes a different update would give a plausible
+                         training curve and a wrong model)
+
+         ★ COST, measured on 1.68B params and extrapolated to 4.14B:
+             baseline step                  1.05 s
+             + fp32 offload optimiser time  1.38 s   (predicted 1.18)
+             = total                        2.43 s   ⇒ 2.31× = +131%
+             a 7 h run becomes ~16.2 h
+
+           predicted from bandwidth alone   +112%
+           MEASURED end-to-end              +131%   ← the 17% gap is the update
+                                                      compute, per-tensor launch
+                                                      overhead and the grad cast
+           naive chunked-from-pageable      +785%   (3f.3b)
+           published ZeRO-Offload       1.93-4.28×; we sit at 2.31×
+
+         ⇒ **fp32 optimiser offload is VIABLE on this machine at ~2.3×.** The
+           mechanism is proven and the arithmetic held within 17%.
+
+         ⚠ NOT INTEGRATED INTO LEROBOT. Tested standalone, deliberately: a
+           failure there points at the optimiser rather than the integration,
+           and costs 2 minutes instead of a model load. Still unproven:
+           checkpoint save/load of pinned state, the accelerate interaction, and
+           grad clipping. Those matter only if it is actually to be USED.
+
+  3f.3d-int lerobot integration  ⏳ NOT DONE — optional
          tractable now that 3f.3c proved pin-once/stream-slices at 55.9 GB/s.
          ~80 lines, NOT DeepSpeed. Scope: 200 steps, target ~2.2 s/step (+112%);
          ~8 s/step would mean it fell back to a pageable path. One checkpoint

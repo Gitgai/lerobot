@@ -1,0 +1,21 @@
+# 3f.3d — CPUOffloadAdamW: fp32 optimiser state in PINNED host memory
+
+CORRECTNESS  max |offload - torch.optim.AdamW| after 10 steps = 2.6e-08
+             -> float32 rounding. MATCHES.
+
+COST (measured on 1.68B params, extrapolated to pi05's 4.14B)
+  baseline step                   1.05 s
+  + fp32 offload optimiser time   1.38 s   (predicted 1.18 from 55.9 GB/s)
+  = total                         2.43 s   => 2.31x = +131%
+  a 7 h run becomes ~16.2 h
+
+  predicted from bandwidth        +112%
+  MEASURED end-to-end             +131%   <- gap is update compute,
+                                             per-tensor launch overhead,
+                                             and the gradient cast
+  naive chunked-from-pageable     +785%   (3f.3b)
+  published ZeRO-Offload      1.93-4.28x; we sit at 2.31x
+
+# => fp32 optimiser offload IS VIABLE here at ~2.3x.
+# NOT integrated into lerobot - tested standalone by design. Unproven:
+# checkpoint save/load of pinned state, accelerate interaction, grad clipping.
