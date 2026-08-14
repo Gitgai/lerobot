@@ -1,0 +1,40 @@
+# 3f.3b — CHUNKED offload supersedes 3f.3's bulk-transfer figures
+#          and 3f.4 — capacity extrapolation. Measured 2026-08-14.
+
+CHUNKED TRANSFER (state on CPU, streamed through a 1 GB pinned buffer)
+  state size       time     effective
+          2 GB    0.55s         7.2 GB/s
+          8 GB    2.00s         8.0 GB/s
+         16 GB    3.96s         8.1 GB/s
+  chunked round-trip   8.0 GB/s
+  single bulk pinned  56.6 GB/s   <- what 3f.3's +29.4% assumed
+
+  8-bit state  +2.07 s/step = +197%   (3f.3 said +29.4%)
+  fp32  state  +8.24 s/step = +785%   (arithmetic said +112%)
+  => a 7 h run becomes ~21 h, NOT ~9 h.
+  => +197% falls inside the literature's 1.93-4.28x for real ZeRO-Offload;
+     +29.4% did not. The optimistic figure assumed a transfer a real
+     implementation cannot perform.
+
+UNTESTED PATH: MemAvailable is 43 GB, so the full 33.1 GB fp32 state COULD
+be held pinned, enabling bulk transfers (~+112%). DeepSpeed pins when it
+fits. Not measured; test incrementally at 16/24/33 GB. Note swap is
+currently 100% used, so there is no headroom.
+
+3f.4 CAPACITY EXTRAPOLATION (calibration: 5.58 GiB per billion params,
+                             2.39 GiB activations+context at bs8)
+  setup                         per 1B  5090 29.9GiB  PRO6000 89.9GiB
+  bf16 + 8-bit Adam (ours)     5.59 GiB        4.9B            15.7B
+  bf16 + fp32 Adam            11.18 GiB        2.5B             7.8B
+  everything fp32             14.90 GiB        1.8B             5.9B
+  # pi05 is 4.14B -> fits ONLY the first row. Plain fp32 caps at 1.8B.
+
+WITH OFFLOAD - two ceilings, smaller binds (GPU 4 B/param, host 2 or 8)
+  card + state                GPU caps      RAM caps (59GB)    binds
+  5090, 8-bit                     7.4B                29.1B      GPU
+  PRO 6000, 8-bit                23.5B                29.1B      GPU
+  5090, fp32                      7.4B                 7.3B      RAM
+  PRO 6000, fp32                 23.5B                 7.3B      RAM
+  # 8-bit: more RAM buys NOTHING, GPU is always the wall.
+  # fp32 : RAM is the wall. A 96 GB card holds 23.5B but 59 GB RAM
+  #        supports only 7.3B. At 128 GB it is 15.8B - still RAM-bound.

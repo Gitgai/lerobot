@@ -1478,9 +1478,11 @@ STEP 3f  capability ladder
          less careful lands in the 40-60% band — both measured on this machine
          in the same minute. Offload implementations PIN, so use 56 GB/s.
        ⇒ ESCALATION LADDER COSTS, recomputed from measurement not spec:
-           8-bit Adam state (8.3 GB)   +0.29 s/step  = +28%   ← VIABLE
-           FP32 Adam state (33.1 GB)   +1.18 s/step  = +112%  ← doubles it
-         A 7 h run becomes ~9 h with 8-bit offload. Annoying, not prohibitive.
+           8-bit Adam state (8.3 GB)   +0.29 s/step  = +28%
+           FP32 Adam state (33.1 GB)   +1.18 s/step  = +112%
+         ⛔ SUPERSEDED BY 3f.3b — these assume ONE BULK TRANSFER. Streaming in
+           chunks, which a real implementation must do, measures 8.0 GB/s not
+           56.6, giving +197% and +785%. A 7 h run becomes ~21 h, not ~9 h.
 
   3f.2 paged 8-bit optimiser  ✅ MEASURED 2026-08-13 — ★ RUNG 3 WORKS
          config           batch   s/step  samples/s  torch GiB
@@ -1558,7 +1560,79 @@ STEP 3f  capability ladder
          so a full integration remains a half-day job. This measurement was the
          cheap way to find out whether it is worth starting: it is.
 
-  3f.4 extrapolation          ____ (not run — desk work, ~1 h)
+  3f.3b CHUNKED offload  ⛔ REVISES 3f.3 SHARPLY — measured 2026-08-14
+       Operator's point: fp32 state should be allocated on CPU and STREAMED,
+       not staged whole. That is what a real implementation must do, and it is
+       7× slower than the bulk transfer 3f.3 assumed.
+
+         state size    time    effective rate
+             2 GB     0.55 s     7.2 GB/s
+             8 GB     2.00 s     8.0 GB/s
+            16 GB     3.96 s     8.1 GB/s
+         ⇒ chunked round-trip  8.0 GB/s
+           single bulk pinned 56.6 GB/s   ← what 3f.3's +29.4% assumed
+
+       WHY: each chunk needs TWO CPU memcpys (pageable→pinned, pinned→pageable)
+       on top of the DMA, and this implementation does not overlap them with
+       compute.
+
+         8-bit state   +2.07 s/step = +197%   (3f.3 said +29.4%)
+         fp32 state    +8.24 s/step = +785%   (arithmetic said +112%)
+
+       ⇒ **"a 7 h run becomes 9.1 h" WAS WRONG. It becomes ~21 h.**
+       ⇒ ★ +197% lands squarely inside the literature's 1.93-4.28× for real
+         ZeRO-Offload, where +29.4% did not. The optimistic figure assumed a
+         single bulk transfer a real implementation cannot perform. A production
+         version with double-buffering and overlap sits between the two — but
+         **closer to the chunked figure.**
+
+       ⚠ ONE UNTESTED PATH REMAINS. MemAvailable is 43 GB (64 GB installed,
+         59.2 GB MemTotal), so the full 33.1 GB of fp32 state COULD be held
+         pinned, enabling bulk transfers. DeepSpeed does pin state when it fits.
+         ⇒ fp32 offload may be +112% (fully pinned) rather than +785% (chunked).
+           NOT MEASURED. Test incrementally — 16 / 24 / 33 GB — since 33 GB of
+           unswappable memory could destabilise the machine.
+         ⚠ swap is currently 8 GB, 100% USED (residue from the training runs),
+           so there is no swap headroom for such a test.
+
+  3f.4 extrapolation  ✅ DONE 2026-08-14 — desk work, no GPU
+
+       CALIBRATION, from the measured pi05 runs:
+         persistent 23.14 GiB / 4.14B = 5.58 GiB per billion params
+         non-persistent (activations + CUDA context) at bs8: 2.39 GiB
+
+       HOW BIG A MODEL FITS IN VRAM
+         setup                      per 1B    5090 (29.9)   PRO 6000 (89.9)
+         bf16 + 8-bit Adam (ours)  5.59 GiB      4.9B           15.7B
+         bf16 + fp32 Adam         11.18 GiB      2.5B            7.8B
+         everything fp32          14.90 GiB      1.8B            5.9B
+
+       ★ π0.5 is 4.14B, so it fits the first row and NOTHING ELSE. With plain
+         fp32 the ceiling is 1.8B and π0.5 would not fit at all. **That single
+         comparison is the whole investigation: the memory tricks are what made
+         a 4.14B model trainable on this card.**
+
+       WITH OFFLOAD — TWO ceilings, the smaller one binds
+         (GPU holds w+g = 4 B/param · host holds state = 2 or 8 B/param)
+
+         card + state          GPU caps at   RAM caps at (59 GB)   binds
+         5090,     8-bit           7.4B            29.1B           GPU
+         PRO 6000, 8-bit          23.5B            29.1B           GPU
+         5090,     fp32            7.4B             7.3B           RAM (barely)
+         PRO 6000, fp32           23.5B             7.3B           RAM (badly)
+
+       ⇒ **With 8-bit state, MORE RAM BUYS NOTHING** — 59 GB already covers 29B
+         params of state. The GPU is always the wall.
+       ⇒ **With fp32 state, RAM is the wall** — and on a 96 GB card it is severe:
+         the card could hold 23.5B but 59 GB of RAM supports only 7.3B. **If the
+         reason to buy a big card is "run fp32 for quality", the RAM must be
+         bought too or the card sits underused.** At 128 GB it becomes 15.8B —
+         still RAM-bound, not VRAM-bound.
+
+       ⚠ EXTRAPOLATED FROM ONE MODEL AT ONE BATCH SIZE. The 2.39 GiB overhead is
+         π0.5-at-bs8-with-checkpointing; a different architecture or batch size
+         moves it. Persistent terms scale linearly in parameter count;
+         activations do not.
 
 STEP 4  corpus decision       DEFERRED TO OPERATOR — see above
 ```
