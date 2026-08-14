@@ -1910,3 +1910,78 @@ systematic offset. Candidates, none tested:
 
 The last is worth checking first because it is the only one that would produce a
 *monotonic* drift rather than degraded reaching, and it is checkable in code.
+
+---
+
+# ROOT CAUSE CANDIDATE, 2026-08-14: a compounding pan bias
+
+Chasing why the live run's pan drifted monotonically, via pure inference probes
+against the running server. No robot motion.
+
+## What the probes established
+
+**1. The output is dominated by STATE, not vision.**
+
+```text
+  vary the IMAGES (real / black / white / grey / swapped)   pan spread  1.2 deg
+  vary the STATE  (-40, -11.7, 0, 30)                       pan spread 69.7 deg
+```
+
+**2. But vision is NOT ignored** — measuring the whole 16-step chunk rather than
+`action[0]`, swapping front/wrist shifts the trajectory by 4.0 deg and black
+images by 2.5 deg. An earlier reading of probe 1 concluded "the policy ignores
+vision"; that used `action[0]` at the REST pose, where the opening motion is
+stereotyped. **Retracted.** It also contradicted the documented sim result that
+moving the oranges 0.150 m moves the reach 0.095-0.117 m.
+
+**3. The policy carries a systematic leftward pan bias, on its OWN training data.**
+Fed a training state with its matching training images, and compared against what
+the demonstrator actually did next:
+
+```text
+  frame 150   PREDICTED  2.9 2.8 2.4 2.3 1.8 1.6 1.7 0.9    drifting down
+              ACTUAL     3.5 3.5 3.5 3.5 3.5 3.5 3.5 3.5    flat
+  frame 300   PREDICTED -11.5 -11.7 -11.6 -12.0 -12.1 ...    drifting down
+              ACTUAL    -11.6 -11.5 -11.4 -11.4 -11.4 ...    flat/rising
+```
+
+Mean pan error 0.6-2.6 deg per chunk, and **the sign is consistently negative.**
+
+## The mechanism this suggests
+
+On training data a 1 deg error is small. But the real loop is CLOSED - each
+chunk's result becomes the next chunk's input - so a constant-sign bias
+integrates:
+
+```text
+  chunk 1     pan -1
+  chunk 2     from there, pan -1 again
+  ...
+  chunk 120   -105 deg, at the joint stop
+```
+
+Which is exactly what the live run measured (-11.7 -> -116.4, 68% of the run
+outside the training range).
+
+**Why sim does not run away:** in sim the visual signal is strong and
+in-distribution, and the vision term corrects the bias each cycle. On the rig the
+visual signal is weaker - tomatoes rather than the training oranges, scene
+brightness 67% and fruit 49% of training, wrist sharpness median 58 with 56% of
+chunks below threshold. If vision is too weak to correct the bias, the bias wins.
+
+⇒ **Hypothesis: a small pan bias that vision normally cancels, running away when
+  the visual signal is degraded.** It fits every observation - the sim/real
+  split, "moves but does not reach", the monotonic direction, and the joint stop.
+
+## NOT yet established
+
+```text
+  - that the bias CAUSES the runaway rather than accompanying it
+  - why the bias exists (checkpoint quality? the corpus units bug? training?)
+  - whether strengthening the visual signal (real oranges, more light) stops it
+```
+
+The cheapest discriminating test: **put real oranges on the table under good
+light and re-run.** If the drift stops, the hypothesis holds and the fix is the
+scene, not the code. If it drifts identically, the bias is unconditional and the
+checkpoint itself is the problem.
