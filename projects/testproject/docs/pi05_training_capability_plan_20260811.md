@@ -1590,6 +1590,91 @@ instead of waiting forever.
 
 ---
 
+# §E ⛔ EARLY VALIDITY GATES — mandatory before any run over 1 hour
+
+**Written after STEP 3g wasted 7 hours on a run that was broken from batch one
+and looked healthy the entire time.** Operator's point, and it is correct: this
+should have been caught in the first minutes, not at the eval.
+
+## What happened, and why nothing flagged it
+
+```text
+lerobot builds input_features FROM THE DATASET's names.
+--rename_map is applied to the BATCH, AFTER those features are fixed.
+⇒ renaming an image key GUARANTEES a mismatch.
+
+    model expected   image · wrist_image      (from the dataset)
+    batch carried    image · image2           (after the rename)
+    ⇒ wrist_image MISSING from all 24,000 batches
+```
+
+**pi05 does not error on a missing camera.** `modeling_pi05.py`:
+
+```python
+missing_img_keys = [k for k in self.config.image_features if k not in batch]
+for _ in range(len(missing_img_keys)):
+    img = torch.ones_like(img) * -1     # padded
+    mask = torch.zeros_like(mask)       # masked out
+```
+
+⇒ It pads and masks. Training runs. Nothing is logged.
+
+★ **AND THE LOSS WENT DOWN.** 0.052 against a healthy run's 0.062 — ~18%
+*better* at every checkpoint, because one camera is a simpler function to fit.
+**The degraded run looked BETTER by the metric being watched**, and I reported
+that as "directionally consistent with the hypothesis". Result: 1-3% instead of
+64.5%.
+
+## GATE E1 — pre-flight batch check  `[seconds]` ⛔ MANDATORY
+
+```bash
+python preflight_batch_check.py --dataset <repo> [--rename-map <json>]
+```
+
+Compares what the model will expect (the dataset's feature names) against what
+the batch will carry (after any rename). **Verified to fail the exact STEP 3g
+config and pass the corrected one.** Costs seconds; would have saved 7 hours.
+
+⇒ Archived at `results/pi05_capability_20260811/preflight_batch_check.py`.
+
+## GATE E2 — early functional eval at the FIRST checkpoint  `[~3 min + a pause]`
+
+Structural checks cannot catch everything. At the first checkpoint (2,000
+batches, ~8% of a run), pause and evaluate at n=40, **then compare against the
+same checkpoint index of a known-good run**:
+
+```text
+3d @ 4,000 → 27.5%    a healthy run is already well above chance this early
+3g @ 2,000 → would have been ~1%
+```
+
+⚠ Cost is a pause plus a ~35 min rewind to the last checkpoint. **Against a 7 h
+run that is under 10%.** Take it.
+
+## GATE E3 — treat DIVERGENCE from a comparable run as a red flag, not a result
+
+⚠ **This is the one I got wrong.** A metric moving differently from a known-good
+run is a reason to STOP AND INVESTIGATE, in either direction. I saw loss 18%
+lower and read it as encouraging.
+
+```text
+loss LOWER  than the comparable run   → investigate. Fewer inputs? Easier task?
+loss HIGHER than the comparable run   → investigate.
+loss TRACKING the comparable run      → the only reassuring case
+```
+
+## The general rule
+
+> **Any run longer than an hour must have a validity gate that costs under 1% of
+> its runtime and tests the thing most likely to be silently wrong.**
+
+For this stack, the thing most likely to be silently wrong is **input plumbing** —
+three separate rename_map traps have appeared in this lane alone, because π0.5,
+the LIBERO dataset and the LIBERO simulator each name the wrist camera
+differently.
+
+---
+
 # §D WHAT BELONGS IN `results/` — and what does not
 
 **Corrected 2026-08-11 after the operator asked why logs were going into git.**
