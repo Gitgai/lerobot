@@ -1402,8 +1402,49 @@ one.
 
 ## The deliverable
 
+## ⛔ THE GATE THAT MATTERS: CAN IT CHECKPOINT?
+
+**Operator, and it reprioritises this whole section:** *"we need training that
+produces checkpoints, otherwise it remains a POC."* Correct.
+
+**A technique that cannot checkpoint is not a training capability — it is a
+demo.** No pause/resume, no crash recovery, no intermediate evaluation, no
+multi-day runs. And rungs 3-5 exist SPECIFICALLY for models large enough to need
+long runs, which is precisely when checkpointing stops being optional.
+
+```text
+rung                 MEASURED?   CHECKPOINTS?   STATUS
+2  8-bit Adam        ✅          ✅ PROVEN      PRODUCTION — 4 long runs, 12
+                                                checkpoints each, resume verified
+3  paged optimiser   ✅          ❌ UNTESTED    POC — both runs used
+                                                save_checkpoint=FALSE
+4  CPU offload       ✅          ❌ UNTESTED    POC — optimiser verified
+                                                standalone, never integrated
+```
+
+⚠ **Rung 2 is the precedent that should worry us.** Checkpointing with 8-bit Adam
+did NOT work out of the box — it took TWO stacked fixes (a python-int step
+counter, then shared qmap tensors) after being estimated at "a few lines".
+**Rungs 3 and 4 carry the same unexamined risk and touch memory in MORE unusual
+ways** — `cudaMallocManaged` and pinned host memory respectively.
+
+⇒ **REPRIORITISED. Checkpoint capability is now a GATE on every rung, ahead of
+any quality experiment:**
+
+```text
+1st  3f.2b  does a PAGED run checkpoint?          ~10 min   ⭐ do this first
+2nd  3f.3e  phase 1-2: integrate offload, and the
+            CHECKPOINT ROUND-TRIP IS THE GATE      ~2.5 h
+3rd  3f.3e  phase 3-4: the 16 h quality run        only after both gates pass
+```
+
+⇒ **Until a rung checkpoints, do not describe it as a capability in any
+summary.** Say POC.
+
+---
+
 A table that can be planned against rather than argued about. **Three of five
-rungs are now measured on this machine:**
+rungs are measured — but only ONE is proven usable for real work:**
 
 ```text
 config                          step time   slowdown   status
