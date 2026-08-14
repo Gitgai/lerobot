@@ -1271,6 +1271,95 @@ training run: fp32 Adam is not needed for π0.5, which fits in VRAM with 8-bit.
 purchase decision is settled. This is capability reference for a future larger
 model — worth building deliberately, not on momentum.
 
+## 3f.3e — ⭐ fp32 ADAM FOR π0.5 VIA OFFLOAD: the last isolable variable
+
+**Operator's idea, and it is worth more than the "test the ability" framing
+suggests.** fp32 Adam does not fit in VRAM — which is exactly why 8-bit Adam has
+never been testable against it. Offload makes the comparison possible.
+
+### It fits, via rung 4
+
+```text
+IN VRAM ALONE      7.71 (bf16 w) + 7.71 (bf16 g) + 30.84 (fp32 m,v)
+                   = 46.3 GiB against 29.9 available   ⛔ DOES NOT FIT
+WITH OFFLOAD       GPU:  7.71 + 7.71 + ~2.4 activations = ~17.8 GiB   ✓ easy
+                   host: 33.1 GB pinned fp32 state                    ✓ proven 3f.3c
+```
+
+### ⇒ WHY IT MATTERS MORE THAN CAPABILITY
+
+**8-bit Adam is one of the two remaining suspects for the 17-point gap to the
+reference, and the ONLY one we have never been able to test.** This gives a
+single-variable comparison:
+
+```text
+STEP 3d   bf16 + 8-BIT Adam · 24k steps · 192k examples  →  80.0% (n=200)
+NEW       bf16 + fp32  Adam · everything else identical  →  ?
+```
+
+```text
+lands ≈ 80%   8-bit Adam costs NOTHING. The lever is exonerated and the residual
+              gap belongs to the starting checkpoint (§3g) or their recipe.
+lands HIGHER  8-bit Adam has a real cost, and "the 5090 trains π0.5" acquires a
+              quality caveat it does not currently have.
+```
+
+### Plan — ⛔ STOP AFTER PHASE 2 AND RE-DECIDE
+
+```text
+PHASE 1  integrate CPUOffloadAdamW into lerobot        ~2 h
+         register via OptimizerConfig (same machinery as adamw_8bit)
+PHASE 2  E1 preflight + 200-step smoke                 ~30 min
+         ⇒ GATE: ~2.4 s/step AND one checkpoint round-trips
+         ⇒ ★ CAPABILITY IS DEMONSTRATED AT THIS POINT. STOP AND RE-DECIDE.
+PHASE 3  full 24,000 steps at 2.43 s/step              ~16 h   ← only if wanted
+PHASE 4  n=200 eval, compare against 80.0%             ~15 min
+```
+
+⚠ **Phase 3 is 16 hours — 2.31× a run that already took 7.** Do not start it
+because phase 2 succeeded; start it only if the quality question is worth a day
+of GPU. **The purchase decision does not depend on it.**
+
+### ⚠ Where the trouble will be — the integration, not the transfer
+
+The optimiser itself is DONE and verified (3f.3d: correct to 2.6e-08, 2.31×).
+What is untested is lerobot's plumbing around it:
+
+```text
+· CHECKPOINT SAVING of pinned state — the highest-risk item. The saver needed
+  TWO stacked fixes for bitsandbytes (python-int step counter, then shared qmap
+  tensors) after being estimated at "a few lines". Pinned host tensors are a
+  THIRD variant of the same question.
+· the accelerate model-preparation interaction
+· grad_clip_norm against parameters whose optimiser state lives off-device
+```
+
+⚠ **Treat the ~2 h estimate as optimistic.** Every plumbing estimate in this lane
+has been.
+
+---
+
+## 3f.2b — DOES A PAGED RUN CHECKPOINT?  `[~10 min]` 🟢
+
+**Gap found when the operator asked whether rung 3 was tested with real
+training.** It was — real lerobot-train, real π0.5, real data, loss decreasing —
+but **`save_checkpoint=False` in both the 20- and 25-step runs.** No checkpoint
+was ever written with a paged optimiser.
+
+⚠ **That is the same shape as a bug that already bit us.** bnb paged tensors come
+from `cudaMallocManaged`; the saver flattens state into `safetensors.save_file`,
+which is exactly where 8-bit Adam produced two stacked failures. Managed memory
+is a third variant, and nothing we ran touched it.
+
+```text
+bs32 · paged · --steps=20 --save_checkpoint=true --save_freq=20
+then RELOAD the checkpoint and confirm finite weights
+```
+
+⇒ Answers whether rung 3 is usable for real work or only for short bursts —
+which matters, because a paged run's whole purpose is surviving at the memory
+edge, and long runs at the edge are precisely where checkpoints are needed.
+
 ## 3f.4 — Extrapolate to hypothetical hardware  `[~1 h, desk work]` 🟢
 
 With 3f.1–3f.3 measured, project onto configurations under consideration:
@@ -1813,7 +1902,27 @@ STEP 3f  capability ladder
            checkpoint save/load of pinned state, the accelerate interaction, and
            grad clipping. Those matter only if it is actually to be USED.
 
-  3f.3d-int lerobot integration  ⏳ NOT DONE — optional
+  3f.2b paged-run checkpoint test  ⏳ NOT DONE — ~10 min
+         GAP: both paged runs used save_checkpoint=FALSE. Real training was
+         exercised (real model, real data, loss falling) but NO checkpoint was
+         ever written with a paged optimiser. Same shape as the 8-bit saver bug:
+         bnb paged tensors are cudaMallocManaged, and the saver flattens into
+         safetensors.save_file.
+         checkpoint writes ____   reloads ____   finite weights ____
+
+  3f.3e fp32 Adam for pi05 via offload  ⏳ PLANNED — the LAST isolable variable
+         fp32 does not fit in VRAM (46.3 GiB vs 29.9) but DOES with offload:
+         GPU ~17.8 GiB · host 33.1 GB pinned (proven 3f.3c)
+         ⇒ gives the single-variable test 8-bit Adam has never had:
+             STEP 3d  bf16 + 8-bit Adam  24k steps  ->  80.0% (n=200)
+             NEW      bf16 + fp32  Adam  identical  ->  ____
+           ~80% = 8-bit costs nothing · higher = it has a real cost
+         PHASE 1 integrate (~2 h) · PHASE 2 smoke 200 steps + checkpoint (~30 min)
+         ⛔ STOP AND RE-DECIDE AFTER PHASE 2 — capability is proven there.
+         PHASE 3 is 16 h (2.31x a run that took 7); start only if the quality
+         question is worth a day of GPU. The purchase decision does not depend
+         on it.
+         smoke step time ____ s (target ~2.4) · checkpoint round-trip ____
          tractable now that 3f.3c proved pin-once/stream-slices at 55.9 GB/s.
          ~80 lines, NOT DeepSpeed. Scope: 200 steps, target ~2.2 s/step (+112%);
          ~8 s/step would mean it fell back to a pageable path. One checkpoint
