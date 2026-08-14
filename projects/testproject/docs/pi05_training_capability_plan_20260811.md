@@ -1140,6 +1140,73 @@ measure   step time · peak VRAM · peak host RAM · largest model that then fit
   fp32 state (80 GB) would NOT fit in this machine's RAM at all.
 ```
 
+## 3f.3c — CAN THE FULL fp32 STATE BE PINNED?  `[~20 min]` 🟡
+
+**The one path that could rescue fp32 offload from +785%.** 3f.3b streamed state
+through a small buffer and measured 8.0 GB/s. But **DeepSpeed pins optimiser
+state outright when it fits**, and if 33.1 GB pins here the bulk path is
+available at 56.6 GB/s:
+
+```text
+fp32 offload, CHUNKED (measured)      +785%   →  a 7 h run becomes ~62 h
+fp32 offload, FULLY PINNED (untested) +112%   →  a 7 h run becomes ~15 h
+```
+
+⇒ **A 7× difference, and it decides whether fp32-quality training is possible
+off-card at all.**
+
+### Is there room? Yes, but not much
+
+```text
+installed        64 GB
+MemTotal         59.2 GB     (~4.8 GB kernel/firmware reserved — normal)
+MemAvailable     43.0 GB     ← 33.1 GB is 77% of this
+Swap              8.0 GB, 100% USED, 0 free
+```
+
+⚠ **Pinned memory is UNSWAPPABLE.** Locking 33.1 GB with only 43 GB available
+and **zero swap headroom** is the riskiest thing in this whole plan. If it goes
+wrong the OOM killer picks a victim by heuristic — possibly the desktop session,
+possibly something of Prakash's.
+
+### Method — incremental, with an abort at every step
+
+```text
+0  PREREQUISITE (operator, needs sudo): clear the stale swap
+     sudo swapoff -a && sudo swapon -a
+   The 8 GB is residue from the training runs — pages evicted under pressure and
+   never faulted back. Clearing it restores headroom before the test, and gives
+   a clean baseline.
+
+1  pin 16 GB  → measure bulk round-trip GB/s → free → check MemAvailable
+2  pin 24 GB  → same
+3  pin 33.1 GB (the real fp32 state size) → same
+
+⛔ ABORT AND FREE IMMEDIATELY IF:
+     MemAvailable drops below ~6 GB
+     the pin call takes more than a few seconds (it is swapping)
+     the desktop becomes unresponsive
+   Free the allocation between EVERY step. Do not hold two at once.
+```
+
+### What each outcome means
+
+```text
+33.1 GB pins, ~56 GB/s     fp32 offload is +112%. Bulk path confirmed, and a
+                           96 GB card's fp32 capacity becomes RAM-bound at
+                           7.3B (59 GB) / 15.8B (128 GB) per §3f.4 — those
+                           numbers assume this path works.
+pins but slowly            partial paging; effective rate is what matters, not
+                           whether the allocation succeeded
+fails at 24 or 33 GB       fp32 offload is chunked-only ⇒ +785% ⇒ effectively
+                           not viable on this machine. **More RAM would change
+                           that** — which is a concrete argument for the 128 GB
+                           spec, not a vague one.
+```
+
+⚠ **This only affects fp32 offload.** The 8-bit path (8.3 GB) already pins
+comfortably and was measured in 3f.3. Nothing here changes the 8-bit numbers.
+
 ## 3f.4 — Extrapolate to hypothetical hardware  `[~1 h, desk work]` 🟢
 
 With 3f.1–3f.3 measured, project onto configurations under consideration:
@@ -1594,6 +1661,16 @@ STEP 3f  capability ladder
            unswappable memory could destabilise the machine.
          ⚠ swap is currently 8 GB, 100% USED (residue from the training runs),
            so there is no swap headroom for such a test.
+
+  3f.3c full-pin test  ⏳ PLANNED — can 33.1 GB of fp32 state be PINNED?
+         decides +112% (bulk) vs +785% (chunked) for fp32 offload — a 7× swing
+         MemAvailable 43 GB · 33.1 GB is 77% of it · swap 100% used, no headroom
+         ⛔ PREREQ (operator, sudo): swapoff -a && swapon -a to clear stale swap
+         method: pin 16 → 24 → 33.1 GB, freeing between each, abort if
+                 MemAvailable < ~6 GB or the desktop stalls
+         if it FAILS: fp32 offload is chunked-only ⇒ not viable here ⇒ a concrete
+                 argument for the 128 GB RAM spec
+         16 GB   ____ GB/s      24 GB   ____ GB/s      33.1 GB  ____ GB/s
 
   3f.4 extrapolation  ✅ DONE 2026-08-14 — desk work, no GPU
 
