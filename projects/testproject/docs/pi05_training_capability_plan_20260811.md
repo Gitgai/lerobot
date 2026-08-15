@@ -1,5 +1,10 @@
 # Phase 2 — can we actually TRAIN π0.5 here, not just fit it?
 
+➡ **WHAT IS OPEN AND IN WHAT ORDER →
+[`PI05_CURRENT_PRIORITY.md`](PI05_CURRENT_PRIORITY.md)** (a ~95-line router).
+**This file is 2,193 lines of evidence and does NOT carry priority.** Consult the
+router first; come here for detail.
+
 Date: 2026-08-11, kiran-AI90. Follows
 [`pi05_full_finetune_on_5090_plan_20260811.md`](pi05_full_finetune_on_5090_plan_20260811.md)
 ("phase 1"), which is CLOSED.
