@@ -27,8 +27,12 @@ from lerobot.configs.policies import PreTrainedConfig
 from lerobot.policies.pi05.modeling_pi05 import PI05Policy
 
 cfg = PreTrainedConfig.from_pretrained(f"{C}/pretrained_model")
-with torch.device("meta"):
-    policy = PI05Policy(cfg)
+# The meta device does not work here: PI05Policy.__init__ calls .to() internally
+# ("Cannot copy out of meta tensor"). Build on the CPU in bf16 instead — ~8.3 GB
+# for 4.14B params, and only the parameter ORDER is wanted, not the values.
+cfg.device = "cpu"
+cfg.dtype = "bfloat16"
+policy = PI05Policy(cfg)
 
 names = [n for n, p in policy.named_parameters() if p.requires_grad]
 sizes = [p.numel() for _, p in policy.named_parameters() if p.requires_grad]

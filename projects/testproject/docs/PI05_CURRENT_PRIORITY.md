@@ -17,6 +17,9 @@ Raw artefacts: `results/pi05_capability_20260811/`.
 
 ```text
 can the 5090 full fine-tune π0.5?   YES — 4 long runs, zero throttling, 0%→80%
+                                     ⚠ "full" = 3.25B of 4.14B. The 2 LM heads
+                                     and the output half of PaliGemma's last
+                                     layer are UNREACHABLE from an action loss.
 is the $11K RTX PRO 6000 justified?  NO — and bigger batches, the main thing more
                                      VRAM buys, made results WORSE (64.5 vs 80.0)
 ```
