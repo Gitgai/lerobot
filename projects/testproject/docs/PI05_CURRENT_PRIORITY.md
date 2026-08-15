@@ -90,10 +90,13 @@ DeepSpeed integration        CPUOffloadAdamW is ~70 lines and already verified;
 ## Standing rules for this lane
 
 ```text
-E1 preflight before ANY run >1 h    preflight_batch_check.py — seconds
+E1 preflight before ANY run >1 h    preflight_features.py — seconds
+                                    (preflight_batch_check.py is SUPERSEDED: it
+                                    encoded a rule, the rule was wrong, and it
+                                    returned a FALSE PASS on 2026-08-14)
 n=200 for any quoted eval           n=40 already produced one 5-point error
 a rung is a POC until it CHECKPOINTS AND RESUMES
-loss is NOT a proxy for capability  it has misled us three times, once by moving
-                                    OPPOSITE to success (the blanked-camera run
-                                    had LOWER loss)
+loss is NOT a proxy for capability  it has misled us three times
+a gate that encodes a RULE inherits every error in that rule — make gates
+report what will actually happen, from the same objects the tool itself builds
 ```

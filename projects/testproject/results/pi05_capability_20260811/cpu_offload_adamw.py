@@ -24,6 +24,9 @@ WHAT IT COSTS, predicted from measurement
       it fell back to a pageable path.
 """
 
+from collections import defaultdict
+from itertools import chain
+
 import torch
 from torch.optim import Optimizer
 
@@ -83,6 +86,66 @@ class CPUOffloadAdamW(Optimizer):
 
         torch.cuda.synchronize()
         return loss
+
+    def load_state_dict(self, state_dict):
+        """Restore state as fp32 PINNED HOST tensors.
+
+        WHY THIS OVERRIDE EXISTS — measured, not anticipated
+        ---------------------------------------------------
+        `Optimizer.load_state_dict` casts every floating-point state tensor to
+        the *parameter's* dtype and device (torch/optim/optimizer.py:754):
+
+            return value.to(dtype=param.dtype, device=param.device)
+
+        π0.5's parameters are bf16 on cuda, so the stock path would resume by
+        turning this optimiser into an ordinary GPU-resident bf16 one:
+
+            fp32 -> bf16    the precision this rung exists to provide is gone
+            cpu  -> cuda:0  4.14B x 2 x 2B = 16.6 GB back onto a 32 GB card
+
+        and it does NOT raise — the toy round-trip in test_offload_checkpoint.py
+        showed it completing "successfully" with both invariants destroyed. So we
+        map ids to params ourselves and never let the base class touch the large
+        tensors; going through super() would allocate that 16.6 GB before any
+        post-hook could undo it.
+        """
+        groups, saved = self.param_groups, state_dict["param_groups"]
+        if len(groups) != len(saved) or any(
+            len(g["params"]) != len(s["params"]) for g, s in zip(groups, saved)
+        ):
+            raise ValueError("loaded state dict does not match this optimizer's param groups")
+
+        id_map = dict(
+            zip(
+                chain.from_iterable(s["params"] for s in saved),
+                chain.from_iterable(g["params"] for g in groups),
+            )
+        )
+
+        state = defaultdict(dict)
+        for k, v in state_dict["state"].items():
+            if k not in id_map:
+                state[k] = v
+                continue
+            restored = {}
+            for key, val in v.items():
+                if key == "step":
+                    restored[key] = (
+                        val.detach().clone().float().cpu()
+                        if torch.is_tensor(val)
+                        else torch.tensor(float(val))
+                    )
+                else:
+                    host = torch.empty(val.shape, dtype=torch.float32, pin_memory=True)
+                    host.copy_(val)          # fp32, host, pinned — the invariant
+                    restored[key] = host
+                    self._pinned_bytes += host.numel() * 4
+            state[id_map[k]] = restored
+
+        # hyperparameters from the checkpoint, parameters from the live model
+        merged = [{**g, **{k: v for k, v in s.items() if k != "params"},
+                   "params": g["params"]} for g, s in zip(groups, saved)]
+        self.__setstate__({"state": state, "param_groups": merged})
 
     @property
     def pinned_gb(self):

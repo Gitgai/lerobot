@@ -1260,7 +1260,7 @@ and took five runs. STEP 3g's pre-flight looked complete and still wasted 7 hour
 
 ```text
 1  implement the optimiser + register it
-2  ⛔ RUN GATE E1 (preflight_batch_check.py) — non-negotiable
+2  ⛔ RUN GATE E1 (preflight_features.py) — non-negotiable
 3  200 steps only. Measure step time against the 1.05 s baseline.
    TARGET: ~2.2 s/step (+112%). Anything near 8 s means the pinning did not
    take effect and it fell back to a pageable path.
@@ -2087,19 +2087,53 @@ instead of waiting forever.
 and looked healthy the entire time.** Operator's point, and it is correct: this
 should have been caught in the first minutes, not at the eval.
 
-## What happened, and why nothing flagged it
+## ⛔ THE ORIGINAL DIAGNOSIS OF 3g WAS WRONG — corrected 2026-08-14
+
+This section previously said: *"lerobot builds input_features FROM THE DATASET's
+names ⇒ renaming an image key GUARANTEES a mismatch."* **That is false for every
+run in this project.** It is true only for a FRESH policy. lerobot states the
+real rule itself, in `configs/train.py:249`:
+
+> "`rename_map` requires a pretrained policy checkpoint. Fresh initialization
+> derives feature names from the current dataset, so no rename is applied."
 
 ```text
-lerobot builds input_features FROM THE DATASET's names.
---rename_map is applied to the BATCH, AFTER those features are fixed.
-⇒ renaming an image key GUARANTEES a mismatch.
-
-    model expected   image · wrist_image      (from the dataset)
-    batch carried    image · image2           (after the rename)
-    ⇒ wrist_image MISSING from all 24,000 batches
+FRESH       --policy.type=pi05    features come from the DATASET
+                                  rename_map is REJECTED outright
+PRETRAINED  --policy.path=...     features come from THE CHECKPOINT
+                                  rename_map maps dataset names onto them,
+                                  and is frequently REQUIRED
 ```
 
-**pi05 does not error on a missing camera.** `modeling_pi05.py`:
+**Measured 2026-08-14.** The checkpoints disagree with each other, which is the
+whole trap:
+
+```text
+lerobot/pi05_base          base_0_rgb · left_wrist_0_rgb · right_wrist_0_rgb
+lerobot/pi05_libero_base   image · image2
+libero_spatial_image (ds)  image · wrist_image
+```
+
+⇒ 3g's rename (`wrist_image -> image2`) against `pi05_libero_base` **matched
+exactly**. The wrist camera was NOT blanked. The recorded mechanism is retracted
+and the "wrist-removed ablation" it claimed to salvage is withdrawn — see
+`results/.../step3g_INVALID_run.txt`. Why 3g scored 1-3% is now UNEXPLAINED; the
+untested leading candidate is an EVAL-side name mismatch, and the checkpoints
+were deleted before this was understood, so it cannot be settled from here.
+
+## ★ WHY A GATE IS STILL MANDATORY — lerobot's validation is OPT-OUT
+
+`policies/factory.py:382`:
+
+```python
+if not rename_map:
+    validate_visual_features_consistency(cfg, features)
+```
+
+**Supplying a rename_map DISABLES lerobot's visual check entirely.** The runs
+that remap cameras — the ones most able to get it wrong — are exactly the ones
+it stops checking. And pi05 does not error on a missing camera
+(`modeling_pi05.py`):
 
 ```python
 missing_img_keys = [k for k in self.config.image_features if k not in batch]
@@ -2108,25 +2142,39 @@ for _ in range(len(missing_img_keys)):
     mask = torch.zeros_like(mask)       # masked out
 ```
 
-⇒ It pads and masks. Training runs. Nothing is logged.
+⇒ It pads and masks. Training runs. Nothing is logged. And in 3g **the loss went
+DOWN** — 0.052 against a healthy 0.062 — which I reported at the time as
+"directionally consistent with the hypothesis".
 
-★ **AND THE LOSS WENT DOWN.** 0.052 against a healthy run's 0.062 — ~18%
-*better* at every checkpoint, because one camera is a simpler function to fit.
-**The degraded run looked BETTER by the metric being watched**, and I reported
-that as "directionally consistent with the hypothesis". Result: 1-3% instead of
-64.5%.
-
-## GATE E1 — pre-flight batch check  `[seconds]` ⛔ MANDATORY
+## GATE E1 — pre-flight feature check  `[seconds]` ⛔ MANDATORY
 
 ```bash
-python preflight_batch_check.py --dataset <repo> [--rename-map <json>]
+python preflight_features.py --dataset <repo> --policy-path <ckpt> \
+    [--rename-map <json>] [--expect-padded N]
 ```
 
-Compares what the model will expect (the dataset's feature names) against what
-the batch will carry (after any rename). **Verified to fail the exact STEP 3g
-config and pass the corrected one.** Costs seconds; would have saved 7 hours.
+It reads the **checkpoint's** `input_features` and the dataset's, applies the
+rename, and reports which policy cameras will be padded with -1 and which
+dataset cameras will be dropped. `--expect-padded` must be declared explicitly,
+because padding is sometimes correct: `pi05_base` has three camera slots and
+LIBERO is a two-camera setup, so `right_wrist_0_rgb` is legitimately padded.
 
-⇒ Archived at `results/pi05_capability_20260811/preflight_batch_check.py`.
+Verified against three configs: it fails `pi05_base` with no rename (which
+lerobot also refuses to start), passes 3g's config, and passes the openpi LIBERO
+mapping with one declared pad.
+
+⇒ `preflight_batch_check.py` is **SUPERSEDED** — it encoded the fresh-init rule
+universally and gave a FALSE PASS on 2026-08-14. Kept, with a warning header,
+only as the record of the mistake.
+
+## THE TRANSFERABLE LESSON
+
+The first gate was built from a plausible mechanism I never tested, and it was
+wrong in the direction that matters: it said PASS for a broken config. A gate
+that encodes a *rule* inherits every error in that rule. **This one instead
+reports what the model will actually receive**, derived from the same config
+objects lerobot builds — so it cannot be wrong about the rule, because it does
+not contain one.
 
 ## GATE E2 — early functional eval at the FIRST checkpoint  `[~3 min + a pause]`
 
