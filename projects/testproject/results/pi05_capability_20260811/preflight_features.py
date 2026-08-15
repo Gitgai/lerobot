@@ -94,9 +94,23 @@ expected = {k for k, v in cfg.input_features.items() if v.type == FeatureType.VI
 # checkpoints declare float32, so bf16 only happens if the CLI asks for it.
 # On 2026-08-15 that default silently sent four runs to an fp32 OOM: fp32
 # params alone are 15.4 GiB of a 32 GB card, before any gradient exists.
-_dt = getattr(cfg, "dtype", "unknown")
-print(f"  policy dtype  {_dt}" + ("   ⚠ pass --policy.dtype=bfloat16 unless fp32 is "
-                                  "DELIBERATE" if _dt == "float32" else ""))
+_MEMORY_LEVERS = [
+    # attribute,              memory-safe value, the flag that sets it
+    ("dtype", "bfloat16", "--policy.dtype=bfloat16"),
+    ("gradient_checkpointing", True, "--policy.gradient_checkpointing=true"),
+]
+print("\n  MEMORY LEVERS — lerobot defaults BOTH of these OFF; the CLI must ask:")
+_lever_warn = False
+for _attr, _want, _flag in _MEMORY_LEVERS:
+    _got = getattr(cfg, _attr, "unknown")
+    if _got == _want:
+        print(f"    ✅ {_attr:24} {_got}")
+    else:
+        print(f"    ⚠  {_attr:24} {_got}   -> pass {_flag}")
+        _lever_warn = True
+if _lever_warn:
+    print("    Unless that is DELIBERATE, this run will not fit: bf16 and gradient")
+    print("    checkpointing are what make π0.5 trainable on 32 GB at all.")
 
 padded = sorted(expected - provided)
 ignored = sorted(provided - expected)

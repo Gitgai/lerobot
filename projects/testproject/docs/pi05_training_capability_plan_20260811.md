@@ -1362,15 +1362,43 @@ fp32; neither can, because fp32 params alone leave no room.
 about it needs reconciling. The earlier claim that it was unverifiable is
 withdrawn.
 
-### GATE E1b — ⛔ PRINT THE EFFECTIVE dtype BEFORE EVERY RUN
+### ⛔ AND THE SAME MISTAKE AGAIN, ONE LEVER OVER: gradient checkpointing
+
+With `--policy.dtype=bfloat16` the next run OOM'd at **27.89 GiB**, still in the
+forward pass. Cause, `configuration_pi05.py:81`:
+
+```text
+gradient_checkpointing: bool = False   # Enable gradient checkpointing for memory optimization
+```
+
+⇒ **BOTH memory levers this project's headline result depends on are OFF by
+default**, and the Configuration block I reconstructed the command from named
+NEITHER. bf16 alone is not enough: without checkpointing, activations at bs8 are
+~20 GiB on their own.
+
+```text
+bf16 + checkpointing   7.71 params + 7.71 grads + ~2.4 activations = ~17.8 GiB  ✓
+bf16, no checkpointing 7.71 params + ~20 activations               = 27.89 GiB  ⛔
+fp32, no checkpointing 15.4 params + ...                           = 27.68 GiB  ⛔
+```
+
+### GATE E1b — ⛔ PRINT EVERY MEMORY LEVER BEFORE EVERY RUN
 
 The plan's Configuration blocks record what is *interesting* about a run and
 omit what is *default*. Defaults are exactly what changes silently between
 machines and versions. **Any config block that is used to reconstruct a command
 must state dtype, batch size, and optimiser explicitly, even when default.**
 
-`preflight_features.py` now prints the effective dtype alongside the cameras, so
-a wrong precision is visible in seconds rather than after a model load.
+`preflight_features.py` now prints a MEMORY LEVERS block — every setting that
+decides whether the run fits, with the flag that sets it — alongside the
+cameras. Adding levers to that list is how this gate stays honest; it is a
+table, not a rule.
+
+```text
+MEMORY LEVERS — lerobot defaults BOTH of these OFF; the CLI must ask:
+  ⚠  dtype                    float32  -> pass --policy.dtype=bfloat16
+  ⚠  gradient_checkpointing   False    -> pass --policy.gradient_checkpointing=true
+```
 
 ⚠ This one failed LOUDLY — an OOM, not a silent degradation — which is the
 lucky case. In fp32 on a bigger card it would simply have trained ~2x slower and
