@@ -34,9 +34,16 @@ from torch.optim import Optimizer
 class CPUOffloadAdamW(Optimizer):
     """AdamW with exp_avg / exp_avg_sq held in pinned host memory."""
 
-    def __init__(self, params, lr=1e-3, betas=(0.9, 0.999), eps=1e-8, weight_decay=1e-2):
+    # 128 MB of fp32 per staged buffer. Large enough to hold bulk DMA rate,
+    # small enough that the transient working set is negligible. See the
+    # CHUNKING note in the module docstring for why this is not optional.
+    CHUNK_ELEMS = 32 * 1024 * 1024
+
+    def __init__(self, params, lr=1e-3, betas=(0.9, 0.999), eps=1e-8, weight_decay=1e-2,
+                 chunk_elems=None):
         super().__init__(params, dict(lr=lr, betas=betas, eps=eps, weight_decay=weight_decay))
         self._pinned_bytes = 0
+        self.chunk_elems = chunk_elems or self.CHUNK_ELEMS
 
     @torch.no_grad()
     def step(self, closure=None):
@@ -62,27 +69,44 @@ class CPUOffloadAdamW(Optimizer):
 
                 st["step"] += 1
                 t = st["step"].item()
-
-                # --- host -> device -------------------------------------
-                m = st["exp_avg"].to(p.device, non_blocking=True)
-                v = st["exp_avg_sq"].to(p.device, non_blocking=True)
-
-                g = p.grad.float()
-                if wd != 0:
-                    p.mul_(1 - lr * wd)                    # decoupled weight decay
-
-                m.mul_(beta1).add_(g, alpha=1 - beta1)
-                v.mul_(beta2).addcmul_(g, g, value=1 - beta2)
-
                 bc1 = 1 - beta1 ** t
                 bc2 = 1 - beta2 ** t
-                denom = (v / bc2).sqrt_().add_(eps)
-                p.addcdiv_(m / bc1, denom, value=-lr)
 
-                # --- device -> host -------------------------------------
-                st["exp_avg"].copy_(m, non_blocking=True)
-                st["exp_avg_sq"].copy_(v, non_blocking=True)
-                del m, v, g, denom
+                if not p.is_contiguous() or not p.grad.is_contiguous():
+                    raise RuntimeError(
+                        "CPUOffloadAdamW streams parameters through flat views and "
+                        f"needs contiguous tensors; got shape {tuple(p.shape)}."
+                    )
+
+                n = p.numel()
+                pv, gv = p.data.view(-1), p.grad.view(-1)
+                mv, vv = st["exp_avg"].view(-1), st["exp_avg_sq"].view(-1)
+
+                for i in range(0, n, self.chunk_elems):
+                    j = min(i + self.chunk_elems, n)
+
+                    # host -> device. Slices of pinned storage are themselves
+                    # pinned, so this stays a DMA, not a staged copy.
+                    m = mv[i:j].to(p.device, non_blocking=True)
+                    v = vv[i:j].to(p.device, non_blocking=True)
+                    g = gv[i:j].float()
+
+                    if wd != 0:
+                        pv[i:j].mul_(1 - lr * wd)          # decoupled weight decay
+
+                    m.mul_(beta1).add_(g, alpha=1 - beta1)
+                    v.mul_(beta2).addcmul_(g, g, value=1 - beta2)
+
+                    # reuse g as the denominator buffer, and fold the bias
+                    # correction into the scalar, so the chunk needs THREE
+                    # fp32 buffers rather than five.
+                    g.copy_(v).div_(bc2).sqrt_().add_(eps)
+                    pv[i:j].addcdiv_(m, g, value=-lr / bc1)
+
+                    # device -> host
+                    mv[i:j].copy_(m, non_blocking=True)
+                    vv[i:j].copy_(v, non_blocking=True)
+                    del m, v, g
 
         torch.cuda.synchronize()
         return loss

@@ -1291,6 +1291,62 @@ WITH OFFLOAD       GPU:  7.71 + 7.71 + ~2.4 activations = ~17.8 GiB   ✓ easy
                    host: 33.1 GB pinned fp32 state                    ✓ proven 3f.3c
 ```
 
+### ⛔ …BUT ~17.8 GiB IS THE RESIDENT FOOTPRINT ONLY. Measured 2026-08-15.
+
+The first integrated run OOM'd at **27.68 GiB allocated**, ~10 GiB above that
+figure. The cause is the optimiser's own TRANSIENT working set, and the design
+note had reasoned from the wrong statistic:
+
+```text
+the note said   "π0.5's 812 tensors average ~5M elements (~20 MB of fp32 state)"
+MEASURED        mean 4.5M elements ... but MAX 526.6M
+                paligemma.lm_head.weight   526.6M  = 2.11 GB per fp32 buffer
+                gemma_expert.lm_head       263.3M  = 1.05 GB
+                everything else            ≤ 33.6M = 0.13 GB
+⇒ the largest tensor is 117x the mean, and transients scale with the MAX
+```
+
+The original step held FIVE fp32 buffers for the tensor being updated —
+`m`, `v`, `g`, `v/bc2`, `m/bc1` — so `lm_head` alone needed 5 × 2.11 = **10.5 GB**:
+
+```text
+17.8 GiB resident + 9.8 GiB transient = 27.6 GiB   vs 27.68 GiB MEASURED
+```
+
+**FIX — stream each parameter in chunks, and use fewer buffers.**
+
+```text
+chunk           32M elements (128 MB of fp32)
+buffers/chunk   THREE, not five:  g is reused as the denominator, and the bias
+                correction folds into the scalar (addcdiv_(m, g, -lr/bc1))
+transient       3 x 128 MB = 384 MB, INDEPENDENT of the largest tensor
+```
+
+⚠ **This is NOT 3f.3b's staged path and must not inherit its 8.0 GB/s.** 3f.3b
+streamed PAGEABLE state through a pinned staging buffer. Here the state is
+*fully pinned*, so a chunk is a slice of pinned storage and still transfers by
+DMA at bulk rate. Correctness re-verified after the rewrite: max deviation from
+torch AdamW over 10 steps = **2.980e-08**.
+
+### ⛔ SEPARATE FINDING — `pi05_base` no longer fits at bs8, WITH EITHER OPTIMISER
+
+An A/B on the identical config, changing only the optimiser:
+
+```text
+adamw_8bit          OOM   28.16 GiB allocated
+adamw_cpu_offload   OOM   27.68 GiB allocated
+```
+
+⇒ **The OOM was never the optimiser.** `lerobot/pi05_base` declares THREE camera
+slots (`base_0_rgb`, `left_wrist_0_rgb`, `right_wrist_0_rgb`); LIBERO supplies
+two, and the padded third still costs activation memory. `pi05_libero_base`
+declares two and matches the dataset exactly, so the capability runs use it.
+
+⚠ This sits ~2.3 GiB above STEP 3d's recorded 27.11 GiB at the same nominal
+batch size. **STEP 3d's exact rename_map is not recoverable** — its checkpoints
+were deleted — so whether 3d truly ran `pi05_base` as the doc states is now
+unverifiable. Treat 27.11 GiB as belonging to a config we cannot reconstruct.
+
 ### ⇒ WHY IT MATTERS MORE THAN CAPABILITY
 
 **8-bit Adam is one of the two remaining suspects for the 17-point gap to the
