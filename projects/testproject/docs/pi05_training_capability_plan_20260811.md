@@ -1328,24 +1328,53 @@ streamed PAGEABLE state through a pinned staging buffer. Here the state is
 DMA at bulk rate. Correctness re-verified after the rewrite: max deviation from
 torch AdamW over 10 steps = **2.980e-08**.
 
-### ⛔ SEPARATE FINDING — `pi05_base` no longer fits at bs8, WITH EITHER OPTIMISER
-
-An A/B on the identical config, changing only the optimiser:
+### ⛔ THE OOM WAS **fp32**. Not the optimiser, not the cameras. Measured 2026-08-15.
 
 ```text
-adamw_8bit          OOM   28.16 GiB allocated
-adamw_cpu_offload   OOM   27.68 GiB allocated
+lerobot/policies/pi05/configuration_pi05.py:33
+    dtype: str = "float32"      # Options: "bfloat16", "float32"
 ```
 
-⇒ **The OOM was never the optimiser.** `lerobot/pi05_base` declares THREE camera
-slots (`base_0_rgb`, `left_wrist_0_rgb`, `right_wrist_0_rgb`); LIBERO supplies
-two, and the padded third still costs activation memory. `pi05_libero_base`
-declares two and matches the dataset exactly, so the capability runs use it.
+**`float32` is lerobot's DEFAULT for pi05, and both checkpoints declare it too**
+(`pi05_base` and `pi05_libero_base` config.json: `"dtype": "float32"`). bf16 has
+to be asked for on the CLI — `--policy.dtype=bfloat16`. I reconstructed the run
+command from this document's own Configuration block, which lists batch size,
+steps and save_freq **but never mentioned dtype**, so every run launched today
+silently ran in fp32:
 
-⚠ This sits ~2.3 GiB above STEP 3d's recorded 27.11 GiB at the same nominal
-batch size. **STEP 3d's exact rename_map is not recoverable** — its checkpoints
-were deleted — so whether 3d truly ran `pi05_base` as the doc states is now
-unverifiable. Treat 27.11 GiB as belonging to a config we cannot reconstruct.
+```text
+fp32 params   4.14B x 4 B = 15.4 GiB   before a single gradient exists
++ activations                          = 27.68 GiB  ->  OOM in the FORWARD pass
+```
+
+**The number was identical — 27.68 GiB — for `pi05_base` (3 camera slots) and
+`pi05_libero_base` (2).** An earlier revision of this section blamed the padded
+third camera. ⛔ **That was wrong**: camera count changed the figure by nothing
+at all, and the coincidence with the chunking arithmetic (17.8 + 9.8 = 27.6) was
+exactly that — a coincidence. The chunking fix is still correct and still
+needed; it just was not what this OOM was about.
+
+⇒ The A/B stands, with the right conclusion: **the optimiser was never the
+cause.** `adamw_8bit` 28.16 GiB and `adamw_cpu_offload` 27.68 GiB both OOM in
+fp32; neither can, because fp32 params alone leave no room.
+
+⇒ STEP 3d's 27.11 GiB is therefore consistent after all — it ran bf16. Nothing
+about it needs reconciling. The earlier claim that it was unverifiable is
+withdrawn.
+
+### GATE E1b — ⛔ PRINT THE EFFECTIVE dtype BEFORE EVERY RUN
+
+The plan's Configuration blocks record what is *interesting* about a run and
+omit what is *default*. Defaults are exactly what changes silently between
+machines and versions. **Any config block that is used to reconstruct a command
+must state dtype, batch size, and optimiser explicitly, even when default.**
+
+`preflight_features.py` now prints the effective dtype alongside the cameras, so
+a wrong precision is visible in seconds rather than after a model load.
+
+⚠ This one failed LOUDLY — an OOM, not a silent degradation — which is the
+lucky case. In fp32 on a bigger card it would simply have trained ~2x slower and
+scored the same, and nothing would ever have flagged it.
 
 ### ⇒ WHY IT MATTERS MORE THAN CAPABILITY
 

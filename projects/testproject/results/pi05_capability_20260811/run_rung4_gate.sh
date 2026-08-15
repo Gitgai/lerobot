@@ -22,6 +22,7 @@ export LEROBOT_CPU_OFFLOAD_ADAM=1
 COMMON=(
   --policy.path=lerobot/pi05_libero_base
   --policy.device=cuda
+  --policy.dtype=bfloat16          # lerobot's pi05 DEFAULT IS float32 — see §E gate E2
   --policy.push_to_hub=false
   --dataset.repo_id=lerobot/libero_spatial_image
   '--rename_map={"observation.images.wrist_image":"observation.images.image2"}'

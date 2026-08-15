@@ -90,6 +90,14 @@ importlib.import_module(f"lerobot.policies.{_ptype}.configuration_{_ptype}")
 cfg = PreTrainedConfig.from_pretrained(a.policy_path)
 expected = {k for k, v in cfg.input_features.items() if v.type == FeatureType.VISUAL}
 
+# GATE E1b — dtype. lerobot's pi05 default is float32 and BOTH published
+# checkpoints declare float32, so bf16 only happens if the CLI asks for it.
+# On 2026-08-15 that default silently sent four runs to an fp32 OOM: fp32
+# params alone are 15.4 GiB of a 32 GB card, before any gradient exists.
+_dt = getattr(cfg, "dtype", "unknown")
+print(f"  policy dtype  {_dt}" + ("   ⚠ pass --policy.dtype=bfloat16 unless fp32 is "
+                                  "DELIBERATE" if _dt == "float32" else ""))
+
 padded = sorted(expected - provided)
 ignored = sorted(provided - expected)
 print(f"\n  policy expects   {sorted(expected)}")
