@@ -1,0 +1,23 @@
+# 3f.2b — DOES A PAGED RUN CHECKPOINT? Partial pass. Measured 2026-08-14.
+
+bs32 · paged · 20 steps · save_checkpoint=true
+  checkpoint WRITES   YES  optimizer_state.safetensors 6.2 GB
+                           model.safetensors 8.8 GB
+                           (the file that failed TWICE for 8-bit Adam)
+  model RELOADS       YES  4.143B trainable, 0 non-finite tensors
+  RESUME              NO   OOM: tried to allocate 2.00 MiB, 97 MiB free,
+                           process holding 29.41 GiB. State LOADED first
+                           ('Resuming data order at epoch 0, sample 640').
+
+FRAGMENTATION RULED OUT — retried with expandable_segments:True:
+  reserved-but-unallocated  512.80 -> 226.10 MiB  (halved; setting worked)
+  allocated by PyTorch      28.31 -> 28.58 GiB
+  still OOM on an 18 MiB request
+  => the ~1 GiB deficit is REAL. Consistent with STEP 3d's measured resume
+     overhead (bs8: 27.11 GiB fresh vs 28.15 resumed).
+
+# RUNG 3: trains at the edge YES · checkpoints YES · RESUMES NO
+# A model that only fits WITH paging gets an UNINTERRUPTIBLE run.
+# LIKELY FIX: the desktop holds 1.42 GiB of VRAM. Moving the display to the
+# AMD iGPU frees almost exactly the deficit. Not proven - needs a rerun
+# after the switch.

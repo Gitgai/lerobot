@@ -1416,8 +1416,10 @@ long runs, which is precisely when checkpointing stops being optional.
 rung                 MEASURED?   CHECKPOINTS?   STATUS
 2  8-bit Adam        ✅          ✅ PROVEN      PRODUCTION — 4 long runs, 12
                                                 checkpoints each, resume verified
-3  paged optimiser   ✅          ❌ UNTESTED    POC — both runs used
-                                                save_checkpoint=FALSE
+3  paged optimiser   ✅          ⚠ PARTIAL      SAVE-ONLY — writes and reloads,
+                                                but CANNOT RESUME (~1 GiB short
+                                                at the edge; fragmentation ruled
+                                                out). Uninterruptible runs.
 4  CPU offload       ✅          ❌ UNTESTED    POC — optimiser verified
                                                 standalone, never integrated
 ```
@@ -1943,13 +1945,46 @@ STEP 3f  capability ladder
            checkpoint save/load of pinned state, the accelerate interaction, and
            grad clipping. Those matter only if it is actually to be USED.
 
-  3f.2b paged-run checkpoint test  ⏳ NOT DONE — ~10 min
-         GAP: both paged runs used save_checkpoint=FALSE. Real training was
-         exercised (real model, real data, loss falling) but NO checkpoint was
-         ever written with a paged optimiser. Same shape as the 8-bit saver bug:
-         bnb paged tensors are cudaMallocManaged, and the saver flattens into
-         safetensors.save_file.
-         checkpoint writes ____   reloads ____   finite weights ____
+  3f.2b paged-run checkpoint test  ✅ RUN 2026-08-14 — PARTIAL PASS
+         bs32 · paged · 20 steps · save_checkpoint=true
+         checkpoint WRITES     ✅ optimizer_state.safetensors 6.2 GB,
+                                  model.safetensors 8.8 GB — the very file that
+                                  failed TWICE for 8-bit Adam
+         model RELOADS         ✅ 4.143B trainable, 0 non-finite tensors
+         ⇒ the STEP 1 fix (scalars→tensors, clone shared storage) covers the
+           managed-memory case too: cudaMallocManaged tensors present as ordinary
+           CUDA tensors to safetensors.
+
+         ⛔ RESUME FAILS — OOM
+           torch.OutOfMemoryError: tried to allocate 2.00 MiB,
+           97.44 MiB free, process holding 29.41 GiB
+           It LOADED the state ("Resuming data order at epoch 0, sample 640")
+           and then died.
+
+         ⚠ FRAGMENTATION RULED OUT. Retried with
+           PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True:
+             reserved-but-unallocated  512.80 MiB → 226.10 MiB  (halved — the
+                                                    setting DID work)
+             allocated by PyTorch      28.31 → 28.58 GiB
+             still OOM, on an 18 MiB request
+           ⇒ the deficit is REAL, ~1 GiB, not fragmentation. Consistent with the
+             resume overhead measured in STEP 3d (bs8: 27.11 GiB fresh vs 28.15
+             resumed).
+
+       ⇒ ★ RUNG 3 STATUS: trains at the edge ✅ · checkpoints ✅ · RESUMES ❌
+         **A model that only fits WITH paging gets an UNINTERRUPTIBLE run.** You
+         can save, and you can load the model for evaluation, but you cannot
+         continue training — which is exactly the multi-day workflow paging
+         exists to enable.
+
+       ⇒ LIKELY FIX, and it connects to §1's iGPU note: the desktop holds
+         **1.42 GiB of VRAM** (gnome-shell, Xwayland, remote-desktop daemon).
+         Moving the display to the AMD iGPU frees almost exactly the ~1 GiB
+         deficit. That switch was already costed as a cable move — no BIOS
+         change, iGPU already enumerated, amdgpu already loaded. **It now has a
+         concrete second payoff: plausibly the difference between resumable and
+         unresumable paged runs.** NOT PROVEN — 1.42 vs ~1 GiB is close but
+         needs the same test rerun after the switch.
 
   3f.3e fp32 Adam for pi05 via offload  ⏳ PLANNED — the LAST isolable variable
          fp32 does not fit in VRAM (46.3 GiB vs 29.9) but DOES with offload:
