@@ -1382,6 +1382,44 @@ bf16, no checkpointing 7.71 params + ~20 activations               = 27.89 GiB  
 fp32, no checkpointing 15.4 params + ...                           = 27.68 GiB  ⛔
 ```
 
+### ★ TWO INDEPENDENT PATHS TRY TO PUT THE OFFLOADED STATE BACK ON THE GPU
+
+Rung 4's whole premise is that the optimiser state lives in host memory. **Two
+separate layers disagree, and each had to be fixed on its own.**
+
+```text
+1  torch    Optimizer.load_state_dict casts state to the PARAM's dtype+device
+            torch/optim/optimizer.py:754
+            ⇒ fp32 host state becomes bf16 cuda state. SILENT.
+            fixed inside CPUOffloadAdamW.load_state_dict
+
+2  accelerate  AcceleratedOptimizer.__init__ does
+            state_dict = move_to_device(optimizer.state_dict(), device)
+            accelerate/optimizer.py:69-75
+            ⇒ prepare() hauls all ~26 GB onto the card. OOM.
+            fixed by prepare(device_placement=[..., False, ...]) for the
+            optimizer slot, in lerobot_train.py
+```
+
+⚠ **Fixing one does not fix the other**, and neither is discoverable from a
+training run.
+
+### ⇒ THIS IS WHY THE GATE IS THE RESUME, NOT THE STEP TIME
+
+Defect 2 is **invisible on a fresh run**: at `prepare()` time the optimiser
+state dict is still empty, so `move_to_device` moves nothing. It fires only when
+state has been loaded first — i.e. **only on resume**.
+
+```text
+fresh 60 steps + checkpoint written    ✅ passed, twice
+resume from that same checkpoint       ⛔ OOM at 28.43 GiB
+```
+
+**A rung that trains beautifully and writes a 26 GB checkpoint can still be
+worthless**, and no amount of watching loss or s/step would ever reveal it. This
+is the concrete justification for the standing rule *a rung is a POC until it
+CHECKPOINTS AND RESUMES*.
+
 ### GATE E1b — ⛔ PRINT EVERY MEMORY LEVER BEFORE EVERY RUN
 
 The plan's Configuration blocks record what is *interesting* about a run and

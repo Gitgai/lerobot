@@ -1,6 +1,6 @@
 # π0.5 / 5090 lane — Current Priority
 
-Last updated: 2026-08-14
+Last updated: 2026-08-15
 
 **This file is a ROUTER: what is open, in what order, and why. It is NOT a log.**
 Detail and evidence: [`pi05_training_capability_plan_20260811.md`](pi05_training_capability_plan_20260811.md) (2,193 lines).
@@ -23,21 +23,24 @@ is the $11K RTX PRO 6000 justified?  NO — and bigger batches, the main thing m
 
 ---
 
-## ★ P0 — IN FLIGHT: rung 4 checkpoint gate
-
-**`adamw_cpu_offload` is now registered in lerobot.** Remaining: run it, and
-prove the checkpoint round-trip.
+## ✅ P0 — DONE 2026-08-15: rung 4 CHECKPOINTS AND RESUMES
 
 ```text
-⛔ THE GATE IS THE CHECKPOINT, NOT THE STEP TIME. An offload optimiser running at
-   exactly 2.43 s/step that cannot save state is worth nothing for real training.
-next   E1 preflight → ~200 steps → save → RESUME from it
-why    rung 4 is currently a POC: verified standalone (2.6e-08, 2.31×), never
-       integrated, never checkpointed
-watch  rung 3 just FAILED this same gate on resume (~1 GiB short). Rung 4 leaves
-       ~17.8 GiB on the GPU vs rung 3's 27.7, so it SHOULD have room — but that
-       is a prediction, not a result.
+train -> checkpoint -> kill -9 -> RESUME -> train -> End of training, EXIT=0
+2.33 s/step steady (2.3x the 8-bit baseline, exactly as predicted)
+GPU 20.5 GiB · host 34.1 GB RSS · optimiser state 26.0 GB, all fp32
+⇒ rung 4 is the FIRST rung to pass all three. Rung 3 still fails on resume.
+detail: results/pi05_capability_20260811/step3f_3e_rung4_gate_PASS.txt
 ```
+
+⚠ **Two defects had to be fixed and NEITHER appears during training** — torch
+casts the state to the param's dtype/device, and accelerate moves it to the GPU
+at `prepare()`. The second is invisible on a fresh run and fires only on resume;
+the 60-step run passed TWICE while it was live. Proof of the standing rule.
+
+★ **NEW BLOCKER FOR ANY LONG RUN — host RAM.** Rung 4 needs ~34 GB. dynus wants
+~47 GB. The box has 59 GB and swap is exhausted. **They cannot coexist**, and
+dynus was OOM-killed 9 times in 6 hours on its own. P2 needs the machine.
 
 ## P1 — BLOCKED ON OPERATOR: move the display to the iGPU
 
@@ -54,7 +57,8 @@ then     rerun the 3f.2b resume test to confirm
 ```text
 3f.3e phases 3-4   fp32 Adam via offload, 24k steps, then n=200 eval
                    compare against STEP 3d's 80.0% — ONE variable
-cost    ~16 h GPU (2.31×) + 15 min eval
+cost    ~19 h GPU (measured 2.33 s/step) + 15 min eval. NEEDS THE WHOLE BOX:
+        ~34 GB host RAM, and dynus wants ~47 GB of the same 59 GB.
 ⚠ do NOT start on momentum from P0 succeeding. This is the only way to isolate
   8-bit Adam, but the purchase decision does not depend on it.
 ```

@@ -1,0 +1,58 @@
+# 3f.3e — RUNG 4 CHECKPOINT GATE: ✅ PASS. Measured 2026-08-15.
+# The FIRST rung to train, checkpoint AND resume. Rung 3 never got past resume.
+
+CONFIG (every lever explicit — omitting them is what cost four launches)
+  policy        lerobot/pi05_libero_base   4,143,404,816 learnable
+  dataset       lerobot/libero_spatial_image
+  rename_map    wrist_image -> image2      (preflight: clean pass, 0 padded)
+  dtype         bfloat16                   ⚠ lerobot default is float32
+  grad ckpt     true                       ⚠ lerobot default is False
+  optimizer     adamw_cpu_offload (chunked CPUOffloadAdamW, fp32 state on host)
+  batch         8
+
+RESULT
+  train 0->60         ✅  2.85 s/step (incl. 11.5 s first step + pinning)
+  checkpoint 000060   ✅  optimizer_state.safetensors 26.0 GB, ALL fp32
+  hard kill -9        ✅  operator-stop simulated
+  RESUME              ✅  "Resuming data order at epoch 0, sample 480" (=60x8)
+  train 60->180       ✅  2.33 s/step steady state
+  checkpoints 120,180 ✅
+  End of training     ✅  EXIT=0
+
+MEMORY
+  GPU   20.5 GiB      state stays OFF the card, as designed
+  host  34.1 GB RSS   26 GB pinned fp32 state + model + workers
+  ⇒ headroom on the GPU: ~9 GiB spare, vs 8-bit Adam's ~2 GiB at the same batch
+
+COST
+  2.33 s/step vs STEP 3d's ~1.02 s/step  =>  2.3x
+  matches the 2.31x predicted from the standalone bench. The +112% arithmetic
+  held because the state is FULLY PINNED: chunks are slices of pinned storage
+  and still DMA at bulk rate, so 3f.3b's staged 8.0 GB/s does NOT apply here.
+
+★ TWO INDEPENDENT DEFECTS HAD TO BE FIXED, AND NEITHER SHOWS UP IN TRAINING
+  1 torch      Optimizer.load_state_dict casts state to the PARAM's dtype and
+               device (torch/optim/optimizer.py:754). fp32 host -> bf16 cuda.
+               SILENT — the toy round-trip "succeeded" with both invariants
+               destroyed. Fixed in CPUOffloadAdamW.load_state_dict.
+  2 accelerate AcceleratedOptimizer.__init__ does move_to_device(state, device)
+               (accelerate/optimizer.py:69-75), hauling all 26 GB onto the card
+               at prepare(). Fixed via prepare(device_placement=[..,False,..]).
+
+  ⇒ Defect 2 is INVISIBLE on a fresh run: the state dict is empty at prepare()
+    time, so the move is a no-op. It fires ONLY on resume. The fresh 60-step
+    run passed TWICE while this bug was live.
+  ⇒ This is the concrete proof of the standing rule: a rung is a POC until it
+    CHECKPOINTS AND RESUMES. Step time and loss would never have revealed it.
+
+OPEN — NOT A FAILURE, BUT UNVERIFIED
+  8 of 813 tensors (~894M params, 21.6%) got NO optimiser state, i.e. never
+  received a gradient in 60 steps. Almost certainly the LM heads: π0.5 trains a
+  flow-matching ACTION objective and never computes vocabulary logits. If so
+  the honest phrasing is "full fine-tune of the 3.25B parameters the objective
+  touches", not "of 4.14B". which_params_get_no_grad.py maps indices to names;
+  NOT YET RUN.
+
+HOST-MEMORY CONSTRAINT FOR ANY LONG RUN
+  rung 4 needs ~34 GB of host RAM. dynus wants ~47 GB. The machine has 59 GB
+  and swap is exhausted. THEY CANNOT COEXIST. P2's ~19 h run needs the box.
