@@ -2194,3 +2194,67 @@ ruled out either. Cheap to test.
 The 89 real episodes (40,712 frames, 3 cameras) are here and **have never been
 used for fine-tuning**. If the diagnosis is a sim-to-real gap, that dataset is
 the fix, and the pi0.5 run already proved this GPU can do a full fine-tune.
+
+---
+
+# 2026-08-16 CONFIRMED: sim-trained. And the camera geometry question reopens.
+
+`docs/evidence_aug8/../logs/leisaac_vs_real.jpg` — the LeIsaac dataset's front
+camera is unmistakably a RENDER (flat shading, a yellow simulated gripper,
+perfect spheres). The 89-episode dataset is a photograph.
+
+```text
+  leisaac_pick_orange   60 eps    SIMULATOR   <- what the checkpoint trained on
+  so101_orange_49_plus  89 eps    REAL        <- never used for fine-tuning
+```
+
+The checkpoint's README says "Finetuned GR00T N1.6 on **Leisaac** pick orange
+dataset". Confirmed visually. **The model has never seen real-arm data.**
+
+## This reopens the front-camera question I closed on 2026-08-12
+
+That retraction reasoned: the training `front` is a low side-on view, therefore
+the laptop webcam is correct and the overhead C270 would be wrong. **It used the
+89-episode REAL dataset as "the training data".** The checkpoint was never
+trained on that.
+
+The dataset it WAS trained on has a front camera that is steep and overhead-ish,
+with the table filling the frame — the sim geometry (0.60 m up, 71 deg
+depression) this document measured back on 2026-08-11.
+
+```text
+  what the checkpoint trained on   steep, overhead-ish, table fills the frame
+  what the rig sends               low, side-on, wall and room behind
+```
+
+⇒ **The original 2026-08-11 advice — route the overhead camera into `front` — may
+  have been right, and the retraction wrong.** Both were reasoned from a dataset;
+  the first from sim, the second from the 89 real episodes. Only the sim one is
+  this checkpoint's training distribution.
+
+⇒ And the 89% -> 44% camera-geometry measurement becomes relevant again. It
+  measured exactly this axis, in the checkpoint's own domain.
+
+## Status of the diagnosis
+
+```text
+  CONFIRMED   the checkpoint is sim-trained; the real arm is out of distribution
+              from the first frame
+  LIKELY      the front camera geometry is also mismatched against its actual
+              training distribution
+  RETRACTED   "the front camera was right all along" (2026-08-12) - reasoned
+              from the wrong dataset
+```
+
+## Two paths, and they are different work
+
+```text
+  A  make the rig look like the SIM      re-aim the front camera overhead.
+     Cheap, testable today, and the 89%->44% figure is a real measurement of
+     what this axis is worth in the checkpoint's own domain.
+  B  make the MODEL know the real world  fine-tune on the 89 real episodes.
+     The durable answer, and that data has never been used.
+```
+
+A is one afternoon. B is a training run this GPU has already been shown to
+handle.
