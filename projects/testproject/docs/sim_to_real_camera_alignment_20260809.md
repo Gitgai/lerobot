@@ -2306,3 +2306,51 @@ Still not success, and the pan runaway persists - the remaining gap (real
 photographs vs renders, plate on the wrong side, wrist sharpness 47) is still
 wide. The fine-tune case stands; this adds evidence that scene alignment ALSO
 pays, and the two are complementary rather than competing.
+
+---
+
+# RUN 4, 2026-08-16 — closes the gripper ON AIR. The choreography without the object.
+
+Same configuration as run 3 (overhead C270 as front, real orange, JPEG). One
+false start: all six motors silent - the arm's power supply was off; operator
+restored it.
+
+```text
+  200 chunks   rtt median 558 ms   wrist sharpness median 24
+  gripper closed at chunk 43, width ~14, and STAYED closed for 157 chunks
+  pan walked -10 -> -117 (the runaway again)
+  all THREE oranges: pixel-identical positions from c35 to c150. NOTHING moved.
+```
+
+Gripper width ~14 is fingers-nearly-touching; an orange holds at ~28-33 (the
+pi0.5 measurements). **It closed on air**, near the fruit region, then rose and
+"carried" nothing while panning away.
+
+## The emerging picture, two runs in a row
+
+With the overhead camera, the policy now reliably produces the SHAPE of the task
+- approach-ish, close, lift, move - but with no grounding on the actual objects.
+Run 3 closed near the plate; run 4 closed on air near the fruit. The choreography
+fires; the object perception does not. That is precisely what a policy trained
+on renders should do when shown photographs: the motion priors transfer, the
+visual grounding does not.
+
+## A real regression this run
+
+Wrist sharpness median 24 - BELOW Aug 8's 27. Half the model's vision was mush
+this run. The late-run frames are bright (150) and featureless: the camera
+staring at the arm's own white parts. The wrist camera remains an unfixed
+liability even after the lighting work.
+
+## Standing summary of the four instrumented runs
+
+```text
+         front camera      target    gripper            oranges
+  run 1  webcam side-on    tomato    never closed       0
+  run 2  webcam side-on    orange    never closed       0
+  run 3  C270 overhead     orange    closed @ c189      0
+  run 4  C270 overhead     orange    closed @ c43, air  0
+```
+
+Monotonically more task-shaped as inputs approach the training distribution;
+never object-grounded. The fine-tune on real data remains the indicated fix.
