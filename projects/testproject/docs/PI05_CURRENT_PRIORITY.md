@@ -1,9 +1,9 @@
 # π0.5 / 5090 lane — Current Priority
 
-Last updated: 2026-08-15
+Last updated: 2026-08-16
 
 **This file is a ROUTER: what is open, in what order, and why. It is NOT a log.**
-Detail and evidence: [`pi05_training_capability_plan_20260811.md`](pi05_training_capability_plan_20260811.md) (2,193 lines).
+Detail and evidence: [`pi05_training_capability_plan_20260811.md`](pi05_training_capability_plan_20260811.md) (2,454 lines).
 Raw artefacts: `results/pi05_capability_20260811/`.
 
 > **Why this file exists:** priority order previously lived only in chat, so the
@@ -26,61 +26,77 @@ is the $11K RTX PRO 6000 justified?  NO — and bigger batches, the main thing m
 
 ---
 
-## ✅ P0 — DONE 2026-08-15: rung 4 CHECKPOINTS AND RESUMES
+## ✅ P0 — DONE 2026-08-15: rung 4 trains, checkpoints AND resumes
 
 ```text
-train -> checkpoint -> kill -9 -> RESUME -> train -> End of training, EXIT=0
-2.33 s/step steady (2.3x the 8-bit baseline, exactly as predicted)
-GPU 20.5 GiB · host 34.1 GB RSS · optimiser state 26.0 GB, all fp32
-⇒ rung 4 is the FIRST rung to pass all three. Rung 3 still fails on resume.
+2.33 s/step = 2.3x the 8-bit baseline · GPU 20.5 GiB · host 34.1 GB · state fp32
+⇒ FIRST rung to pass all three. Rung 3 still fails on resume, and now matters
+  less: rung 4 does everything rung 3 does, and resumes.
 detail: results/pi05_capability_20260811/step3f_3e_rung4_gate_PASS.txt
 ```
 
-⚠ **Two defects had to be fixed and NEITHER appears during training** — torch
-casts the state to the param's dtype/device, and accelerate moves it to the GPU
-at `prepare()`. The second is invisible on a fresh run and fires only on resume;
-the 60-step run passed TWICE while it was live. Proof of the standing rule.
-
-★ **NEW BLOCKER FOR ANY LONG RUN — host RAM.** Rung 4 needs ~34 GB. dynus wants
-~47 GB. The box has 59 GB and swap is exhausted. **They cannot coexist**, and
-dynus was OOM-killed 9 times in 6 hours on its own. P2 needs the machine.
+★ **HOST RAM IS THE NEW BINDING CONSTRAINT, not VRAM.** Rung 4 needs ~34 GB;
+dynus wants ~47 GB of the same 59 GB; swap is exhausted. Check `pgrep dynus` is
+empty before any long run.
 
 ## P1 — BLOCKED ON OPERATOR: move the display to the iGPU
 
+**Verified NOT done, 2026-08-15 23:43.** The monitor is still on the 5090:
+
 ```text
-cable move to the motherboard output + reboot. No BIOS change (iGPU already
-enumerated, amdgpu loaded). Frees the desktop's 1.42 GiB of VRAM.
-why now  rung 3's paged resume fails by ~1 GiB. This is plausibly the exact fix,
-         and would flip rung 3 from SAVE-ONLY back to fully usable.
+card0 = amdgpu (AMD Granite Ridge iGPU)   DP-4, DP-5, HDMI-A-2 all FREE
+card1 = nvidia (RTX 5090)                 HDMI-A-1  ← CONNECTED
+recheck  for c in /sys/class/drm/card*-*/status; do ... done
+do       move the cable to a motherboard port + reboot. No BIOS change needed.
+frees    ~1.0-1.9 GiB of VRAM (varies with what the desktop is running)
+why      rung 3's paged resume fails by ~1 GiB — plausibly the exact fix
 then     rerun the 3f.2b resume test to confirm
 ```
 
-## P2 — the last open QUESTION: does 8-bit Adam cost accuracy?
+⚠ Lower value than it was: **rung 4 now does everything rung 3 does AND resumes**,
+so this rescues a rung we no longer depend on. Still cheap, still worth doing.
+
+## P2 — 🔴 NEEDS AN OPERATOR DECISION before it can start
+
+**The question is still open and still worth answering: does 8-bit Adam cost
+accuracy?** Every result this project has was produced with 8-bit Adam, and
+nobody has ever compared it to real fp32 Adam — fp32 does not fit in VRAM
+(46.3 GiB vs 29.9 available). Rung 4 is what makes the comparison possible.
+
+⛔ **THE BLOCKER IS NOT THE MACHINE — IT IS THE BASELINE.**
 
 ```text
-3f.3e phases 3-4   fp32 Adam via offload, 24k steps, then n=200 eval
-                   compare against STEP 3d's 80.0% — ONE variable
-cost    ~19 h GPU (measured 2.33 s/step) + 15 min eval. NEEDS THE WHOLE BOX:
-        ~34 GB host RAM, and dynus wants ~47 GB of the same 59 GB.
-⚠ do NOT start on momentum from P0 succeeding. This is the only way to isolate
-  8-bit Adam, but the purchase decision does not depend on it.
+STEP 3d's exact command is UNRECOVERABLE. Searched 2026-08-15: no shell
+history, no train_config.json, checkpoints deleted.
+
+KNOWN     pi05_base · libero_spatial_image · bs8 · 24k steps · save_freq 2000
+          bf16 + gradient checkpointing (it would have OOM'd otherwise)
+NOT KNOWN the rename_map, and whether it truly used pi05_base as the doc says
 ```
 
-## P3 — 3g rerun: the starting-checkpoint hypothesis
+⇒ Comparing a new fp32 arm against 3d's 80.0% may be a TWO-variable comparison,
+which is the exact failure mode that cost four launches and a 7 h run this week.
 
 ```text
-from pi05_libero_base, NO rename_map, E1 preflight first. ~7 h.
-The previous attempt blanked the wrist camera for 24,000 batches and measured
-nothing. E1 now makes that specific failure impossible.
-⚠ Affects no decision. Scientific closure only.
+OPTION A  both arms fresh from ONE known config      ~24 h   genuinely 1 variable
+OPTION B  fp32 arm only, vs 3d's 80.0%               ~17 h   ⚠ baseline unverified
+OPTION C  hold                                          —    changes no decision
 ```
 
-## P4 — 🔴 NEEDS AN OPERATOR DECISION: our own data (STEP 4)
+⚠ **The $11K verdict does not depend on this.** P2 closes the original quality
+question; it does not reopen the purchase one.
+
+**Launch spec, fully explicit — do NOT reconstruct it from prose:**
+see `pi05_training_capability_plan_20260811.md` §3f.3e "P2 LAUNCH SPEC".
+
+## P3 / P4 — dormant, nothing blocking
 
 ```text
-Mixing state-machine-generated with recorded episodes is a research decision,
-not a technical one. Bring STEP 2/3 results to it. Also: the 89 real episodes
-still need v3.0 → GR00T v2 conversion.
+P3  3g rerun (starting-checkpoint hypothesis)  ~7 h · affects NO decision.
+    ⚠ its original premise is RETRACTED — the wrist camera was never blanked.
+    See results/.../step3g_INVALID_run.txt before planning it.
+P4  🔴 OPERATOR DECISION: our own 89 episodes (STEP 4). Research call, not a
+    technical one. Episodes still need v3.0 -> GR00T v2 conversion.
 ```
 
 ---
@@ -106,4 +122,8 @@ a rung is a POC until it CHECKPOINTS AND RESUMES
 loss is NOT a proxy for capability  it has misled us three times
 a gate that encodes a RULE inherits every error in that rule — make gates
 report what will actually happen, from the same objects the tool itself builds
+NEVER rebuild a run command from a Configuration block. State every lever
+explicitly, defaults included — dtype and gradient_checkpointing BOTH default
+OFF and both silently cost a launch on 2026-08-15.
+use setsid for long runs — a bare background job died to a session teardown
 ```

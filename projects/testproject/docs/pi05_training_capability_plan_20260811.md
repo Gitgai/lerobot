@@ -1382,6 +1382,63 @@ bf16, no checkpointing 7.71 params + ~20 activations               = 27.89 GiB  
 fp32, no checkpointing 15.4 params + ...                           = 27.68 GiB  ⛔
 ```
 
+### ⭐ P2 LAUNCH SPEC — copy this, do NOT rebuild it from prose
+
+**Written 2026-08-16 because rebuilding a command from a Configuration block is
+what cost four launches and a 7 h run.** Every lever is stated, including the
+ones that are "just the default" — those are precisely the ones that bite.
+
+⛔ **STATUS: awaiting an operator decision (A / B / C in the router). Not started.**
+
+```bash
+# GATE FIRST — seconds, non-negotiable
+cd /home/kiran/sim/pi05-fullft-probe
+./.venv312/bin/python preflight_features.py \
+  --dataset lerobot/libero_spatial_image \
+  --policy-path lerobot/pi05_base \
+  --rename-map '{"observation.images.image":"observation.images.base_0_rgb",
+                 "observation.images.wrist_image":"observation.images.left_wrist_0_rgb"}' \
+  --expect-padded 1        # pi05_base has 3 camera slots; LIBERO is a 2-camera setup
+# MUST print: dtype/gradient_checkpointing levers, and "PASS — padding is as declared"
+```
+
+```bash
+# ARM B — fp32 Adam via rung 4.  ~17 h  (24,000 x 2.33 s)
+LEROBOT_CPU_OFFLOAD_ADAM=1 \
+setsid nohup ./.venv312/bin/lerobot-train \
+  --policy.path=lerobot/pi05_base \
+  --policy.device=cuda \
+  --policy.dtype=bfloat16 \
+  --policy.gradient_checkpointing=true \
+  --policy.push_to_hub=false \
+  --dataset.repo_id=lerobot/libero_spatial_image \
+  '--rename_map={"observation.images.image":"observation.images.base_0_rgb","observation.images.wrist_image":"observation.images.left_wrist_0_rgb"}' \
+  --batch_size=8 --steps=24000 \
+  --save_checkpoint=true --save_freq=2000 \
+  --output_dir=/home/kiran/lerobot_assets/probes/pi05_p2_fp32 \
+  --job_name=p2_fp32 --wandb.enable=false &
+
+# ARM A — identical, but LEROBOT_CPU_OFFLOAD_ADAM=0 (8-bit).  ~7 h
+# Run this too under OPTION A. It is the only way the comparison is 1-variable.
+```
+
+```text
+⚠ setsid, not plain nohup. A bare background job was killed by an agent-session
+  teardown mid-run on 2026-08-15.
+⚠ 12 checkpoints x 26 GB optimiser state = ~310 GB under OPTION B's arm.
+  Disk is fine (1.5 T free) but budget the write time.
+⚠ NEEDS THE WHOLE BOX: ~34 GB host RAM. dynus wants ~47 GB of the same 59 GB,
+  and swap is exhausted. Confirm `pgrep dynus` is empty before launching.
+```
+
+**Then, and only then, evaluate:**
+
+```text
+n=200 (NOT n=40 — n=40 once produced a 5-point error)
+compare  OPTION A: arm A vs arm B          <- one variable, trustworthy
+         OPTION B: arm B vs STEP 3d's 80.0% <- two variables, caveat the result
+```
+
 ### ★ TWO INDEPENDENT PATHS TRY TO PUT THE OFFLOADED STATE BACK ON THE GPU
 
 Rung 4's whole premise is that the optimiser state lives in host memory. **Two
