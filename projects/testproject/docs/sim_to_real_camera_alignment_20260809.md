@@ -1985,3 +1985,72 @@ The cheapest discriminating test: **put real oranges on the table under good
 light and re-run.** If the drift stops, the hypothesis holds and the fix is the
 scene, not the code. If it drifts identically, the bias is unconditional and the
 checkpoint itself is the problem.
+
+---
+
+# RUN 2, 2026-08-16 — real orange, correct aim, JPEG on. Still fails.
+
+The discriminating test: if the pan bias is conditional on a weak visual signal,
+a real orange under a correctly-aimed camera should stop the drift.
+
+Scene verified before starting: plate left, **real orange** centre (hue 14.0
+against training's 11.0; the Aug-14 tomatoes were 20.5), front camera restored to
+the low side-on training geometry.
+
+## Result: the task failed identically. The numbers did not.
+
+```text
+                        RUN 1 (tomatoes, raw)   RUN 2 (orange, JPEG)
+  round trip                 615 ms                  564 ms
+  wrist sharpness             58                      37
+  oranges placed               0                       0
+
+  COMMAND BIAS (action[0] - state)
+  shoulder_pan          -0.83   99% neg          -0.24   77% neg   <- REDUCED
+  elbow_flex            -2.46   99% neg          -2.38   99% neg   <- UNCHANGED
+  gripper               -0.00   50% neg          +0.06   45% neg   (the control)
+
+  MOTION RANGE
+  shoulder_pan           104.7                    71.9
+  shoulder_lift           51.6                   114.9
+  elbow_flex              19.7                    64.5
+```
+
+## What this settles, and what it does not
+
+**The pan bias IS partly conditional on the visual signal.** A real, correctly
+framed orange cut it from 99% one-signed to 77%, and the pan drift from 105 deg
+to 72 deg. That is a real effect and it means vision does reach the pan channel.
+
+**The elbow_flex bias is NOT conditional. It is identical across both runs**
+(-2.46/99% vs -2.38/99%), across two different scenes, two different targets, two
+camera configurations and two transports. Whatever produces it does not depend on
+what the policy sees.
+
+**And the task still failed completely.** `docs/evidence_aug8/run2_frames.jpg`:
+the arm rises up and to the right, the orange sits untouched in centre frame, and
+the wrist view loses the workspace by c60 and is near-black by c90. The failure
+mode shifted - this time driven by shoulder_lift (114.9 deg) and elbow (64.5 deg)
+rather than pan alone - but the outcome did not.
+
+⇒ **Improving the scene is not sufficient.** The fork posed on 2026-08-14 resolves
+  toward the checkpoint: a bias that survives a corrected scene, on a joint whose
+  bias does not move at all, is a property of the model rather than the rig.
+
+## Caveats, stated because several variables moved at once
+
+```text
+  - run 2 changed the target, the camera aim AND the transport together.
+    The pan improvement cannot be attributed to any one of them.
+  - wrist sharpness got WORSE (58 -> 37), so the visual signal was not
+    uniformly better. Part of why pan improved and elbow did not may be that.
+  - n=1 each. These are traces, not a battery.
+```
+
+## Where this points
+
+The checkpoint was fine-tuned on `so101_pick_orange_v2.1`, a dataset **not on
+this machine**. The 89-episode set that IS here has never been used for
+fine-tuning. If the bias is in the checkpoint, the next move is a training
+question - retrain on the available data, or recover the dataset that produced
+this one - and not another rig adjustment.
