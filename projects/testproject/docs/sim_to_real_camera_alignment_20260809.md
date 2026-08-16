@@ -2258,3 +2258,51 @@ depression) this document measured back on 2026-08-11.
 
 A is one afternoon. B is a training run this GPU has already been shown to
 handle.
+
+---
+
+# RUN 3, 2026-08-16 — overhead C270 as `front`. FIRST GRIPPER CLOSURE on hardware.
+
+First real-arm run with the front channel fed by the overhead C270 (the training
+geometry) instead of the side-on laptop webcam. Same real orange, JPEG on.
+
+## The trend across the three instrumented runs
+
+```text
+              run 1              run 2              run 3
+front camera  webcam, side-on    webcam, side-on    C270, OVERHEAD
+target        tomatoes           real orange        real orange
+pan bias      -0.83, 99% neg     -0.24, 77% neg     still drifts, -13 -> -101
+gripper       50-58, never       47-58, never       CLOSED to 14.6,
+              closed             closed             chunks 189-199
+oranges       0                  0                  0
+```
+
+**Each step toward the training distribution produces more task-shaped
+behaviour.** Run 3's front view (see run3_frames.jpg) now closely resembles the
+training renders - overhead, table filling the frame, both oranges and the plate
+visible.
+
+## What actually happened in run 3
+
+The pan still walked out of distribution (-13 -> -101 by mid-run). But then:
+shoulder_lift ROSE from -104 to -2, wrist_roll became active for the first time
+(range 19 deg vs 2-7 in earlier runs), and at chunks 189-199 the gripper closed
+into the grasp range for the first time in any hardware run. The wrist view at
+those chunks shows the camera nearly touching something WHITE - consistent with
+the arm being at the plate.
+
+Zero oranges picked. The closure happened at the wrong place. But this is the
+first object-directed-looking sequence the real arm has ever produced.
+
+## Reading
+
+Supports the out-of-distribution diagnosis from both directions: behaviour
+degrades gracefully as inputs leave the training distribution, and RECOVERS
+incrementally as they approach it. The camera change alone took the policy from
+"never actuates the gripper" to "closes it near the plate".
+
+Still not success, and the pan runaway persists - the remaining gap (real
+photographs vs renders, plate on the wrong side, wrist sharpness 47) is still
+wide. The fine-tune case stands; this adds evidence that scene alignment ALSO
+pays, and the two are complementary rather than competing.
