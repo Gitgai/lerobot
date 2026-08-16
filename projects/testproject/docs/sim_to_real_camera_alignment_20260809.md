@@ -2115,3 +2115,82 @@ somewhere the policy has never seen.
 Measured on TRAINING data, i.e. in-distribution. It says what the model does
 where it is well-defined. It says nothing about behaviour outside that, which is
 exactly where the live runs spend most of their time.
+
+---
+
+# 2026-08-16 — THE CHECKPOINT IS DOWNLOADED AND SIM-TRAINED. Major correction.
+
+Searched both machines for `so101_pick_orange_v2.1`. **It is on neither.** But
+the search found what the checkpoint actually is.
+
+## It was downloaded, not trained here
+
+`~/lerobot_assets/checkpoints/gr00t_n16_leisaac_orange/` carries an HF download
+cache (`.cache/huggingface/download/*.metadata`), a README, `.gitattributes` and
+a `scripts/` directory — the signature of `hf download` on someone else's model
+repo, pulled 2026-08-05.
+
+## Its own README and eval script say SIMULATOR
+
+```text
+  README.md          "Finetuned GR00T N1.6 on Leisaac pick orange dataset"
+  scripts/finetune.sh --dataset_path dataset/so101_pick_orange_v2.1
+  scripts/leisaac_client.sh
+                     --task=LeIsaac-SO101-PickOrange-v0      <- the SIM task
+                     --policy_language_instruction="Pick up the orange and
+                                                     place it on the plate"
+```
+
+**LeIsaac is the simulator.** The author's own evaluation recipe runs it against
+the Isaac Sim task, not hardware.
+
+### Retracting the "trained on real arm data" claim
+
+On 2026-08-12 this document concluded the checkpoint was fine-tuned on REAL data,
+from `dataset_type: physical_embodiment` in its config. **That is the DEFAULT
+value of the field** (`gr00t/configs/data/data_config.py:28`), not a statement
+about sim versus hardware. The conclusion was drawn from an unset default.
+
+## What this does to the bias finding
+
+The offline bias measurement (320 samples, `shoulder_pan` -1.04, CI excluding
+zero) was made against **`so101_orange_49_plus_grasp_pick_move_focus` — the 89
+REAL episodes.** If the checkpoint is sim-trained, that is not its training
+distribution at all.
+
+⇒ **What I measured is the model's error on data it was never trained on.** That
+  is out-of-distribution error, not a defect. Calling it "a bias in the
+  checkpoint" over-claimed considerably.
+
+The measurement stands as a fact; the interpretation does not.
+
+## What this reframes
+
+```text
+  86% in sim            its NATIVE domain - the task it was fine-tuned on
+  0% on the real arm    a straightforward sim-to-real gap
+  systematic error on   expected - the model has never seen this distribution
+    the 89 real episodes
+```
+
+**The model has never been trained on real-arm data.** Every real-arm run has
+been out of distribution from the first frame. That is a simpler and more likely
+explanation than a defective checkpoint, and it fits every observation.
+
+## Also found: a different instruction
+
+```text
+  the author's eval    "Pick up the orange and place it on the plate"
+  our client + sim     "Grab orange and place into plate"
+```
+
+Different sentences. The 2026-08-14 note "the instruction is ruled out" was based
+on our sim eval and our client agreeing with each other — they do, but **neither
+matches the string the checkpoint's author used.** Not necessarily wrong, but not
+ruled out either. Cheap to test.
+
+## What follows
+
+The 89 real episodes (40,712 frames, 3 cameras) are here and **have never been
+used for fine-tuning**. If the diagnosis is a sim-to-real gap, that dataset is
+the fix, and the pi0.5 run already proved this GPU can do a full fine-tune.
