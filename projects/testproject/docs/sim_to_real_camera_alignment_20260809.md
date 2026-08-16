@@ -2054,3 +2054,64 @@ this machine**. The 89-episode set that IS here has never been used for
 fine-tuning. If the bias is in the checkpoint, the next move is a training
 question - retrain on the available data, or recover the dataset that produced
 this one - and not another rig adjustment.
+
+---
+
+# BIAS MEASURED AT SCALE, OFFLINE — 2026-08-16
+
+320 samples across 8 training episodes, 5,120 predicted actions, replayed against
+ground-truth demonstrator actions. **No feedback loop**, so anything here is a
+property of the model rather than closed-loop dynamics — the distinction the live
+runs could not make.
+
+```text
+  joint             mean err   median   % neg     95% CI of the mean
+  shoulder_pan        -1.040   -0.805     69%   [-1.480, -0.600]   BIASED
+  shoulder_lift       +1.495   +1.879     26%   [+0.520, +2.469]   BIASED
+  elbow_flex          +5.084   +2.947     25%   [+4.096, +6.072]   BIASED
+  wrist_flex          +0.045   -0.536     54%   [-0.704, +0.794]   no
+  wrist_roll          +0.801   +0.882     21%   [+0.499, +1.102]   BIASED
+  gripper             +0.385   +0.161     48%   [-0.288, +1.058]   no
+```
+
+**The gripper is the control and it comes out unbiased**, which validates the
+method — the signed errors elsewhere are not an artefact of the measurement.
+
+## The confirmation
+
+**`shoulder_pan` carries a systematic NEGATIVE bias of about -1.0 deg per chunk,
+and the confidence interval excludes zero.** It matches the live runs in both
+sign and magnitude (-0.83 and -0.24 measured on the arm). This is a model
+property, present with no feedback loop, on the policy's own training data.
+
+In closed loop that integrates: -1 deg per chunk over 120 chunks is the 105 deg
+runaway that walked the arm into its joint stop in run 1.
+
+## The complication — stated because it matters
+
+**`elbow_flex` is +5.08 offline but was -2.46 LIVE. Opposite signs.**
+
+So the live elbow behaviour is NOT explained by a model bias. Something about the
+closed loop, or about the out-of-distribution states the arm reached, reverses
+it. The earlier note calling the elbow bias "unconditional" was wrong: it is
+unconditional *across live runs*, but it does not agree with the offline
+measurement at all.
+
+## The mechanism this supports
+
+```text
+  1. the model has a real -1.0 deg/chunk bias on shoulder_pan   (measured, n=320)
+  2. closed loop integrates it - each chunk anchors to the new position
+  3. the arm leaves the training distribution (run 1: at chunk 59, 68% of the run)
+  4. outside it, all joints behave arbitrarily - which is where the elbow sign
+     flip and run 2's shoulder_lift excursion come from
+```
+
+The pan bias is the *initiator*. The rest is what happens after the arm is
+somewhere the policy has never seen.
+
+## Caveat
+
+Measured on TRAINING data, i.e. in-distribution. It says what the model does
+where it is well-defined. It says nothing about behaviour outside that, which is
+exactly where the live runs spend most of their time.
