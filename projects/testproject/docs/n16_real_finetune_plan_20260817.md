@@ -1,7 +1,7 @@
 # Plan: fine-tune GR00T N1.6 on the 89 real episodes
 
-Created 2026-08-17. Status: **S1 COMPLETE — gate passed with one finding (D4).
-S2 next.**
+Created 2026-08-17. Status: **S3 IN FLIGHT — full 10,000-step run launched 12:24,
+ETA ~16:05. S1+S2 complete; see the S2 log below.**
 
 ---
 
@@ -233,3 +233,42 @@ or any dataset". It appears in this dataset, which was recorded with it. It was
 invented, then demonstrated under, which makes it real training vocabulary now.
 Do NOT edit the dataset's string instead - the demos were recorded under it and
 consistency between training and serving is all that matters.
+
+
+---
+
+## S2 RESULTS — 2026-08-17. Five rounds to green; all gates now passed.
+
+```text
+  round 1  FAIL 16 s   dataset is v3, loader wants v2.1 (meta/episodes.jsonl)
+           -> wrote scripts/convert_v30_to_v21_orange89.py. 89 episodes, 178
+              frame-accurate clips, ZERO verification failures. `top` camera
+              dropped by construction (resolves D1). Original untouched.
+  round 2  FAIL 60 s   OOM by 48 MB at Adam state creation, 29.57 GB
+  round 3  FAIL 60 s   batch 4 changed nothing (29.81 GB) - the floor is
+              STRUCTURAL: fp32 model (launcher sets load_bf16=False) + fp32
+              Adam states. Batch size is not the lever.
+  round 4  FAIL        my error: `pip` does not exist in a uv venv; bitsandbytes
+              never installed. Relaunched before verifying the install.
+  round 5  PASS        8-bit Adam via env-gated launcher patch (N16_OPTIM,
+              default behaviour unchanged, .pre-optim backup beside it).
+              100/100 steps in 2:09 = 46.5 steps/min, peak 24.9 GB.
+  serve check PASS     checkpoint-100 loads in the policy server and answers
+              get_action with finite (1,16,5) chunks.
+```
+
+Also learned from the launcher defaults: **the author's recipe tunes only the
+projector + diffusion head** (tune_llm and tune_visual default False). The Eagle
+vision backbone - a VLM pretrained on real photos - stays frozen in both their
+sim fine-tune and ours. We are re-fitting the same action mapping, on real data.
+
+## S3 LAUNCH — 12:24
+
+```text
+  output    ~/lerobot_assets/checkpoints/n16_real89_20260817
+  settings  batch 4 x accum 8 (effective 32), 8-bit Adam, lr 1e-4,
+            author's colour jitter, save every 1000, keep 12
+  measured  46.5 steps/min, peak 24.9 GB (6.4 GB headroom)
+  ETA       ~215 min -> ~16:05, an afternoon not an overnight
+  monitor   per-checkpoint events + error watch, persistent
+```
