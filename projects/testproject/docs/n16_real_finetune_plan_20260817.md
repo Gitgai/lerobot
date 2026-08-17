@@ -466,3 +466,53 @@ Step 6 needs the operator and a working arm; steps 1-5 need neither.
   - the instruction string must switch to the dataset's own sentence,
     "pick up the orange and move it to another place", in client AND eval
 ```
+
+## 10. Full fine-tune: asked, checked, answered (2026-08-17)
+
+Question: "Are you sure we should not do full finetune?" Rather than restate the
+earlier argument, two checks were run that could have overturned it. Neither did.
+
+**Check 1 - what did the one successful real-arm fine-tune train?**
+The July pi0.5 run is the only intervention that has ever produced a real
+grasp-lift-carry on this arm, on these same 89 episodes. Its config
+(`docs/pi05_active_work_tracker.md:1284`):
+
+```
+train_expert_only=true
+```
+
+That is pi0.5's term for: train the action expert, leave the vision-language
+backbone frozen. The precedent that worked was also a partial fine-tune.
+
+**Check 2 - did the render training ever damage the vision backbone?**
+Direct weight comparison, base `nvidia/GR00T-N1.6-3B` vs the sim-trained
+checkpoint-10000, 1106 tensors each:
+
+| group | result |
+|---|---|
+| vision backbone (40 sampled) | **40 identical, 0 changed**, max abs difference `0.00e+00` |
+| action head / projector (40 sampled) | **0 identical, 40 changed**, max abs difference `9.33e-02` |
+
+The simulator fine-tune never touched vision. The backbone in our starting
+checkpoint is bit-identical to NVIDIA's, pretrained on real photographs and
+never exposed to a render. The damage is confined to the action head and
+projector - exactly the two components we are retraining.
+
+A full fine-tune would therefore spend its extra capacity repairing a component
+that was never broken.
+
+**Check 3 - would it even fit?**
+
+| | params | optimizer state (fp32 master + 8-bit Adam) |
+|---|---|---|
+| trainable now (head + projector) | 1.419 B (43.2%) | 8.5 GB |
+| full fine-tune (everything) | 3.287 B (100%) | 19.7 GB (+11.2 GB) |
+
+Measured peak during the current frozen run: **24.4 GB of 31.8 GB**. Adding
+11.2 GB does not fit. Full fine-tuning on this card would need gradient
+checkpointing plus a smaller batch, i.e. a materially slower and different run.
+
+**Honest limit of this answer.** Full fine-tuning has not been run head-to-head
+against the frozen run, so this is a reasoned case from three measurements, not
+a measured comparison. It is two flags away (`tune_llm`, `tune_visual`) if the
+frozen run plateaus. It is not the thing to try first.
