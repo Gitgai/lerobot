@@ -272,3 +272,52 @@ sim fine-tune and ours. We are re-fitting the same action mapping, on real data.
   ETA       ~215 min -> ~16:05, an afternoon not an overnight
   monitor   per-checkpoint events + error watch, persistent
 ```
+
+---
+
+## S4 FIRST PROBE — 2026-08-17. Real-data training works, measured at 40%.
+
+Training died at step 4,025/10,000 when the session ended (checkpoints 1000-4000
+intact and resumable). Before spending more GPU, the operator asked to test what
+exists. Correct instinct, and it produced the first hard evidence that the whole
+diagnosis-and-fix chain is right.
+
+**Method** — head-to-head, offline. Both checkpoints predict the next 16 actions
+from the SAME real states and real images; both scored against what the human
+demonstrator actually did. 64 samples across 8 episodes.
+
+Deliberately NOT tested in the simulator: the model has moved domains, so sim is
+now the out-of-distribution world for it and its scores would mislead in the
+opposite direction. The plan's own S4 warning, honoured.
+
+```text
+                shoulder   shoulder   elbow    wrist    wrist
+                pan        lift       flex     flex     roll    gripper  OVERALL
+  sim-trained    4.23       7.63       9.79     5.97     2.87    4.66     5.857
+  real @40%      1.50       2.42       3.43     3.32     1.74    3.29     2.618
+  change         -65%       -68%       -65%     -44%     -39%    -29%     -55%
+```
+
+**Error more than halved, every joint improved, at 40% of training.**
+
+The headline is `shoulder_pan`: **-65%**. That is the joint whose systematic
+negative bias (-1.04 offline, CI excluding zero) walked the arm from -11 to -117
+in run 1 and drove every hardware failure. The bias was an artefact of a model
+that had never seen a photograph, and real data is dissolving it. That closes the
+loop between the diagnosis and the fix with a number.
+
+**Caveat, stated before the numbers were read:** training used all 89 episodes,
+so there is no held-out set. This measures FIT, not generalisation. It answers
+"is it learning" - the right question at 40% - and not "will the arm work".
+Only the arm answers that.
+
+## Decision pending: which camera view the final model should expect
+
+```text
+  A  resume checkpoint-4000 (side-on front)   ~1h45   re-aim the rig to side-on later
+  B  restart on the topfront dataset          ~3h     matches the C270 mounted today
+  C  both, then A/B on the arm                ~5h     settles it empirically
+```
+
+`so101_orange_89_v21_topfront` is already built (89 overhead clips, 0 verification
+failures), so B and C carry no preparation cost.
