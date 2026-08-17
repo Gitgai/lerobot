@@ -321,3 +321,64 @@ Only the arm answers that.
 
 `so101_orange_89_v21_topfront` is already built (89 overhead clips, 0 verification
 failures), so B and C carry no preparation cost.
+
+---
+
+## S4 ADVERSARIAL RE-TEST — 2026-08-17. All four checks pass. One reveals more.
+
+The operator, correctly, refused to accept the first probe on trust: this
+investigation has produced six retractions, all of the same kind - a measurement
+read past what it could support. So the claim was re-tested with checks designed
+to FAIL. Script: `scripts/rigorous_checkpoint_check.py`.
+
+```text
+                              SIM-TRAINED      REAL-TRAINED 40%
+  C3 honest score              5.717 deg        2.604 deg
+  C1 with WRONG images         5.783            6.952
+     penalty                   +0.066           +4.348
+  C4 vs "don't move"           -0.020           +3.093
+```
+
+**C3, sampling.** 8 hand-picked episodes gave 5.857 vs 2.618; ALL 89 at random
+seed-fixed frames gives 5.717 vs 2.604. The selection was not flattering
+anything.
+
+**C1, the cheat check.** Correct state, images from a DIFFERENT episode:
+
+```text
+  sim model    error moves 0.066 deg  -> it is NOT LOOKING AT THE CAMERAS
+  real model   error moves 4.348 deg  -> it is reading them, and breaks without
+```
+
+**C4, the sanity floor.** Against the dumbest predictor, "the arm does not move":
+
+```text
+  sim model    WORSE than not moving (-0.020) on real data
+  real model   beats it by 3.093
+```
+
+## What this establishes, and what it does not
+
+**Established, measured, not inferred:** the sim-trained checkpoint is
+functionally BLIND on real photographs and performs worse than inaction. That
+is no longer a behavioural inference from four hardware runs - it is a direct
+measurement over 89 episodes with a falsifiable check. And it explains every
+hardware run exactly: a model that ignores its cameras and emits roughly
+"stay put, drifting left" produces smooth, unmotivated motion.
+
+**Established:** the real-trained checkpoint uses vision. The failure mode most
+feared - memorising state->action and ignoring images - is ruled out by C1.
+
+**NOT established, and this limit is real:** C1 proves the model USES the images;
+it does not prove it GENERALISES. A model that memorised "these pictures ->
+these actions" would also break with wrong images. Separating those requires
+data it never trained on, and none exists - all 89 episodes were used.
+
+⇒ Honest ceiling: **it learned this data, and it uses its eyes to do so.**
+  Whether it picks up an orange is answerable only by the arm.
+
+### A note for the next session
+
+Future work should hold out ~10 episodes before training so generalisation can be
+measured directly. Not doing so here was an oversight; the recipe trains on
+everything given to it and nobody carved out a test split.
