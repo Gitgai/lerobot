@@ -1,7 +1,7 @@
 # Plan: fine-tune GR00T N1.6 on the 89 real episodes
 
-Created 2026-08-17. Status: **S3 IN FLIGHT — full 10,000-step run launched 12:24,
-ETA ~16:05. S1+S2 complete; see the S2 log below.**
+Created 2026-08-17. Status: **OPTION C SELECTED — train BOTH camera variants,
+then A/B on the arm. See section 9 for the execution plan.**
 
 ---
 
@@ -382,3 +382,87 @@ data it never trained on, and none exists - all 89 episodes were used.
 Future work should hold out ~10 episodes before training so generalisation can be
 measured directly. Not doing so here was an oversight; the recipe trains on
 everything given to it and nobody carved out a test split.
+
+
+---
+
+## 9. OPTION C — train both variants, A/B on hardware (selected 2026-08-17)
+
+### What is being trained — NOT a full fine-tune
+
+Confirmed from the run's own `experiment_cfg/conf.yaml`:
+
+```text
+  tune_llm              false    language model FROZEN
+  tune_visual           false    vision backbone FROZEN
+  tune_projector        true     TRAINED
+  tune_diffusion_model  true     TRAINED (the action head)
+```
+
+Deliberate, and correct for this job. The Eagle vision backbone is a VLM
+pretrained on REAL photographs - it never needed fixing. What was broken is the
+mapping from perception to motor commands, which the sim fine-tune fitted to
+renders. That mapping is exactly what the projector and diffusion head are. With
+89 episodes, unfreezing the backbone would likely overfit rather than help.
+
+The S4 evidence says the frozen-backbone approach is working: error halved, and
+image-sensitivity went from 0.07 deg (blind) to 4.35 deg (dependent on vision).
+
+### The two runs
+
+```text
+  RUN-SIDE   dataset so101_orange_89_v21            front = laptop-webcam view
+                                                    (low, side-on)
+  RUN-TOP    dataset so101_orange_89_v21_topfront   front = overhead C270 view
+```
+
+Everything else identical: base model, 10,000 steps, batch 4 x accum 8, 8-bit
+Adam, lr 1e-4, the author's colour jitter. One variable - the front camera view.
+
+Sequential, ~3 h each (measured 46-55 steps/min). RUN-SIDE cannot resume from
+checkpoint-4000 if the held-out split below is adopted, since that changes the
+training set; fresh starts for both keeps them comparable anyway.
+
+### Held-out episodes — RECOMMENDED, not yet approved
+
+All 89 episodes were used in the first run, which is why S4 can prove the model
+USES vision but not that it GENERALISES. Holding out 10 episodes fixes that:
+
+```text
+  train on 79, hold out 10 (fixed list, same 10 for BOTH runs)
+  cost      ~11% of the data
+  buys      a real generalisation number, and a fair A/B: both variants
+            scored on episodes NEITHER has seen
+```
+
+Without it, the A/B compares two models on their own training data - which
+measures fit, and fit alone would favour whichever variant memorises more easily.
+**Strongly recommended. Say no and I will run without it.**
+
+### Sequence
+
+```text
+  1. build the 79/10 split (metadata only, minutes)          if approved
+  2. RUN-SIDE   ~3 h, detached (setsid - the last run died with its session)
+  3. probe RUN-SIDE on the held-out 10
+  4. RUN-TOP    ~3 h, detached
+  5. probe RUN-TOP on the same held-out 10
+  6. A/B ON THE ARM - the only test that decides anything:
+       serve RUN-SIDE, re-aim front camera SIDE-ON,  n>=5 runs
+       serve RUN-TOP,  re-aim front camera OVERHEAD, n>=5 runs
+       success = the flight-success definition: goal + zero penetrations
+  7. keep the loser; both are evidence
+```
+
+Step 6 needs the operator and a working arm; steps 1-5 need neither.
+
+### What could still make all of this fail
+
+```text
+  - the wrist camera is STILL degraded (median 24 in run 4, staring at the arm's
+    own white parts when raised). Both models train on GOOD wrist frames from the
+    demos and would be served marginal ones. FIX BEFORE STEP 6.
+  - 89 episodes is small; pi0.5 managed real grasps on it, N1.6 may not
+  - the instruction string must switch to the dataset's own sentence,
+    "pick up the orange and move it to another place", in client AND eval
+```
