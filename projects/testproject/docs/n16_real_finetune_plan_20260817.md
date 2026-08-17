@@ -1,6 +1,7 @@
 # Plan: fine-tune GR00T N1.6 on the 89 real episodes
 
-Created 2026-08-17. Status: **not started, awaiting go-ahead.**
+Created 2026-08-17. Status: **S1 COMPLETE — gate passed with one finding (D4).
+S2 next.**
 
 ---
 
@@ -189,3 +190,46 @@ simultaneously, so testing is checkpoint-gated unless S2 shows otherwise:
   S4 probes              during S3 pauses
   S5 arm eval            next session, operator present
 ```
+
+
+---
+
+## S1 RESULTS — 2026-08-17
+
+```text
+  D1  three cameras vs two     DEFERRED TO S2 - the smoke test settles it at
+                               zero extra cost (a loader that chokes on `top`
+                               fails at step 0)
+  D2  units                    PASS. |action-state| mean 1.1-4.7 per joint,
+                               ranges +/-105 - real motor-unit teleop, coherent
+  D3  structure                PASS, after understanding it: videos are 30 fps
+                               CFR, 990.8 s = 29,724 frames/camera. The 89
+                               episodes = 49 originals + 40 FOCUS episodes that
+                               reference the SAME video by timestamp windows
+                               (grasp_focus_windows.csv), so 40,712 data rows >
+                               29,724 unique frames, by design. Loader reads by
+                               timestamp range - consistent.
+  D4  task string              FINDING: the dataset's instruction is
+                               "pick up the orange and move it to another place"
+                               - the July-era invented sentence. NOT
+                               "Grab orange and place into plate".
+  Q1  base model               huggingface.co reachable (HTTP 200) - the 6 GB
+                               download is available. Base-model start stands.
+```
+
+### D4 consequence — instruction discipline after training
+
+The fine-tuned model will be conditioned on the DATASET's sentence. After
+training, every consumer must switch to it:
+
+```text
+  n16_realarm_client.py  --lang_instruction  "pick up the orange and move it to another place"
+  sim eval               --policy_language_instruction likewise
+```
+
+Note the irony recorded for posterity: the eval harness comment (2026-08-05)
+called this exact sentence "an INVENTED sentence that appears nowhere in the env
+or any dataset". It appears in this dataset, which was recorded with it. It was
+invented, then demonstrated under, which makes it real training vocabulary now.
+Do NOT edit the dataset's string instead - the demos were recorded under it and
+consistency between training and serving is all that matters.
