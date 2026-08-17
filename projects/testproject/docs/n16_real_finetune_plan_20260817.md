@@ -1,0 +1,191 @@
+# Plan: fine-tune GR00T N1.6 on the 89 real episodes
+
+Created 2026-08-17. Status: **not started, awaiting go-ahead.**
+
+---
+
+## 0. Why — the evidence this rests on
+
+The four instrumented hardware runs plus the confirmed provenance establish:
+
+```text
+  the checkpoint is SIM-TRAINED (its README + the LeIsaac dataset is renders)
+  same checkpoint, same day:  sim 89% (8/9)   real arm 0%
+  run 4: full pick choreography executed ON AIR - gripper closed to width 14
+         (an orange holds at 28-33), all three oranges pixel-identical
+  four-run dose-response: behaviour becomes monotonically more task-shaped as
+         inputs approach the training distribution, never object-grounded
+```
+
+**And the decisive precedent, from this rig's own history:** the July π0.5 work
+produced real grasp→lift→carry on this arm using a checkpoint fine-tuned on
+`orange49_plus_grasp_focus` — **the same 89 episodes this plan uses**
+(`agent_handoff_pi05_20260803.md:321`). The one intervention that has ever
+produced a real grasp on this hardware is fine-tuning on this data. It also
+answers "is 89 episodes enough": it was, once.
+
+Honest bound: π0.5 with this data still carry-slipped. Expect real grasps at an
+imperfect rate, not perfection.
+
+## 1. The recipe — reuse the author's, swap the dataset
+
+The current checkpoint ships its own training script
+(`gr00t_n16_leisaac_orange/scripts/finetune.sh`), which is the recipe already
+proven to produce a working fine-tune of this exact model:
+
+```text
+  gr00t/experiment/launch_finetune.py            <- exists in ~/sim/Isaac-GR00T-n16
+  --base_model_path nvidia/GR00T-N1.6-3B
+  --dataset_path    <OURS: so101_orange_49_plus_grasp_pick_move_focus>
+  --modality_config_path configs/so101_config.py <- ships with the checkpoint
+  --max_steps 10000  --save_steps 1000  --save_total_limit 5
+  --learning_rate 1e-4  --warmup_ratio 0.05  --weight_decay 1e-5
+  --global_batch_size 32
+  --color_jitter_params brightness 0.3 contrast 0.4 saturation 0.5 hue 0.08
+```
+
+Changes from the author's invocation, each with a reason:
+
+```text
+  dataset_path        the 89 real episodes                      the entire point
+  global_batch_size   32 -> whatever fits in 32 GB (8 likely,   author's GPU unknown;
+                      with gradient accumulation to keep the    pi0.5 precedent: batch 8
+                      effective batch at 32 if throughput       + checkpointing fits in
+                      allows)                                   26 GB on this card
+  --use_wandb         DROP                                      offline machine habit;
+                                                                HF_HUB_OFFLINE=1 likewise
+  save_total_limit    5 -> 10                                   keep every checkpoint;
+                                                                disk is cheap (8.8 GB x10),
+                                                                early ones are the probes
+```
+
+Keep the colour jitter — it is domain-randomisation the author already tuned,
+and it helps a small real dataset.
+
+### Open questions the smoke test answers (S2 below)
+
+```text
+  Q1  does nvidia/GR00T-N1.6-3B need downloading? (~6 GB - NOT in the HF cache)
+      FALLBACK if download is a problem: warm-start from the current sim-trained
+      checkpoint instead of the base model. Also scientifically interesting
+      (sim+real curriculum) but changes the experiment; base-model start is the
+      default because it reproduces the author's recipe.
+  Q2  peak VRAM at batch 8 -> decides batch size and whether pause-free eval fits
+  Q3  steps/min -> the real ETA
+```
+
+## 2. Dataset gate (S1) — verify before any GPU time
+
+The 89-episode set differs from what the recipe expects in known ways; each
+needs an explicit check, not an assumption:
+
+```text
+  D1  THREE cameras (front, top, wrist) vs the modality config's two.
+      Check: does the gr00t loader select by modality.json keys and ignore
+      `top`, or does it choke? If it chokes: generate a two-camera view of the
+      dataset (metadata-level, no video re-encode).
+  D2  the corpus units history. This dataset is REAL teleop (state and action
+      both from the arm, motor units) - the varied_corpus rad/motor bug was a
+      SIM-corpus defect and should not apply here. Verify anyway: action minus
+      state should be small per step; ranges must match the -100..100 and 0..100
+      motor conventions. (Spot-checked 2026-08-16: ranges look right.)
+  D3  fps 30 vs the recipe's expectation; episode lengths; no NaN/truncated
+      episodes; videos decode (ffmpeg present).
+  D4  the task string in meta. The policy will be conditioned on whatever
+      sentence the dataset carries - confirm it is "Grab orange and place into
+      plate" (the string every eval and the client already use).
+```
+
+Gate: all four pass -> proceed. Any fail -> fix the dataset copy, never the original.
+
+## 3. Smoke test (S2) — 100 steps, ~15 min
+
+Run the real invocation with `--max_steps 100`. Read off:
+
+```text
+  peak VRAM        -> final batch size; whether eval can run alongside training
+  steps/min        -> firm ETA for 10,000 steps (pi0.5 reference: 49.8/min)
+  loss curve       -> decreasing, not NaN
+  checkpoint-100   -> loads in the policy server, answers a get_action call
+```
+
+That last check catches format drift between training output and the serving
+path before 12 hours are spent, not after.
+
+## 4. The full run (S3)
+
+```text
+  launch via a script under backup_staging/rebuild-logs/ (the battery pattern:
+  setsid nohup, own log, no pkill-by-name - kill by PID with /proc comm check)
+  10,000 steps, checkpoint every 1,000
+  ETA from S2; pi0.5-based guess: 3.5 h (batch 8, no accumulation) to
+  ~13 h (accumulation x4) - overnight either way
+  GPU guard: refuse to start if < 21 GB free (protects against a stray server)
+  monitor: checkpoint-directory mtimes, the pattern that caught the pi0.5
+  cadence; a stalled cadence = a hung run, kill -9 and investigate
+```
+
+## 5. Early-checkpoint probes (S4) — the pause-and-test loop
+
+One 32 GB GPU cannot hold training (~26 GB) + server (8.5) + Isaac Sim (13)
+simultaneously, so testing is checkpoint-gated unless S2 shows otherwise:
+
+```text
+  at checkpoint-2000:
+    PAUSE training            (resume is proven on this GPU - pi0.5 14k -> 20k)
+    5-min OFFLINE PROBE       bias_at_scale.py against checkpoint-2000:
+                              per-joint error vs ground truth on held-out
+                              episodes. Learning = errors shrinking vs the
+                              sim-trained checkpoint's (pan -1.04 etc.)
+    25-min SIM SANITY n=3     NOTE the inversion: for a REAL-trained model the
+                              SIM is now out of distribution. Expect sim scores
+                              to DROP as real competence grows. The sim battery
+                              here checks only "loads and acts coherently",
+                              not quality. Do not repeat the wrong-yardstick
+                              mistake in reverse.
+    RESUME
+  looks broken at 2000 -> stop having lost ~1 h, not 12
+```
+
+**The real quality gate after training is the ARM, not the simulator.**
+
+## 6. Evaluation on hardware (S5)
+
+```text
+  serve the best checkpoint (by offline-probe error, not sim score)
+  the instrumented client, unchanged: --jpeg_quality=92, overhead C270,
+  wrist via proxy
+  scene per the training data: plate LEFT, fruit clustered right  <- matters
+  n>=5 runs; success = the flight-success definition: goal + zero
+  penetrations, one verdict
+  compare against the four-run baseline table (never closed / closed on air)
+  KEEP the sim-trained checkpoint-10000 untouched for A/B
+```
+
+## 7. Risks, stated
+
+```text
+  base-model download        ~6 GB, needs working HF access; fallback in Q1
+  VRAM                       author's batch 32 may not fit; S2 decides
+  89 episodes                enough for pi0.5's grasps, but N1.6 may differ
+  catastrophic forgetting    real-only tuning may lose sim skills; acceptable -
+                             the sim checkpoint is kept; sim+real co-training is
+                             the v2 if real-only underwhelms
+  wrist camera               STILL degraded (median 24 in run 4, staring at the
+                             arm's own parts when raised). The model will train
+                             on GOOD wrist frames from the demos but be served
+                             marginal ones. Fix before S5 if possible.
+  the pan runaway            if it persists after real-data tuning, it was never
+                             a domain-gap artefact and becomes its own
+                             investigation
+```
+
+## 8. Timeline
+
+```text
+  S1 dataset gate        ~20 min      nothing at the bench
+  S2 smoke test          ~15 min      -> firm ETA
+  S3 full run            overnight
+  S4 probes              during S3 pauses
+  S5 arm eval            next session, operator present
+```
