@@ -2354,3 +2354,37 @@ liability even after the lighting work.
 
 Monotonically more task-shaped as inputs approach the training distribution;
 never object-grounded. The fine-tune on real data remains the indicated fix.
+
+## Wrist "blur" resolved by calibration, not repair (2026-08-18)
+
+The pre-A/B checklist said "fix the wrist camera: sharpness 24, needs 60+".
+Measured today, live rig, before touching anything:
+
+```text
+  live proxy frame          42.3
+  rpicam-still 640x480      44.1
+  full-res 2592x1944        46.6 whole-frame, uniform near-to-far
+  supersample test          1296x972 downscaled -> 38.0 (WORSE than native)
+```
+
+Then the reference that should have been measured first - the wrist channel of
+the 89 TRAINING recordings themselves:
+
+```text
+  median 27.6    p10 14.7    p90 56.6
+  78% of training frames are SOFTER than today's 42.3
+```
+
+The camera is sharper today than most of what the model trained on. The "60+"
+gate was an uncalibrated guess in the client (comment said "below ~100 is
+blurred"); run 4's alarming "median 24" sits almost exactly ON the training
+median of 27.6 - moving-arm frames carry motion blur, in training and in
+serving alike. The OV5647 is fixed-focus; its uniform ~45 on this scene is what
+this lens does at this distance, and it is what the dataset looks like.
+
+Actions: client warning recalibrated 60 -> 15 (training p10). No physical
+intervention. Do NOT clean/refocus the lens toward "sharp": the model has never
+seen a sharp wrist frame; matching training beats improving on it.
+
+Retraction: "fix the wrist camera before the A/B" is withdrawn as a
+precondition. The A/B needs only the arm plugged in.

@@ -346,7 +346,9 @@ def main() -> None:
             Aug 8 failed because the wrist view drifted onto the floor for the
             final 46% of the run and NOTHING NOTICED. Sim says that condition
             alone takes the task from 83% to 0%, so it is worth a warning.
-            sharpness = variance of Laplacian; below ~100 is blurred at 640x480.
+            sharpness = variance of Laplacian. Calibrated 2026-08-18 against the
+            89 training recordings: wrist median 27.6, p10 14.7. Warn only
+            below the training p10 - the model never saw sharper anyway.
             """
             g = _cv2.cvtColor(_img, _cv2.COLOR_RGB2GRAY)
             return {
@@ -381,7 +383,7 @@ def main() -> None:
                 _health = _wrist_health(obs["wrist"]) if "wrist" in obs else {}
                 # LOUD, not buried in a file: a wrist camera that has lost the
                 # workspace is the single failure mode we know breaks the task.
-                if _health and _health["sharpness"] < 60:
+                if _health and _health["sharpness"] < 15:
                     print(f"[real] *** WRIST DEGRADED chunk {_chunk}: "
                           f"sharpness={_health['sharpness']} "
                           f"brightness={_health['brightness']} *** ", flush=True)
