@@ -2540,3 +2540,17 @@ Brain A (side camera) is the base going forward: it grasps every time, never
 drops, and fails in exactly one way. Next fixes target that one way:
 RTC (carry duration is the drift window), release-focused demos (the plate
 as an explicit place target), and optionally a software release guard.
+
+## Visual audit of all 20 runs; a4 rescored (2026-08-19)
+
+Storyboards built for every run (9 sampled moments, front + wrist) and checked
+against the trace-based scores. One correction found: run a4 was a COMPLETION.
+The policy carried with the gripper commanded ~31.5 - above the audit's <30
+"shut" threshold - fingers blocked at 36 (gap +4.7), swing to +50, wide-open
+release, return to rest. The threshold-free re-audit (sustained gap>2) confirms
+holds in all 10 A runs and 7 B runs; no other stage scores changed.
+
+FINAL: Brain A 4/10 complete, 10/10 grasps. Brain B 2/10 complete, 7/10 grasps.
+
+Full visual record published (all 20 storyboards, request/response anatomy,
+corrections log): claude.ai artifact "N1.6 real-arm A/B - the full visual record".
