@@ -2490,3 +2490,15 @@ badly-aimed releases follow.
 Consequence for priorities: RTC / longer execution horizon moves UP - making
 rollouts temporally resemble demonstrations directly attacks this mechanism.
 The base stays where it is.
+
+## Re-score after the retraction (2026-08-19)
+
+Operator confirms: the oranges in runs 6 and 8 landed ON THE TABLE. With the
+off-table-release claim withdrawn, those runs read: approached, grasped,
+lifted, carried, deliberately released, orange at a new spot on the table.
+That is the task, complete.
+
+FINAL BRAIN B SCORE: 2/10 full completions, 7/10 grasps, 6/10 carries.
+First fully autonomous real-arm completions for N1.6 on this rig - ever.
+The wrist-drift finding stands (awkward release attitude, slips in 3 runs),
+as does the sim benchmark context (86%).
