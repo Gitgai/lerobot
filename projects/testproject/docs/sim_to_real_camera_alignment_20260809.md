@@ -2502,3 +2502,41 @@ FINAL BRAIN B SCORE: 2/10 full completions, 7/10 grasps, 6/10 carries.
 First fully autonomous real-arm completions for N1.6 on this rig - ever.
 The wrist-drift finding stands (awkward release attitude, slips in 3 runs),
 as does the sim benchmark context (86%).
+
+## The A/B completed: Brain A ten attempts (2026-08-19)
+
+Brain A = n16_real79_side checkpoint-10000, front channel = the laptop's
+built-in webcam (the July recording camera, confirmed in docs and never moved).
+Same protocol, client, latency regime as Brain B's ten. Room at brightness
+~100 vs training 173 (operator's call to proceed; camera settings audited,
+two off-default controls reset, sensor physically cannot reach 173 at 30 fps
+in this light).
+
+| attempt | result |
+|---|---|
+| 1-3 | COMPLETE: grasp ~20s, carry to +49..+52, release, return to rest |
+| 4 | grasped, released instantly - orange had been placed AT the drop zone |
+| 5-8, 10 | over-carry: strong hold, sailed past the zone, pinned at pan +116.5 (joint limit), cut |
+| 9 | over-carry, half-opened (cmd 32) at the limit, orange stayed wedged |
+
+A: 10/10 grasps (grip +4.6..+7.0), 3/10 complete, ZERO slips/stalls/overreaches.
+B:  7/10 grasps, 2/10 complete, failures split stall/overreach/slip.
+
+Statistics, honestly: completions 3 vs 2 (no difference), grasps 10/10 vs 7/10
+(Fisher p~0.2, suggestive not significant). The qualitative gap is failure
+STRUCTURE: A has exactly one failure mode (does not stop the carry); B has
+three. One fix on A (release timing) addresses 6/7 of its failures.
+
+Unexplained: A's completions were runs 1-2-3 consecutively. Tested and
+refuted: lighting drift (99-105 all runs), orange placement (clustered, no
+separation), wrist-mount shift (a10 matches a1). Untested candidate: servo
+temperature across the 90-min session. Recorded as open.
+
+Bus faults at connect reached six for the campaign (ids 3,4,5,6 various);
+never mid-run. Motor PSU remains the suspect component.
+
+### Verdict
+Brain A (side camera) is the base going forward: it grasps every time, never
+drops, and fails in exactly one way. Next fixes target that one way:
+RTC (carry duration is the drift window), release-focused demos (the plate
+as an explicit place target), and optionally a software release guard.
