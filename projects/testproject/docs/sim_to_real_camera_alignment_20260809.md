@@ -2388,3 +2388,72 @@ seen a sharp wrist frame; matching training beats improving on it.
 
 Retraction: "fix the wrist camera before the A/B" is withdrawn as a
 precondition. The A/B needs only the arm plugged in.
+
+## First real-arm evaluation of the real-data fine-tune - ten scored attempts (2026-08-18)
+
+Model: n16_real79_top checkpoint-10000 ("Brain B", overhead C270 in the front
+channel), served from NJ, arm in Pune. Protocol: replay-verified rig first,
+then ten policy attempts, arm reset to the training rest pose between attempts,
+orange repositioned by the operator, every run traced (rtt, state, action,
+wrist health) with every model input frame saved.
+
+### Rig verification (before any policy attempt)
+Joint replay of recording 56 grasped, carried and released its orange once the
+orange was placed at the recorded spot (gripper gap +3.4 sustained 7 s).
+Two placement misses first - the gap collapse pinpointed both. The rig can
+still do the task; the recordings are reproducible on today's hardware.
+
+### The ten attempts
+
+| # | grasped | carried | end of carry | stage/6 |
+|---|---------|---------|--------------|---------|
+| 1 | + (+11 peak) | + | timer cut mid-place (100s limit, mine) | 5 |
+| 2 | - | - | hover stall 3 cm short, never closed | 1 |
+| 3 | + (+7.6) | + | slip during swing | 5- |
+| 4 | - | - | overreached, pecked past the orange | 2 |
+| 5 | - | - | overreached, hovered open | 2 |
+| 6 | + (+4.3) | + | DELIBERATE release at pan +50 | 5.5 |
+| 7 | + (+6.0) | + | slip at pan +64 | 5- |
+| 8 | + (+6.2) | + | DELIBERATE release at pan +64 | 5.5 |
+| 9 | + (+3.1) | - | froze holding the orange on the table | 3.5 |
+| 10 | + (+3.5) | + | slip at pan +50 | 5- |
+
+Grasped 7/10. Carried 6/10. Deliberate correctly-angled releases 2.
+Orange on the table at the end: 0 - see geometry below.
+
+### The two systematic findings
+
+1. GEOMETRY, not policy: training releases span pan -28..+72 (median +42,
+   p90 +63, n=62). Tonight's carry endings (+50, +64, +64, +50) are INSIDE
+   that range. But the wrist camera at those poses shows the table edge and
+   the wall socket where July's recordings show wood under the orange
+   (train_release_ep27 vs place_check). The base-to-table relation changed
+   when the arm was moved weeks ago; the trained release sector now overhangs
+   air. A base rotation of ~15-20 deg CCW (or a 10-15 cm slide) restores it -
+   attempted once by the operator, verified unchanged, deferred to next
+   session with the park-at-release-pose photo check as the acceptance test.
+
+2. Slips correlate with shallow grasps: the three mid-swing slips had grip
+   gaps +3.1-3.5; the runs that held to a deliberate release had +4.3-6.2
+   (operator demos: +6.0). Grasp depth, not the swing itself, decides
+   whether the carry survives.
+
+### Constants across all ten
+round trip median 564 ms (p95 610, n=~2300 cycles), duty cycle 31% moving,
+wrist frame age ~45 ms, wrist sharpness in training range. Three connect-time
+bus faults (voltage error id6, no-status id4, bad-status id5/id6) - all at
+connect, never mid-run; motor PSU suspected, watch it.
+
+### What this settles
+The sim-trained checkpoint never moved the arm toward an orange. The
+real-data fine-tune, first time on hardware: 7/10 grasps at operator-level
+grip strength, 6 carries, 2 deliberate releases. Every remaining failure is
+either understood rig geometry or a known imitation-learning mode (stall,
+shallow grasp) that more/better demonstrations address. The "train on real
+photographs" diagnosis is confirmed end to end.
+
+### Next
+- Fix base geometry (photo acceptance test ready: place_pose.npy park + wrist view shows wood)
+- Brain A (side camera) ten-attempt set for the A/B - needs the side camera re-aimed
+- Grasp-depth improvement: more demos with deep grasps, or a grasp-retry behaviour
+- RTC to lift the 31% duty cycle
