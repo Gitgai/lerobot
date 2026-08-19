@@ -2457,3 +2457,36 @@ photographs" diagnosis is confirmed end to end.
 - Brain A (side camera) ten-attempt set for the A/B - needs the side camera re-aimed
 - Grasp-depth improvement: more demos with deep grasps, or a grasp-retry behaviour
 - RTC to lift the 31% duty cycle
+
+## RETRACTION: "the base moved" (2026-08-19)
+
+The operator challenged the moved-base conclusion: the wrist at the parked
+release pose is tilted diagonally, so the camera sees the wall socket
+regardless of what is under the fingers. Verified - they are right:
+
+```text
+wrist_flex at release:   July ep27 +46.2   ep31 +57.1
+                         run 8     -82.4   run 6 -61.6     (~130 deg apart)
+```
+
+The July-vs-tonight wrist-camera comparison compared two different camera
+attitudes, not two different tables. The park-and-photograph acceptance test
+tested camera direction, not drop position. "Base moved" is WITHDRAWN; the
+operator confirms nothing in the rig has moved. The base adjustments requested
+on 2026-08-18/19 were based on this error.
+
+## The real finding: policy-commanded wrist drift in long carries
+
+Training carries hold wrist_flex +35..+103 (median +85; below -50 in only
+0.3% of 14,601 carry frames). Tonight every hold STARTED in that range
+(+41..+89) and then drifted; runs 6/7/8 ended at -62..-87. Commanded-vs-actual
+lag is under 6 deg throughout - the policy commanded the drift, the servo
+obeyed. The failure is compounding off-distribution drift during carries that
+run 10-30x slower than the demonstrations (31% duty, 60-90 s to reach the
+release zone vs 2-3 s in demos). The longer the rollout lingers in states no
+demo contains, the further the wrist walks out of distribution; slips and
+badly-aimed releases follow.
+
+Consequence for priorities: RTC / longer execution horizon moves UP - making
+rollouts temporally resemble demonstrations directly attacks this mechanism.
+The base stays where it is.
