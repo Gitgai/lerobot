@@ -465,10 +465,18 @@ def main() -> None:
             import queue as _queue
             import threading as _threading
 
-            _req: "_queue.Queue" = _queue.Queue(maxsize=1)
-            _rep: "_queue.Queue" = _queue.Queue(maxsize=1)
+            # DEPTH-2 PIPELINE (G1b fix, 2026-08-20): one in-flight request
+            # leaves each chunk ~11/16 expired on arrival -> 46% duty measured.
+            # Two workers with their OWN sockets keep the server continuously
+            # fed; the REP socket serialises them server-side. Replies can
+            # interleave, so the consumer discards any reply older than the
+            # last one applied (staleness guard).
+            _req: "_queue.Queue" = _queue.Queue(maxsize=2)
+            _rep: "_queue.Queue" = _queue.Queue(maxsize=2)
 
             def _worker():
+                wclient = PolicyClient(host=cfg.policy_host, port=cfg.policy_port)
+                wpolicy = So100Adapter(wclient, jpeg_quality=cfg.jpeg_quality)
                 while True:
                     obs, meta = _req.get()
                     if obs is None:
@@ -480,14 +488,15 @@ def main() -> None:
                         meta["wrist_age_s"] = None if age != age else round(age, 3)
                     t0 = time.time()
                     try:
-                        acts = policy.get_action(obs)
+                        acts = wpolicy.get_action(obs)
                     except Exception as exc:
                         meta["error"] = repr(exc)
                         acts = None
                     meta["rtt_ms"] = round((time.time() - t0) * 1000, 1)
                     _rep.put((acts, obs, meta))
 
-            _threading.Thread(target=_worker, daemon=True).start()
+            for _ in range(2):
+                _threading.Thread(target=_worker, daemon=True).start()
 
             def _snap():
                 obs = robot.get_observation()
@@ -495,7 +504,10 @@ def main() -> None:
                 return obs, {"t_obs": time.time()}
 
             _req.put(_snap())
+            _req.put(_snap())          # prime both workers
+            _last_applied_tobs = 0.0
             actions, ai, last_action = None, 0, None
+            _blend = 0
             starved = 0
             ck = 0
             print("[real] RTC pipeline live", flush=True)
@@ -511,6 +523,12 @@ def main() -> None:
                     if acts is None:
                         raise RuntimeError(
                             f"policy request failed: {meta.get('error')}")
+                    if meta["t_obs"] <= _last_applied_tobs:
+                        # stale interleaved reply - drop it, keep pipeline full
+                        _req.put(_snap())
+                        fresh = None
+                if fresh is not None:
+                    _last_applied_tobs = meta["t_obs"]
                     for _cam in ("front", "wrist"):
                         if hasattr(obs_used.get(_cam), "shape"):
                             _cv2.imwrite(str(_fdir / f"c{ck:04d}_{_cam}.jpg"),
@@ -541,13 +559,28 @@ def main() -> None:
                           f"rtt={meta['rtt_ms']:.0f}ms "
                           f"age={(time.time() - meta['t_obs']) * 1000:.0f}ms "
                           f"starved={starved}", flush=True)
-                    actions, ai = acts, 0
+                    # SKIP-AHEAD (G1 fix, 2026-08-20): the chunk's early steps
+                    # cover time that already executed while it was in flight.
+                    # Enter it at the step matching NOW, else every switch
+                    # commands a position from ~rtt ago - the sawtooth jerk the
+                    # operator saw. Keep >=4 usable steps as a floor.
+                    _skip = int(round((time.time() - meta["t_obs"]) * 30))
+                    actions, ai = acts, min(max(_skip, 0), len(acts) - 4)
+                    _blend = 3 if last_action is not None else 0
                     starved = 0
                     ck += 1
                     _req.put(_snap())  # next request rides the fresh chunk
                 if actions is not None and ai < len(actions):
-                    last_action = actions[ai]
-                    robot.send_action(last_action)
+                    tgt = actions[ai]
+                    if _blend > 0 and last_action is not None:
+                        # MICRO-BLEND: 3-tick cross-fade into the new chunk to
+                        # absorb residual mismatch at the seam.
+                        w = (4 - _blend) / 4.0
+                        tgt = {k: last_action[k] * (1 - w) + tgt[k] * w
+                               for k in tgt}
+                        _blend -= 1
+                    last_action = tgt
+                    robot.send_action(tgt)
                     ai += 1
                 else:
                     starved += 1
