@@ -224,6 +224,9 @@ class EvalConfig:
     # 2026-08-14: worst-joint delta 3.36 deg vs a 2.94 deg noise floor).
     jpeg_quality: int = 0
     dry_run: bool = False
+    # RTC (plan: n16_rtc_plan_20260820.md): pipeline requests so the arm never
+    # waits on the network. false = the sequential loop, byte-identical.
+    rtc: bool = False
     robot: dict = field(default_factory=dict)  # replaced below when not dry_run
 
 
@@ -246,6 +249,93 @@ def run_dry(cfg) -> None:
     print("[dry] NETWORK + WIRE + SERVER: OK")
 
 
+def run_dry_rtc(cfg, n_chunks: int = 25) -> None:
+    """Gate G0 of n16_rtc_plan_20260820.md: exercise the full RTC pipeline
+    against the live server with a fake robot. Executing an action = sleeping
+    one 30 Hz tick. Measures duty cycle and starvation - the two numbers that
+    decide whether the pipeline is worth taking to the arm."""
+    import queue
+    import threading
+
+    client = PolicyClient(host=cfg.policy_host, port=cfg.policy_port)
+    print(f"[G0] ping {cfg.policy_host}:{cfg.policy_port} ->", client.ping())
+    adapter = So100Adapter(client, jpeg_quality=cfg.jpeg_quality)
+
+    def snap():
+        return {
+            "front": np.zeros((480, 640, 3), np.uint8),
+            "wrist": np.zeros((480, 640, 3), np.uint8),
+            "lang": cfg.lang_instruction,
+            **{k: 0.0 for k in adapter.robot_state_keys},
+        }, {"t_obs": time.time()}
+
+    req: "queue.Queue" = queue.Queue(maxsize=1)
+    rep: "queue.Queue" = queue.Queue(maxsize=1)
+
+    def worker():
+        while True:
+            obs, meta = req.get()
+            if obs is None:
+                return
+            t0 = time.time()
+            try:
+                acts = adapter.get_action(obs)
+            except Exception as exc:
+                meta["error"] = repr(exc)
+                acts = None
+            meta["rtt_ms"] = (time.time() - t0) * 1000
+            rep.put((acts, meta))
+
+    threading.Thread(target=worker, daemon=True).start()
+    req.put(snap())
+    t_wall0 = time.time()
+    exec_ticks = starve_ticks = chunks = 0
+    starve_run, starve_runs, rtts, ages = 0, [], [], []
+    actions, ai = None, 0
+    while chunks < n_chunks:
+        tic = time.time()
+        try:
+            acts, meta = rep.get_nowait()
+            if acts is None:
+                raise RuntimeError(f"policy request failed: {meta.get('error')}")
+            rtts.append(meta["rtt_ms"])
+            ages.append((time.time() - meta["t_obs"]) * 1000)
+            actions, ai = acts, 0
+            chunks += 1
+            if starve_run:
+                starve_runs.append(starve_run)
+                starve_run = 0
+            req.put(snap())
+        except queue.Empty:
+            pass
+        if actions is not None and ai < len(actions):
+            ai += 1
+            exec_ticks += 1
+        elif actions is not None:
+            starve_ticks += 1
+            starve_run += 1
+            if starve_run > 60:
+                raise RuntimeError("G0 FAIL: starved > 2 s")
+        dt = time.time() - tic
+        if dt < 1 / 30:
+            time.sleep(1 / 30 - dt)
+    req.put((None, None))
+    wall = time.time() - t_wall0
+    duty = exec_ticks / 30 / wall * 100
+    rtts_s = sorted(rtts)
+    print(f"[G0] {chunks} chunks in {wall:.1f}s")
+    print(f"[G0] rtt median {rtts_s[len(rtts_s)//2]:.0f} ms  max {rtts_s[-1]:.0f} ms")
+    print(f"[G0] chunk age at first execution: median "
+          f"{sorted(ages)[len(ages)//2]:.0f} ms")
+    print(f"[G0] DUTY CYCLE {duty:.1f}%  (sequential baseline: 31%)")
+    print(f"[G0] starvation: {starve_ticks} ticks total, per-chunk runs "
+          f"{starve_runs[:8]}{'...' if len(starve_runs) > 8 else ''}")
+    ok = duty >= 90 and (not starve_runs or
+                         sorted(starve_runs)[len(starve_runs)//2] <= 2)
+    print(f"[G0] {'PASS' if ok else 'FAIL'} "
+          f"(need duty >=90% and median starvation <=2 ticks)")
+
+
 def main() -> None:
     import sys
 
@@ -253,7 +343,10 @@ def main() -> None:
         # light-weight path: no lerobot imports at all
         @draccus.wrap()
         def _dry(cfg: EvalConfig):
-            run_dry(cfg)
+            if cfg.rtc:
+                run_dry_rtc(cfg)
+            else:
+                run_dry(cfg)
 
         _dry()
         return
@@ -290,6 +383,8 @@ def main() -> None:
         # Set this to fetch it directly instead; leave empty to use whatever
         # --robot.cameras provides.
         wrist_url: str = ""
+        # RTC (plan: n16_rtc_plan_20260820.md). false = sequential loop.
+        rtc: bool = False
 
     @draccus.wrap()
     def _real(cfg: RealConfig):
@@ -357,8 +452,118 @@ def main() -> None:
                 "contrast": round(float(g.std()), 1),
             }
 
+        def _rtc_loop():
+            """RTC (n16_rtc_plan_20260820.md): one request always in flight
+            while the arm executes the previous answer.
+
+            Thread contract (risk R4): THIS thread owns the serial bus
+            (send_action + get_observation). The worker owns the network
+            socket and the wrist HTTP proxy. They exchange data only through
+            two 1-slot queues. Exits only by exception (Ctrl+C, starvation,
+            request failure) so the caller's finally-block always runs.
+            """
+            import queue as _queue
+            import threading as _threading
+
+            _req: "_queue.Queue" = _queue.Queue(maxsize=1)
+            _rep: "_queue.Queue" = _queue.Queue(maxsize=1)
+
+            def _worker():
+                while True:
+                    obs, meta = _req.get()
+                    if obs is None:
+                        return
+                    if cfg.wrist_url:
+                        w, age = _fetch_wrist(cfg.wrist_url)
+                        if w is not None:
+                            obs["wrist"] = w
+                        meta["wrist_age_s"] = None if age != age else round(age, 3)
+                    t0 = time.time()
+                    try:
+                        acts = policy.get_action(obs)
+                    except Exception as exc:
+                        meta["error"] = repr(exc)
+                        acts = None
+                    meta["rtt_ms"] = round((time.time() - t0) * 1000, 1)
+                    _rep.put((acts, obs, meta))
+
+            _threading.Thread(target=_worker, daemon=True).start()
+
+            def _snap():
+                obs = robot.get_observation()
+                obs["lang"] = cfg.lang_instruction
+                return obs, {"t_obs": time.time()}
+
+            _req.put(_snap())
+            actions, ai, last_action = None, 0, None
+            starved = 0
+            ck = 0
+            print("[real] RTC pipeline live", flush=True)
+            while True:
+                tic = time.time()
+                fresh = None
+                try:
+                    fresh = _rep.get_nowait()
+                except _queue.Empty:
+                    pass
+                if fresh is not None:
+                    acts, obs_used, meta = fresh
+                    if acts is None:
+                        raise RuntimeError(
+                            f"policy request failed: {meta.get('error')}")
+                    for _cam in ("front", "wrist"):
+                        if hasattr(obs_used.get(_cam), "shape"):
+                            _cv2.imwrite(str(_fdir / f"c{ck:04d}_{_cam}.jpg"),
+                                         _cv2.cvtColor(obs_used[_cam],
+                                                       _cv2.COLOR_RGB2BGR))
+                    _health = (_wrist_health(obs_used["wrist"])
+                               if hasattr(obs_used.get("wrist"), "shape") else {})
+                    if _health and _health["sharpness"] < 15:
+                        print(f"[real] *** WRIST DEGRADED chunk {ck}: "
+                              f"sharpness={_health['sharpness']} ***", flush=True)
+                    _trace.write(_json.dumps({
+                        "chunk": ck,
+                        "t": round(meta["t_obs"], 3),
+                        "rtt_ms": meta["rtt_ms"],
+                        "chunk_age_ms": round((time.time() - meta["t_obs"]) * 1000, 1),
+                        "starved_ticks": starved,
+                        "rtc": True,
+                        "state": {k: round(float(obs_used[k]), 2)
+                                  for k in policy.robot_state_keys if k in obs_used},
+                        "action0": {k: round(float(v), 2) for k, v in acts[0].items()},
+                        "chunk_len": len(acts),
+                        "executed": len(acts),
+                        "wrist": _health,
+                        "wrist_age_s": meta.get("wrist_age_s"),
+                    }) + "\n")
+                    print(f"[real] chunk {ck}: pan={acts[0]['shoulder_pan.pos']:+.1f} "
+                          f"grip={acts[0]['gripper.pos']:+.1f} "
+                          f"rtt={meta['rtt_ms']:.0f}ms "
+                          f"age={(time.time() - meta['t_obs']) * 1000:.0f}ms "
+                          f"starved={starved}", flush=True)
+                    actions, ai = acts, 0
+                    starved = 0
+                    ck += 1
+                    _req.put(_snap())  # next request rides the fresh chunk
+                if actions is not None and ai < len(actions):
+                    last_action = actions[ai]
+                    robot.send_action(last_action)
+                    ai += 1
+                else:
+                    starved += 1
+                    if last_action is not None:
+                        robot.send_action(last_action)  # hold position
+                    if starved > 60:
+                        raise RuntimeError(
+                            "RTC starved >2 s - link or server stalled")
+                dt = time.time() - tic
+                if dt < 1.0 / 30:
+                    time.sleep(1.0 / 30 - dt)
+
         _chunk = 0
         try:
+            if cfg.rtc:
+                _rtc_loop()  # exits only by exception; finally below still runs
             while True:
                 _t_obs = time.time()
                 obs = robot.get_observation()
