@@ -500,9 +500,20 @@ def main() -> None:
                     t0 = time.time()
                     try:
                         acts = wpolicy.get_action(obs)
-                    except Exception as exc:
-                        meta["error"] = repr(exc)
-                        acts = None
+                    except Exception:
+                        # A 12,000 km link flaps sometimes (measured: one 9.2 s
+                        # spike and one >15 s timeout, 2026-08-21). One retry on
+                        # a FRESH socket - a timed-out ZMQ REQ socket is dead.
+                        try:
+                            wclient2 = PolicyClient(host=cfg.policy_host,
+                                                    port=cfg.policy_port)
+                            wpolicy2 = So100Adapter(wclient2,
+                                                    jpeg_quality=cfg.jpeg_quality)
+                            acts = wpolicy2.get_action(obs)
+                            meta["retried"] = True
+                        except Exception as exc2:
+                            meta["error"] = repr(exc2)
+                            acts = None
                     meta["rtt_ms"] = round((time.time() - t0) * 1000, 1)
                     _rep.put((acts, obs, meta))
 
@@ -608,8 +619,16 @@ def main() -> None:
                     starved += 1
                     if last_action is not None:
                         robot.send_action(last_action)  # hold position
-                    if starved > 60:
-                        raise RuntimeError("RTC starved >2 s - link or server stalled")
+                    # Before the FIRST chunk there is nothing to starve from -
+                    # a cold server's first inference can take >2 s (bug found
+                    # 2026-08-21 on a freshly restarted server). Generous 60 s
+                    # for warm-up; the tight 2 s abort applies only after.
+                    if actions is not None and starved > 60:
+                        raise RuntimeError(
+                            "RTC starved >2 s - link or server stalled")
+                    if actions is None and starved > 1800:
+                        raise RuntimeError(
+                            "no first chunk in 60 s - server dead?")
                 dt = time.time() - tic
                 if dt < 1.0 / 30:
                     time.sleep(1.0 / 30 - dt)
