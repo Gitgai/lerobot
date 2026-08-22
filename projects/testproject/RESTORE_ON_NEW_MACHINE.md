@@ -25,10 +25,11 @@ Two ways to transfer, then how to put the files back.
 ## Transfer method A — Direct over Wi-Fi (recommended)
 
 The **old laptop** (source) already runs an SSH server:
-- **Old laptop IP:** `192.168.1.163`  ·  **user:** `prakash-gaikwad`  ·  (Wi-Fi `192.168.1.x`)
+
+- **Old laptop IP:** `192.168.1.163` · **user:** `prakash-gaikwad` · (Wi-Fi `192.168.1.x`)
 - ⚠️ That IP is DHCP — re-check it on the old laptop with `hostname -I` right before transferring.
 
-On the **new laptop** (after Ubuntu is installed and on the *same Wi-Fi*), **pull** each folder:
+On the **new laptop** (after Ubuntu is installed and on the _same Wi-Fi_), **pull** each folder:
 
 ```bash
 # make target dirs
@@ -86,7 +87,7 @@ sudo chown -R $USER:$USER ~/PrakashProjects /data/* ~/.cache/huggingface ~/.ssh 
 chmod 600 ~/.ssh/runpod_ed25519
 ```
 
-*(No compression is used — the data is already-compressed video, so plain `tar` is fastest.)*
+_(No compression is used — the data is already-compressed video, so plain `tar` is fastest.)_
 
 ---
 

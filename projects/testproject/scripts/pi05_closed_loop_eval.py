@@ -31,7 +31,6 @@ from pathlib import Path
 
 import cv2
 import numpy as np
-
 from pi05_guarded_real_action_test import (
     CONFIG_PATH,
     SO101_MOTORS,
@@ -128,7 +127,9 @@ def raw_observation_from_existing_robot_obs(
     front_camera_name = cfg.get("front_camera_name", cfg["camera_name"])
 
     image = resize_rgb(robot_obs[camera_name], target_width, target_height)
-    raw_observation: dict[str, object] = {f"{motor}.pos": float(robot_obs[f"{motor}.pos"]) for motor in SO101_MOTORS}
+    raw_observation: dict[str, object] = {
+        f"{motor}.pos": float(robot_obs[f"{motor}.pos"]) for motor in SO101_MOTORS
+    }
 
     if camera_fill_mode == "duplicate":
         raw_observation["top"] = image
@@ -151,7 +152,9 @@ def raw_observation_from_existing_robot_obs(
             raise ValueError("--wrist-camera-url is required for camera-fill-mode=top-front-wrist")
         raw_observation["top"] = resize_rgb(robot_obs[top_camera_name], target_width, target_height)
         raw_observation["front"] = resize_rgb(robot_obs[front_camera_name], target_width, target_height)
-        raw_observation["wrist"] = resize_rgb(fetch_remote_jpeg(wrist_camera_url), target_width, target_height)
+        raw_observation["wrist"] = resize_rgb(
+            fetch_remote_jpeg(wrist_camera_url), target_width, target_height
+        )
     elif camera_fill_mode == "top-url-front-wrist":
         if not top_camera_url:
             raise ValueError("--top-camera-url is required for camera-fill-mode=top-url-front-wrist")
@@ -159,7 +162,9 @@ def raw_observation_from_existing_robot_obs(
             raise ValueError("--wrist-camera-url is required for camera-fill-mode=top-url-front-wrist")
         raw_observation["top"] = resize_rgb(fetch_remote_jpeg(top_camera_url), target_width, target_height)
         raw_observation["front"] = resize_rgb(robot_obs[front_camera_name], target_width, target_height)
-        raw_observation["wrist"] = resize_rgb(fetch_remote_jpeg(wrist_camera_url), target_width, target_height)
+        raw_observation["wrist"] = resize_rgb(
+            fetch_remote_jpeg(wrist_camera_url), target_width, target_height
+        )
     else:
         raise ValueError(f"Unsupported camera fill mode: {camera_fill_mode}")
 
@@ -168,7 +173,9 @@ def raw_observation_from_existing_robot_obs(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     parser.add_argument("--config", type=Path, default=CONFIG_PATH)
     parser.add_argument("--server-address", default="127.0.0.1:8080")
     parser.add_argument("--policy", default="zz4321/so101_pi05")
@@ -190,7 +197,9 @@ def main() -> None:
         default=8.0,
         help="SAFETY GUARD: max per-send joint move (deg). Caps slams; does not steer behaviour.",
     )
-    parser.add_argument("--settle-s", type=float, default=0.15, help="Pause after each send (lets the arm move).")
+    parser.add_argument(
+        "--settle-s", type=float, default=0.15, help="Pause after each send (lets the arm move)."
+    )
     parser.add_argument("--camera-fill-mode", default="top-url-front-wrist")
     parser.add_argument("--top-camera-url", default=None)
     parser.add_argument("--wrist-camera-url", default=None)
@@ -267,7 +276,9 @@ def main() -> None:
             fieldnames = ["phase", "query", "step", "action_in_chunk", *[f"{m}.pos" for m in SO101_MOTORS]]
             writer_csv = csv.DictWriter(f, fieldnames=fieldnames)
             writer_csv.writeheader()
-            writer_csv.writerow({"phase": "before", "query": -1, "step": -1, "action_in_chunk": -1, **before_state})
+            writer_csv.writerow(
+                {"phase": "before", "query": -1, "step": -1, "action_in_chunk": -1, **before_state}
+            )
 
             while step < args.max_steps:
                 raw_observation = observation_for_policy(
@@ -296,13 +307,25 @@ def main() -> None:
                     policy_action = actions[k]
                     target = tensor_action_to_robot_action(policy_action)
                     writer_csv.writerow(
-                        {"phase": "commanded", "query": query, "step": step, "action_in_chunk": k,
-                         **{f"{m}.pos": float(policy_action[i].item()) for i, m in enumerate(SO101_MOTORS)}}
+                        {
+                            "phase": "commanded",
+                            "query": query,
+                            "step": step,
+                            "action_in_chunk": k,
+                            **{
+                                f"{m}.pos": float(policy_action[i].item()) for i, m in enumerate(SO101_MOTORS)
+                            },
+                        }
                     )
                     sent_action = robot.send_action(target)
                     writer_csv.writerow(
-                        {"phase": "sent", "query": query, "step": step, "action_in_chunk": k,
-                         **{f"{m}.pos": float(sent_action[f"{m}.pos"]) for m in SO101_MOTORS}}
+                        {
+                            "phase": "sent",
+                            "query": query,
+                            "step": step,
+                            "action_in_chunk": k,
+                            **{f"{m}.pos": float(sent_action[f"{m}.pos"]) for m in SO101_MOTORS},
+                        }
                     )
 
                     settle_until = time.perf_counter() + args.settle_s
@@ -328,7 +351,9 @@ def main() -> None:
                 query += 1
 
             after_state = read_state(robot)
-            writer_csv.writerow({"phase": "after", "query": query, "step": step, "action_in_chunk": -1, **after_state})
+            writer_csv.writerow(
+                {"phase": "after", "query": query, "step": step, "action_in_chunk": -1, **after_state}
+            )
 
         print()
         print_state("after_state:", after_state)

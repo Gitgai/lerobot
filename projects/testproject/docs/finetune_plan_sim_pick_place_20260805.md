@@ -1,6 +1,7 @@
 # Fine-tuning plan: GR00T first, then Pi05 — sim pick-and-place
 
 > # ⚠️ SUPERSEDED 2026-08-06 by `PLAN_real_arm_via_gr00t_20260806.md`
+>
 > **Phase 1 (reproduce their fine-tune on their dataset) is DROPPED.** It answers
 > "could we train one if we needed to", but we already have a working sim
 > checkpoint and the real blocker is HARDWARE, not sim capability.
@@ -76,7 +77,7 @@ TRAINING
 
 ### 2a. The public dataset is NOT GR00T-flavored
 
-GR00T needs **"GR00T-flavored LeRobot v2"**, which is standard LeRobot *plus*
+GR00T needs **"GR00T-flavored LeRobot v2"**, which is standard LeRobot _plus_
 extra meta files. Compare:
 
 ```text
@@ -101,7 +102,7 @@ can also generate them before writing anything by hand.
 ### 2b. LeIsaac's converter needs ITS OWN era-matched venv
 
 `isaaclab2lerobot.py` docstring: **`pip install lerobot==0.3.3`,
-`numpy==1.26.0`**. Ours are LeRobot 0.6.1 / 0.5.2. So converting *our own* sim
+`numpy==1.26.0`**. Ours are LeRobot 0.6.1 / 0.5.2. So converting _our own_ sim
 HDF5 costs another venv — the fourth today.
 
 **This is avoidable at first.** The public dataset is already in LeRobot format;
@@ -112,7 +113,7 @@ converter is not on the critical path.
 
 ## 3. The plan
 
-### Phase 0 — MEASURE THE BASELINE — *** DONE 2026-08-06 ***
+### Phase 0 — MEASURE THE BASELINE — **_ DONE 2026-08-06 _**
 
 ```text
 run                     steps  placed          lifts (m)      placeSteps  1stPlace
@@ -149,7 +150,7 @@ the SAME task.
 
 **Consequence for the rest of this plan: there is no capability gap to close.**
 The reference policy performs the full task essentially every time. Phases 1-2
-are therefore PIPELINE VALIDATION - can *we* produce a checkpoint this good? -
+are therefore PIPELINE VALIDATION - can _we_ produce a checkpoint this good? -
 and not an attempt to beat a weak baseline.
 
 ### Phase 1 — IN PROGRESS 2026-08-06. Data ready; training BLOCKED on a GPU leak.
@@ -182,7 +183,7 @@ BLOCKED
   meaningless.
 ```
 
-#### *** THE AV1 TRAP — three failures, none of which mention video ***
+#### **_ THE AV1 TRAP — three failures, none of which mention video _**
 
 `LightwheelAI/leisaac-pick-orange` stores its video as **AV1**. On this machine
 that breaks GR00T's dataloader three separate ways:

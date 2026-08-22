@@ -84,7 +84,7 @@ does not write (we write v3.0; only a forward v2.1->v3.0 converter ships).
 
 ---
 
-## 4. *** THE TASK STRING, SETTLED ***
+## 4. **_ THE TASK STRING, SETTLED _**
 
 ```text
 meta/tasks.jsonl of the official dataset:
@@ -185,8 +185,8 @@ n1.7-release     2.9.0        YES - what we run today (verified, arch list
 ```
 
 **The matched sim-trained comparison is DONE, and it succeeded.** It also
-reframes every earlier failure: Pi05 and GR00T N1.7 are *real-world*-trained
-checkpoints failing in *sim* — a genuine domain gap, not our tooling, because a
+reframes every earlier failure: Pi05 and GR00T N1.7 are _real-world_-trained
+checkpoints failing in _sim_ — a genuine domain gap, not our tooling, because a
 sim-trained checkpoint on the same rig, scene, cameras and scoring picks the
 fruit up.
 

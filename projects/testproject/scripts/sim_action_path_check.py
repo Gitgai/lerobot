@@ -55,9 +55,8 @@ app_launcher = AppLauncher(headless=args.headless, enable_cameras=True)
 simulation_app = app_launcher.app
 
 import gymnasium as gym  # noqa: E402
-import torch  # noqa: E402
-
 import leisaac  # noqa: F401,E402
+import torch  # noqa: E402
 from isaaclab_tasks.utils import parse_env_cfg  # noqa: E402
 from leisaac.utils.env_utils import get_task_type  # noqa: E402
 

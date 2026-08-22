@@ -2,7 +2,7 @@
 # From saved checkpoints. ~7 min total; decided whether a 6.8 h run was worth it.
 
 STEPS      EXAMPLES      SUCCESS  DELTA
-4000       32000           27.5%  
+4000       32000           27.5%
 8000       64000           57.5%  +30.0
 12000      96000           70.0%  +12.5
 

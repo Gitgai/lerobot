@@ -71,6 +71,7 @@ in this project — and Pi05 failing WITH the domain advantage is the strongest
 evidence the problem is Pi05's architecture/recipe, not deployment.
 
 Two implications, honestly:
+
 - the as-is hardware test (step 1 below) starts from further back than domain
   logic alone suggests — in-domain training didn't save Pi05 on hardware
 - if our 89 episodes are themselves flawed, GR00T inherits the flaw. Counter-
@@ -82,7 +83,7 @@ Two implications, honestly:
 
 ## 3. THE PLAN (revised 2026-08-06 — user's correction)
 
-### Step 0 — ROBUSTNESS CAMPAIGN IN SIM — *** DONE 2026-08-06, GATE LIFTED ***
+### Step 0 — ROBUSTNESS CAMPAIGN IN SIM — **_ DONE 2026-08-06, GATE LIFTED _**
 
 ```text
 17/18 runs scored (twoPlates crashed on a known script bug). Full results:
@@ -116,8 +117,8 @@ WHY THIS MILDLY RAISES THE AS-IS TEST'S ODDS
 
 ### Step 1 — TRY THE SIM-TRAINED N1.6 CHECKPOINT AS-IS ON THE REAL ARM
 
-Added on the user's standing rule: *"instead of guessing we could just test,
-because testing doesn't cost us much."* The prediction is that it fails (visual
+Added on the user's standing rule: _"instead of guessing we could just test,
+because testing doesn't cost us much."_ The prediction is that it fails (visual
 domain gap, and Pi05 failed even in-domain) — but a prediction is not a
 measurement, this is literally the project's original use-others'-work-as-is
 strategy, and **nothing is wasted either way**: the serving path built for this

@@ -52,4 +52,3 @@ Reason:
 Conclusion:
 
 Use Orin for simulator smoke tests and simple robotics workloads. Use cloud GPU for full pretrained policy evaluation.
-

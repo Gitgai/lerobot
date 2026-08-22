@@ -24,21 +24,21 @@ Last updated: 2026-08-06
 
 > # 🍊 **2026-08-05: A POLICY PICKED UP THE ORANGE.**
 >
-> `12e21/gr00t_n1d6_leisaac_pick_orange` — GR00T **N1.6**, fine-tuned *inside*
+> `12e21/gr00t_n1d6_leisaac_pick_orange` — GR00T **N1.6**, fine-tuned _inside_
 > LeIsaac on this exact task — **grasped, lifted 0.173 m, and carried the orange
 > 0.260 m**, holding it for **59 consecutive steps**. The known-good state
 > machine lifts 0.196 m. It did **not** place.
 >
 > **The project's first real manipulation success**, in sim or on hardware.
 >
-> It reframes every earlier failure: Pi05 and GR00T N1.7 are *real-world*-trained
-> checkpoints failing in *sim* — a genuine **domain gap**, not our tooling and not
+> It reframes every earlier failure: Pi05 and GR00T N1.7 are _real-world_-trained
+> checkpoints failing in _sim_ — a genuine **domain gap**, not our tooling and not
 > a broken metric, because a sim-trained checkpoint on the same rig, scene,
 > cameras and scoring picks the fruit up. Driven by LeIsaac's **native** n1.6
 > client, so none of our adapter code is in the measurement.
 >
 > Two corrections it exposed: (1) I had declared this comparison out of reach on
-> an **unchecked** assumption — n1.6 pins torch 2.7.1, which *does* support
+> an **unchecked** assumption — n1.6 pins torch 2.7.1, which _does_ support
 > sm_120; verifying was one `curl`. (2) The N1.7 server already applies
 > `to_absolute_chunking`, so our adapter was **doubling every joint target** and
 > three scored runs were void. Corrected, N1.7 tracks the orange within 20 cm for
@@ -97,6 +97,7 @@ Last updated: 2026-08-06
 > Read: `gr00t_n17_sim_evaluation_20260805.md`
 
 > # 👉 START HERE: `STATE_20260805.md`
+>
 > One page: what is verified, what we learned about 012000, the strategy in
 > force, the next step, and the unchanged load-bearing unknown — **nothing has
 > been tested on the real arm.** The banners below are the running log, newest
@@ -215,6 +216,7 @@ Last updated: 2026-08-06
 > **2026-08-05 CORRECTED + REPEATED: Pi05 012000 DOES reach in simulation.**
 > The "frozen arm" run was FAULTY (stale policy-server state). Three clean runs
 > with a fresh server, same scene:
+>
 > ```text
 > run    steps  d_start  closest  grip_range  grasp  place
 > run2     600   0.239    0.145      1.421     no     no
@@ -222,11 +224,12 @@ Last updated: 2026-08-06
 > run4     600   0.236    0.181      1.354     no     no
 > demo    1500   0.248    0.130      1.395     no     no
 > ```
+>
 > **The 1500-step run is the informative one:** closest approach 0.130 m, 71% of
 > steps within 0.20 m, 32% within 0.15 m — and still no grasp. **2.5× the time
 > bought 1.5 cm.** So the policy does not slowly converge and stall; it settles
 > at a STABLE HOVERING DISTANCE of 13–18 cm and holds there. Not lost, not
-> wandering — a *consistent wrong distance*. That is what you would expect if
+> wandering — a _consistent wrong distance_. That is what you would expect if
 > depth/scale cues come from a camera geometry that no longer matches, and it
 > makes S1 (move the orange) and S2 (add the `top` camera) directly diagnostic.
 > It approaches 5–9 cm and works the gripper, in a rendered kitchen it has never
@@ -264,9 +267,11 @@ Last updated: 2026-08-06
 > episodes.
 >
 > ## 2026-08-05 PUBLIC SO-101 DATASETS + CHECKPOINTS — and we can run them in sim
+>
 > **Fine-tuned SO-101 checkpoints exist for both families, and our harness can
 > already evaluate them** — testing one is just a different
 > `--policy_checkpoint_path`.
+>
 > ```text
 > GR00T   robocurve/gr00t-n1.7-so101-molmoact2   3B  <- N1.7, our repo's version
 > PI0.5   hjkso1406/pi05-peft-so101-4tasks-aug   4B
@@ -278,13 +283,14 @@ Last updated: 2026-08-06
 >         jinseonylee/SO101_PickAndPlace_Fruit   <- closest to our task
 >         gpudad/so101_pick_cube_chunked  1.46M rows (largest)
 > ```
+>
 > Conditions unchanged: **Era 1 rule** (each checkpoint needs its training-era
 > code identified — most repos have no model card) and **read failure
 > asymmetrically** (works in sim = strong; fails = weak).
 >
 > **GOAL: use someone else's checkpoint AS IS and skip fine-tuning.** Worth
 > testing. **Test GR00T FIRST** — 012000 uses ABSOLUTE joint targets, which are
-> tied to a specific arm's *calibration*, so a stranger's pi05 checkpoint emits
+> tied to a specific arm's _calibration_, so a stranger's pi05 checkpoint emits
 > angles offset from ours (same robot model, different zero points). **GR00T
 > defaults to RELATIVE actions**, which carry no calibration assumption — the
 > only candidate whose action representation can cross between arms.
@@ -297,6 +303,7 @@ Last updated: 2026-08-06
 > 012000 is 4.14B and still gives 145 empty squeezes when an onion moves inches.
 >
 > **SCREENED 2026-08-05 — 3 candidates, 1 survived, ~1 GB spent.**
+>
 > ```text
 > felixmayor/pi05_so101_orange_cube   RUNNABLE AS-IS via openpi (see below)
 > yen-0/smolvla-so101-digits-0707     OUT  needs observation.target_drawing
@@ -304,10 +311,11 @@ Last updated: 2026-08-06
 > robocurve/gr00t-n1.7-so101-molmoact2  ** VIABLE **  new_embodiment,
 >                                       front+wrist, RELATIVE action space
 > ```
+>
 > **CORRECTION: the openpi checkpoint is NOT out.** I first said "convert it (a
 > day's work) or skip it" — both wrong. **LeIsaac speaks openpi natively**:
 > `OpenPIServicePolicyClient` (websocket, port 8000, `camera_keys=["front",
-> "wrist"]` — matching our sim), `--policy_type=openpi`, and it even **pins a
+"wrist"]` — matching our sim), `--policy_type=openpi`, and it even **pins a
 > target openpi commit** (`5bff19b0…`), which partly solves the Era 1 pairing
 > problem. So: clone openpi at that commit, serve the checkpoint, point LeIsaac
 > at it. That is an install over a slow link, not a day of conversion code — and
@@ -318,6 +326,7 @@ Last updated: 2026-08-06
 > `gr00tn1.5/1.6`, and `openpi`. "No LeRobot loader" ≠ "cannot run".
 >
 > ## ✅ 2026-08-05 GR00T N1.7 NOW RUNS — gate cleared AND protocol bridged
+>
 > ```text
 > gated backbone  nvidia/Cosmos-Reason2-2B  ACCESS GRANTED, 4.6 GB cached
 >                 -> offline from now on; unblocks S3/S5 fine-tuning too
@@ -326,6 +335,7 @@ Last updated: 2026-08-06
 > smoke test      action shape (1, 96) float32 = 16 timesteps x 6 DoF
 >                 first row [0.0971, 2.724, -0.7633, 0.4511, 0.4671, 0.0142]
 > ```
+>
 > **LeIsaac ships n1.5/n1.6 clients only; this checkpoint is N1.7.** Seven wire
 > differences, each found by one probe: `data` must wrap `{"observation": obs}`;
 > observation is **nested** not flat-dotted; groups are `video`/`state`/**`language`**
@@ -346,15 +356,17 @@ Last updated: 2026-08-06
 >
 > NEXT: wire the adapter into `sim_policy_eval_instrumented.py` so GR00T is
 > scored from ground truth in the SAME scene as Pi05 — directly comparable to
-> *hovers 13–18 cm, 0/6 grasps*.
+> _hovers 13–18 cm, 0/6 grasps_.
 
 > (superseded) **⛔ GR00T IS BLOCKED ON GATED ACCESS (2026-08-05).** The checkpoint downloaded
 > fine (6.1 GB, verified) but the server will not start:
+>
 > ```text
 > Cannot download the VLM backbone 'nvidia/Cosmos-Reason2-2B' — gated HF repo.
 > EVERY GR00T checkpoint (incl. base GR00T-N1.7-3B) loads this backbone, so both
 > zero-shot inference AND FINETUNING require access.
 > ```
+>
 > **This blocks the entire GR00T track — S3 and S5 too, not just this
 > checkpoint.** The 6.1 GB we hold is the action expert + adapters; the
 > vision-language backbone is a separate gated download, and **it cannot be
@@ -376,19 +388,17 @@ Last updated: 2026-08-06
 > however good it is — and **you cannot just download the missing environment.**
 > People publish models constantly (one command); publishing an environment means
 > packaging scene assets, task logic and termination code. That is what LeIsaac
-> *is*, and why there is essentially only one for the SO-101.
+> _is_, and why there is essentially only one for the SO-101.
 > Screen order, all free before any weights: observation space → checkpoint
-> format → absolute vs relative actions → *then* download.
+> format → absolute vs relative actions → _then_ download.
 
-
->
 > **TRAP: camera key names lie.** `finish_sandwich`'s `front` camera is mounted
 > TOP-DOWN. Same key name as ours, different geometry — so "has front+wrist"
 > does not mean the views match. Check the POSE, not the key. Same lesson as S2
 > from another direction.
 >
 > **STRATEGY NOTE:** "build the real rig to match sim" is right, but S2 showed a
-> *mismatched* match is worse than none. A stronger variant is to make **sim
+> _mismatched_ match is worse than none. A stronger variant is to make **sim
 > diverse enough that the real rig falls inside its distribution** (PI's ablation
 > ranks environment diversity highest; LeIsaac declares 6 scenes and object
 > positions are config values). Our own 012000 is welded to ONE table — matching
@@ -396,6 +406,7 @@ Last updated: 2026-08-06
 > Read: **`public_so101_datasets_and_checkpoints_20260805.md`**
 
 > ## 2026-08-05 S1 + S2 RESULTS — the reach IS object-directed; a 3rd camera HURT
+>
 > ```text
 > S1  moved all 3 oranges +0.150 m in y
 >     arm followed +0.095 m (run) / +0.117 m (settled) = 64-78% tracking
@@ -403,12 +414,13 @@ Last updated: 2026-08-06
 > S2  added an overhead `top` camera (pose INVENTED by us)
 >     closest 0.133 -> 0.136 (unchanged), time within 0.20 m 86% -> 23%
 > ```
+>
 > **S1 is the real finding: 012000 RETAINS VISUAL GROUNDING** and it survived a
 > room-scale domain shift — rendered kitchen, different lighting, synthetic
 > orange, `top` masked. It is no longer "it reaches", it **reaches for the
 > orange**. So the failure is **FINAL POSITIONING, not perception** — it knows
 > where the orange is and stops 13–15 cm short. The 64–78% (not 100%) tracking
-> plus a rising d_min in the moved scene points to a *systematic offset that
+> plus a rising d*min in the moved scene points to a \_systematic offset that
 > worsens away from the trained position*.
 >
 > **S2 is a useful negative: a wrong view is worse than no view.** The pose was
@@ -421,6 +433,7 @@ Last updated: 2026-08-06
 > Read: **`s1_s2_results_20260805.md`**
 
 > ## ✅ 2026-08-05: THE TRUST EXAM PASSED. THE LOCAL STACK IS SOUND.
+>
 > ```text
 > first-gripper correlation  0.714    pod 0.826    broken-harness sig 0.197
 > closed-ish frames  n=21             pod n=21          <- EXACT MATCH
@@ -428,6 +441,7 @@ Last updated: 2026-08-06
 > predicted mean     24.7             pod 24.1
 > MAE                5.45             pod 4.41
 > ```
+>
 > The exact match on n and recorded mean proves the frame selection reproduced
 > the pod protocol, which is what makes the rest comparable. 0.714 is **3.6× the
 > broken-harness signature** and in the pod's regime — a working stack, not a
@@ -742,30 +756,30 @@ P2 = useful after current evidence exists
 P3 = later improvement
 ```
 
-| ID | Priority | Status | Task | Evidence Needed | Next Action |
-| --- | --- | --- | --- | --- | --- |
-| T01 | P0 | done | Make wrist camera usable by official LeRobot as a normal camera | Wrist appears as `/dev/video6`, reports Video Capture, and OpenCV reads frames | Keep bridge running before tests |
-| T02 | P0 | done | Save fresh 3-camera precheck images | Top/front/wrist images saved by official camera discovery | Recheck only if cameras move or reboot |
-| T03 | P1 | done | Run one clean official async 3-camera test | Run folder with logs, camera precheck, external video, official defaults | Latest run is labeled from IMG_9257 |
-| T04 | P1 | done | Label official run outcome | Outcome score 0-5 and key timestamps | Outcome: reach/near-contact, no grasp/lift |
-| T05 | P1 | done | Review official async logs | Model load, inference timing, queue behavior, errors | Record findings in evidence register |
-| T06 | P2 | done | Add read-only async trace instrumentation | User approval and reason official logs are insufficient | Implemented as opt-in `--trace_dir`; default behavior unchanged |
-| T07 | P2 | done | Run one instrumented official async trace test | Images, state, action chunks, executed actions, timing | Trace saved under `artifacts/traces/official_async_3cam_trace_20260720_010244/` |
-| T08 | P2 | done | Compare failed trace against 49 training episodes | Reviewed grasp-pick-move windows with synchronized camera and action evidence | First pass found 45 good windows, 2 uncertain, 1 bad, 1 grasp_only |
-| T09 | P2 | done | Decide whether grasp-pick-move correction episodes are justified | Evidence identifies which part of align-close-lift-move-place is missing or underrepresented | Do not record new episodes yet; mine focused dataset first |
-| T10 | P2 | done | Ask approval and create offline focused-dataset builder | User-approved script plan, review CSV, output path, and no source overwrite | Script created; no robot movement |
-| T11 | P2 | done | Build and validate focused grasp-pick-move dataset | LeRobotDataset loads, videos decode, metadata/action/state align | 40 good non-holdout windows validated |
-| T12 | P2 | done | Build and validate Option A training dataset | Original 49 + focused windows once, LeRobotDataset load passes | Dataset and package tarball created |
-| T13 | P1 | done | Upload Option A dataset to RunPod | Current RunPod direct TCP SSH host/port works and dataset extracts under `/workspace/lerobot_datasets` | Uploaded to active pod at `213.192.2.83:40161` using `~/.ssh/runpod_ed25519` |
-| T14 | P1 | done | Fine-tune Option A | Smoke train passes, then expert train writes checkpoints | 3000-step expert run completed; checkpoint `003000/pretrained_model` exists |
-| T15 | P1 | done | Run staged longer Option A fine-tune | RTX 3090 batch_size=4 train reaches checkpoint `012000/pretrained_model` | Complete checkpoint exists at `012000/pretrained_model` |
-| T16 | P1 | done | Sampled offline-compare 012000 against successful close/hold focus frames | Same successful focus frames should show close/hold predictions | 6-frame CPU probe found 0 predicted near-close chunks; see `docs/pi05_012000_cpu_probe_close_frames_20260725.md` |
-| T17 | P1 | done | Evaluate staged checkpoint on real arm | Official 3-camera async run with trace, logs, and physical outcome | Two complete 012000 traces were captured |
-| T18 | P1 | done | Analyze staged real-arm evaluation | Trace shows camera frames, Pi05 action chunks, executed actions, state, timing, and task text | See `docs/pi05_012000_trace_vs_training_analysis_20260723.md` |
-| T19 | P1 | todo | Full GPU offline audit 012000 across all focus windows | All focused close/hold/lift phases compared against recorded actions, with 003000 baseline if available | Run before another ordinary physical test |
-| T20 | P1 | todo | Decide training fix from offline audit | Evidence separates checkpoint undertraining, gripper/action normalization, timing, or data weighting | Choose next training/change only after T19 |
-| T21 | P1 | todo | Run start-state-controlled official evaluation | First observed gripper state is in/near training open range, then official 3-camera async trace | Do only after full offline audit/checkpoint fix or explicit user approval |
-| T22 | P2 | todo | Decide correction-data strategy | Evidence says whether existing focused windows are insufficient after training/action checks | Record new correction episodes only if audit says existing data is not enough |
+| ID  | Priority | Status | Task                                                                      | Evidence Needed                                                                                         | Next Action                                                                                                      |
+| --- | -------- | ------ | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| T01 | P0       | done   | Make wrist camera usable by official LeRobot as a normal camera           | Wrist appears as `/dev/video6`, reports Video Capture, and OpenCV reads frames                          | Keep bridge running before tests                                                                                 |
+| T02 | P0       | done   | Save fresh 3-camera precheck images                                       | Top/front/wrist images saved by official camera discovery                                               | Recheck only if cameras move or reboot                                                                           |
+| T03 | P1       | done   | Run one clean official async 3-camera test                                | Run folder with logs, camera precheck, external video, official defaults                                | Latest run is labeled from IMG_9257                                                                              |
+| T04 | P1       | done   | Label official run outcome                                                | Outcome score 0-5 and key timestamps                                                                    | Outcome: reach/near-contact, no grasp/lift                                                                       |
+| T05 | P1       | done   | Review official async logs                                                | Model load, inference timing, queue behavior, errors                                                    | Record findings in evidence register                                                                             |
+| T06 | P2       | done   | Add read-only async trace instrumentation                                 | User approval and reason official logs are insufficient                                                 | Implemented as opt-in `--trace_dir`; default behavior unchanged                                                  |
+| T07 | P2       | done   | Run one instrumented official async trace test                            | Images, state, action chunks, executed actions, timing                                                  | Trace saved under `artifacts/traces/official_async_3cam_trace_20260720_010244/`                                  |
+| T08 | P2       | done   | Compare failed trace against 49 training episodes                         | Reviewed grasp-pick-move windows with synchronized camera and action evidence                           | First pass found 45 good windows, 2 uncertain, 1 bad, 1 grasp_only                                               |
+| T09 | P2       | done   | Decide whether grasp-pick-move correction episodes are justified          | Evidence identifies which part of align-close-lift-move-place is missing or underrepresented            | Do not record new episodes yet; mine focused dataset first                                                       |
+| T10 | P2       | done   | Ask approval and create offline focused-dataset builder                   | User-approved script plan, review CSV, output path, and no source overwrite                             | Script created; no robot movement                                                                                |
+| T11 | P2       | done   | Build and validate focused grasp-pick-move dataset                        | LeRobotDataset loads, videos decode, metadata/action/state align                                        | 40 good non-holdout windows validated                                                                            |
+| T12 | P2       | done   | Build and validate Option A training dataset                              | Original 49 + focused windows once, LeRobotDataset load passes                                          | Dataset and package tarball created                                                                              |
+| T13 | P1       | done   | Upload Option A dataset to RunPod                                         | Current RunPod direct TCP SSH host/port works and dataset extracts under `/workspace/lerobot_datasets`  | Uploaded to active pod at `213.192.2.83:40161` using `~/.ssh/runpod_ed25519`                                     |
+| T14 | P1       | done   | Fine-tune Option A                                                        | Smoke train passes, then expert train writes checkpoints                                                | 3000-step expert run completed; checkpoint `003000/pretrained_model` exists                                      |
+| T15 | P1       | done   | Run staged longer Option A fine-tune                                      | RTX 3090 batch_size=4 train reaches checkpoint `012000/pretrained_model`                                | Complete checkpoint exists at `012000/pretrained_model`                                                          |
+| T16 | P1       | done   | Sampled offline-compare 012000 against successful close/hold focus frames | Same successful focus frames should show close/hold predictions                                         | 6-frame CPU probe found 0 predicted near-close chunks; see `docs/pi05_012000_cpu_probe_close_frames_20260725.md` |
+| T17 | P1       | done   | Evaluate staged checkpoint on real arm                                    | Official 3-camera async run with trace, logs, and physical outcome                                      | Two complete 012000 traces were captured                                                                         |
+| T18 | P1       | done   | Analyze staged real-arm evaluation                                        | Trace shows camera frames, Pi05 action chunks, executed actions, state, timing, and task text           | See `docs/pi05_012000_trace_vs_training_analysis_20260723.md`                                                    |
+| T19 | P1       | todo   | Full GPU offline audit 012000 across all focus windows                    | All focused close/hold/lift phases compared against recorded actions, with 003000 baseline if available | Run before another ordinary physical test                                                                        |
+| T20 | P1       | todo   | Decide training fix from offline audit                                    | Evidence separates checkpoint undertraining, gripper/action normalization, timing, or data weighting    | Choose next training/change only after T19                                                                       |
+| T21 | P1       | todo   | Run start-state-controlled official evaluation                            | First observed gripper state is in/near training open range, then official 3-camera async trace         | Do only after full offline audit/checkpoint fix or explicit user approval                                        |
+| T22 | P2       | todo   | Decide correction-data strategy                                           | Evidence says whether existing focused windows are insufficient after training/action checks            | Record new correction episodes only if audit says existing data is not enough                                    |
 
 ## 5. Current Highest Priority
 
@@ -894,25 +908,25 @@ pick up the orange and move it to another place
 
 Use this section to record important evidence files after each run.
 
-| Date | Run ID | Evidence | What It Proves | Notes |
-| --- | --- | --- | --- | --- |
-| 2026-07-18 | camera_check_20260718_223923 | `artifacts/camera_check_20260718_223923/` | Top/front/wrist images existed, but front framing was weak and wrist adapter still needed work | Use only as pre-fix evidence |
-| 2026-07-18 | IMG_9248 | `artifacts/IMG_9248.MOV` and extracted frames | Arm reached/touched/pushed orange but did not cleanly grasp/lift | External video, not exact Pi05 input trace |
-| 2026-07-19 | official_async_3cam_20260719_1547_long | `projects/testproject/logs/official_async_3cam_20260719_1547_long/robot_client.log`; RunPod `/workspace/logs/policy_server_official_3cam_20260719_long.log` | Official LeRobot async connected top/front/wrist/follower, used `robot.max_relative_target=None`, loaded Pi05 on GPU, and generated action chunks | Physical outcome still needs external video/direct observation |
-| 2026-07-19 | IMG_9257 | `artifacts/IMG_9257.MOV`; analysis frames under `artifacts/video_analysis_img_9257/` | Arm repeatedly reached the orange zone and got close, but the orange stayed outside the gripper center; no clean close/lift was visible | External video only; does not show exact Pi05 image/action trace |
-| 2026-07-19 | official_async_3cam_20260719_1725_repeat | `projects/testproject/logs/official_async_3cam_20260719_1725_repeat/robot_client.log`; RunPod `/workspace/logs/policy_server_official_3cam_20260719_40003.log` | Official LeRobot async connected top/front/wrist/follower after RunPod migration, used `robot.max_relative_target=None`, loaded Pi05 on GPU, and generated action chunks without server errors | Physical outcome still needs external video/direct observation |
-| 2026-07-19 | IMG_9258 | `artifacts/IMG_9258 (1).MOV`; analysis frames under `artifacts/video_analysis_img_9258_1/` | Repeat video shows reach and side/top contact with the orange, but no centered grasp and no lift | External video only; strengthens the reach-without-grasp finding |
-| 2026-07-20 | official_async_3cam_trace_20260720_010244 | `artifacts/traces/official_async_3cam_trace_20260720_010244/`; `analysis_contact_sheet.jpg`; `analysis_action_state_timeline.png` | Official LeRobot async with top/front/wrist captured 130 observations, 390 images, 115 Pi05 action chunks, and 1,564 executed actions; no `robot.max_relative_target` clamp was used; requested and performed actions matched | Trace shows good visual input and no hidden command clamp; gripper close appears strongest early, then trends open near the object |
-| 2026-07-21 | dataset_grasp_window_audit_20260720 | `artifacts/dataset_grasp_window_audit_20260720/grasp_pick_move_review.csv`; `contact_sheet_pages_v2/`; `codex_visual_review_notes.md`; `grasp_focus_execution_summary.txt` | Existing 49-episode dataset contains many usable full grasp-pick-move windows; gripper direction confirmed from visual/action evidence | First pass labels: 45 good, 2 uncertain, 1 bad, 1 grasp_only; 5 good windows held out; 40 good non-holdout windows available for the first focused dataset |
-| 2026-07-21 | grasp_focus_dataset_validation_20260721 | `artifacts/grasp_focus_dataset_validation_20260721/validation_report.md`; `/data/lerobot_datasets/so101_orange_49_grasp_pick_move_focus` | Focused dataset built from 40 approved non-holdout windows; 10,988 frames; LeRobotDataset load/decode passed with top/front/wrist | Original source dataset was not modified |
-| 2026-07-21 | orange49_plus_grasp_focus_validation_20260721 | `artifacts/orange49_plus_grasp_focus_validation_20260721/validation_report.md`; `/data/lerobot_datasets/so101_orange_49_plus_grasp_pick_move_focus`; `/data/downloads/so101_orange_49_plus_grasp_pick_move_focus.tar.gz` | Option A dataset built and validated: original 49 episodes plus focused windows once; 89 episodes, 40,712 frames; LeRobotDataset load/decode passed | Package tarball is 764 MB |
-| 2026-07-21 | runpod_option_a_upload_20260721 | `/workspace/lerobot_datasets/so101_orange_49_plus_grasp_pick_move_focus` | Option A dataset uploaded and extracted on RunPod | Uploaded to `root@213.192.2.83:40161` using `~/.ssh/runpod_ed25519`; extracted size about 793 MB |
-| 2026-07-21 | pi05_orange49_plus_grasp_focus_smoke_20260721 | `/workspace/logs/pi05_orange49_plus_grasp_focus_smoke_20260721.log` | Dataset, checkpoint loading, and training loop worked on RunPod | 200/200 steps completed; checkpoint save hit disk quota before cleanup, so it was treated as train-loop proof only |
-| 2026-07-21 | pi05_orange49_plus_grasp_focus_expert_20260721 | `/workspace/logs/pi05_orange49_plus_grasp_focus_expert_20260721.log`; `/workspace/outputs/pi05_orange49_plus_grasp_focus_expert/checkpoints/003000/pretrained_model` | Option A fine-tune completed from checkpoint 005000 and wrote a usable Pi05 checkpoint | 3000/3000 steps, final loss about 0.053, `model.safetensors` 8.8 GB, checkpoint directory 11 GB |
-| 2026-07-22 | pi05_orange49_focus_bs4_from003000_012000_20260721_193801 | `/workspace/logs/pi05_orange49_focus_bs4_from003000_012000_20260721_193801.log`; partial `/workspace/outputs/pi05_orange49_plus_grasp_focus_bs4_from003000_012000/checkpoints/006000` | Batch_size=4 training ran successfully to step 6000, but checkpoint save failed because of disk quota | `006000` is incomplete: only `config.json`, no `model.safetensors`, no `train_config.json`, no `training_state`; do not use |
-| 2026-07-22 | runpod_checkpoint_cleanup_20260722 | RunPod `/workspace/outputs/pi05_base_to_orange49_expert/checkpoints` | Deleted old base checkpoints `001000`-`004000` after user approval; kept complete `005000` base and complete focused `003000` | Workspace usage dropped from about 91 GB to about 48 GB |
-| 2026-07-23 | pi05_012000_trace_vs_training_analysis_20260723 | `docs/pi05_012000_trace_vs_training_analysis_20260723.md`; `artifacts/trace_vs_training_analysis_20260723/`; traces `official_async_3cam_012000_trace_20260722_230756` and `official_async_3cam_012000_trace_20260722_233341` | 012000 reached/contacted the orange but did not produce reliable center-close-hold-lift behavior | Trace 230756 had 0 strong-close actions; trace 233341 had early strong close, then open near the orange |
-| 2026-07-25 | offline_compare_012000_focus_20260725_cpu_probe | `docs/pi05_012000_cpu_probe_close_frames_20260725.md`; `artifacts/offline_compare_012000_focus_20260725_cpu_probe/summary.json`; `artifacts/offline_compare_012000_focus_20260725_cpu_probe/012000_cpu_probe_close_frames.csv` | On six successful focus-window close/hold frames, recorded first gripper averaged 21.80 but 012000 predicted first gripper averaged 40.35 and predicted 0 near-close chunks | Sampled CPU-only probe; next step is full GPU audit across all 40 focus windows and 003000 baseline if available |
+| Date       | Run ID                                                    | Evidence                                                                                                                                                                                                                       | What It Proves                                                                                                                                                                                                                | Notes                                                                                                                                                      |
+| ---------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-07-18 | camera_check_20260718_223923                              | `artifacts/camera_check_20260718_223923/`                                                                                                                                                                                      | Top/front/wrist images existed, but front framing was weak and wrist adapter still needed work                                                                                                                                | Use only as pre-fix evidence                                                                                                                               |
+| 2026-07-18 | IMG_9248                                                  | `artifacts/IMG_9248.MOV` and extracted frames                                                                                                                                                                                  | Arm reached/touched/pushed orange but did not cleanly grasp/lift                                                                                                                                                              | External video, not exact Pi05 input trace                                                                                                                 |
+| 2026-07-19 | official_async_3cam_20260719_1547_long                    | `projects/testproject/logs/official_async_3cam_20260719_1547_long/robot_client.log`; RunPod `/workspace/logs/policy_server_official_3cam_20260719_long.log`                                                                    | Official LeRobot async connected top/front/wrist/follower, used `robot.max_relative_target=None`, loaded Pi05 on GPU, and generated action chunks                                                                             | Physical outcome still needs external video/direct observation                                                                                             |
+| 2026-07-19 | IMG_9257                                                  | `artifacts/IMG_9257.MOV`; analysis frames under `artifacts/video_analysis_img_9257/`                                                                                                                                           | Arm repeatedly reached the orange zone and got close, but the orange stayed outside the gripper center; no clean close/lift was visible                                                                                       | External video only; does not show exact Pi05 image/action trace                                                                                           |
+| 2026-07-19 | official_async_3cam_20260719_1725_repeat                  | `projects/testproject/logs/official_async_3cam_20260719_1725_repeat/robot_client.log`; RunPod `/workspace/logs/policy_server_official_3cam_20260719_40003.log`                                                                 | Official LeRobot async connected top/front/wrist/follower after RunPod migration, used `robot.max_relative_target=None`, loaded Pi05 on GPU, and generated action chunks without server errors                                | Physical outcome still needs external video/direct observation                                                                                             |
+| 2026-07-19 | IMG_9258                                                  | `artifacts/IMG_9258 (1).MOV`; analysis frames under `artifacts/video_analysis_img_9258_1/`                                                                                                                                     | Repeat video shows reach and side/top contact with the orange, but no centered grasp and no lift                                                                                                                              | External video only; strengthens the reach-without-grasp finding                                                                                           |
+| 2026-07-20 | official_async_3cam_trace_20260720_010244                 | `artifacts/traces/official_async_3cam_trace_20260720_010244/`; `analysis_contact_sheet.jpg`; `analysis_action_state_timeline.png`                                                                                              | Official LeRobot async with top/front/wrist captured 130 observations, 390 images, 115 Pi05 action chunks, and 1,564 executed actions; no `robot.max_relative_target` clamp was used; requested and performed actions matched | Trace shows good visual input and no hidden command clamp; gripper close appears strongest early, then trends open near the object                         |
+| 2026-07-21 | dataset_grasp_window_audit_20260720                       | `artifacts/dataset_grasp_window_audit_20260720/grasp_pick_move_review.csv`; `contact_sheet_pages_v2/`; `codex_visual_review_notes.md`; `grasp_focus_execution_summary.txt`                                                     | Existing 49-episode dataset contains many usable full grasp-pick-move windows; gripper direction confirmed from visual/action evidence                                                                                        | First pass labels: 45 good, 2 uncertain, 1 bad, 1 grasp_only; 5 good windows held out; 40 good non-holdout windows available for the first focused dataset |
+| 2026-07-21 | grasp_focus_dataset_validation_20260721                   | `artifacts/grasp_focus_dataset_validation_20260721/validation_report.md`; `/data/lerobot_datasets/so101_orange_49_grasp_pick_move_focus`                                                                                       | Focused dataset built from 40 approved non-holdout windows; 10,988 frames; LeRobotDataset load/decode passed with top/front/wrist                                                                                             | Original source dataset was not modified                                                                                                                   |
+| 2026-07-21 | orange49_plus_grasp_focus_validation_20260721             | `artifacts/orange49_plus_grasp_focus_validation_20260721/validation_report.md`; `/data/lerobot_datasets/so101_orange_49_plus_grasp_pick_move_focus`; `/data/downloads/so101_orange_49_plus_grasp_pick_move_focus.tar.gz`       | Option A dataset built and validated: original 49 episodes plus focused windows once; 89 episodes, 40,712 frames; LeRobotDataset load/decode passed                                                                           | Package tarball is 764 MB                                                                                                                                  |
+| 2026-07-21 | runpod_option_a_upload_20260721                           | `/workspace/lerobot_datasets/so101_orange_49_plus_grasp_pick_move_focus`                                                                                                                                                       | Option A dataset uploaded and extracted on RunPod                                                                                                                                                                             | Uploaded to `root@213.192.2.83:40161` using `~/.ssh/runpod_ed25519`; extracted size about 793 MB                                                           |
+| 2026-07-21 | pi05_orange49_plus_grasp_focus_smoke_20260721             | `/workspace/logs/pi05_orange49_plus_grasp_focus_smoke_20260721.log`                                                                                                                                                            | Dataset, checkpoint loading, and training loop worked on RunPod                                                                                                                                                               | 200/200 steps completed; checkpoint save hit disk quota before cleanup, so it was treated as train-loop proof only                                         |
+| 2026-07-21 | pi05_orange49_plus_grasp_focus_expert_20260721            | `/workspace/logs/pi05_orange49_plus_grasp_focus_expert_20260721.log`; `/workspace/outputs/pi05_orange49_plus_grasp_focus_expert/checkpoints/003000/pretrained_model`                                                           | Option A fine-tune completed from checkpoint 005000 and wrote a usable Pi05 checkpoint                                                                                                                                        | 3000/3000 steps, final loss about 0.053, `model.safetensors` 8.8 GB, checkpoint directory 11 GB                                                            |
+| 2026-07-22 | pi05_orange49_focus_bs4_from003000_012000_20260721_193801 | `/workspace/logs/pi05_orange49_focus_bs4_from003000_012000_20260721_193801.log`; partial `/workspace/outputs/pi05_orange49_plus_grasp_focus_bs4_from003000_012000/checkpoints/006000`                                          | Batch_size=4 training ran successfully to step 6000, but checkpoint save failed because of disk quota                                                                                                                         | `006000` is incomplete: only `config.json`, no `model.safetensors`, no `train_config.json`, no `training_state`; do not use                                |
+| 2026-07-22 | runpod_checkpoint_cleanup_20260722                        | RunPod `/workspace/outputs/pi05_base_to_orange49_expert/checkpoints`                                                                                                                                                           | Deleted old base checkpoints `001000`-`004000` after user approval; kept complete `005000` base and complete focused `003000`                                                                                                 | Workspace usage dropped from about 91 GB to about 48 GB                                                                                                    |
+| 2026-07-23 | pi05_012000_trace_vs_training_analysis_20260723           | `docs/pi05_012000_trace_vs_training_analysis_20260723.md`; `artifacts/trace_vs_training_analysis_20260723/`; traces `official_async_3cam_012000_trace_20260722_230756` and `official_async_3cam_012000_trace_20260722_233341`  | 012000 reached/contacted the orange but did not produce reliable center-close-hold-lift behavior                                                                                                                              | Trace 230756 had 0 strong-close actions; trace 233341 had early strong close, then open near the orange                                                    |
+| 2026-07-25 | offline_compare_012000_focus_20260725_cpu_probe           | `docs/pi05_012000_cpu_probe_close_frames_20260725.md`; `artifacts/offline_compare_012000_focus_20260725_cpu_probe/summary.json`; `artifacts/offline_compare_012000_focus_20260725_cpu_probe/012000_cpu_probe_close_frames.csv` | On six successful focus-window close/hold frames, recorded first gripper averaged 21.80 but 012000 predicted first gripper averaged 40.35 and predicted 0 near-close chunks                                                   | Sampled CPU-only probe; next step is full GPU audit across all 40 focus windows and 003000 baseline if available                                           |
 
 Add every serious run here.
 
@@ -1550,13 +1564,13 @@ See docs/repo_source_control_policy.md.
 
 ## 9. Blocker Log
 
-| Blocker | First Seen | Owner | Current Status | Unblocks |
-| --- | --- | --- | --- | --- |
-| `/dev/video6` is output-only, not capture | 2026-07-18 | local machine setup | resolved through v4l2loopback bridge | official 3-camera async test |
-| Pi TCP stream exits after client disconnect | 2026-07-18 | Raspberry Pi camera setup | mitigated by running bridge before tests | stable wrist camera feed |
-| Connected ESP32 is serial/JTAG, not `/dev/videoX` | 2026-07-19 | hardware choice | not usable for wrist unless flashed as UVC | wrist camera replacement |
-| Exact Pi05 image/action trace missing from official async | 2026-07-18 | LeRobot async instrumentation decision | resolved for opt-in traced runs with `--trace_dir` | precise root-cause diagnosis |
-| RunPod disk quota during Pi05 checkpoint save | 2026-07-21 | RunPod storage management | mitigated by deleting temporary outputs/tarballs and saving only final checkpoint | Option A expert fine-tune |
+| Blocker                                                   | First Seen | Owner                                  | Current Status                                                                    | Unblocks                     |
+| --------------------------------------------------------- | ---------- | -------------------------------------- | --------------------------------------------------------------------------------- | ---------------------------- |
+| `/dev/video6` is output-only, not capture                 | 2026-07-18 | local machine setup                    | resolved through v4l2loopback bridge                                              | official 3-camera async test |
+| Pi TCP stream exits after client disconnect               | 2026-07-18 | Raspberry Pi camera setup              | mitigated by running bridge before tests                                          | stable wrist camera feed     |
+| Connected ESP32 is serial/JTAG, not `/dev/videoX`         | 2026-07-19 | hardware choice                        | not usable for wrist unless flashed as UVC                                        | wrist camera replacement     |
+| Exact Pi05 image/action trace missing from official async | 2026-07-18 | LeRobot async instrumentation decision | resolved for opt-in traced runs with `--trace_dir`                                | precise root-cause diagnosis |
+| RunPod disk quota during Pi05 checkpoint save             | 2026-07-21 | RunPod storage management              | mitigated by deleting temporary outputs/tarballs and saving only final checkpoint | Option A expert fine-tune    |
 
 ## 10. How To Update This Tracker
 

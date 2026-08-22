@@ -14,11 +14,11 @@ LIBERO
 
 ## Completed Results
 
-| Suite | Tasks | Episodes | Success |
-| --- | --- | ---: | ---: |
-| LIBERO Object | 0-9 | 100 | 99% |
-| LIBERO Spatial | 0-9 | 100 | 97% |
-| LIBERO Goal | 0-9 | 100 | 96% |
+| Suite          | Tasks | Episodes | Success |
+| -------------- | ----- | -------: | ------: |
+| LIBERO Object  | 0-9   |      100 |     99% |
+| LIBERO Spatial | 0-9   |      100 |     97% |
+| LIBERO Goal    | 0-9   |      100 |     96% |
 
 ## Local Video Folders
 
@@ -56,4 +56,3 @@ The run did not complete.
 Recommendation:
 
 Run `LIBERO 10` on a larger VM instead of retrying repeatedly on the same 16 GB instance.
-

@@ -66,7 +66,6 @@ from lerobot.transport.utils import grpc_channel_options, send_bytes_in_chunks
 from lerobot.utils.import_utils import register_third_party_plugins
 
 from .configs import RobotClientConfig
-from .image_codec import compress_observation_images
 from .helpers import (
     Action,
     FPSTracker,
@@ -79,6 +78,7 @@ from .helpers import (
     map_robot_keys_to_lerobot_features,
     visualize_action_queue_size,
 )
+from .image_codec import compress_observation_images
 from .trace_recorder import AsyncClientTraceRecorder
 
 

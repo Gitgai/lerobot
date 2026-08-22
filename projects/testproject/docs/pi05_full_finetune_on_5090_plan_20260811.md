@@ -29,15 +29,15 @@ Full record and raw evidence: §8, and
 
 ➡ **THIS DOC IS CLOSED. Continue in
 [`pi05_training_capability_plan_20260811.md`](pi05_training_capability_plan_20260811.md)**
-— phase 2 answers *"can we TRAIN here?"*, which this one does not: it fixes the
+— phase 2 answers _"can we TRAIN here?"_, which this one does not: it fixes the
 checkpoint blocker, measures the largest batch that fits, and runs a sustained
 LIBERO capability run. It also carries the autonomy contract for unattended
 execution.
 
 ---
 
-*Original framing, kept because the reasoning is what made the answer
-trustworthy:*
+_Original framing, kept because the reasoning is what made the answer
+trustworthy:_
 
 **Status: NOT YET ATTEMPTED.** The enabling config was described but never run.
 
@@ -99,13 +99,13 @@ Gate B checks it.
 
 **693M is the number you get when the whole VLM is frozen** — our existing,
 already-measured recipe. If the trainable counter reads 693M, the run is training
-**17% of the model**, will comfortably fit, and would be read as *"the 5090
-handles full fine-tuning"* — **when full fine-tuning was never tested.** That is
+**17% of the model**, will comfortably fit, and would be read as _"the 5090
+handles full fine-tuning"_ — **when full fine-tuning was never tested.** That is
 re-measuring August's result and then declining an $11K purchase on it.
 
 ⚠ **This is not paranoia.** `train_expert_only` and `freeze_vision_encoder` can
 arrive from the **pretrained checkpoint's own config**, not only from the command
-line. Passing `--policy.train_expert_only=false` states an *intention*; counting
+line. Passing `--policy.train_expert_only=false` states an _intention_; counting
 parameters is what confirms it **took effect**. Exactly the same shape as the
 optimizer trap in §3: flag accepted, value overridden, nothing warns you.
 
@@ -178,8 +178,8 @@ is **0.5.2 or nothing.**
 
 ### ⇒ REVERSED: route A is adopted. Why the original objection no longer holds
 
-The objection was *"a version change on top of a memory experiment — two
-variables at once."* Three things retire it:
+The objection was _"a version change on top of a memory experiment — two
+variables at once."_ Three things retire it:
 
 ```text
 1  0.4.4 is BLOCKED, not merely less convenient. There is no version-matched
@@ -198,8 +198,8 @@ variables at once."* Three things retire it:
 therefore `.venv312`. The 3.11 venv is left in place, unused — the failed 0.5.2
 install into it exited cleanly without touching torch.
 
-⚠ **§0's OOM ladder was measured on a 0.4.x stack** and is now a *different
-version* from the run. It stays as context — it is what motivated the question —
+⚠ **§0's OOM ladder was measured on a 0.4.x stack** and is now a _different
+version_ from the run. It stays as context — it is what motivated the question —
 but **it is no longer a valid quantitative comparator.** Step 7b is the
 comparator. Do not quote 26.3 GB against a 0.5.2 number.
 
@@ -223,13 +223,13 @@ tokenizer_processor · device_processor
 0.5.2 has that exact class — `RelativeActionsProcessorStep` — but **registers it
 under a different key**, `delta_actions_processor`
 (`processor/relative_action_processor.py:84`). A pure **rename** between
-versions: the published checkpoint was serialised by a *newer* lerobot.
+versions: the published checkpoint was serialised by a _newer_ lerobot.
 
 ⚠ **An alias would have "worked", and was the wrong move.** Registering
 `relative_actions_processor` as a second name for the 0.5.2 class would have let
 the run proceed — but if anything beyond the key changed, actions get silently
 mis-processed. **Match the version the artifact was written by; do not teach old
-code the new name.** For a *memory* probe the action semantics barely matter,
+code the new name.** For a _memory_ probe the action semantics barely matter,
 which is exactly what would have made it an easy and invisible mistake.
 
 ### ⇒ lerobot 0.6.1, matched to the published checkpoint
@@ -376,15 +376,15 @@ bitsandbytes not installed         CONFIRMED — absent from all three   plan co
                                    venvs
 ```
 
-⇒ **Two code changes, not one:** the 8-bit optimizer registration *and*
+⇒ **Two code changes, not one:** the 8-bit optimizer registration _and_
 gradient accumulation. Budget accordingly; measure them separately.
 
 ### Unrelated but noticed
 
 `~/lerobot_assets/checkpoints/pi05_sim_varied` — the 30k-step run
-REALARM_RESULT_20260808 launched — **is not on disk anywhere** (searched
+REALARM*RESULT_20260808 launched — **is not on disk anywhere** (searched
 /home/kiran, /mnt, /media to depth 9). Only `pi05_012000` remains. Either it was
-pruned or it never landed; the sim battery evaluated *something* under that name,
+pruned or it never landed; the sim battery evaluated \_something* under that name,
 so this should be resolved before any of those numbers are re-derived. **Not a
 blocker for this experiment** — LIBERO is the recommended dataset anyway.
 
@@ -528,7 +528,7 @@ session   Wayland / GNOME
 ```
 
 ⛔ **CORRECTION to an earlier claim in this doc: no BIOS change is needed.** The
-iGPU is *already* enabled — its connectors are enumerated and live, and `amdgpu`
+iGPU is _already_ enabled — its connectors are enumerated and live, and `amdgpu`
 is loaded. An earlier revision said this "likely needs a BIOS change"; that was
 written before checking and is **false**.
 
@@ -583,7 +583,7 @@ and a reboot, while STEP −1 is five minutes and may make the whole question mo
 schedule.** The switch is now known to be cheap, which is an argument for doing
 it soon — not for doing it first.
 
-⇒ If the display *does* move before the run, nothing in this plan breaks: Gate A
+⇒ If the display _does_ move before the run, nothing in this plan breaks: Gate A
 already requires re-measuring `memory.free` at run time rather than trusting a
 recorded constant. **Record which GPU drove the display in §8** — it changes the
 ceiling the result was measured against.
@@ -645,7 +645,7 @@ elif self.use_policy_training_preset and not self.resume:   # L134
 
 ⇒ Pass `--optimizer.type=adamw_8bit` alone and the preset **overwrites it after
 parsing**. The run proceeds on FP32 AdamW, OOMs at ~49.7 GB, and the conclusion
-is *"the 5090 cannot do it"* — **on a bug, not a measurement.** That is an $11K
+is _"the 5090 cannot do it"_ — **on a bug, not a measurement.** That is an $11K
 mistake and there is no error message.
 
 ⇒ **Disabling the preset requires BOTH optimizer and scheduler**, or L132 raises
@@ -735,8 +735,8 @@ and time overhead and would confound a memory measurement. Note it, don't copy i
 ⛔ Not available, no flag, verified §0.0. `Accelerator()` is built without
 `gradient_accumulation_steps` and `update_policy()` steps every batch.
 
-⇒ **Gate A does not need it.** bs1 without accumulation is a valid *memory*
-measurement even though it is not a usable *training recipe*. That is the whole
+⇒ **Gate A does not need it.** bs1 without accumulation is a valid _memory_
+measurement even though it is not a usable _training recipe_. That is the whole
 point: it answers the $11K question with one code change instead of two.
 
 ---
@@ -823,7 +823,7 @@ peak VRAM < 29.93 GiB free ceiling, 100 steps complete, loss FINITE throughout
 ⚠ **Re-measure `memory.free` at run time; do not reuse the number above.** It was
 29.93 GiB with an idle desktop on 2026-08-11 and moves with whatever else is on
 the display. **Record the baseline immediately before the run** and report peak
-against *that*, not against a remembered constant:
+against _that_, not against a remembered constant:
 
 ```bash
 nvidia-smi --query-gpu=memory.total,memory.used,memory.free \
@@ -854,7 +854,7 @@ backward / optimizer step. Those need different fixes.
 meaningless.**
 
 ⛔ **The snippet previously written here does not exist.**
-`num_parameters(only_trainable=True)` is a *transformers* `PreTrainedModel`
+`num_parameters(only_trainable=True)` is a _transformers_ `PreTrainedModel`
 method; LeRobot's `PreTrainedPolicy` does not define it (verified — grep in
 `lerobot/policies/pretrained.py` returns nothing). It would have raised
 `AttributeError` and, in a hurry, been skipped. Use plain PyTorch:
@@ -911,13 +911,16 @@ $11K decision.**
 ## 5. Escalation ladder — only if Gate A fails
 
 # ✅ NOT NEEDED. Gate A passed at 24.74 GiB with 7.10 GiB to spare, on the
+
 # baseline four levers alone. **NOTHING BELOW WAS USED.** Steps 3–5 remain
+
 # untried reserve — relevant only if batch size is raised, a longer context is
+
 # needed, or a larger model is attempted later. Kept for that reason.
 
 ⚠ **Steps 1 and 2 of the old ladder are already spent.** The §3 baseline command
-*includes* the 8-bit optimizer — without it there is nothing to measure — and it
-*excludes* gradient accumulation deliberately. So the ladder below starts at what
+_includes_ the 8-bit optimizer — without it there is nothing to measure — and it
+_excludes_ gradient accumulation deliberately. So the ladder below starts at what
 used to be step 3. Left in place with strikethrough numbering so the ordering is
 not silently re-derived later.
 
@@ -945,7 +948,7 @@ a solution.
 
 ⛔ **THE SLOWDOWN DENOMINATOR IS CONFOUNDED — fix it before applying this table.**
 The obvious baseline, `1.4 steps/s`, is **bs4 expert-only**. Comparing full-FT at
-**bs1** against it varies **two things at once** — batch size *and* which
+**bs1** against it varies **two things at once** — batch size _and_ which
 parameters train — so the resulting "Nx" is not a slowdown, it is a mixture.
 
 ```text
@@ -977,7 +980,7 @@ still OOM, or >10x, or unstable   a higher-VRAM card becomes a rational
                                   it rather than a vendor table.
 ```
 
-**What the OpenPI >70 GB figure does and does not prove:** it says *their*
+**What the OpenPI >70 GB figure does and does not prove:** it says _their_
 standard JAX configuration needs >70 GB. It does not prove no full-parameter
 configuration fits in 32 GB, and it is not measured on our stack. Those are
 different claims, and only an experiment separates them.

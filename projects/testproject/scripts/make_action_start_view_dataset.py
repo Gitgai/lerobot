@@ -15,7 +15,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-
 FPS = 30
 TASK_TEXT = "pick up the orange and move it to another place"
 

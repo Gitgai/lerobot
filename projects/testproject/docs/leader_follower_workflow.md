@@ -121,9 +121,9 @@ Move to SmolVLA only when:
 
 Use this table for every policy:
 
-| Policy | Dataset | Task | Trials | Success | Notes |
-| --- | --- | --- | ---: | ---: | --- |
-| ACT | block_place_v1 | place block on target | 20 | TBD | TBD |
+| Policy | Dataset        | Task                  | Trials | Success | Notes |
+| ------ | -------------- | --------------------- | -----: | ------: | ----- |
+| ACT    | block_place_v1 | place block on target |     20 |     TBD | TBD   |
 
 ## Common Problems
 
@@ -201,4 +201,3 @@ Power supply:
 ```
 
 Once those are fixed, the next step is a hardware bill of materials and assembly checklist.
-

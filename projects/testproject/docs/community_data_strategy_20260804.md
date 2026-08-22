@@ -75,7 +75,7 @@ HF search "so101" -> ~9,000 dataset hits
 ```
 
 The MolmoAct2 index is the most valuable item here. Its language annotations mean
-episodes can be filtered by instruction - e.g. everything that is a *place*.
+episodes can be filtered by instruction - e.g. everything that is a _place_.
 
 ### Published checkpoints (unverified)
 

@@ -7,8 +7,8 @@
 +++ b/lerobot/optim/optimizers.py	2026-08-11 17:10:07.005677275 -0400
 @@ -111,6 +111,30 @@
          return torch.optim.AdamW(params, **kwargs)
- 
- 
+
+
 +# --- PROBE PATCH: pi05 full fine-tune on a 32 GB 5090 ---------------------
 +# docs/pi05_full_finetune_on_5090_plan_20260811.md
 +# FP32 AdamW holds m+v at 8 bytes/param = 30.8 GiB for pi05's 4.14B, which alone
@@ -40,7 +40,7 @@
 +++ b/lerobot/policies/pi05/configuration_pi05.py	2026-08-11 17:10:07.005769708 -0400
 @@ -146,7 +146,12 @@
              self.output_features[ACTION] = action_feature
- 
+
      def get_optimizer_preset(self) -> AdamWConfig:
 -        return AdamWConfig(
 +        # PROBE PATCH: validate() overwrites any --optimizer.type from the CLI

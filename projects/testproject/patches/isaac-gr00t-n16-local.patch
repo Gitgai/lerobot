@@ -23,7 +23,7 @@ index 99e29af..aa69718 100644
 --- a/gr00t/eval/real_robot/SO100/eval_so100.py
 +++ b/gr00t/eval/real_robot/SO100/eval_so100.py
 @@ -30,13 +30,18 @@ from gr00t.policy.server_client import PolicyClient
- 
+
  # Importing various robot configs ensures CLI autocompletion works
  from lerobot.cameras.opencv.configuration_opencv import OpenCVCameraConfig  # noqa: F401
 +# LOCAL PATCH 2026-08-06 (backup: eval_so100.py.orig): lerobot 0.4.4 - the
@@ -50,7 +50,7 @@ index a5baf0f..929dd40 100644
 @@ -67,7 +67,12 @@ if __name__ == "__main__":
      else:
          config.model.extra_augmentation_config = None
- 
+
 -    config.model.load_bf16 = False
 +    # LOCAL PATCH 2026-08-06: was False, which loads the 3B model in fp32
 +    # (~12 GB of weights) even though training already runs bf16 mixed
@@ -62,7 +62,7 @@ index a5baf0f..929dd40 100644
      config.model.eagle_collator = True
      config.model.model_name = "nvidia/Eagle-Block2A-2B-v2"
 @@ -76,7 +81,17 @@ if __name__ == "__main__":
- 
+
      config.training.experiment_name = ft_config.experiment_name
      config.training.start_from_checkpoint = ft_config.base_model_path
 -    config.training.optim = "adamw_torch"

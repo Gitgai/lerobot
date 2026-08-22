@@ -2,9 +2,10 @@
 
 Last updated: 2026-08-05
 Answers three questions raised after the first Pi05 sim runs:
-  1. should we test Pi05 with two cameras?
-  2. can the sim provide a THIRD camera, as Pi05 expects?
-  3. do we need NVIDIA's dataset, or can the sim generate our data?
+
+1. should we test Pi05 with two cameras?
+2. can the sim provide a THIRD camera, as Pi05 expects?
+3. do we need NVIDIA's dataset, or can the sim generate our data?
 
 Prerequisites: the working stack in `new_machine_local_serving_20260804.md`.
 Related: `sim_place_data_generation_20260805.md`, `groot_vs_pi05_comparison_plan_20260804.md`.

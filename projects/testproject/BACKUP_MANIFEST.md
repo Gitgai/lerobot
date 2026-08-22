@@ -134,8 +134,8 @@ cp ~/lerobot_assets/lerobot_trainingera/src/lerobot/async_inference/image_codec.
 
 ### CORRECTION 2026-08-07 - the "irreplaceable recordings" were neither
 
-This section used to open with *"Recorded demonstrations (35 GB) - the part you
-can never get back"*, describing `sim_pick_place.hdf5` and
+This section used to open with _"Recorded demonstrations (35 GB) - the part you
+can never get back"_, describing `sim_pick_place.hdf5` and
 `sim_pick_place_ep4.hdf5` as hand-teleoped and unrecoverable. **Both claims
 were wrong.**
 
@@ -165,8 +165,8 @@ leisaac_pick_orange (real teleop)  action  [6] joint  -> leader arm
 `seed = int(time.time())` proves nothing either way - it is the LeIsaac default
 in `generate.py`, `teleop_se3_agent.py` and `policy_inference.py` alike.
 
-**The rule this earns:** *"irreplaceable" is a claim about provenance, and
-provenance must be read out of the artifact, never inferred from its path.*
+**The rule this earns:** _"irreplaceable" is a claim about provenance, and
+provenance must be read out of the artifact, never inferred from its path._
 Before marking anything unrecoverable, open it and find the signature.
 
 ### What actually holds the data now
@@ -231,7 +231,7 @@ HF CACHE
 CLEAN CLONES - re-clone at these exact commits, they are all 0 commits ahead
     ~/sim/leisaac-src            LightwheelAI/leisaac              24d3bcd
         submodule dependencies/IsaacLab                            3c6e67bb5
-        (but see Section 2 - the datasets/ inside it are NOT re-clonable)
+        (but see Section 2 - the datasets/ inside it are NOT re-cloneable)
     ~/sim/Isaac-GR00T            NVIDIA/Isaac-GR00T                b995540
     ~/sim/Isaac-GR00T-n16        NVIDIA/Isaac-GR00T                ead5283  + patch
     ~/sim/openpi                 Physical-Intelligence/openpi      5bff19b
@@ -362,7 +362,6 @@ Another user (kkondo) runs a ROS/Gazebo/Flightmare stack on this box, which is
   and are not yours to back up - but your ASIS scripts DRIVE their build, so
   your harness is worthless on a new machine without dynus_ws also being there.
 ```
-
 
 ## Added 2026-08-07 — the N1.6 stack (see docs/N16_REBUILD_RUNBOOK.md)
 

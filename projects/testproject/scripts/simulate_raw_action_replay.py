@@ -16,7 +16,6 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 
-
 MOTORS = [
     "shoulder_pan",
     "shoulder_lift",
@@ -27,13 +26,14 @@ MOTORS = [
 ]
 
 DEFAULT_LOG = Path(
-    "/data/downloads/3cam tests/"
-    "pi05_episode29_overfit_003000_realarm_50actions_20260703_231147.actions.csv"
+    "/data/downloads/3cam tests/pi05_episode29_overfit_003000_realarm_50actions_20260703_231147.actions.csv"
 )
 DEFAULT_OUT_DIR = Path("/data/downloads/3cam tests")
 
 
-def load_action_log(path: Path) -> tuple[dict[str, float], dict[str, float], list[dict[str, float]], list[dict[str, float]]]:
+def load_action_log(
+    path: Path,
+) -> tuple[dict[str, float], dict[str, float], list[dict[str, float]], list[dict[str, float]]]:
     before: dict[str, float] | None = None
     after: dict[str, float] | None = None
     commanded: list[dict[str, float]] = []
@@ -112,7 +112,9 @@ def write_summary(
     return rows
 
 
-def plot_trajectories(path: Path, before: dict[str, float], after: dict[str, float], commanded: np.ndarray, sent: np.ndarray) -> None:
+def plot_trajectories(
+    path: Path, before: dict[str, float], after: dict[str, float], commanded: np.ndarray, sent: np.ndarray
+) -> None:
     steps = np.arange(len(commanded))
     fig, axes = plt.subplots(3, 2, figsize=(14, 10), sharex=True)
     axes = axes.ravel()
@@ -121,8 +123,16 @@ def plot_trajectories(path: Path, before: dict[str, float], after: dict[str, flo
         ax = axes[idx]
         ax.plot(steps, commanded[:, idx], label="raw Pi05 commanded", color="#d55e00", linewidth=2)
         ax.plot(steps, sent[:, idx], label="LeRobot sent", color="#0072b2", linestyle="--", linewidth=2)
-        ax.axhline(before[motor], color="#666666", linestyle=":", linewidth=1.5, label="before" if idx == 0 else None)
-        ax.axhline(after[motor], color="#009e73", linestyle="-.", linewidth=1.5, label="real after" if idx == 0 else None)
+        ax.axhline(
+            before[motor], color="#666666", linestyle=":", linewidth=1.5, label="before" if idx == 0 else None
+        )
+        ax.axhline(
+            after[motor],
+            color="#009e73",
+            linestyle="-.",
+            linewidth=1.5,
+            label="real after" if idx == 0 else None,
+        )
         ax.set_title(motor)
         ax.set_ylabel("deg / gripper units")
         ax.grid(True, alpha=0.25)
@@ -154,12 +164,12 @@ def draw_arm_schematic(ax: plt.Axes, pose: np.ndarray, title: str) -> None:
 
     points = [(0.0, 0.0)]
     x, y = 0.0, 0.0
-    for length, angle in zip(lengths, angles):
+    for length, angle in zip(lengths, angles, strict=False):
         x += length * math.cos(angle)
         y += length * math.sin(angle)
         points.append((x, y))
 
-    xs, ys = zip(*points)
+    xs, ys = zip(*points, strict=False)
     ax.plot(xs, ys, "-o", color="#0072b2", linewidth=5, markersize=7)
 
     grip_open = np.clip((gripper - 15.0) / 45.0, 0.0, 1.0)
@@ -178,7 +188,12 @@ def draw_arm_schematic(ax: plt.Axes, pose: np.ndarray, title: str) -> None:
     pan_x = 0.55 * math.sin(shoulder_pan)
     pan_y = -1.1
     ax.plot([0, pan_x], [pan_y, pan_y + 0.35], color="#009e73", linewidth=4)
-    ax.text(-1.65, -1.25, f"pan {math.degrees(shoulder_pan):.1f}\nwrist_roll {wrist_roll:.1f}\ngripper {gripper:.1f}", fontsize=9)
+    ax.text(
+        -1.65,
+        -1.25,
+        f"pan {math.degrees(shoulder_pan):.1f}\nwrist_roll {wrist_roll:.1f}\ngripper {gripper:.1f}",
+        fontsize=9,
+    )
 
     ax.set_title(title)
     ax.set_xlim(-1.8, 2.4)
@@ -189,7 +204,9 @@ def draw_arm_schematic(ax: plt.Axes, pose: np.ndarray, title: str) -> None:
     ax.set_yticks([])
 
 
-def make_replay_video(path: Path, before: dict[str, float], commanded: np.ndarray, sent: np.ndarray, fps: float) -> None:
+def make_replay_video(
+    path: Path, before: dict[str, float], commanded: np.ndarray, sent: np.ndarray, fps: float
+) -> None:
     frames: list[np.ndarray] = []
     before_arr = np.array([before[motor] for motor in MOTORS], dtype=float)
 
@@ -199,7 +216,6 @@ def make_replay_video(path: Path, before: dict[str, float], commanded: np.ndarra
         draw_arm_schematic(axes[1], sent[step], f"LeRobot-sent target {step + 1}/{len(sent)}")
 
         raw_delta = commanded[step] - before_arr
-        sent_delta = sent[step] - before_arr
         max_extra = float(np.abs(commanded[step] - sent[step]).max())
         fig.suptitle(
             f"Joint-space replay only | max raw-vs-sent difference this step: {max_extra:.2f}",

@@ -60,15 +60,23 @@ parser.add_argument("--move-oranges", default=None, help="dx,dy,dz for ALL orang
 parser.add_argument("--scatter-oranges", default=None, help="dx1,dy1,dx2,dy2,dx3,dy3")
 parser.add_argument("--move-plate", default=None, help="dx,dy,dz for the goal")
 parser.add_argument("--scale-oranges", type=float, default=None)
-parser.add_argument("--add-decoys", type=int, default=0,
-                    help="orange-coloured spheres near the oranges; the SM ignores them (GT-driven), so demos recorded with them teach 'the REAL orange despite lookalikes'")
+parser.add_argument(
+    "--add-decoys",
+    type=int,
+    default=0,
+    help="orange-coloured spheres near the oranges; the SM ignores them (GT-driven), so demos recorded with them teach 'the REAL orange despite lookalikes'",
+)
 parser.add_argument("--tint", default=None, help='"Name:r,g,b;..." recolor scene entities')
 parser.add_argument("--light-scale", type=float, default=None)
 parser.add_argument("--light-color", default=None, help='"r,g,b" - recolors ALL lights, i.e. the whole room')
-parser.add_argument("--snapshot-dir", default=None,
-                    help="Save the FRONT and WRIST camera frames as PNGs into this dir at the steps given by --snapshot-at. With a small --max_steps this doubles as a fast 'what does this variation look like' capture.")
-parser.add_argument("--snapshot-at", default="30,60",
-                    help="Comma-separated step indices at which to save frames.")
+parser.add_argument(
+    "--snapshot-dir",
+    default=None,
+    help="Save the FRONT and WRIST camera frames as PNGs into this dir at the steps given by --snapshot-at. With a small --max_steps this doubles as a fast 'what does this variation look like' capture.",
+)
+parser.add_argument(
+    "--snapshot-at", default="30,60", help="Comma-separated step indices at which to save frames."
+)
 args = parser.parse_args()
 
 from isaaclab.app import AppLauncher  # noqa: E402
@@ -80,9 +88,8 @@ import csv  # noqa: E402
 from pathlib import Path  # noqa: E402
 
 import gymnasium as gym  # noqa: E402
-import torch  # noqa: E402
-
 import leisaac  # noqa: F401,E402
+import torch  # noqa: E402
 from isaaclab_tasks.utils import parse_env_cfg  # noqa: E402
 from leisaac.datagen.state_machine import PickOrangeStateMachine  # noqa: E402
 from leisaac.utils.env_utils import dynamic_reset_gripper_effort_limit_sim  # noqa: E402
@@ -109,7 +116,7 @@ def main() -> None:
             cfg.init_state.pos = (old[0] + dx, old[1] + dy, old[2] + dz)
     if args.scatter_oranges:
         vals = [float(v) for v in args.scatter_oranges.split(",")]
-        for (name, dx, dy) in zip(ORANGES, vals[0::2], vals[1::2], strict=True):
+        for name, dx, dy in zip(ORANGES, vals[0::2], vals[1::2], strict=True):
             cfg = getattr(env_cfg.scene, name)
             old = cfg.init_state.pos
             cfg.init_state.pos = (old[0] + dx, old[1] + dy, old[2])
@@ -129,17 +136,23 @@ def main() -> None:
         base = env_cfg.scene.Orange001.init_state.pos
         for i in range(min(args.add_decoys, len(offsets))):
             ox, oy = offsets[i]
-            setattr(env_cfg.scene, f"Decoy{i + 1}", RigidObjectCfg(
-                prim_path=f"{{ENV_REGEX_NS}}/Decoy{i + 1}",
-                spawn=sim_utils.SphereCfg(
-                    radius=0.035,
-                    rigid_props=sim_utils.RigidBodyPropertiesCfg(),
-                    mass_props=sim_utils.MassPropertiesCfg(mass=0.15),
-                    collision_props=sim_utils.CollisionPropertiesCfg(),
-                    visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.95, 0.55, 0.12)),
+            setattr(
+                env_cfg.scene,
+                f"Decoy{i + 1}",
+                RigidObjectCfg(
+                    prim_path=f"{{ENV_REGEX_NS}}/Decoy{i + 1}",
+                    spawn=sim_utils.SphereCfg(
+                        radius=0.035,
+                        rigid_props=sim_utils.RigidBodyPropertiesCfg(),
+                        mass_props=sim_utils.MassPropertiesCfg(mass=0.15),
+                        collision_props=sim_utils.CollisionPropertiesCfg(),
+                        visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.95, 0.55, 0.12)),
+                    ),
+                    init_state=RigidObjectCfg.InitialStateCfg(
+                        pos=(base[0] + ox, base[1] + oy, base[2] + 0.02)
+                    ),
                 ),
-                init_state=RigidObjectCfg.InitialStateCfg(pos=(base[0] + ox, base[1] + oy, base[2] + 0.02)),
-            ))
+            )
 
     # The recorder defaults to EXPORT_ALL, which opens an HDF5 for writing and
     # fails with "unable to lock file" if anything else holds it - and would
@@ -245,7 +258,11 @@ def main() -> None:
             row["d_min"] = round(min(dists), 4)
             if grasp_frame is not None:
                 row["d_grasp_min"] = round(
-                    min(float(torch.linalg.norm(env.scene[n].data.root_pos_w[0] - grasp_frame)) for n in ORANGES), 4
+                    min(
+                        float(torch.linalg.norm(env.scene[n].data.root_pos_w[0] - grasp_frame))
+                        for n in ORANGES
+                    ),
+                    4,
                 )
 
             subtasks = obs_dict.get("subtask_terms", {})

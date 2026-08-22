@@ -24,23 +24,23 @@ problem; ~25% = layout dice (the SM cannot see a plate tint).
 Driver: scripts/sm_generate_topups.sh
 
 TOP-UP RESULTS (2026-08-07):
-  b4_plate_topup    5/5 kept at 36% (14 attempts) -> the 7% WAS layout dice,
-                    confirmed by the second measurement exactly as designed.
-                    Blue plate look: now 6 episodes.
-  b8_geometry_topup 0/25. Combined round1+topup: 1/40 = 2.5%. NOT dice - the
-                    static offsets (oranges +6,+5cm / plate -8,+6cm) sit
-                    genuinely outside the SM choreography's competence,
-                    plausibly at the plate-approach reach edge.
-  FIX RESULT: b8_geometry_half kept 2/20 at 10% - halved offsets are hard
-  for the SM too, but the geometry look now has 3 episodes total.
-  *** FINAL CENSUS (corpus COMPLETE, 08-07): 34 successful episodes ~ 102
-  pick-place demos across 8 looks, 380 GB raw. Conversion NOT started -
-  fallback prep awaits the user's go; the main line is the as-is hardware
-  test. Recorded episodes replay in their varied scenes via
-  scripts/sim_replay_varied.py (needs --enable_cameras). ***
-  NOTE the corpus is not geometry-poor even without b8: the env re-randomizes
-  object layouts EVERY episode inside EVERY batch, so all ~35 episodes carry
-  layout variation within the canonical range; b8 only adds LARGER shifts. (Sections 2-4 preserve the investigation;
+b4\*plate_topup 5/5 kept at 36% (14 attempts) -> the 7% WAS layout dice,
+confirmed by the second measurement exactly as designed.
+Blue plate look: now 6 episodes.
+b8_geometry_topup 0/25. Combined round1+topup: 1/40 = 2.5%. NOT dice - the
+static offsets (oranges +6,+5cm / plate -8,+6cm) sit
+genuinely outside the SM choreography's competence,
+plausibly at the plate-approach reach edge.
+FIX RESULT: b8_geometry_half kept 2/20 at 10% - halved offsets are hard
+for the SM too, but the geometry look now has 3 episodes total.
+\*\** FINAL CENSUS (corpus COMPLETE, 08-07): 34 successful episodes ~ 102
+pick-place demos across 8 looks, 380 GB raw. Conversion NOT started -
+fallback prep awaits the user's go; the main line is the as-is hardware
+test. Recorded episodes replay in their varied scenes via
+scripts/sim*replay_varied.py (needs --enable_cameras). \*\*\*
+NOTE the corpus is not geometry-poor even without b8: the env re-randomizes
+object layouts EVERY episode inside EVERY batch, so all ~35 episodes carry
+layout variation within the canonical range; b8 only adds LARGER shifts. (Sections 2-4 preserve the investigation;
 the tinted-paradox warning in section 3 was resolved by the control in 4b,
 and 4b itself now carries a correction — read 4d.)
 
@@ -92,7 +92,7 @@ Taken at face value: the scripted SM under variation scores WORSE than the
 neural policy did on the same scenes (N1.6: 2/3-3/3). Do not take it at face
 value yet:
 
-## 3. *** THE TINTED PARADOX — this battery is CONFOUNDED ***
+## 3. **_ THE TINTED PARADOX — this battery is CONFOUNDED _**
 
 ```text
 `tinted` is APPEARANCE-ONLY (blue plate + half light). The SM never reads
@@ -238,7 +238,6 @@ memory question from the GR00T attempt (26 GB floor on a 32 GB card) must be
 re-checked for Pi05's 4.14B before promising a training run.
 ```
 
-
 ---
 
 ## 6. THE EXECUTABLE RECIPE (final — everything below is verified)
@@ -337,7 +336,6 @@ per-orange rate, guarantees corpus quality.
 - n>=3 for any number anyone will quote; report drops alongside successes
 ```
 
-
 ---
 
 ## 7. CONVERSION (2026-08-07) — measured, running, and two bugs it caught
@@ -384,7 +382,6 @@ AFTER VALIDATION (pending): user go for deleting the 380 GB raw; then the
 Pi0.5 memory audit is the last prep step before the fallback is fully armed.
 ```
 
-
 ## 8. CONVERSION COMPLETE AND VALIDATED (2026-08-07)
 
 ```text
@@ -417,7 +414,6 @@ DECISIONS:
   2. Pi0.5 memory audit -> still pending; the last step to fully arm the
      fallback.
 ```
-
 
 ---
 
@@ -457,7 +453,6 @@ never published. The wider workspace coverage is plausibly mimic-style
 layout randomization - consistent with (but not proof of) the policy's
 strong geometry handling relative to our SM.
 ```
-
 
 ## 10. Housekeeping closed (2026-08-07)
 

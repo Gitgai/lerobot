@@ -17,11 +17,13 @@ to recover `model.parameters()` ORDER, which is what the optimiser indexes by.
 import json
 import sys
 
-import torch
 from safetensors import safe_open
 
-C = sys.argv[1] if len(sys.argv) > 1 else \
-    "/home/kiran/lerobot_assets/probes/pi05_rung4_gate/checkpoints/000060"
+C = (
+    sys.argv[1]
+    if len(sys.argv) > 1
+    else "/home/kiran/lerobot_assets/probes/pi05_rung4_gate/checkpoints/000060"
+)
 
 from lerobot.configs.policies import PreTrainedConfig
 from lerobot.policies.pi05.modeling_pi05 import PI05Policy
@@ -40,7 +42,7 @@ sizes = [p.numel() for _, p in policy.named_parameters() if p.requires_grad]
 pg = json.load(open(f"{C}/training_state/optimizer_param_groups.json"))
 declared = [i for g in pg for i in g["params"]]
 with safe_open(f"{C}/training_state/optimizer_state.safetensors", framework="pt") as f:
-    have = {int(k.split("/")[1]) for k in f.keys()}
+    have = {int(k.split("/")[1]) for k in f}
 
 missing = sorted(set(declared) - have)
 print("=" * 76)
@@ -52,18 +54,19 @@ print(f"  of which got state              {len(have)}")
 print(f"  NEVER UPDATED                   {len(missing)}")
 print()
 if len(names) != len(declared):
-    print(f"  ⚠ graph has {len(names)} trainable tensors but the optimiser declared "
-          f"{len(declared)} — index mapping below may be unreliable.")
+    print(
+        f"  ⚠ graph has {len(names)} trainable tensors but the optimiser declared "
+        f"{len(declared)} — index mapping below may be unreliable."
+    )
 tot = 0
 for i in missing:
     if i < len(names):
         tot += sizes[i]
-        print(f"    [{i:4}] {sizes[i]/1e6:9.1f}M  {names[i]}")
+        print(f"    [{i:4}] {sizes[i] / 1e6:9.1f}M  {names[i]}")
     else:
         print(f"    [{i:4}] (index beyond the graph's parameter list)")
 print()
-print(f"  total never updated  {tot/1e9:.3f}B of {sum(sizes)/1e9:.3f}B "
-      f"({100*tot/sum(sizes):.1f}%)")
+print(f"  total never updated  {tot / 1e9:.3f}B of {sum(sizes) / 1e9:.3f}B ({100 * tot / sum(sizes):.1f}%)")
 print("=" * 76)
 print("  If these are the LM heads, the behaviour is correct and the honest")
 print("  phrasing is 'full fine-tune of the 3.25B parameters the action")

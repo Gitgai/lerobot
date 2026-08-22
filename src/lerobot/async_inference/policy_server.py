@@ -49,7 +49,6 @@ from lerobot.types import PolicyAction
 
 from .configs import PolicyServerConfig
 from .constants import SUPPORTED_POLICIES
-from .image_codec import decompress_observation_images
 from .helpers import (
     FPSTracker,
     Observation,
@@ -60,6 +59,7 @@ from .helpers import (
     observations_similar,
     raw_observation_to_observation,
 )
+from .image_codec import decompress_observation_images
 
 
 class PolicyServer(services_pb2_grpc.AsyncInferenceServicer):

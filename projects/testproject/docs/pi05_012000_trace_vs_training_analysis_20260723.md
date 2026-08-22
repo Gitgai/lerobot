@@ -107,11 +107,11 @@ lower gripper value = more closed
 
 Frame-level gripper distribution:
 
-| Dataset part | Frames | Strong close action <=25 | Near close action <=35 | Open action >=45 |
-| --- | ---: | ---: | ---: | ---: |
-| Original 49 full episodes | 29,724 | 5,660 frames, 19.04% | 10,728 frames, 36.09% | 11,809 frames, 39.73% |
-| Focused 40 windows | 10,988 | 4,449 frames, 40.49% | 6,832 frames, 62.18% | 2,506 frames, 22.81% |
-| Full Option A mix | 40,712 | 10,109 frames, 24.83% | 17,560 frames, 43.13% | 14,315 frames, 35.16% |
+| Dataset part              | Frames | Strong close action <=25 | Near close action <=35 |      Open action >=45 |
+| ------------------------- | -----: | -----------------------: | ---------------------: | --------------------: |
+| Original 49 full episodes | 29,724 |     5,660 frames, 19.04% |  10,728 frames, 36.09% | 11,809 frames, 39.73% |
+| Focused 40 windows        | 10,988 |     4,449 frames, 40.49% |   6,832 frames, 62.18% |  2,506 frames, 22.81% |
+| Full Option A mix         | 40,712 |    10,109 frames, 24.83% |  17,560 frames, 43.13% | 14,315 frames, 35.16% |
 
 So the focused dataset does contain many grasp-close examples.
 
@@ -309,17 +309,17 @@ distribution.
 
 Live starts:
 
-| Trace | Live first state gripper | Live first action gripper |
-| --- | ---: | ---: |
-| 230756 | 28.64 | 30.56 |
-| 233341 | 21.19 | -4.01 |
+| Trace  | Live first state gripper | Live first action gripper |
+| ------ | -----------------------: | ------------------------: |
+| 230756 |                    28.64 |                     30.56 |
+| 233341 |                    21.19 |                     -4.01 |
 
 Training start distributions:
 
-| Training group | State gripper p10 | State gripper mean | State gripper p90 |
-| --- | ---: | ---: | ---: |
-| Original 49 episode starts | 28.38 | 39.14 | 49.73 |
-| Focus 40 window starts | 41.91 | 50.27 | 55.84 |
+| Training group             | State gripper p10 | State gripper mean | State gripper p90 |
+| -------------------------- | ----------------: | -----------------: | ----------------: |
+| Original 49 episode starts |             28.38 |              39.14 |             49.73 |
+| Focus 40 window starts     |             41.91 |              50.27 |             55.84 |
 
 Interpretation:
 

@@ -70,7 +70,7 @@ on the arm are now one command.
 > REPRODUCIBLE.** `bitsandbytes` is not present anywhere on this machine: not in
 > the GR00T venv, not in leisaac, not in testproject, not in the uv cache. The
 > only filesystem hits are `transformers/` and `diffusers/` integration shims
-> merely *named* bitsandbytes. Either this venv was rebuilt since (see
+> merely _named_ bitsandbytes. Either this venv was rebuilt since (see
 > `N16_REBUILD_RUNBOOK.md`) or the claim is wrong.
 > ⇒ **Do not cite "8-bit Adam works on this card" as established.** It is being
 > tested from scratch as STEP −1 of
@@ -106,3 +106,4 @@ WHY THIS EXACT SETUP IS THE RIGHT DIAGNOSTIC: same recipe as 012000
   fails where N1.6 succeeded -> architecture convicted, Pi05 retires
 TOMORROW: v3->GR00T-v2 bridge for the 89 real episodes -> GR00T-real
 fine-tune (the hardware shot; the only untested 2x2 cell).
+```

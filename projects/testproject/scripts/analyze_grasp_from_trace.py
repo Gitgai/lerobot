@@ -142,9 +142,7 @@ def main():
         if r is None:
             print(f"{name}: no usable trace data")
             continue
-        widths = (
-            f"{r['hold_widths'][0]:.0f}-{r['hold_widths'][1]:.0f}" if r["hold_widths"] else "-"
-        )
+        widths = f"{r['hold_widths'][0]:.0f}-{r['hold_widths'][1]:.0f}" if r["hold_widths"] else "-"
         print(
             f"{name}\n"
             f"  {r['duration_s']:.0f}s | {r['obs_rate']:.2f} obs/s | {r['action_rate']:.1f} act/s\n"

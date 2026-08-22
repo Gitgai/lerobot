@@ -144,6 +144,7 @@ chmod 600 ~/.ssh/runpod_ed25519
 
 If the old machine is gone and calibration is lost, both arms must be
 re-calibrated with the official lerobot calibration flow before ANY policy run
+
 - an uncalibrated follower makes every result meaningless.
 
 ---

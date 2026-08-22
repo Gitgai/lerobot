@@ -1,7 +1,8 @@
 # N1.6 robustness campaign — how much can the scene change before it breaks?
 
 Date: 2026-08-06 (final update 08-07). Status: **COMPLETE at n>=3.**
-User's call, and the right one: *more sim testing before hardware; don't rush.*
+User's call, and the right one: _more sim testing before hardware; don't rush._
+
 > **READ SECTION 5 (end of file) FIRST** — the final n>=3 table supersedes every
 > intermediate verdict in sections 2-4, and several INVERTED at proper n.
 
@@ -198,7 +199,6 @@ That ordering is the user's decision and it stands.
 > policy. Every sim evaluation now reports drops/retries and last-placement
 > step alongside the success rate — and when a human watching the GUI disagrees
 > with the summary statistics, RE-SCORE before defending the summary.
-
 
 ---
 

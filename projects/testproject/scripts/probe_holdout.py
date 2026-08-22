@@ -18,6 +18,7 @@ that is what it will see when served.
 
 Usage: probe_holdout.py <ckpt> <label> <side|top>
 """
+
 import json
 import os
 import subprocess
@@ -36,16 +37,29 @@ ROOT = "/home/kiran/lerobot_assets/datasets"
 D = f"{ROOT}/so101_orange_89_v21" + ("_topfront" if VARIANT == "top" else "")
 INSTR = "pick up the orange and move it to another place"
 PORT = 5559
-RNG = np.random.default_rng(20260818)          # fixed: both variants see identical frames
+RNG = np.random.default_rng(20260818)  # fixed: both variants see identical frames
 
 HOLDOUT = json.load(open(f"{ROOT}/holdout_episodes.json"))["holdout"]
 
 srv = subprocess.Popen(
-    ["/home/kiran/sim/Isaac-GR00T-n16/.venv/bin/python", "-u", "-m", "gr00t.eval.run_gr00t_server",
-     "--model_path", CKPT, "--embodiment-tag", "NEW_EMBODIMENT",
-     "--host", "127.0.0.1", "--port", str(PORT)],
-    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-    env={**os.environ, "HF_HUB_OFFLINE": "1"})
+    [
+        "/home/kiran/sim/Isaac-GR00T-n16/.venv/bin/python",
+        "-u",
+        "-m",
+        "gr00t.eval.run_gr00t_server",
+        "--model_path",
+        CKPT,
+        "--embodiment-tag",
+        "NEW_EMBODIMENT",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        str(PORT),
+    ],
+    stdout=subprocess.DEVNULL,
+    stderr=subprocess.DEVNULL,
+    env={**os.environ, "HF_HUB_OFFLINE": "1"},
+)
 for _ in range(72):
     if f":{PORT}" in subprocess.run(["ss", "-tln"], capture_output=True, text=True).stdout:
         break
@@ -57,16 +71,20 @@ client = PolicyClient(host="127.0.0.1", port=PORT)
 def frame(cam, ep, idx):
     cap = cv2.VideoCapture(f"{D}/videos/chunk-000/observation.images.{cam}/episode_{ep:06d}.mp4")
     cap.set(cv2.CAP_PROP_POS_FRAMES, idx)
-    ok, f = cap.read(); cap.release()
+    ok, f = cap.read()
+    cap.release()
     return cv2.cvtColor(cv2.resize(f, (640, 480)), cv2.COLOR_BGR2RGB)[None, None] if ok else None
 
 
 def ask(fr, wr, state):
     s = np.asarray(state, dtype=np.float32)
-    ch, _ = client.get_action({
-        "video": {"front": fr, "wrist": wr},
-        "state": {"single_arm": s[:5][None, None], "gripper": s[5:6][None, None]},
-        "language": {"annotation.human.task_description": [[INSTR]]}})
+    ch, _ = client.get_action(
+        {
+            "video": {"front": fr, "wrist": wr},
+            "state": {"single_arm": s[:5][None, None], "gripper": s[5:6][None, None]},
+            "language": {"annotation.human.task_description": [[INSTR]]},
+        }
+    )
     return np.concatenate([ch["single_arm"][0], ch["gripper"][0]], axis=1)
 
 
@@ -77,12 +95,12 @@ for ep in HOLDOUT:
     ac = np.stack(df["action"].to_numpy())
     if len(st) < 60:
         continue
-    for i in np.linspace(10, len(st) - 20, 6, dtype=int):   # 6 points spread through each episode
+    for i in np.linspace(10, len(st) - 20, 6, dtype=int):  # 6 points spread through each episode
         i = int(i)
         fr, wr = frame("front", ep, i), frame("wrist", ep, i)
         if fr is None or wr is None:
             continue
-        truth = ac[i:i + 16]
+        truth = ac[i : i + 16]
         honest.append(np.abs(ask(fr, wr, st[i]) - truth).mean())
         other = int(RNG.choice([e for e in HOLDOUT if e != ep]))
         of, ow = frame("front", other, 20), frame("wrist", other, 20)
@@ -93,9 +111,18 @@ for ep in HOLDOUT:
 srv.terminate()
 h, m, n = np.array(honest), np.array(mismatched), np.array(nothing)
 print(f"\n=== {LABEL} ===  {len(h)} samples from {len(HOLDOUT)} HELD-OUT episodes")
-print(f"  HONEST      {h.mean():6.3f} deg  +/- {h.std()/np.sqrt(len(h)):.3f}")
-print(f"  MISMATCHED  {m.mean():6.3f} deg   penalty {m.mean()-h.mean():+.3f}  (must be clearly positive)")
-print(f"  DO-NOTHING  {n.mean():6.3f} deg   model beats it by {n.mean()-h.mean():+.3f}")
-json.dump({"label": LABEL, "variant": VARIANT, "n": len(h),
-           "honest": float(h.mean()), "mismatched": float(m.mean()), "nothing": float(n.mean())},
-          open(f"/home/kiran/lerobot_assets/probes/holdout_{VARIANT}.json", "w"), indent=2)
+print(f"  HONEST      {h.mean():6.3f} deg  +/- {h.std() / np.sqrt(len(h)):.3f}")
+print(f"  MISMATCHED  {m.mean():6.3f} deg   penalty {m.mean() - h.mean():+.3f}  (must be clearly positive)")
+print(f"  DO-NOTHING  {n.mean():6.3f} deg   model beats it by {n.mean() - h.mean():+.3f}")
+json.dump(
+    {
+        "label": LABEL,
+        "variant": VARIANT,
+        "n": len(h),
+        "honest": float(h.mean()),
+        "mismatched": float(m.mean()),
+        "nothing": float(n.mean()),
+    },
+    open(f"/home/kiran/lerobot_assets/probes/holdout_{VARIANT}.json", "w"),
+    indent=2,
+)

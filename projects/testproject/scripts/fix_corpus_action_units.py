@@ -33,6 +33,7 @@ explicitly if you want it.
 
 SAFETY: writes a NEW dataset directory; the original is never modified.
 """
+
 import json
 import shutil
 import sys
@@ -121,23 +122,28 @@ st = json.loads(sp.read_text())
 old_min = st["action"]["min"]
 st["action"] = stats_for(A)
 sp.write_text(json.dumps(st, indent=4))
-print(f"\n  stats.json action.min  {np.round(old_min,3).tolist()}")
-print(f"                     ->  {np.round(st['action']['min'],2).tolist()}")
+print(f"\n  stats.json action.min  {np.round(old_min, 3).tolist()}")
+print(f"                     ->  {np.round(st['action']['min'], 2).tolist()}")
 
 # ---- 3. per-episode stats ----
 for p in sorted(DST.glob("meta/episodes/**/*.parquet")):
     df = pd.read_parquet(p)
-    for key, fn in (("min", lambda a: a.min(0)), ("max", lambda a: a.max(0)),
-                    ("mean", lambda a: a.mean(0)), ("std", lambda a: a.std(0)),
-                    ("q01", lambda a: np.quantile(a, .01, 0)), ("q10", lambda a: np.quantile(a, .10, 0)),
-                    ("q50", lambda a: np.quantile(a, .50, 0)), ("q90", lambda a: np.quantile(a, .90, 0)),
-                    ("q99", lambda a: np.quantile(a, .99, 0))):
+    for key, fn in (
+        ("min", lambda a: a.min(0)),
+        ("max", lambda a: a.max(0)),
+        ("mean", lambda a: a.mean(0)),
+        ("std", lambda a: a.std(0)),
+        ("q01", lambda a: np.quantile(a, 0.01, 0)),
+        ("q10", lambda a: np.quantile(a, 0.10, 0)),
+        ("q50", lambda a: np.quantile(a, 0.50, 0)),
+        ("q90", lambda a: np.quantile(a, 0.90, 0)),
+        ("q99", lambda a: np.quantile(a, 0.99, 0)),
+    ):
         col = f"stats/action/{key}"
         if col in df.columns:
-            df[col] = [fn(np.concatenate(ep_slices[int(e)])).astype(np.float32)
-                       for e in df["episode_index"]]
+            df[col] = [fn(np.concatenate(ep_slices[int(e)])).astype(np.float32) for e in df["episode_index"]]
     df.to_parquet(p, index=False)
     print(f"  per-episode stats: {p.name}  {len(df)} episodes updated")
 
-print(f"\n  DONE. action now in motor units, stats regenerated at both levels.")
-print(f"  Out-of-range targets on elbow_flex/wrist_flex are PRESERVED by design - see docstring.")
+print("\n  DONE. action now in motor units, stats regenerated at both levels.")
+print("  Out-of-range targets on elbow_flex/wrist_flex are PRESERVED by design - see docstring.")

@@ -12,8 +12,9 @@ import argparse
 import os
 
 from isaaclab.app import AppLauncher
-from lerobot.datasets.lerobot_dataset import LeRobotDataset
 from tqdm import tqdm
+
+from lerobot.datasets.lerobot_dataset import LeRobotDataset
 
 # add argparse arguments
 parser = argparse.ArgumentParser(description="Convert IsaacLab dataset to LeRobot Dataset v3.")
@@ -173,7 +174,7 @@ def convert_isaaclab_to_lerobot():
 
     now_episode_index = 0
     for hdf5_id, hdf5_file in enumerate(hdf5_files_list):
-        print(f"[{hdf5_id+1}/{len(hdf5_files_list)}] Processing hdf5 file: {hdf5_file}")
+        print(f"[{hdf5_id + 1}/{len(hdf5_files_list)}] Processing hdf5 file: {hdf5_file}")
 
         dataset_file_handler = HDF5DatasetFileHandler()
         dataset_file_handler.open(hdf5_file)

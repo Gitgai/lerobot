@@ -41,7 +41,9 @@ parser.add_argument(
 )
 
 AppLauncher.add_app_launcher_args(parser)
-parser.add_argument("--tint", default=None, help='"Name:r,g,b;..." recolor scene entities to MATCH the recording')
+parser.add_argument(
+    "--tint", default=None, help='"Name:r,g,b;..." recolor scene entities to MATCH the recording'
+)
 parser.add_argument("--scale-oranges", type=float, default=None)
 parser.add_argument("--add-decoys", type=int, default=0)
 args_cli = parser.parse_args()
@@ -54,13 +56,12 @@ import os
 import time
 
 import gymnasium as gym
+import leisaac  # noqa: F401
 import torch
 from isaaclab.envs import ManagerBasedRLEnv
 from isaaclab.utils.datasets import EpisodeData, HDF5DatasetFileHandler
 from isaaclab_tasks.utils import parse_env_cfg
 from leisaac.utils.env_utils import get_task_type
-
-import leisaac  # noqa: F401
 
 
 class RateLimiter:
@@ -135,18 +136,28 @@ def main():
     if args_cli.add_decoys:
         import isaaclab.sim as sim_utils
         from isaaclab.assets import RigidObjectCfg
+
         _offsets = [(0.07, -0.07), (-0.09, 0.06)]
         _base = env_cfg.scene.Orange001.init_state.pos
         for _i in range(min(args_cli.add_decoys, len(_offsets))):
             _ox, _oy = _offsets[_i]
-            setattr(env_cfg.scene, f"Decoy{_i + 1}", RigidObjectCfg(
-                prim_path=f"{{ENV_REGEX_NS}}/Decoy{_i + 1}",
-                spawn=sim_utils.SphereCfg(radius=0.035,
-                    rigid_props=sim_utils.RigidBodyPropertiesCfg(),
-                    mass_props=sim_utils.MassPropertiesCfg(mass=0.15),
-                    collision_props=sim_utils.CollisionPropertiesCfg(),
-                    visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.95, 0.55, 0.12))),
-                init_state=RigidObjectCfg.InitialStateCfg(pos=(_base[0] + _ox, _base[1] + _oy, _base[2] + 0.02))))
+            setattr(
+                env_cfg.scene,
+                f"Decoy{_i + 1}",
+                RigidObjectCfg(
+                    prim_path=f"{{ENV_REGEX_NS}}/Decoy{_i + 1}",
+                    spawn=sim_utils.SphereCfg(
+                        radius=0.035,
+                        rigid_props=sim_utils.RigidBodyPropertiesCfg(),
+                        mass_props=sim_utils.MassPropertiesCfg(mass=0.15),
+                        collision_props=sim_utils.CollisionPropertiesCfg(),
+                        visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.95, 0.55, 0.12)),
+                    ),
+                    init_state=RigidObjectCfg.InitialStateCfg(
+                        pos=(_base[0] + _ox, _base[1] + _oy, _base[2] + 0.02)
+                    ),
+                ),
+            )
 
     env: ManagerBasedRLEnv = gym.make(args_cli.task, cfg=env_cfg).unwrapped
 
@@ -161,6 +172,7 @@ def main():
 
     if args_cli.tint:
         from pxr import Gf, Sdf, UsdShade
+
         for _spec in args_cli.tint.split(";"):
             _name, _rgb = _spec.split(":")
             _r, _g, _b = (float(v) for v in _rgb.split(","))
@@ -173,7 +185,8 @@ def main():
             for _p2 in _stage.Traverse():
                 if _p2.GetPath().pathString.endswith(f"/{_name}"):
                     UsdShade.MaterialBindingAPI.Apply(_p2).Bind(
-                        _mat, bindingStrength=UsdShade.Tokens.strongerThanDescendants)
+                        _mat, bindingStrength=UsdShade.Tokens.strongerThanDescendants
+                    )
         print(f"[replay] tints applied: {args_cli.tint}")
 
     idle_action = torch.zeros(env.action_space.shape)
@@ -209,7 +222,9 @@ def main():
 
                         if next_episode_index is not None:
                             replayed_episode_count += 1
-                            print(f"{replayed_episode_count:4}: Loading #{next_episode_index} episode to env_{env_id}")
+                            print(
+                                f"{replayed_episode_count:4}: Loading #{next_episode_index} episode to env_{env_id}"
+                            )
                             episode_data = dataset_file_handler.load_episode(
                                 episode_names[next_episode_index], env.device
                             )

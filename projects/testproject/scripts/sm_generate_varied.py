@@ -57,8 +57,12 @@ parser.add_argument("--seed", type=int, default=None)
 parser.add_argument("--step_hz", type=int, default=60)
 parser.add_argument("--dataset_file", required=True)
 parser.add_argument("--num_demos", type=int, default=5, help="successful episodes to record; 0 = unlimited")
-parser.add_argument("--max_attempts", type=int, default=0,
-                    help="stop after this many EPISODES regardless of success (0 = unlimited). Bounds an overnight batch.")
+parser.add_argument(
+    "--max_attempts",
+    type=int,
+    default=0,
+    help="stop after this many EPISODES regardless of success (0 = unlimited). Bounds an overnight batch.",
+)
 # DEFAULT IS "all": EXPORT_SUCCEEDED_ONLY + StreamingRecorderManager HANGS
 # SILENTLY on this stack (100% CPU, no output, diagnosed 2026-08-06 via probe
 # markers - "recorder attached" never printed). EXPORT_ALL is the day-1-proven
@@ -77,9 +81,8 @@ app_launcher = AppLauncher(headless=False, enable_cameras=True)
 simulation_app = app_launcher.app
 
 import gymnasium as gym  # noqa: E402
-import torch  # noqa: E402
-
 import leisaac  # noqa: F401,E402
+import torch  # noqa: E402
 from isaaclab.envs import ManagerBasedRLEnv  # noqa: E402
 from isaaclab.managers import DatasetExportMode, TerminationTermCfg  # noqa: E402
 from isaaclab_tasks.utils import parse_env_cfg  # noqa: E402
@@ -129,7 +132,7 @@ def apply_cfg_variations(env_cfg) -> None:
             cfg.init_state.pos = (old[0] + dx, old[1] + dy, old[2] + dz)
     if args_cli.scatter_oranges:
         vals = [float(v) for v in args_cli.scatter_oranges.split(",")]
-        for (name, dx, dy) in zip(ORANGES, vals[0::2], vals[1::2], strict=True):
+        for name, dx, dy in zip(ORANGES, vals[0::2], vals[1::2], strict=True):
             cfg = getattr(env_cfg.scene, name)
             old = cfg.init_state.pos
             cfg.init_state.pos = (old[0] + dx, old[1] + dy, old[2])
@@ -148,17 +151,23 @@ def apply_cfg_variations(env_cfg) -> None:
         base = env_cfg.scene.Orange001.init_state.pos
         for i in range(min(args_cli.add_decoys, len(offsets))):
             ox, oy = offsets[i]
-            setattr(env_cfg.scene, f"Decoy{i + 1}", RigidObjectCfg(
-                prim_path=f"{{ENV_REGEX_NS}}/Decoy{i + 1}",
-                spawn=sim_utils.SphereCfg(
-                    radius=0.035,
-                    rigid_props=sim_utils.RigidBodyPropertiesCfg(),
-                    mass_props=sim_utils.MassPropertiesCfg(mass=0.15),
-                    collision_props=sim_utils.CollisionPropertiesCfg(),
-                    visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.95, 0.55, 0.12)),
+            setattr(
+                env_cfg.scene,
+                f"Decoy{i + 1}",
+                RigidObjectCfg(
+                    prim_path=f"{{ENV_REGEX_NS}}/Decoy{i + 1}",
+                    spawn=sim_utils.SphereCfg(
+                        radius=0.035,
+                        rigid_props=sim_utils.RigidBodyPropertiesCfg(),
+                        mass_props=sim_utils.MassPropertiesCfg(mass=0.15),
+                        collision_props=sim_utils.CollisionPropertiesCfg(),
+                        visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.95, 0.55, 0.12)),
+                    ),
+                    init_state=RigidObjectCfg.InitialStateCfg(
+                        pos=(base[0] + ox, base[1] + oy, base[2] + 0.02)
+                    ),
                 ),
-                init_state=RigidObjectCfg.InitialStateCfg(pos=(base[0] + ox, base[1] + oy, base[2] + 0.02)),
-            ))
+            )
 
 
 def apply_stage_variations(stage) -> None:
@@ -192,8 +201,9 @@ def main() -> None:
     output_file_name = os.path.splitext(os.path.basename(args_cli.dataset_file))[0]
     if output_dir and not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    assert not os.path.exists(args_cli.dataset_file), \
+    assert not os.path.exists(args_cli.dataset_file), (
         f"{args_cli.dataset_file} exists - each batch writes a FRESH file"
+    )
 
     env_cfg = parse_env_cfg(args_cli.task, device=args_cli.device, num_envs=1)
     env_cfg.use_teleop_device("so101_state_machine")
@@ -208,12 +218,14 @@ def main() -> None:
 
     # recorder config, exactly as generate.py does it
     env_cfg.recorders.dataset_export_mode = (
-        DatasetExportMode.EXPORT_SUCCEEDED_ONLY if args_cli.export == "success" else DatasetExportMode.EXPORT_ALL
+        DatasetExportMode.EXPORT_SUCCEEDED_ONLY
+        if args_cli.export == "success"
+        else DatasetExportMode.EXPORT_ALL
     )
     env_cfg.recorders.dataset_export_dir_path = output_dir
     env_cfg.recorders.dataset_filename = output_file_name
     if not hasattr(env_cfg.terminations, "success"):
-        setattr(env_cfg.terminations, "success", None)
+        env_cfg.terminations.success = None
     env_cfg.terminations.success = TerminationTermCfg(
         func=lambda env: torch.zeros(env.num_envs, dtype=torch.bool, device=env.device)
     )
@@ -276,8 +288,10 @@ def main() -> None:
                     demos = env.recorder_manager.exported_successful_episode_count
                     rate = demos / attempts if attempts else 0.0
                     hours = (time.time() - t0) / 3600
-                    print(f"[gen] episode {attempts}: {'SUCCESS' if success else 'failed'} | "
-                          f"kept {demos}/{args_cli.num_demos or '?'} | rate {rate:.0%} | {hours:.2f} h")
+                    print(
+                        f"[gen] episode {attempts}: {'SUCCESS' if success else 'failed'} | "
+                        f"kept {demos}/{args_cli.num_demos or '?'} | rate {rate:.0%} | {hours:.2f} h"
+                    )
                     if args_cli.num_demos and demos >= args_cli.num_demos:
                         print("[gen] target reached")
                         # BUG FIX (2026-08-07): breaking here WITHOUT a reset

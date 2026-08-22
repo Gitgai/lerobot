@@ -35,8 +35,12 @@ repos:
       - id: check-case-conflict
       - id: check-yaml
       - id: check-toml
+      # .patch files encode blank context lines as a single trailing space;
+      # stripping them corrupts the patch, so keep both fixers away from them.
       - id: end-of-file-fixer
+        exclude: '\.patch$'
       - id: trailing-whitespace
+        exclude: '\.patch$'
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.14.1
@@ -91,7 +95,8 @@ repos:
     hooks:
       - id: mypy
         args: [--config-file=pyproject.toml]
-        exclude: ^(examples|benchmarks|tests)/
+        # projects/: experiment scripts, outside the gradual-typing scope (see CLAUDE.md)
+        exclude: ^(examples|benchmarks|tests|projects)/
 
   ##### Docstring Checks #####
   # - repo: https://github.com/akaihola/darglint2

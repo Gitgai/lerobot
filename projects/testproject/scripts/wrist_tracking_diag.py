@@ -11,6 +11,7 @@ Move the leader arm — especially the wrist — during the run.
 
 from __future__ import annotations
 
+import contextlib
 import csv
 import json
 import time
@@ -63,14 +64,10 @@ def main() -> None:
                 w.writerow([f"{t:.3f}"] + [f"{v:.2f}" for v in L] + [f"{v:.2f}" for v in F])
                 time.sleep(0.03)
         finally:
-            try:
+            with contextlib.suppress(Exception):
                 leader.disconnect()
-            except Exception:
-                pass
-            try:
+            with contextlib.suppress(Exception):
                 follower.disconnect()
-            except Exception:
-                pass
 
     # ---- per-joint tracking report ----
     print(f"\nlogged {len(rows)} steps -> {out_csv}\n")
@@ -79,7 +76,7 @@ def main() -> None:
     for i, m in enumerate(MOTORS):
         Ls = [r[0][i] for r in rows]
         Fs = [r[1][i] for r in rows]
-        errs = [abs(l - f) for l, f in zip(Ls, Fs)]
+        errs = [abs(lv - fv) for lv, fv in zip(Ls, Fs, strict=False)]
         l_range = max(Ls) - min(Ls)
         f_range = max(Fs) - min(Fs)
         mean_err = sum(errs) / len(errs)

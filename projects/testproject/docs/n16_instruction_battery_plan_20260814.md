@@ -27,7 +27,7 @@ rig: the gripper-in-wrist-frame measurement shows the camera moved **1.6 deg**
 across the whole Aug 8 run. The mount held.
 
 ⇒ **The cause of the observed failure is still unidentified.** This tests the
-  cheapest remaining candidate.
+cheapest remaining candidate.
 
 ## The candidate
 
@@ -125,7 +125,6 @@ Carry the harness lessons already paid for:
   n=6, not n=1     a single run produced a wrong conclusion here
 ```
 
-
 ---
 
 ## 5. CANCELLED — the two arms were the same string
@@ -159,7 +158,7 @@ was **wrong**. It has been through it in every single run.
 ### The result, obtained for free
 
 **The instruction is ruled out as the sim-vs-real difference.** The 86% baseline
-was achieved *using the client's sentence*. It cannot explain why the same
+was achieved _using the client's sentence_. It cannot explain why the same
 sentence yields 0% on hardware.
 
 The script had already reasoned this out and left the reasoning in a comment: the
@@ -190,7 +189,7 @@ applies here and was not applied.
 ```
 
 ⇒ The simulator is no longer generating hypotheses that survive contact with the
-  operator's observation. **The next real information comes from a hardware run
-  with the instrumented client**, which records joint state, round trip and
-  camera health per chunk — turning "did it reach for the orange" from an
-  inference into a column in a file.
+operator's observation. **The next real information comes from a hardware run
+with the instrumented client**, which records joint state, round trip and
+camera health per chunk — turning "did it reach for the orange" from an
+inference into a column in a file.

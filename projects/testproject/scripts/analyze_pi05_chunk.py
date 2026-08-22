@@ -82,7 +82,7 @@ def main() -> None:
     ranges: dict[str, float] = {}
     for m in SO101_MOTORS:
         vals = chunk[m]
-        b = before.get(m, float('nan'))
+        b = before.get(m, float("nan"))
         rng = max(vals) - min(vals)
         ranges[m] = rng
         print(
@@ -104,9 +104,12 @@ def main() -> None:
     wrist_roll_range = ranges["wrist_roll"]
 
     print("READ (measured facts -> interpretation):")
-    print(f"  position-joint motion across chunk: max {approach_range:.1f} deg, total {approach_total:.1f} deg")
-    print(f"  gripper: net {grip_net:+.1f} deg, range {grip_range:.1f} deg, "
-          f"min@{grip_min_i} max@{grip_max_i}")
+    print(
+        f"  position-joint motion across chunk: max {approach_range:.1f} deg, total {approach_total:.1f} deg"
+    )
+    print(
+        f"  gripper: net {grip_net:+.1f} deg, range {grip_range:.1f} deg, min@{grip_min_i} max@{grip_max_i}"
+    )
     print(f"  wrist_roll range: {wrist_roll_range:.1f} deg")
     print()
 
@@ -132,9 +135,13 @@ def main() -> None:
     if looks_like_grasp:
         print("SUMMARY: chunk CONTAINS an approach + gripper-close signature. Worth a closed-loop run.")
     elif approach_range > 10.0:
-        print("SUMMARY: chunk shows approach motion but no clear gripper close. Inconclusive -> closed-loop test.")
+        print(
+            "SUMMARY: chunk shows approach motion but no clear gripper close. Inconclusive -> closed-loop test."
+        )
     else:
-        print("SUMMARY: chunk is mostly reorientation, little approach/close. Weak. Still confirm with closed-loop.")
+        print(
+            "SUMMARY: chunk is mostly reorientation, little approach/close. Weak. Still confirm with closed-loop."
+        )
     print()
     print("NOTE: one open-loop chunk is ~1.5-2 s. Pi05 is meant to run CLOSED-LOOP and correct")
     print("over many chunks, so this is a screen, not a verdict. Test 2 (closed-loop) is the verdict.")

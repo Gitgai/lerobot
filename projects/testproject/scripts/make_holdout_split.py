@@ -35,8 +35,14 @@ def split_one(name: str, holdout: list[int]) -> None:
     if dst.exists():
         shutil.rmtree(dst)
 
-    eps_meta = [json.loads(l) for l in (src / "meta/episodes.jsonl").read_text().splitlines() if l.strip()]
-    stats_meta = [json.loads(l) for l in (src / "meta/episodes_stats.jsonl").read_text().splitlines() if l.strip()]
+    eps_meta = [
+        json.loads(line) for line in (src / "meta/episodes.jsonl").read_text().splitlines() if line.strip()
+    ]
+    stats_meta = [
+        json.loads(line)
+        for line in (src / "meta/episodes_stats.jsonl").read_text().splitlines()
+        if line.strip()
+    ]
     by_idx = {e["episode_index"]: e for e in eps_meta}
     stats_by_idx = {e["episode_index"]: e for e in stats_meta}
 
@@ -63,8 +69,12 @@ def split_one(name: str, holdout: list[int]) -> None:
                 dst / f"videos/chunk-000/{c}/episode_{new_i:06d}.mp4",
             )
 
-        e = dict(by_idx[old_i]); e["episode_index"] = new_i; new_eps.append(e)
-        s = dict(stats_by_idx[old_i]); s["episode_index"] = new_i; new_stats.append(s)
+        e = dict(by_idx[old_i])
+        e["episode_index"] = new_i
+        new_eps.append(e)
+        s = dict(stats_by_idx[old_i])
+        s["episode_index"] = new_i
+        new_stats.append(s)
 
     (dst / "meta/episodes.jsonl").write_text("".join(json.dumps(e) + "\n" for e in new_eps))
     (dst / "meta/episodes_stats.jsonl").write_text("".join(json.dumps(e) + "\n" for e in new_stats))
@@ -80,13 +90,12 @@ def split_one(name: str, holdout: list[int]) -> None:
         if (src / "meta" / f).exists():
             shutil.copy2(src / "meta" / f, dst / "meta" / f)
 
-    print(f"  {dst.name}: {len(keep)} episodes, {total_frames} frames, {len(keep)*len(cams)} videos")
+    print(f"  {dst.name}: {len(keep)} episodes, {total_frames} frames, {len(keep) * len(cams)} videos")
 
 
 rng = np.random.default_rng(SEED)
 all_eps = sorted(
-    int(p.stem.split("_")[-1])
-    for p in (ROOT / VARIANTS[0] / "data/chunk-000").glob("*.parquet")
+    int(p.stem.split("_")[-1]) for p in (ROOT / VARIANTS[0] / "data/chunk-000").glob("*.parquet")
 )
 holdout = sorted(rng.choice(all_eps, N_HOLDOUT, replace=False).tolist())
 print(f"held-out episodes (identical for both variants): {holdout}")
@@ -95,4 +104,4 @@ for v in VARIANTS:
     split_one(v, holdout)
 
 (ROOT / "holdout_episodes.json").write_text(json.dumps({"seed": SEED, "holdout": holdout}, indent=2))
-print(f"\nheld-out list written to {ROOT/'holdout_episodes.json'}")
+print(f"\nheld-out list written to {ROOT / 'holdout_episodes.json'}")

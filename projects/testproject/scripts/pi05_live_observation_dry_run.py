@@ -33,7 +33,6 @@ from lerobot.transport.utils import grpc_channel_options, send_bytes_in_chunks
 from lerobot.utils.constants import OBS_STR
 from lerobot.utils.feature_utils import hw_to_dataset_features
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 CONFIG_PATH = PROJECT_ROOT / "config" / "so101.json"
 
@@ -57,7 +56,7 @@ def load_config(path: Path) -> dict[str, Any]:
 def make_lerobot_features(image_shape: tuple[int, int, int]) -> dict[str, PolicyFeature]:
     hardware_features: dict[str, type | tuple[int, int, int]] = {
         **{f"{motor}.pos": float for motor in SO101_MOTORS},
-        **{camera: image_shape for camera in PI05_CAMERA_NAMES},
+        **dict.fromkeys(PI05_CAMERA_NAMES, image_shape),
     }
     return hw_to_dataset_features(hardware_features, OBS_STR, use_video=False)
 
@@ -189,7 +188,8 @@ def main() -> None:
     else:
         setup_start = time.perf_counter()
         stub.SendPolicyInstructions(
-            services_pb2.PolicySetup(data=pickle.dumps(policy_config)), timeout=args.timeout_s  # nosec B301
+            services_pb2.PolicySetup(data=pickle.dumps(policy_config)),
+            timeout=args.timeout_s,  # nosec B301
         )
         print(f"policy_setup_s: {time.perf_counter() - setup_start:.3f}")
 

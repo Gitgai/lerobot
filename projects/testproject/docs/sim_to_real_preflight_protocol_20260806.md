@@ -267,12 +267,12 @@ tolerance is meaningless until you have measured the deviation.**
 ### The second miss, from this protocol's own rules
 
 Stage B found `gamma135` = **0/3 placed**, the worst run of the entire
-preflight, and wrote a hard rig requirement: *"LOCK the real cameras'
+preflight, and wrote a hard rig requirement: _"LOCK the real cameras'
 auto-white-balance AND auto-exposure ... a drifting white balance is this
-policy's one proven kill switch."*
+policy's one proven kill switch."_
 
-`REALARM_RESULT_20260808.md` records the rig as *"WB locked, **exposure
-auto**"*. Half-complied. And the run-2 frames measure at mean brightness
+`REALARM_RESULT_20260808.md` records the rig as _"WB locked, **exposure
+auto**"_. Half-complied. And the run-2 frames measure at mean brightness
 **100/255** — a dim, low-contrast image, which is the direction `gamma135`
 proved fatal. This is a live second hypothesis, independent of geometry.
 
@@ -338,11 +338,11 @@ expensive path sim was built to avoid.
 ## The 2026-08-08 result does NOT establish H2
 
 `REALARM_RESULT_20260808.md` concludes "THE AS-IS TRANSFER FAILS". The failure
-is real and well-measured. The *attribution* is not yet supported.
+is real and well-measured. The _attribution_ is not yet supported.
 
-A transfer test asks: *given the kind of observation it trained on, does the
-policy act correctly in the real world?* What was run was: *given an observation
-from a viewpoint it has never seen, does the policy act correctly?* The second
+A transfer test asks: _given the kind of observation it trained on, does the
+policy act correctly in the real world?_ What was run was: _given an observation
+from a viewpoint it has never seen, does the policy act correctly?_ The second
 question answers itself and says nothing about the first.
 
 ⇒ Treat "as-is transfer fails" as **provisional** until Stage 0 passes and the
@@ -397,7 +397,7 @@ VERIFIED             a sim render and a real photo of the same scene look like
 ```
 
 Until that holds, transfer cannot be measured. Once it holds, a negative result
-is genuinely informative — and *then* training is aimed at a diagnosed problem
+is genuinely informative — and _then_ training is aimed at a diagnosed problem
 instead of a suspected one.
 
 ## Honest downside
@@ -411,7 +411,7 @@ another reason to establish the correspondence before spending GPU-months.
 
 ## Stage 0b — THE LINK AND THE SENSOR (added 2026-08-11, STANDING)
 
-Stage 0 asked whether sim and real *see the same scene*. It did not ask whether
+Stage 0 asked whether sim and real _see the same scene_. It did not ask whether
 they see it **at the same rate** or **at the same quality**. Both were wrong on
 2026-08-08 and neither was checked.
 

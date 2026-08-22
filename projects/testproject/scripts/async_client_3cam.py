@@ -10,10 +10,15 @@ Server side (on the GPU pod):
 SSH tunnel (laptop):
   ssh -N -L 8080:localhost:8080 -i <key> -p <port> root@<pod-ip>
 """
+
 from __future__ import annotations
-import argparse, sys
+
+import argparse
+import sys
+
 import http_camera  # noqa: F401  registers the `http` camera type
 from record_3cam_demos import cameras_arg, load_config, resolve_port
+
 from lerobot.async_inference.robot_client import async_client, register_third_party_plugins
 
 
@@ -24,14 +29,20 @@ def main() -> None:
     p.add_argument("--ckpt", default="/workspace/ckpt/pretrained_model", help="checkpoint path ON THE POD.")
     p.add_argument("--task", default="pick up the orange and move it to another place")
     p.add_argument("--fps", type=int, default=int(cfg.get("camera_fps", 30)))
-    p.add_argument("--max-relative-target", default="5", help="per-step joint cap (safety). 'null' to disable.")
+    p.add_argument(
+        "--max-relative-target", default="5", help="per-step joint cap (safety). 'null' to disable."
+    )
     p.add_argument("--actions-per-chunk", type=int, default=50)
     p.add_argument("--chunk-size-threshold", type=float, default=0.6, help="->1 = more feedback/closed-loop")
     p.add_argument("--aggregate-fn", default="weighted_average")
     p.add_argument("--policy-type", default="act", help="policy type on the server (act, pi05, ...)")
     p.add_argument("--trace-dir", default=None, help="optional read-only trace output directory")
-    p.add_argument("--jpeg-quality", type=int, default=None, help="JPEG-compress observation images (e.g. 92)")
-    p.add_argument("--obs-min-interval", type=float, default=None, help="min seconds between observation sends")
+    p.add_argument(
+        "--jpeg-quality", type=int, default=None, help="JPEG-compress observation images (e.g. 92)"
+    )
+    p.add_argument(
+        "--obs-min-interval", type=float, default=None, help="min seconds between observation sends"
+    )
     p.add_argument("--print-only", action="store_true")
     args = p.parse_args()
 

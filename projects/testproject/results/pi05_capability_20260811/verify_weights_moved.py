@@ -13,7 +13,6 @@ Usage:  python verify_weights_moved.py <checkpoint_dir>
 import sys
 from pathlib import Path
 
-import torch
 from huggingface_hub import hf_hub_download
 from safetensors.torch import load_file
 
@@ -38,10 +37,11 @@ base = load_file(base_path)
 # Normalise to the base namespace so the comparison is like-for-like, rather
 # than reporting "0 shared tensors" and calling it a naming mystery.
 if not (set(trained) & set(base)):
-    stripped = {k[len("model."):]: v for k, v in trained.items() if k.startswith("model.")}
+    stripped = {k[len("model.") :]: v for k, v in trained.items() if k.startswith("model.")}
     if set(stripped) & set(base):
         print(f"key remap detected: stripped 'model.' prefix from {len(stripped)} tensors\n")
         trained = stripped
+
 
 # VLM backbone vs action expert — by MODULE PATH, not substring.
 #
@@ -54,6 +54,7 @@ if not (set(trained) & set(base)):
 #       paligemma_with_expert.gemma_expert.* the action expert  (always trains)
 def is_vlm(name: str) -> bool:
     return "paligemma_with_expert.paligemma." in name
+
 
 shared = [k for k in trained if k in base]
 vlm_keys = [k for k in shared if is_vlm(k)]
@@ -92,7 +93,9 @@ print("\n" + "=" * 72)
 print(f"  VLM backbone tensors changed   {vlm_moved}/{vlm_total}")
 print(f"  expert/projection tensors      {oth_moved}/{oth_total}")
 verdict = vlm_moved > 0
-print(f"\n  VERDICT: {'PASS — the VLM backbone MOVED. Genuine full fine-tune.' if verdict else 'FAIL — VLM frozen in practice despite requires_grad'}")
+print(
+    f"\n  VERDICT: {'PASS — the VLM backbone MOVED. Genuine full fine-tune.' if verdict else 'FAIL — VLM frozen in practice despite requires_grad'}"
+)
 if not verdict:
     print("  ⇒ trainable==total was necessary but NOT sufficient. Investigate.")
 print("=" * 72)

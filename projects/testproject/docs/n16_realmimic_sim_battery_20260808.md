@@ -1,7 +1,7 @@
 # N1.6 REAL-MIMIC sim battery — decompose the real-arm failure before fine-tuning
 
 Date: 2026-08-08. Status: **PLANNED — runs tonight after the Pi0.5 eval frees
-the GPU.** User's proposal: recreate the real rig's appearance *inside* the
+the GPU.** User's proposal: recreate the real rig's appearance _inside_ the
 simulator and re-test N1.6, so "domain gap" stops being one blob of an
 explanation and becomes named ingredients.
 
@@ -14,8 +14,8 @@ inherits), `sim_to_real_preflight_protocol_20260806.md`.
 ## 0. The question
 
 On the real arm N1.6 produced coherent motion with ZERO object-directedness.
-The run-2 evidence frames (logs/realarm_frames_run2_20260808/) show exactly
-what it saw, and three *content* differences stand out against the sim scene:
+The run-2 evidence frames (logs/realarm*frames_run2_20260808/) show exactly
+what it saw, and three \_content* differences stand out against the sim scene:
 
 ```text
 1. FRUIT COLOR    the real fruit reads tomato-RED, not sim-orange - and the
@@ -65,7 +65,7 @@ REALMIMIC   all four of the above combined                     the closest sim
 ```
 
 Color values were eyeballed from the run-2 evidence frames; they need to be
-*in the direction of* the real rig, not exact — the test is whether the
+_in the direction of_ the real rig, not exact — the test is whether the
 policy's features survive the shift, not colorimetry.
 
 ## 3. Decision rules — agreed BEFORE results, so we don't rationalize
@@ -153,14 +153,14 @@ GEOMETRY HURTS
 geometry. That is the cheap-to-vary dimension, not the load-bearing one.
 
 **And the real rig was a geometry condition.** `REALARM_RESULT_20260808.md`
-records the scene as *"plate LEFT, one orange center-right"* — against a
+records the scene as _"plate LEFT, one orange center-right"_ — against a
 canonical sim scene of three oranges with the plate elsewhere. That is
 simultaneously **moved plate** (33%) and **a parked/relocated orange** (44%):
 the two worst conditions in the suite, combined, plus an object count the
 policy never saw in training.
 
-The observed behaviour fits. Run 1: *"smooth motion from rest, sweep to the
-LEFT — the plate side — never toward the orange."* That is what a policy
+The observed behaviour fits. Run 1: _"smooth motion from rest, sweep to the
+LEFT — the plate side — never toward the orange."_ That is what a policy
 following a learned spatial prior does when the layout it expects is absent.
 
 ## R2. The real failure was CATEGORICAL, not graded — test that first
@@ -300,7 +300,7 @@ it (SIM_VALIDATION_20260809.md).
 ### obsDelay: deliberately not run
 
 R2 lists it, and it stays unrun on purpose. The plan's own instruction is to
-pick N from *measured* wire latency; the real rig is disconnected, so the
+pick N from _measured_ wire latency; the real rig is disconnected, so the
 Raspberry Pi wrist stream and the two-machine hop cannot be measured. An
 invented N proves nothing if it shows no effect and is an artifact of the guess
 if it does. **Run it when the hardware is back**, with a measured number.
@@ -381,7 +381,7 @@ the wall, a socket and a pole in shot. The wrist pair diverges the same way.
 
 That reframes every null in this document. `bgrSwap` 67%, `movedPlate` 67%,
 `parkedOrange` 67%, `realLayout` 50% against canonical 74% — all of these
-perturb *within* the trained viewpoint. None of them move the camera. `camOff`
+perturb _within_ the trained viewpoint. None of them move the camera. `camOff`
 came closest and moved it 5 cm and 5 deg, against a real discrepancy of tens of
 centimetres and tens of degrees.
 

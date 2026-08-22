@@ -12,7 +12,7 @@ ingredient hurts?" This one asks a sharper question the photos forced:
 
 ## 0. The finding
 
-The sim and real "front" cameras share a *name* and nothing else.
+The sim and real "front" cameras share a _name_ and nothing else.
 
 ```text
                  SIM  (what N1.6 trained on)      REAL (what it was given)
@@ -38,7 +38,7 @@ errored anywhere in the stack — the client sent `front`, the policy consumed
 `front`. But the policy's `front` input was trained on an elevated downward view
 and was handed a table-level horizontal one. Same key, different meaning.
 
-It also explains the *shape* of the hardware failure. `REALARM_RESULT_20260808.md`
+It also explains the _shape_ of the hardware failure. `REALARM_RESULT_20260808.md`
 records coherent motion with **zero object-directedness** — intact motion priors,
 absent visual grounding. That is what a policy does when its observation comes
 from a viewpoint its training distribution never contained. And the robustness
@@ -47,7 +47,7 @@ displacement; the real rig differs by tens of centimetres and tens of degrees.
 
 Every condition tested so far came back null (`bgrSwap` 67%, `movedPlate` 67%,
 `parkedOrange` 67%, `realLayout` 50%, against canonical 74%) — because all of
-them perturb *within* the trained viewpoint. None of them move the camera.
+them perturb _within_ the trained viewpoint. None of them move the camera.
 
 ---
 
@@ -127,7 +127,7 @@ motion, no object-directedness).
 
 **Why this is worth doing.** It converts "the domain gap is large" into a
 measured, attributable cause, using only GPU time. If sim-with-real-camera fails
-while sim-with-sim-camera works, camera placement is established as *sufficient*
+while sim-with-sim-camera works, camera placement is established as _sufficient_
 to cause the failure.
 
 ### Method: match by snapshot, not by arithmetic
@@ -193,7 +193,7 @@ when mounting the real camera, and nobody has it.
 Not reachable by any flag: **background clutter** (wall, socket, pole). That is
 scene geometry, not a camera parameter, and needs USD assets added to
 `kitchen_with_orange`. Given the wide real FOV, a large share of the policy's
-input *was* background — so this may matter, and it is the one item that cannot
+input _was_ background — so this may matter, and it is the one item that cannot
 be screened cheaply.
 
 ---
@@ -213,8 +213,8 @@ CANNOT prove that fixing the camera makes N1.6 work on the arm. Matching the
       n16_realmimic_sim_battery_20260808.md section 1 stands unchanged.
 ```
 
-**The honest framing of the user's hypothesis** — *"with the correct hardware
-setup like in sim, N1.6 may work on hardware"* — is that it is a **reasonable
+**The honest framing of the user's hypothesis** — _"with the correct hardware
+setup like in sim, N1.6 may work on hardware"_ — is that it is a **reasonable
 and now testable prediction**, promoted from speculation by the evidence above,
 but not yet a conclusion. The sim experiment can make it much more or much less
 likely before any hardware time is spent, which is precisely why it should run
@@ -232,7 +232,7 @@ scattered 10 · tomatoRed 11 · paperPlate 5 · REALMIMIC 0
 ```
 
 Those results stand and should be scored — but note every one of them perturbs
-*within* the trained viewpoint, which is why they were all null. `camOff` is the
+_within_ the trained viewpoint, which is why they were all null. `camOff` is the
 closest to this line and moved the camera by only 5 cm and 5 deg.
 
 ---
@@ -242,7 +242,7 @@ closest to this line and moved the camera by only 5 cm and 5 deg.
 ## CORRECTION: FOV was never a mismatch. Position and pitch are.
 
 §0 of this document claimed sim's front camera is ~40 deg against a webcam's
-~65 deg. **That was wrong.** It assumed IsaacLab's *default* 20.955 mm aperture.
+~65 deg. **That was wrong.** It assumed IsaacLab's _default_ 20.955 mm aperture.
 `single_arm_env_cfg.py` sets it explicitly:
 
 ```python
@@ -357,7 +357,7 @@ SIGKILL).
 repeated six times, seeds 7001-7052.
 
 The canonical arm is not redundant with the pooled n=22 baseline. It controls
-for *session* effects — GPU state, server instance, thermal drift. Running all
+for _session_ effects — GPU state, server instance, thermal drift. Running all
 of one arm then all of the other would put any drift entirely on the second
 half, where it would masquerade as the effect. Interleaving splits it evenly.
 
@@ -511,7 +511,7 @@ BACKGROUND CLUTTER  wall, socket, pole, speaker fill much of the real ~67 deg
 ## CORRECTION to a standing rig requirement
 
 `sim_to_real_preflight_protocol_20260806.md` Stage B recorded `gamma135` = 0/3,
-called it *"the one hardware-gap killer"*, and wrote a hard rig requirement on
+called it _"the one hardware-gap killer"_, and wrote a hard rig requirement on
 that basis. **That was n=1.**
 
 At n=6 here, gamma scores **61% (mean 1.83)** with one zero run, and does not
@@ -520,7 +520,7 @@ an unlucky draw from a wide distribution, not a reliable kill switch.
 
 The requirement to lock auto-exposure and auto-white-balance is still worth
 keeping — it costs nothing and the effect is real if not fatal. But it should
-not be described as *the* killer, and the exposure-left-on-auto violation on the
+not be described as _the_ killer, and the exposure-left-on-auto violation on the
 2026-08-08 rig is **not** a sufficient explanation for that failure.
 
 ## Unresolved: the physics instability
@@ -596,7 +596,7 @@ is still unmodelled.
 ## Consequently: NO TRAINING IS JUSTIFIED YET
 
 Written into `sim_to_real_preflight_protocol_20260806.md` as a standing rule,
-with Stage 0 (observation *equivalence*, not just robustness) and the decision
+with Stage 0 (observation _equivalence_, not just robustness) and the decision
 tree for when a training run is warranted. Two known, mechanically fixable
 defects still sit in the observation channel; training now aims at a channel
 that is broken in at least two measurable ways.
@@ -752,8 +752,8 @@ CHUNK TIMING          the real loop's execution rate vs sim's. --obs-delay=2 was
 sim condition in this document was designed against an assumed local link.
 
 This reframes the whole investigation, and it explains the thing that has been
-unexplained for three days: *why all 13 sim conditions failed to reproduce the
-hardware signature.*
+unexplained for three days: _why all 13 sim conditions failed to reproduce the
+hardware signature._
 
 ## Why sim CANNOT reproduce a latency failure, by construction
 
@@ -766,8 +766,8 @@ REAL  the world keeps running. The arm sits frozen mid-reach for the whole
       round trip while gravity, the object and the cameras carry on.
 ```
 
-No `--obs-delay` value fixes this. That flag makes observations *stale*; it
-cannot make the arm *stop*. The two are different failures, and the one the
+No `--obs-delay` value fixes this. That flag makes observations _stale_; it
+cannot make the arm _stop_. The two are different failures, and the one the
 hardware has is the one sim structurally cannot show.
 
 Stage B's `--obs-delay=2` was 67 ms at 30 Hz. Against a round trip of ~1 s that
@@ -785,9 +785,9 @@ for action_dict in actions[: cfg.action_horizon]:            # 8 of 16 executed
     time.sleep(1.0 / 30 - (toc - tic))                       # 30 Hz
 ```
 
-* **1.76 MiB per policy call**, uncompressed, NJ↔Pune, every call.
-* **8 actions execute = 267 ms of motion**, then the loop blocks on the next call.
-* **Half of every chunk is discarded.** The policy plans 16 steps; 8 run.
+- **1.76 MiB per policy call**, uncompressed, NJ↔Pune, every call.
+- **8 actions execute = 267 ms of motion**, then the loop blocks on the next call.
+- **Half of every chunk is discarded.** The policy plans 16 steps; 8 run.
 
 Duty cycle as a function of round trip:
 
@@ -829,7 +829,7 @@ Does the N1.6 client carry any of the mitigations that made π0.5 work?
 local. π0.5 needed all four to grasp anything over this link.
 
 ⇒ A policy stopping every 267 ms for ~1 s, acting on truncated chunks, would
-produce *coherent motion that never converges on the object* — the Aug 8
+produce _coherent motion that never converges on the object_ — the Aug 8
 signature — and would do it regardless of camera geometry.
 
 ## NOT MEASURED — do this first, it is one command
@@ -851,7 +851,7 @@ T3  re-run the arm with T1+T2. If it engages, the link was the cause.
 Sim renders a pinhole camera: perfectly sharp, noise-free, fixed focus, fixed
 exposure, no rolling shutter, no compression. **Every condition in this document
 compared geometry between a pristine render and a real sensor**, and never
-compared image *quality* at all.
+compared image _quality_ at all.
 
 The client's own docstring already lists this as rig spec priority (2):
 
@@ -859,7 +859,7 @@ The client's own docstring already lists this as rig spec priority (2):
 
 **Whether that was done on Aug 8 is not recorded anywhere.** And autofocus is
 not mentioned in any document — the wrist camera is a Raspberry Pi module on a
-*moving arm*; if AF is enabled it hunts on every move.
+_moving arm_; if AF is enabled it hunts on every move.
 
 There is a nasty interaction with the duty cycle above: the client captures its
 observation **immediately after the 8-step motion burst** — i.e. at the moment
@@ -932,7 +932,7 @@ own aperture — never the 20.955 default, that assumption already burned us onc
 ```
 
 **At 1/30 s the smear is wider than the orange.** And the real client captures
-its observation *immediately after* the 8-step motion burst — peak smear, peak
+its observation _immediately after_ the 8-step motion burst — peak smear, peak
 AF hunt. B3's 3 px box blur is not the same experiment.
 
 ## B12 is the important one
@@ -983,7 +983,7 @@ failed to close on it, and then did not try again for 106 more chunks.
 
 ⇒ **The founding premise of this document was wrong.** "Coherent motion, zero
 object-directedness" is not what the data shows. And the consequence is large:
-the 13 sim conditions that produced *completion* failures were reproducing the
+the 13 sim conditions that produced _completion_ failures were reproducing the
 **correct class** all along. The three-day puzzle of "why can't sim reproduce
 this" dissolves — sim was never failing to reproduce it.
 
@@ -1054,7 +1054,7 @@ frozen BLACK frame. A client cannot tell this from a working feed.
 
 ⇒ Restarted against .12; verified serving live frames (3 pulls, 3 distinct MD5s).
 ⇒ **The proxy must fail loudly.** Serving a stale frame with 200 is the worst
-   possible behaviour and would silently poison any run.
+possible behaviour and would silently poison any run.
 
 Note the Aug 8 wrist frames DID change content, so the feed was live then. This
 freeze is a LATER fault, not the Aug 8 cause.
@@ -1242,7 +1242,7 @@ testing 5 degrees against a real offset of 45-90. That is why the axis looked
 harmless for three days.
 
 ⇒ FIX THE WRIST CAMERA MOUNT. This now outranks every other open item,
-  including the 331 ms link and the instruction string.
+including the 331 ms link and the instruction string.
 
 ## What it does NOT settle
 
@@ -1333,7 +1333,7 @@ N1.6 client sends raw `np.save` arrays with no compression.
 
 ⇒ **JPEG would remove most of the 409 ms.** π0.5 measured 14.6x on this link.
 ⇒ B12 is now exactly parameterised: 740 ms at 30 Hz = **`--policy-stall 22`**.
-  No longer a guess.
+No longer a guess.
 
 ## Standing against the wrist result
 
@@ -1391,8 +1391,8 @@ stand.** The laptop webcam was feeding the `front` channel a view that matches
 the training distribution.
 
 ⇒ **My advice to route the C270 into `front` was WRONG.** It would have replaced
-  an in-distribution view with an out-of-distribution overhead one. The overhead
-  view belongs in `top`, a channel this policy does not consume.
+an in-distribution view with an out-of-distribution overhead one. The overhead
+view belongs in `top`, a channel this policy does not consume.
 
 ⇒ The Aug 8 front camera was **not** a defect. Remove it from the fix list.
 
@@ -1510,8 +1510,8 @@ background, match on silhouette. Gave a clean-looking control (late-vs-late
 wrist diff 5.6, early-vs-late 34.6). **Also unusable.** The best match found,
 c0013 vs c0135, is again visibly two different poses.
 
-**Why both failed, and the actual finding:** *the arm never returns to its early
-pose.* In the second half of the run it occupies a different region of the
+**Why both failed, and the actual finding:** _the arm never returns to its early
+pose._ In the second half of the run it occupies a different region of the
 workspace entirely. With no matched-pose pair anywhere in the 143 chunks, this
 question is **not answerable from this dataset**, by any descriptor.
 
@@ -1582,7 +1582,7 @@ The policy still reaches the object; it fails to complete.
   delay22 SIM  reaches to 0.016 m, places 4/18
 ```
 
-That is a *completion* failure, and it is a different signature from the wrist
+That is a _completion_ failure, and it is a different signature from the wrist
 result, where the policy never approached at all (0.09-0.10 m).
 
 ## The two causes explain DIFFERENT HALVES of Aug 8
@@ -1632,10 +1632,10 @@ device whose lease rotates, behind a proxy that reports success while serving
 stale bytes.
 
 ⇒ Repointed at the Pi's **ZeroTier address, 192.168.194.203**, which is assigned
-  per-member and persists. Verified serving live frames (3 pulls, 3 distinct
-  MD5s). This survives both DHCP rotation and the current local-wifi breakage.
+per-member and persists. Verified serving live frames (3 pulls, 3 distinct
+MD5s). This survives both DHCP rotation and the current local-wifi breakage.
 ⇒ The proxy should still be made to FAIL LOUDLY. Serving a stale frame with a
-  200 is the worst possible behaviour and is what hid this for four days.
+200 is the worst possible behaviour and is what hid this for four days.
 
 ## Image quality: FIXED
 
@@ -1731,12 +1731,12 @@ returned, the gripper silhouette overlapped at IoU 65.4% with a centroid shift o
 ```
 
 ⇒ **The mount needs nothing.** Strain-relief, fasteners, re-aiming — all off the
-  list. The earlier advice to fix the mount was aimed at a fault that does not
-  exist.
+list. The earlier advice to fix the mount was aimed at a fault that does not
+exist.
 
 ⇒ The real fault is **behavioural**: the policy walked itself into poses where its
-  own wrist camera could not see the workspace, and then could not recover
-  because it had lost the camera it needed to recover with.
+own wrist camera could not see the workspace, and then could not recover
+because it had lost the camera it needed to recover with.
 
 This fits the staleness result. Acting on 740 ms old observations, the policy
 failed the grasp at chunks 24-36, then drifted into a pose with no workspace in
@@ -1809,7 +1809,7 @@ through that space is not determinable from these images.**
 ```
 
 ⇒ The ORIGINAL characterisation of the run was right, and the 2026-08-12
-  "premise correction" in this document was itself the error.
+"premise correction" in this document was itself the error.
 
 ## Method note
 
@@ -1909,7 +1909,7 @@ systematic offset. Candidates, none tested:
 ```
 
 The last is worth checking first because it is the only one that would produce a
-*monotonic* drift rather than degraded reaching, and it is checkable in code.
+_monotonic_ drift rather than degraded reaching, and it is checkable in code.
 
 ---
 
@@ -1970,8 +1970,8 @@ brightness 67% and fruit 49% of training, wrist sharpness median 58 with 56% of
 chunks below threshold. If vision is too weak to correct the bias, the bias wins.
 
 ⇒ **Hypothesis: a small pan bias that vision normally cancels, running away when
-  the visual signal is degraded.** It fits every observation - the sim/real
-  split, "moves but does not reach", the monotonic direction, and the joint stop.
+the visual signal is degraded.** It fits every observation - the sim/real
+split, "moves but does not reach", the monotonic direction, and the joint stop.
 
 ## NOT yet established
 
@@ -2034,8 +2034,8 @@ mode shifted - this time driven by shoulder_lift (114.9 deg) and elbow (64.5 deg
 rather than pan alone - but the outcome did not.
 
 ⇒ **Improving the scene is not sufficient.** The fork posed on 2026-08-14 resolves
-  toward the checkpoint: a bias that survives a corrected scene, on a joint whose
-  bias does not move at all, is a property of the model rather than the rig.
+toward the checkpoint: a bias that survives a corrected scene, on a joint whose
+bias does not move at all, is a property of the model rather than the rig.
 
 ## Caveats, stated because several variables moved at once
 
@@ -2094,7 +2094,7 @@ runaway that walked the arm into its joint stop in run 1.
 So the live elbow behaviour is NOT explained by a model bias. Something about the
 closed loop, or about the out-of-distribution states the arm reached, reverses
 it. The earlier note calling the elbow bias "unconditional" was wrong: it is
-unconditional *across live runs*, but it does not agree with the offline
+unconditional _across live runs_, but it does not agree with the offline
 measurement at all.
 
 ## The mechanism this supports
@@ -2107,7 +2107,7 @@ measurement at all.
      flip and run 2's shoulder_lift excursion come from
 ```
 
-The pan bias is the *initiator*. The rest is what happens after the arm is
+The pan bias is the _initiator_. The rest is what happens after the arm is
 somewhere the policy has never seen.
 
 ## Caveat
@@ -2159,8 +2159,8 @@ REAL episodes.** If the checkpoint is sim-trained, that is not its training
 distribution at all.
 
 ⇒ **What I measured is the model's error on data it was never trained on.** That
-  is out-of-distribution error, not a defect. Calling it "a bias in the
-  checkpoint" over-claimed considerably.
+is out-of-distribution error, not a defect. Calling it "a bias in the
+checkpoint" over-claimed considerably.
 
 The measurement stands as a fact; the interpretation does not.
 
@@ -2228,12 +2228,12 @@ depression) this document measured back on 2026-08-11.
 ```
 
 ⇒ **The original 2026-08-11 advice — route the overhead camera into `front` — may
-  have been right, and the retraction wrong.** Both were reasoned from a dataset;
-  the first from sim, the second from the 89 real episodes. Only the sim one is
-  this checkpoint's training distribution.
+have been right, and the retraction wrong.** Both were reasoned from a dataset;
+the first from sim, the second from the 89 real episodes. Only the sim one is
+this checkpoint's training distribution.
 
 ⇒ And the 89% -> 44% camera-geometry measurement becomes relevant again. It
-  measured exactly this axis, in the checkpoint's own domain.
+measured exactly this axis, in the checkpoint's own domain.
 
 ## Status of the diagnosis
 
@@ -2329,11 +2329,12 @@ pi0.5 measurements). **It closed on air**, near the fruit region, then rose and
 ## The emerging picture, two runs in a row
 
 With the overhead camera, the policy now reliably produces the SHAPE of the task
+
 - approach-ish, close, lift, move - but with no grounding on the actual objects.
-Run 3 closed near the plate; run 4 closed on air near the fruit. The choreography
-fires; the object perception does not. That is precisely what a policy trained
-on renders should do when shown photographs: the motion priors transfer, the
-visual grounding does not.
+  Run 3 closed near the plate; run 4 closed on air near the fruit. The choreography
+  fires; the object perception does not. That is precisely what a policy trained
+  on renders should do when shown photographs: the motion priors transfer, the
+  visual grounding does not.
 
 ## A real regression this run
 
@@ -2398,6 +2399,7 @@ orange repositioned by the operator, every run traced (rtt, state, action,
 wrist health) with every model input frame saved.
 
 ### Rig verification (before any policy attempt)
+
 Joint replay of recording 56 grasped, carried and released its orange once the
 orange was placed at the recorded spot (gripper gap +3.4 sustained 7 s).
 Two placement misses first - the gap collapse pinpointed both. The rig can
@@ -2405,18 +2407,18 @@ still do the task; the recordings are reproducible on today's hardware.
 
 ### The ten attempts
 
-| # | grasped | carried | end of carry | stage/6 |
-|---|---------|---------|--------------|---------|
-| 1 | + (+11 peak) | + | timer cut mid-place (100s limit, mine) | 5 |
-| 2 | - | - | hover stall 3 cm short, never closed | 1 |
-| 3 | + (+7.6) | + | slip during swing | 5- |
-| 4 | - | - | overreached, pecked past the orange | 2 |
-| 5 | - | - | overreached, hovered open | 2 |
-| 6 | + (+4.3) | + | DELIBERATE release at pan +50 | 5.5 |
-| 7 | + (+6.0) | + | slip at pan +64 | 5- |
-| 8 | + (+6.2) | + | DELIBERATE release at pan +64 | 5.5 |
-| 9 | + (+3.1) | - | froze holding the orange on the table | 3.5 |
-| 10 | + (+3.5) | + | slip at pan +50 | 5- |
+| #   | grasped      | carried | end of carry                           | stage/6 |
+| --- | ------------ | ------- | -------------------------------------- | ------- |
+| 1   | + (+11 peak) | +       | timer cut mid-place (100s limit, mine) | 5       |
+| 2   | -            | -       | hover stall 3 cm short, never closed   | 1       |
+| 3   | + (+7.6)     | +       | slip during swing                      | 5-      |
+| 4   | -            | -       | overreached, pecked past the orange    | 2       |
+| 5   | -            | -       | overreached, hovered open              | 2       |
+| 6   | + (+4.3)     | +       | DELIBERATE release at pan +50          | 5.5     |
+| 7   | + (+6.0)     | +       | slip at pan +64                        | 5-      |
+| 8   | + (+6.2)     | +       | DELIBERATE release at pan +64          | 5.5     |
+| 9   | + (+3.1)     | -       | froze holding the orange on the table  | 3.5     |
+| 10  | + (+3.5)     | +       | slip at pan +50                        | 5-      |
 
 Grasped 7/10. Carried 6/10. Deliberate correctly-angled releases 2.
 Orange on the table at the end: 0 - see geometry below.
@@ -2439,12 +2441,14 @@ Orange on the table at the end: 0 - see geometry below.
    whether the carry survives.
 
 ### Constants across all ten
+
 round trip median 564 ms (p95 610, n=~2300 cycles), duty cycle 31% moving,
 wrist frame age ~45 ms, wrist sharpness in training range. Three connect-time
 bus faults (voltage error id6, no-status id4, bad-status id5/id6) - all at
 connect, never mid-run; motor PSU suspected, watch it.
 
 ### What this settles
+
 The sim-trained checkpoint never moved the arm toward an orange. The
 real-data fine-tune, first time on hardware: 7/10 grasps at operator-level
 grip strength, 6 carries, 2 deliberate releases. Every remaining failure is
@@ -2453,6 +2457,7 @@ shallow grasp) that more/better demonstrations address. The "train on real
 photographs" diagnosis is confirmed end to end.
 
 ### Next
+
 - Fix base geometry (photo acceptance test ready: place_pose.npy park + wrist view shows wood)
 - Brain A (side camera) ten-attempt set for the A/B - needs the side camera re-aimed
 - Grasp-depth improvement: more demos with deep grasps, or a grasp-retry behaviour
@@ -2512,15 +2517,15 @@ Same protocol, client, latency regime as Brain B's ten. Room at brightness
 two off-default controls reset, sensor physically cannot reach 173 at 30 fps
 in this light).
 
-| attempt | result |
-|---|---|
-| 1-3 | COMPLETE: grasp ~20s, carry to +49..+52, release, return to rest |
-| 4 | grasped, released instantly - orange had been placed AT the drop zone |
+| attempt | result                                                                                 |
+| ------- | -------------------------------------------------------------------------------------- |
+| 1-3     | COMPLETE: grasp ~20s, carry to +49..+52, release, return to rest                       |
+| 4       | grasped, released instantly - orange had been placed AT the drop zone                  |
 | 5-8, 10 | over-carry: strong hold, sailed past the zone, pinned at pan +116.5 (joint limit), cut |
-| 9 | over-carry, half-opened (cmd 32) at the limit, orange stayed wedged |
+| 9       | over-carry, half-opened (cmd 32) at the limit, orange stayed wedged                    |
 
 A: 10/10 grasps (grip +4.6..+7.0), 3/10 complete, ZERO slips/stalls/overreaches.
-B:  7/10 grasps, 2/10 complete, failures split stall/overreach/slip.
+B: 7/10 grasps, 2/10 complete, failures split stall/overreach/slip.
 
 Statistics, honestly: completions 3 vs 2 (no difference), grasps 10/10 vs 7/10
 (Fisher p~0.2, suggestive not significant). The qualitative gap is failure
@@ -2536,6 +2541,7 @@ Bus faults at connect reached six for the campaign (ids 3,4,5,6 various);
 never mid-run. Motor PSU remains the suspect component.
 
 ### Verdict
+
 Brain A (side camera) is the base going forward: it grasps every time, never
 drops, and fails in exactly one way. Next fixes target that one way:
 RTC (carry duration is the drift window), release-focused demos (the plate

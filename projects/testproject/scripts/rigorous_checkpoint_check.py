@@ -20,6 +20,7 @@ Four ways the first result could be false, each given a check that can FAIL:
 
 Usage: rigorous_check.py <ckpt_path> <label>
 """
+
 import os
 import subprocess
 import sys
@@ -36,14 +37,27 @@ CKPT, LABEL = sys.argv[1], sys.argv[2]
 D = "/home/kiran/lerobot_assets/datasets/so101_orange_89_v21"
 INSTR = "pick up the orange and move it to another place"
 PORT = 5558
-RNG = np.random.default_rng(20260817)          # fixed seed: identical samples for both models
+RNG = np.random.default_rng(20260817)  # fixed seed: identical samples for both models
 
 srv = subprocess.Popen(
-    ["/home/kiran/sim/Isaac-GR00T-n16/.venv/bin/python", "-u", "-m", "gr00t.eval.run_gr00t_server",
-     "--model_path", CKPT, "--embodiment-tag", "NEW_EMBODIMENT",
-     "--host", "127.0.0.1", "--port", str(PORT)],
-    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-    env={**os.environ, "HF_HUB_OFFLINE": "1"})
+    [
+        "/home/kiran/sim/Isaac-GR00T-n16/.venv/bin/python",
+        "-u",
+        "-m",
+        "gr00t.eval.run_gr00t_server",
+        "--model_path",
+        CKPT,
+        "--embodiment-tag",
+        "NEW_EMBODIMENT",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        str(PORT),
+    ],
+    stdout=subprocess.DEVNULL,
+    stderr=subprocess.DEVNULL,
+    env={**os.environ, "HF_HUB_OFFLINE": "1"},
+)
 for _ in range(60):
     if f":{PORT}" in subprocess.run(["ss", "-tln"], capture_output=True, text=True).stdout:
         break
@@ -55,22 +69,27 @@ client = PolicyClient(host="127.0.0.1", port=PORT)
 def frame(cam, ep, idx):
     cap = cv2.VideoCapture(f"{D}/videos/chunk-000/observation.images.{cam}/episode_{ep:06d}.mp4")
     cap.set(cv2.CAP_PROP_POS_FRAMES, idx)
-    ok, f = cap.read(); cap.release()
+    ok, f = cap.read()
+    cap.release()
     return cv2.cvtColor(cv2.resize(f, (640, 480)), cv2.COLOR_BGR2RGB)[None, None] if ok else None
 
 
 def ask(fr, wr, state):
     s = np.asarray(state, dtype=np.float32)
-    ch, _ = client.get_action({
-        "video": {"front": fr, "wrist": wr},
-        "state": {"single_arm": s[:5][None, None], "gripper": s[5:6][None, None]},
-        "language": {"annotation.human.task_description": [[INSTR]]}})
+    ch, _ = client.get_action(
+        {
+            "video": {"front": fr, "wrist": wr},
+            "state": {"single_arm": s[:5][None, None], "gripper": s[5:6][None, None]},
+            "language": {"annotation.human.task_description": [[INSTR]]},
+        }
+    )
     return np.concatenate([ch["single_arm"][0], ch["gripper"][0]], axis=1)
 
 
 # C3: ALL episodes, random frames, fixed seed
-eps = sorted(int(p.split("_")[-1].split(".")[0])
-             for p in os.listdir(f"{D}/data/chunk-000") if p.endswith(".parquet"))
+eps = sorted(
+    int(p.split("_")[-1].split(".")[0]) for p in os.listdir(f"{D}/data/chunk-000") if p.endswith(".parquet")
+)
 matched, mismatched, frozen = [], [], []
 BLACK = np.zeros((1, 1, 480, 640, 3), np.uint8)
 n_ok = 0
@@ -84,12 +103,13 @@ for ep in eps:
     fr, wr = frame("front", ep, i), frame("wrist", ep, i)
     if fr is None or wr is None:
         continue
-    truth = ac[i:i + 16]
+    truth = ac[i : i + 16]
 
-    matched.append(np.abs(ask(fr, wr, st[i]) - truth).mean())          # honest score
+    matched.append(np.abs(ask(fr, wr, st[i]) - truth).mean())  # honest score
     # C1: same state, images from a DIFFERENT episode
     other = int(RNG.choice([e for e in eps if e != ep]))
-    of = frame("front", other, 20); ow = frame("wrist", other, 20)
+    of = frame("front", other, 20)
+    ow = frame("wrist", other, 20)
     if of is not None and ow is not None:
         mismatched.append(np.abs(ask(of, ow, st[i]) - truth).mean())
     # C4: the do-nothing baseline
@@ -99,8 +119,12 @@ for ep in eps:
 srv.terminate()
 m, mm, fz = np.array(matched), np.array(mismatched), np.array(frozen)
 print(f"\n=== {LABEL} ===  {n_ok} episodes, 1 random frame each, seed-fixed")
-print(f"  C3 honest score (correct images)     {m.mean():6.3f} deg   +/- {m.std()/np.sqrt(len(m)):.3f}")
-print(f"  C1 with MISMATCHED images            {mm.mean():6.3f} deg   "
-      f"(penalty {mm.mean()-m.mean():+.3f} - a vision-using model MUST get worse)")
-print(f"  C4 do-nothing baseline               {fz.mean():6.3f} deg   "
-      f"(model beats it by {fz.mean()-m.mean():+.3f})")
+print(f"  C3 honest score (correct images)     {m.mean():6.3f} deg   +/- {m.std() / np.sqrt(len(m)):.3f}")
+print(
+    f"  C1 with MISMATCHED images            {mm.mean():6.3f} deg   "
+    f"(penalty {mm.mean() - m.mean():+.3f} - a vision-using model MUST get worse)"
+)
+print(
+    f"  C4 do-nothing baseline               {fz.mean():6.3f} deg   "
+    f"(model beats it by {fz.mean() - m.mean():+.3f})"
+)

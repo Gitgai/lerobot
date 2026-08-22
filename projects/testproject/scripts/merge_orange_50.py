@@ -1,11 +1,13 @@
-import warnings; warnings.filterwarnings("ignore")
-from lerobot.datasets.lerobot_dataset import LeRobotDataset
+import warnings
+
+warnings.filterwarnings("ignore")
 from lerobot.datasets.dataset_tools import merge_datasets
+from lerobot.datasets.lerobot_dataset import LeRobotDataset
 
 SRC = {
     "move_cleaned": "/data/lerobot_datasets/so101_pick_orange_move_cleaned",
-    "grasp_b1":     "/data/lerobot_datasets/so101_pick_orange_grasp_b1",
-    "grasp_b2":     "/data/lerobot_datasets/so101_pick_orange_grasp_b2",
+    "grasp_b1": "/data/lerobot_datasets/so101_pick_orange_grasp_b1",
+    "grasp_b2": "/data/lerobot_datasets/so101_pick_orange_grasp_b2",
 }
 dss = []
 for k, root in SRC.items():

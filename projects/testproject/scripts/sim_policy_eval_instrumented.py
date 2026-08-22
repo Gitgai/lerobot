@@ -80,12 +80,21 @@ parser.add_argument("--policy_host", default="localhost")
 parser.add_argument("--policy_port", type=int, default=8080)
 parser.add_argument("--policy_timeout_ms", type=int, default=30000)
 parser.add_argument("--policy_action_horizon", type=int, default=50)
-parser.add_argument("--radian-actions", action="store_true",
-                    help="Checkpoint outputs RADIAN actions (converter unit bug); invert the client motor->rad conversion to recover them.")
-parser.add_argument("--camera-rename", default=None,
-                    help='Rename sim camera keys for the policy, e.g. "front:base_0_rgb,wrist:left_wrist_0_rgb" - needed when the checkpoint was trained under pi0-style names via --rename_map.')
-parser.add_argument("--policy_checkpoint_path", default=None,
-                    help="LeRobot path only; the GR00T server already holds its own checkpoint.")
+parser.add_argument(
+    "--radian-actions",
+    action="store_true",
+    help="Checkpoint outputs RADIAN actions (converter unit bug); invert the client motor->rad conversion to recover them.",
+)
+parser.add_argument(
+    "--camera-rename",
+    default=None,
+    help='Rename sim camera keys for the policy, e.g. "front:base_0_rgb,wrist:left_wrist_0_rgb" - needed when the checkpoint was trained under pi0-style names via --rename_map.',
+)
+parser.add_argument(
+    "--policy_checkpoint_path",
+    default=None,
+    help="LeRobot path only; the GR00T server already holds its own checkpoint.",
+)
 parser.add_argument(
     "--policy_language_instruction",
     default=None,
@@ -104,41 +113,86 @@ parser.add_argument(
     "RATE is needed rather than one run.",
 )
 parser.add_argument("--out", default="logs/sim_policy_gt.csv")
-parser.add_argument("--move-oranges", default=None,
-                    help="S1: shift ALL oranges by \"dx,dy,dz\" metres to test whether the reach is object-directed or a positional prior.")
-parser.add_argument("--scatter-oranges", default=None,
-                    help="Harder than --move-oranges: PER-ORANGE offsets \"dx1,dy1,dx2,dy2,dx3,dy3\" (z unchanged). A uniform shift preserves the objects' relative layout; scattering destroys it.")
-parser.add_argument("--move-plate", default=None,
-                    help="Shift the PLATE (the goal) by \"dx,dy,dz\" metres. Tests goal perception separately from object perception - the env's own training randomization was only +/-3 cm.")
-parser.add_argument("--jitter-camera", default=None,
-                    help="Perturb the FRONT camera mount by \"dx,dy,dz\" metres. Measures viewpoint sensitivity, which is exactly the error a real camera mount will have. S2 warns: a wrong view can be worse than none.")
-parser.add_argument("--tint", default=None,
-                    help="Recolor scene entities: \"Name:r,g,b;Name2:r,g,b\" (0-1 floats). Binds a PreviewSurface material stronger-than-descendants, so it overrides the asset's own textures. Names match prim paths, e.g. Plate, Robot, Orange001.")
-parser.add_argument("--light-scale", type=float, default=None,
-                    help="Multiply every light's intensity (0.35 = dim evening, 2.5 = blown out).")
-parser.add_argument("--light-color", default=None,
-                    help="Set every light's color to \"r,g,b\" - warm/cool lighting recolors the WHOLE scene cheaply.")
-parser.add_argument("--add-plate", default=None,
-                    help="Spawn a SECOND identical plate at \"dx,dy\" from the real one. The GT place term still tracks only the original -> measures whether the policy is goal-ambiguous.")
-parser.add_argument("--add-decoys", type=int, default=0,
-                    help="Spawn N orange-COLORED spheres near the oranges. We have no other fruit assets; a same-color decoy is the sharper test anyway - does it grab AN ORANGE or anything orange-ish?")
-parser.add_argument("--scale-oranges", type=float, default=None,
-                    help="Scale the oranges (0.75 = small, 1.3 = large). Changes both the visual and the grasp width needed.")
+parser.add_argument(
+    "--move-oranges",
+    default=None,
+    help='S1: shift ALL oranges by "dx,dy,dz" metres to test whether the reach is object-directed or a positional prior.',
+)
+parser.add_argument(
+    "--scatter-oranges",
+    default=None,
+    help='Harder than --move-oranges: PER-ORANGE offsets "dx1,dy1,dx2,dy2,dx3,dy3" (z unchanged). A uniform shift preserves the objects\' relative layout; scattering destroys it.',
+)
+parser.add_argument(
+    "--move-plate",
+    default=None,
+    help='Shift the PLATE (the goal) by "dx,dy,dz" metres. Tests goal perception separately from object perception - the env\'s own training randomization was only +/-3 cm.',
+)
+parser.add_argument(
+    "--jitter-camera",
+    default=None,
+    help='Perturb the FRONT camera mount by "dx,dy,dz" metres. Measures viewpoint sensitivity, which is exactly the error a real camera mount will have. S2 warns: a wrong view can be worse than none.',
+)
+parser.add_argument(
+    "--tint",
+    default=None,
+    help='Recolor scene entities: "Name:r,g,b;Name2:r,g,b" (0-1 floats). Binds a PreviewSurface material stronger-than-descendants, so it overrides the asset\'s own textures. Names match prim paths, e.g. Plate, Robot, Orange001.',
+)
+parser.add_argument(
+    "--light-scale",
+    type=float,
+    default=None,
+    help="Multiply every light's intensity (0.35 = dim evening, 2.5 = blown out).",
+)
+parser.add_argument(
+    "--light-color",
+    default=None,
+    help='Set every light\'s color to "r,g,b" - warm/cool lighting recolors the WHOLE scene cheaply.',
+)
+parser.add_argument(
+    "--add-plate",
+    default=None,
+    help='Spawn a SECOND identical plate at "dx,dy" from the real one. The GT place term still tracks only the original -> measures whether the policy is goal-ambiguous.',
+)
+parser.add_argument(
+    "--add-decoys",
+    type=int,
+    default=0,
+    help="Spawn N orange-COLORED spheres near the oranges. We have no other fruit assets; a same-color decoy is the sharper test anyway - does it grab AN ORANGE or anything orange-ish?",
+)
+parser.add_argument(
+    "--scale-oranges",
+    type=float,
+    default=None,
+    help="Scale the oranges (0.75 = small, 1.3 = large). Changes both the visual and the grasp width needed.",
+)
 # ---- PREFLIGHT flags (sim_to_real_preflight_protocol_20260806.md) ----
 # Image mods apply to the frames the POLICY sees, after rendering - mimicking
 # camera artifacts the renderer never produces. GT scoring is untouched.
-parser.add_argument("--img-bgr-swap", action="store_true",
-                    help="B1: swap RGB->BGR on policy frames. OpenCV cameras deliver BGR; this run is the FAILURE SIGNATURE for a channel-order bug in a real client.")
-parser.add_argument("--img-noise", type=float, default=None,
-                    help="B2: gaussian sensor noise, sigma in uint8 units (e.g. 8).")
-parser.add_argument("--img-blur", type=int, default=None,
-                    help="B3: box blur kernel in px (e.g. 3).")
-parser.add_argument("--img-jpeg", type=int, default=None,
-                    help="B4: JPEG encode/decode at this quality (e.g. 40).")
-parser.add_argument("--img-gamma", type=float, default=None,
-                    help="B5: gamma shift (1.35 = washed out) - a white-balance stand-in.")
-parser.add_argument("--obs-delay", type=int, default=0,
-                    help="B6: policy sees the observation from K env-steps ago. On hardware the world moves ~100-200 ms during capture+inference; this isolates that staleness.")
+parser.add_argument(
+    "--img-bgr-swap",
+    action="store_true",
+    help="B1: swap RGB->BGR on policy frames. OpenCV cameras deliver BGR; this run is the FAILURE SIGNATURE for a channel-order bug in a real client.",
+)
+parser.add_argument(
+    "--img-noise", type=float, default=None, help="B2: gaussian sensor noise, sigma in uint8 units (e.g. 8)."
+)
+parser.add_argument("--img-blur", type=int, default=None, help="B3: box blur kernel in px (e.g. 3).")
+parser.add_argument(
+    "--img-jpeg", type=int, default=None, help="B4: JPEG encode/decode at this quality (e.g. 40)."
+)
+parser.add_argument(
+    "--img-gamma",
+    type=float,
+    default=None,
+    help="B5: gamma shift (1.35 = washed out) - a white-balance stand-in.",
+)
+parser.add_argument(
+    "--obs-delay",
+    type=int,
+    default=0,
+    help="B6: policy sees the observation from K env-steps ago. On hardware the world moves ~100-200 ms during capture+inference; this isolates that staleness.",
+)
 # --- Stage 0b additions (2026-08-11): MOTION-COUPLED artifacts. -------------
 # B2-B5 are static and per-run constant. Every real artifact on this rig is
 # neither: the wrist camera is bolted to a MOVING arm (prim_path .../gripper)
@@ -146,61 +200,101 @@ parser.add_argument("--obs-delay", type=int, default=0,
 # wrong shape twice over - it blurs the static camera's static table, which
 # never happens, and it does not blur the wrist camera harder when the arm moves
 # fast, which always happens. These flags couple the artifact to actual motion.
-parser.add_argument("--img-motion-blur", type=float, default=None,
-                    help="B9: EXPOSURE TIME in ms (e.g. 16.7 = 1/60 s). Blur length is "
-                         "computed from the camera's ACTUAL measured motion each step - "
-                         "directional, not isotropic - and applies only to cameras that "
-                         "physically move. This is the artifact a wrist camera on a "
-                         "moving arm actually produces; --img-blur is not.")
-parser.add_argument("--img-motion-blur-depth", type=float, default=0.25,
-                    help="Scene depth in metres used for the translation term of B9 "
-                         "(rotation is depth-independent). 0.25 ~ wrist-to-table.")
-parser.add_argument("--img-af-hunt", default=None,
-                    help='B10: autofocus hunting as "speed_thresh,max_sigma,decay". Above '
-                         'speed_thresh (m/s) focus is lost and defocus ramps to max_sigma px; '
-                         'it decays by `decay` per settled step. Models a Pi camera with AF '
-                         'left ON, which hunts on every move. NO static flag expresses this: '
-                         'the blur must VARY over the run, keyed to motion.')
-parser.add_argument("--policy-stall", type=int, default=0,
-                    help="B12: the world ADVANCES for K env-steps while the policy call is "
-                         "outstanding, with no fresh action - the arm holds its last command. "
-                         "THIS IS THE ONE CONDITION SIM OTHERWISE CANNOT EXPRESS: normally the "
-                         "client steps the env, so a slow policy call pauses physics too and "
-                         "latency is FREE. On hardware the world keeps running while the arm "
-                         "sits frozen. GPU is in NJ, arm is in Pune - ~12,000 km per call. "
-                         "K = round_trip_seconds * 30. Pair with --obs-delay K: staleness and "
-                         "stall are different halves of the same latency, and B6 only had one.")
-parser.add_argument("--img-ae-lag", type=float, default=None,
-                    help="B11: auto-exposure first-order lag, 0<a<=1 (0.15 = sluggish). Real "
-                         "AE ramps over ~0.5-2 s after a scene change, so frames just after a "
-                         "move are mis-exposed and then recover. --img-gamma is a FIXED shift "
-                         "and cannot show this.")
-parser.add_argument("--rotate-camera", type=float, default=None,
-                    help="B7: pitch the FRONT camera by DEG degrees. Position jitter was tested in the campaign; ANGLE was not, and degrees move the image more than centimetres.")
-parser.add_argument("--jitter-wrist-camera", default=None,
-                    help="B8: perturb the WRIST camera mount by \"dx,dy,dz\" metres - it was never perturbed at all.")
-parser.add_argument("--park-oranges", default=None,
-                    help="C: comma-list of orange indices (e.g. \"2,3\") moved ~1 m out of the workspace, approximating removal. Score only the remaining orange(s).")
+parser.add_argument(
+    "--img-motion-blur",
+    type=float,
+    default=None,
+    help="B9: EXPOSURE TIME in ms (e.g. 16.7 = 1/60 s). Blur length is "
+    "computed from the camera's ACTUAL measured motion each step - "
+    "directional, not isotropic - and applies only to cameras that "
+    "physically move. This is the artifact a wrist camera on a "
+    "moving arm actually produces; --img-blur is not.",
+)
+parser.add_argument(
+    "--img-motion-blur-depth",
+    type=float,
+    default=0.25,
+    help="Scene depth in metres used for the translation term of B9 "
+    "(rotation is depth-independent). 0.25 ~ wrist-to-table.",
+)
+parser.add_argument(
+    "--img-af-hunt",
+    default=None,
+    help='B10: autofocus hunting as "speed_thresh,max_sigma,decay". Above '
+    "speed_thresh (m/s) focus is lost and defocus ramps to max_sigma px; "
+    "it decays by `decay` per settled step. Models a Pi camera with AF "
+    "left ON, which hunts on every move. NO static flag expresses this: "
+    "the blur must VARY over the run, keyed to motion.",
+)
+parser.add_argument(
+    "--policy-stall",
+    type=int,
+    default=0,
+    help="B12: the world ADVANCES for K env-steps while the policy call is "
+    "outstanding, with no fresh action - the arm holds its last command. "
+    "THIS IS THE ONE CONDITION SIM OTHERWISE CANNOT EXPRESS: normally the "
+    "client steps the env, so a slow policy call pauses physics too and "
+    "latency is FREE. On hardware the world keeps running while the arm "
+    "sits frozen. GPU is in NJ, arm is in Pune - ~12,000 km per call. "
+    "K = round_trip_seconds * 30. Pair with --obs-delay K: staleness and "
+    "stall are different halves of the same latency, and B6 only had one.",
+)
+parser.add_argument(
+    "--img-ae-lag",
+    type=float,
+    default=None,
+    help="B11: auto-exposure first-order lag, 0<a<=1 (0.15 = sluggish). Real "
+    "AE ramps over ~0.5-2 s after a scene change, so frames just after a "
+    "move are mis-exposed and then recover. --img-gamma is a FIXED shift "
+    "and cannot show this.",
+)
+parser.add_argument(
+    "--rotate-camera",
+    type=float,
+    default=None,
+    help="B7: pitch the FRONT camera by DEG degrees. Position jitter was tested in the campaign; ANGLE was not, and degrees move the image more than centimetres.",
+)
+parser.add_argument(
+    "--jitter-wrist-camera",
+    default=None,
+    help='B8: perturb the WRIST camera mount by "dx,dy,dz" metres - it was never perturbed at all.',
+)
+parser.add_argument(
+    "--park-oranges",
+    default=None,
+    help='C: comma-list of orange indices (e.g. "2,3") moved ~1 m out of the workspace, approximating removal. Score only the remaining orange(s).',
+)
 # --- Stage 0 additions (2026-08-09): observation EQUIVALENCE, not just robustness.
 # B7/B8 tested 5 deg and 2 cm and passed; the real rig differed by ~0.6 m, ~70 deg
 # and 25 deg of FOV. See sim_to_real_camera_alignment_20260809.md.
-parser.add_argument("--rotate-wrist-camera", type=float, default=None,
-                    help="Pitch the WRIST camera by N degrees about its local X. The wrist could "
-                         "previously only be TRANSLATED (--jitter-wrist-camera), but the real "
-                         "rig's wrist view differs mostly in ANGLE.")
-parser.add_argument("--camera-fov", type=float, default=None,
-                    help="Override the FRONT camera horizontal FOV in degrees (sim default ~40; "
-                         "a stock laptop webcam is ~60-70, which is why the real frames include "
-                         "the wall). Converted to focal_length against the 20.955 mm aperture.")
-parser.add_argument("--wrist-fov", type=float, default=None,
-                    help="Same for the WRIST camera (sim default ~32 deg).")
-parser.add_argument("--snapshot-dir", default=None,
-                    help="Save FRONT and WRIST frames as PNGs here at --snapshot-at steps. Ported "
-                         "from sim_harness_positive_control.py. This is how a sim view is matched "
-                         "against a real photo - camera extrinsics cannot be derived from a "
-                         "photograph, so you iterate visually.")
-parser.add_argument("--snapshot-at", default="30,60",
-                    help="Comma list of steps at which to save snapshots.")
+parser.add_argument(
+    "--rotate-wrist-camera",
+    type=float,
+    default=None,
+    help="Pitch the WRIST camera by N degrees about its local X. The wrist could "
+    "previously only be TRANSLATED (--jitter-wrist-camera), but the real "
+    "rig's wrist view differs mostly in ANGLE.",
+)
+parser.add_argument(
+    "--camera-fov",
+    type=float,
+    default=None,
+    help="Override the FRONT camera horizontal FOV in degrees (sim default ~40; "
+    "a stock laptop webcam is ~60-70, which is why the real frames include "
+    "the wall). Converted to focal_length against the 20.955 mm aperture.",
+)
+parser.add_argument(
+    "--wrist-fov", type=float, default=None, help="Same for the WRIST camera (sim default ~32 deg)."
+)
+parser.add_argument(
+    "--snapshot-dir",
+    default=None,
+    help="Save FRONT and WRIST frames as PNGs here at --snapshot-at steps. Ported "
+    "from sim_harness_positive_control.py. This is how a sim view is matched "
+    "against a real photo - camera extrinsics cannot be derived from a "
+    "photograph, so you iterate visually.",
+)
+parser.add_argument("--snapshot-at", default="30,60", help="Comma list of steps at which to save snapshots.")
 
 args = parser.parse_args()
 
@@ -213,9 +307,8 @@ import csv  # noqa: E402
 from pathlib import Path  # noqa: E402
 
 import gymnasium as gym  # noqa: E402
-import torch  # noqa: E402
-
 import leisaac  # noqa: F401,E402  (registers the tasks)
+import torch  # noqa: E402
 from isaaclab_tasks.utils import parse_env_cfg  # noqa: E402
 from leisaac.policy import LeRobotServicePolicyClient  # noqa: E402
 from leisaac.utils.env_utils import dynamic_reset_gripper_effort_limit_sim  # noqa: E402
@@ -293,20 +386,24 @@ def main() -> None:
                 continue
             old = cfg.init_state.pos
             cfg.init_state.pos = (old[0] + dx, old[1] + dy, old[2] + dz)
-            print(f"[eval] moved {name}: {tuple(round(v, 3) for v in old)} -> "
-                  f"{tuple(round(v, 3) for v in cfg.init_state.pos)}")
+            print(
+                f"[eval] moved {name}: {tuple(round(v, 3) for v in old)} -> "
+                f"{tuple(round(v, 3) for v in cfg.init_state.pos)}"
+            )
 
     if args.scatter_oranges:
         vals = [float(v) for v in args.scatter_oranges.split(",")]
         assert len(vals) == 6, "--scatter-oranges wants dx1,dy1,dx2,dy2,dx3,dy3"
-        for (name, dx, dy) in zip(ORANGES, vals[0::2], vals[1::2], strict=True):
+        for name, dx, dy in zip(ORANGES, vals[0::2], vals[1::2], strict=True):
             cfg = getattr(env_cfg.scene, name, None)
             if cfg is None:
                 continue
             old = cfg.init_state.pos
             cfg.init_state.pos = (old[0] + dx, old[1] + dy, old[2])
-            print(f"[eval] scattered {name}: {tuple(round(v, 3) for v in old)} -> "
-                  f"{tuple(round(v, 3) for v in cfg.init_state.pos)}")
+            print(
+                f"[eval] scattered {name}: {tuple(round(v, 3) for v in old)} -> "
+                f"{tuple(round(v, 3) for v in cfg.init_state.pos)}"
+            )
 
     if args.move_plate:
         dx, dy, dz = (float(v) for v in args.move_plate.split(","))
@@ -316,8 +413,10 @@ def main() -> None:
         else:
             old = cfg.init_state.pos
             cfg.init_state.pos = (old[0] + dx, old[1] + dy, old[2] + dz)
-            print(f"[eval] moved Plate: {tuple(round(v, 3) for v in old)} -> "
-                  f"{tuple(round(v, 3) for v in cfg.init_state.pos)}")
+            print(
+                f"[eval] moved Plate: {tuple(round(v, 3) for v in old)} -> "
+                f"{tuple(round(v, 3) for v in cfg.init_state.pos)}"
+            )
 
     if args.jitter_camera:
         dx, dy, dz = (float(v) for v in args.jitter_camera.split(","))
@@ -327,8 +426,10 @@ def main() -> None:
         else:
             old = cam.offset.pos
             cam.offset.pos = (old[0] + dx, old[1] + dy, old[2] + dz)
-            print(f"[eval] jittered front camera: {tuple(round(v, 3) for v in old)} -> "
-                  f"{tuple(round(v, 3) for v in cam.offset.pos)}")
+            print(
+                f"[eval] jittered front camera: {tuple(round(v, 3) for v in old)} -> "
+                f"{tuple(round(v, 3) for v in cam.offset.pos)}"
+            )
 
     if args.rotate_camera:
         import math
@@ -380,8 +481,9 @@ def main() -> None:
         aperture = getattr(cam.spawn, "horizontal_aperture", 20.955)
         old_f = cam.spawn.focal_length
         cam.spawn.focal_length = aperture / (2.0 * math.tan(math.radians(_flag) / 2.0))
-        print(f"[eval] {_name} camera FOV -> {_flag} deg "
-              f"(focal {old_f:.1f} -> {cam.spawn.focal_length:.1f} mm)")
+        print(
+            f"[eval] {_name} camera FOV -> {_flag} deg (focal {old_f:.1f} -> {cam.spawn.focal_length:.1f} mm)"
+        )
 
     if args.jitter_wrist_camera:
         dx, dy, dz = (float(v) for v in args.jitter_wrist_camera.split(","))
@@ -390,8 +492,10 @@ def main() -> None:
             raise RuntimeError("--jitter-wrist-camera: wrist camera not on scene cfg")
         old = cam.offset.pos
         cam.offset.pos = (old[0] + dx, old[1] + dy, old[2] + dz)
-        print(f"[eval] jittered wrist camera: {tuple(round(v, 3) for v in old)} -> "
-              f"{tuple(round(v, 3) for v in cam.offset.pos)}")
+        print(
+            f"[eval] jittered wrist camera: {tuple(round(v, 3) for v in old)} -> "
+            f"{tuple(round(v, 3) for v in cam.offset.pos)}"
+        )
 
     if args.park_oranges:
         # ~1 m to the side: out of both camera views and off the table. The
@@ -426,8 +530,10 @@ def main() -> None:
         old = plate.init_state.pos
         plate2.init_state.pos = (old[0] + dx, old[1] + dy, old[2])
         env_cfg.scene.Plate2 = plate2
-        print(f"[eval] second plate at {tuple(round(v, 3) for v in plate2.init_state.pos)} "
-              "(GT place term still tracks the ORIGINAL only)")
+        print(
+            f"[eval] second plate at {tuple(round(v, 3) for v in plate2.init_state.pos)} "
+            "(GT place term still tracks the ORIGINAL only)"
+        )
 
     if args.add_decoys:
         import isaaclab.sim as sim_utils
@@ -435,7 +541,7 @@ def main() -> None:
 
         # Offsets fan the decoys out between/around the real oranges.
         offsets = [(0.07, -0.07), (-0.09, 0.06), (0.05, 0.11), (-0.06, -0.10)]
-        base = getattr(env_cfg.scene, "Orange001").init_state.pos
+        base = env_cfg.scene.Orange001.init_state.pos
         for i in range(min(args.add_decoys, len(offsets))):
             ox, oy = offsets[i]
             decoy = RigidObjectCfg(
@@ -565,8 +671,12 @@ def main() -> None:
         )
         print(f"[eval] GR00T N1.7 client, cameras={gr00t_cameras} (scene has {list(camera_infos)})")
     else:
-        _cam_rename = dict(kv.split(":") for kv in args.camera_rename.split(",")) if args.camera_rename else {}
-        _client_infos = {_cam_rename.get(k, k): v for k, v in camera_infos.items()} if _cam_rename else camera_infos
+        _cam_rename = (
+            dict(kv.split(":") for kv in args.camera_rename.split(",")) if args.camera_rename else {}
+        )
+        _client_infos = (
+            {_cam_rename.get(k, k): v for k, v in camera_infos.items()} if _cam_rename else camera_infos
+        )
         policy = LeRobotServicePolicyClient(
             host=args.policy_host,
             port=args.policy_port,
@@ -580,8 +690,18 @@ def main() -> None:
         )
 
     # ---- PREFLIGHT: image perturbations + observation staleness ----
-    _img_mods_on = any([args.img_bgr_swap, args.img_noise, args.img_blur, args.img_jpeg,
-                        args.img_gamma, args.img_motion_blur, args.img_af_hunt, args.img_ae_lag])
+    _img_mods_on = any(
+        [
+            args.img_bgr_swap,
+            args.img_noise,
+            args.img_blur,
+            args.img_jpeg,
+            args.img_gamma,
+            args.img_motion_blur,
+            args.img_af_hunt,
+            args.img_ae_lag,
+        ]
+    )
     if _img_mods_on or args.obs_delay:
         import numpy as _np
 
@@ -603,11 +723,13 @@ def main() -> None:
         def _quat_to_mat(q):
             """wxyz -> 3x3. IsaacLab reports camera orientation as wxyz."""
             w, x, y, z = q
-            return _np.array([
-                [1 - 2 * (y * y + z * z), 2 * (x * y - w * z), 2 * (x * z + w * y)],
-                [2 * (x * y + w * z), 1 - 2 * (x * x + z * z), 2 * (y * z - w * x)],
-                [2 * (x * z - w * y), 2 * (y * z + w * x), 1 - 2 * (x * x + y * y)],
-            ])
+            return _np.array(
+                [
+                    [1 - 2 * (y * y + z * z), 2 * (x * y - w * z), 2 * (x * z + w * y)],
+                    [2 * (x * y + w * z), 1 - 2 * (x * x + z * z), 2 * (y * z - w * x)],
+                    [2 * (x * z - w * y), 2 * (y * z + w * x), 1 - 2 * (x * x + y * y)],
+                ]
+            )
 
         def _image_smear(cam_key: str, width: int):
             """Image-plane displacement (dx, dy) in px during one exposure.
@@ -641,12 +763,12 @@ def main() -> None:
                 return 0.0, 0.0, 0.0
             p0, q0 = prev
             R0, R1 = _quat_to_mat(q0), _quat_to_mat(quat)
-            v_world = (pos - p0) / _DT                       # m/s
+            v_world = (pos - p0) / _DT  # m/s
             v_cam = R1.T @ v_world
-            dR = R0.T @ R1                                   # relative rotation
-            omega = _np.array([dR[2, 1] - dR[1, 2],
-                               dR[0, 2] - dR[2, 0],
-                               dR[1, 0] - dR[0, 1]]) / (2.0 * _DT)   # rad/s, camera frame
+            dR = R0.T @ R1  # relative rotation
+            omega = _np.array([dR[2, 1] - dR[1, 2], dR[0, 2] - dR[2, 0], dR[1, 0] - dR[0, 1]]) / (
+                2.0 * _DT
+            )  # rad/s, camera frame
             # f in px from the camera's OWN cfg (never assume the 20.955 default -
             # this scene overrides horizontal_aperture and that already burned us).
             try:
@@ -740,30 +862,43 @@ def main() -> None:
                 a = a[None]
             return torch.from_numpy(_np.ascontiguousarray(a)).to(t.device)
 
-        print(f"[eval] PREFLIGHT mods: bgr={args.img_bgr_swap} noise={args.img_noise} "
-              f"blur={args.img_blur} jpeg={args.img_jpeg} gamma={args.img_gamma} delay={args.obs_delay}")
-        print(f"[eval] MOTION-COUPLED: motion_blur={args.img_motion_blur}ms "
-              f"af_hunt={args.img_af_hunt} ae_lag={args.img_ae_lag} stall={args.policy_stall}")
+        print(
+            f"[eval] PREFLIGHT mods: bgr={args.img_bgr_swap} noise={args.img_noise} "
+            f"blur={args.img_blur} jpeg={args.img_jpeg} gamma={args.img_gamma} delay={args.obs_delay}"
+        )
+        print(
+            f"[eval] MOTION-COUPLED: motion_blur={args.img_motion_blur}ms "
+            f"af_hunt={args.img_af_hunt} ae_lag={args.img_ae_lag} stall={args.policy_stall}"
+        )
 
     # obs_history[k] = the policy-facing observation as of k env-steps ago.
     from collections import deque as _deque
 
-    obs_history: "_deque[dict]" = _deque(maxlen=max(args.obs_delay, 0) + 1)
+    obs_history: _deque[dict] = _deque(maxlen=max(args.obs_delay, 0) + 1)
 
     def _remember(od: dict) -> None:
         """Snapshot the policy-facing obs (clone tensors - sim buffers may be
         reused in place) so --obs-delay can serve a genuinely OLD frame."""
         if args.obs_delay:
-            obs_history.append(
-                {k: (v.clone() if torch.is_tensor(v) else v) for k, v in od["policy"].items()}
-            )
+            obs_history.append({k: (v.clone() if torch.is_tensor(v) else v) for k, v in od["policy"].items()})
 
     obs_dict, _ = env.reset()
     _remember(obs_dict)
     out_path = Path(args.out)
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
-    fields = ["step", "ee_x", "ee_y", "ee_z", "d_orange1", "d_orange2", "d_orange3", "d_min", "d_grasp_min", "gripper_cmd"]
+    fields = [
+        "step",
+        "ee_x",
+        "ee_y",
+        "ee_z",
+        "d_orange1",
+        "d_orange2",
+        "d_orange3",
+        "d_min",
+        "d_grasp_min",
+        "gripper_cmd",
+    ]
     fields += [f"o{i}_{a}" for i in (1, 2, 3) for a in ("x", "y", "z")]
     fields += [f"pick_{o.lower()}" for o in ORANGES] + [f"put_{o.lower()}_to_plate" for o in ORANGES]
 
@@ -797,14 +932,19 @@ def main() -> None:
             actions = policy.get_action(policy_obs).to(env.device)
             if args.radian_actions:
                 import numpy as _np
+
                 _sysp = str(Path(__file__).parent)
                 import sys as _sys2
+
                 if _sysp not in _sys2.path:
                     _sys2.path.insert(0, _sysp)
                 from gr00t_n17_client_adapter import sim_to_motor as _s2m
+
                 _a = actions.cpu().numpy()
                 _shape = _a.shape
-                actions = torch.from_numpy(_s2m(_a.reshape(-1, _shape[-1])).astype("float32").reshape(_shape)).to(env.device)
+                actions = torch.from_numpy(
+                    _s2m(_a.reshape(-1, _shape[-1])).astype("float32").reshape(_shape)
+                ).to(env.device)
             if args.policy_type.startswith("gr00t") and actions.ndim == 2:
                 # The adapter returns [T, DOF]; the env loop below wants LeRobot's
                 # [T, 1, DOF]. (A flat [1, T*DOF] is also tolerated.)
@@ -840,7 +980,7 @@ def main() -> None:
                 # run3 fired the GT term at d_min=0.092 m because the GRASP frame
                 # was inside 0.05 m. Log both so a grasp can be judged honestly.
                 grasp_frame = None
-                if "ee_frame" in env.scene.keys():
+                if "ee_frame" in env.scene:
                     tgt = env.scene["ee_frame"].data.target_pos_w
                     ee = tgt[0, 0]
                     grasp_frame = tgt[0, 1] if tgt.shape[1] > 1 else None
@@ -908,7 +1048,9 @@ def main() -> None:
 
                 if step % 100 == 0:
                     handle.flush()
-                    print(f"[eval] step {step:4d}  d_min={row['d_min']:.3f} m  gripper={row['gripper_cmd']:+.2f}")
+                    print(
+                        f"[eval] step {step:4d}  d_min={row['d_min']:.3f} m  gripper={row['gripper_cmd']:+.2f}"
+                    )
                 step += 1
 
                 if bool(terminated[0]) or bool(timed_out[0]):

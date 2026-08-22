@@ -143,7 +143,7 @@ per evaluation is ~20 minutes. Batch the downloads, read the results together.
 **Screen candidates on FORMAT and OBSERVATION SPACE before downloading weights.**
 This eliminated two of three for roughly one API call and 1 GB.
 
-```text
+````text
 felixmayor/pi05_so101_orange_cube          RUNNABLE AS-IS - DO NOT CONVERT
   files: assets/so101/norm_stats.json, metadata.pt, model.safetensors, optimizer.pt
   That is OPENPI layout, not LeRobot - so it will NOT load in our LeRobot policy
@@ -203,10 +203,10 @@ abi chosen by torch._C._GLIBCXX_USE_CXX11_ABI; uninstall deepspeed (training-
 only, breaks the transformers import without CUDA_HOME). Server flag DIFFERS
 from n1.7: --embodiment-tag=NEW_EMBODIMENT (hyphen, uppercase).
 Any FURTHER n1.6 checkpoint is now nearly free.
-```
+````
 
-*** THE HEADING BELOW IS SUPERSEDED - kept for the reasoning that led here ***
-*** SIM-TRAINED CHECKPOINTS EXIST - AND BLACKWELL BLOCKS THEM (2026-08-05) ***
+**_ THE HEADING BELOW IS SUPERSEDED - kept for the reasoning that led here _**
+**_ SIM-TRAINED CHECKPOINTS EXIST - AND BLACKWELL BLOCKS THEM (2026-08-05) _**
 
 ```text
 Checkpoints trained INSIDE LeIsaac, on our exact task, all ungated:
@@ -254,54 +254,51 @@ This is why the harness positive control was done with LeIsaac's own state
 machine instead - no checkpoint, no venv, and it answered the same question.
 ```
 
-robocurve/gr00t-n1.7-so101-molmoact2   *** EVALUATED IN SIM - SEE BELOW ***
-  *** STATUS 2026-08-05 (final) - gate SOLVED, adapter WORKS, and the model has
-  now been SCORED in LeIsaac from ground truth. ***
+robocurve/gr00t-n1.7-so101-molmoact2 **_ EVALUATED IN SIM - SEE BELOW _**
+**_ STATUS 2026-08-05 (final) - gate SOLVED, adapter WORKS, and the model has
+now been SCORED in LeIsaac from ground truth. _**
 
-  RESULT: reaches the grasp frame to 0.039 m and closes the gripper (predicate
-  TRUE for 80 consecutive steps) - but the orange moves 0.0001 m. It approaches
-  far better than Pi05, which never satisfies even proximity+closure, and it
-  ACQUIRES NOTHING. No place, ever.
-  -> gr00t_n17_sim_evaluation_20260805.md   (full write-up + the 3 adapter bugs)
+RESULT: reaches the grasp frame to 0.039 m and closes the gripper (predicate
+TRUE for 80 consecutive steps) - but the orange moves 0.0001 m. It approaches
+far better than Pi05, which never satisfies even proximity+closure, and it
+ACQUIRES NOTHING. No place, ever.
+-> gr00t_n17_sim_evaluation_20260805.md (full write-up + the 3 adapter bugs)
 
-  WHAT IT WAS ACTUALLY TRAINED ON (checked the model card 2026-08-05, because
-  an earlier draft of the eval doc got this WRONG and said "table cleanup"):
-    SO-101 subset of allenai/MolmoAct2-SO100_101-Dataset
-    2,242 episodes / 1.8M frames, filtered from 39 public community repos
-    task family: tabletop pick/place, stacking, sorting
-    THE CARD PUBLISHES NO INSTRUCTION STRINGS. So no instruction we send can be
-    called "the training string", and phrasing experiments must be reported as
-    sensitivity, not as matching.
+WHAT IT WAS ACTUALLY TRAINED ON (checked the model card 2026-08-05, because
+an earlier draft of the eval doc got this WRONG and said "table cleanup"):
+SO-101 subset of allenai/MolmoAct2-SO100_101-Dataset
+2,242 episodes / 1.8M frames, filtered from 39 public community repos
+task family: tabletop pick/place, stacking, sorting
+THE CARD PUBLISHES NO INSTRUCTION STRINGS. So no instruction we send can be
+called "the training string", and phrasing experiments must be reported as
+sensitivity, not as matching.
 
-  THREE SCREENING CRITERIA THIS CHECKPOINT ADDED (apply to the NEXT one BEFORE
-  spending an hour on an adapter):
-    1. UNITS. Read experiment_cfg/dataset_statistics.json FIRST. Arm ~ +/-100
-       and gripper ~ 0..100 means LeRobot MOTOR units, NOT the sim's radians.
-       LeIsaac's LeRobot client converts; a hand-written client must too.
-    2. ABSOLUTE vs RELATIVE. conf.yaml `use_relative_action` + the per-modality
-       `reps:` list. Here [RELATIVE, ABSOLUTE] - arm is a delta, gripper is not.
-    3. CAMERA COUNT. conf.yaml video.modality_keys is the authority. Sending a
-       view it never trained on is actively harmful (S2 proved that on Pi05).
+THREE SCREENING CRITERIA THIS CHECKPOINT ADDED (apply to the NEXT one BEFORE
+spending an hour on an adapter): 1. UNITS. Read experiment_cfg/dataset_statistics.json FIRST. Arm ~ +/-100
+and gripper ~ 0..100 means LeRobot MOTOR units, NOT the sim's radians.
+LeIsaac's LeRobot client converts; a hand-written client must too. 2. ABSOLUTE vs RELATIVE. conf.yaml `use_relative_action` + the per-modality
+`reps:` list. Here [RELATIVE, ABSOLUTE] - arm is a delta, gripper is not. 3. CAMERA COUNT. conf.yaml video.modality_keys is the authority. Sending a
+view it never trained on is actively harmful (S2 proved that on Pi05).
 
-  SOLVED:
-    gated backbone nvidia/Cosmos-Reason2-2B: access granted (gated: auto - a
-      licence click, free, instant). User authenticated as `kgaikwad`.
-      Backbone cached at ~/.cache/huggingface/hub/models--nvidia--Cosmos-Reason2-2B
-      (4.6 GB) - OFFLINE FROM NOW ON, and it unblocks the ENTIRE GR00T track
-      including S3 and S5 fine-tuning.
-    GR00T server runs: 1,091,722,240 DiT params + 201,433,088 SelfAttn params
-      loaded, ZMQ REP bound on :5555.
-      ./.venv/bin/python -m gr00t.eval.run_gr00t_server \
-        --model_path=~/lerobot_assets/checkpoints/gr00t_n17_so101 \
-        --embodiment_tag=new_embodiment --port=5555
-    sim venv needed pyzmq (LeIsaac's [gr00t] extra); `uv pip install pyzmq
+SOLVED:
+gated backbone nvidia/Cosmos-Reason2-2B: access granted (gated: auto - a
+licence click, free, instant). User authenticated as `kgaikwad`.
+Backbone cached at ~/.cache/huggingface/hub/models--nvidia--Cosmos-Reason2-2B
+(4.6 GB) - OFFLINE FROM NOW ON, and it unblocks the ENTIRE GR00T track
+including S3 and S5 fine-tuning.
+GR00T server runs: 1,091,722,240 DiT params + 201,433,088 SelfAttn params
+loaded, ZMQ REP bound on :5555.
+./.venv/bin/python -m gr00t.eval.run_gr00t_server \
+ --model_path=~/lerobot_assets/checkpoints/gr00t_n17_so101 \
+ --embodiment_tag=new_embodiment --port=5555
+sim venv needed pyzmq (LeIsaac's [gr00t] extra); `uv pip install pyzmq
       msgpack` - verified it does NOT disturb torch 2.7.0+cu128/sm_120.
-    checkpoint schema is CORRECT: new_embodiment -> action ['single_arm',
-      'gripper'], state ['single_arm','gripper'] - exactly what LeIsaac wants.
+checkpoint schema is CORRECT: new_embodiment -> action ['single_arm',
+'gripper'], state ['single_arm','gripper'] - exactly what LeIsaac wants.
 
-  *** SOLVED 2026-08-05: N1.7 NOW WORKS via a written adapter. ***
-    scripts/gr00t_n17_client_adapter.py  ->  Gr00tN17Client
-    Returns [16, 6] float32 = 16 timesteps x 6 DoF, IN SIM RADIANS.
+**_ SOLVED 2026-08-05: N1.7 NOW WORKS via a written adapter. _**
+scripts/gr00t_n17_client_adapter.py -> Gr00tN17Client
+Returns [16, 6] float32 = 16 timesteps x 6 DoF, IN SIM RADIANS.
 
     WARNING - an earlier note here quoted a smoke test of "(1, 96), first row
     [0.0971, 2.724, -0.7633, ...]". Those numbers came from the BUGGED adapter
@@ -317,7 +314,7 @@ robocurve/gr00t-n1.7-so101-molmoact2   *** EVALUATED IN SIM - SEE BELOW ***
       returned actions stay within ~0.5 rad of the current state
       round-trip motor_to_sim(sim_to_motor(x)) == x to 1.5e-7
 
-  THE N1.6 -> N1.7 WIRE FORMAT MAP (seven differences, one probe each):
+THE N1.6 -> N1.7 WIRE FORMAT MAP (seven differences, one probe each):
 
 ```text
     LeIsaac n1.6 client sends        GR00T N1.7 server wants
@@ -352,59 +349,60 @@ testable, which is worth having, but it was not free. Weigh that before
 attempting the same for other non-matching checkpoints.
 ```
 
-  ORIGINAL FAILURE ANALYSIS (kept - LeIsaac supports gr00tn1.5 / gr00tn1.6 only):
-    gr00tn1.5 client -> KeyError: 'action.single_arm'
-      cause: it sends annotation.human.ACTION.task_description; the checkpoint
-      declares annotation.human.task_description. (line 65 vs the checkpoint's
-      experiment_cfg). FIX: use --policy_type=gr00tn1.6, which sends the right
-      key at service_policy_clients.py:136.
-    gr00tn1.6 client -> ValueError: zero-dimensional arrays cannot be concatenated
-      the keys now EXIST but the returned values are 0-d where the client does
-      np.concatenate([action_chunk["action.single_arm"],
-                      action_chunk["action.gripper"]])
-      i.e. a RESPONSE-SHAPE gap between an n1.6 client and an N1.7 server.
+ORIGINAL FAILURE ANALYSIS (kept - LeIsaac supports gr00tn1.5 / gr00tn1.6 only):
+gr00tn1.5 client -> KeyError: 'action.single_arm'
+cause: it sends annotation.human.ACTION.task_description; the checkpoint
+declares annotation.human.task_description. (line 65 vs the checkpoint's
+experiment_cfg). FIX: use --policy_type=gr00tn1.6, which sends the right
+key at service_policy_clients.py:136.
+gr00tn1.6 client -> ValueError: zero-dimensional arrays cannot be concatenated
+the keys now EXIST but the returned values are 0-d where the client does
+np.concatenate([action_chunk["action.single_arm"],
+action_chunk["action.gripper"]])
+i.e. a RESPONSE-SHAPE gap between an n1.6 client and an N1.7 server.
 
-  HONEST COST NOTE: the goal was "use someone else's work AS IS instead of
-  spending hours". Bridging n1.6 -> N1.7 means writing a client adapter, which
-  is exactly the hours that goal was meant to avoid. The FINE-TUNE path (S3/S5)
-  uses GR00T's OWN tooling end to end, with no version bridging, and produces a
-  checkpoint whose format matches its server by construction - now unblocked by
-  the same gated access.
+HONEST COST NOTE: the goal was "use someone else's work AS IS instead of
+spending hours". Bridging n1.6 -> N1.7 means writing a client adapter, which
+is exactly the hours that goal was meant to avoid. The FINE-TUNE path (S3/S5)
+uses GR00T's OWN tooling end to end, with no version bridging, and produces a
+checkpoint whose format matches its server by construction - now unblocked by
+the same gated access.
 
-robocurve/gr00t-n1.7-so101-molmoact2       (original screening notes)
-  *** 2026-08-05: DOWNLOADED (6.1 GB, both shards verified, 1030 tensors) AND
-  THE SERVER WILL NOT START: ***
-    RuntimeError: Cannot download the VLM backbone 'nvidia/Cosmos-Reason2-2B',
-    which is a gated Hugging Face repo. EVERY GR00T CHECKPOINT (including the
-    base nvidia/GR00T-N1.7-3B) loads this backbone, so BOTH zero-shot inference
-    AND FINETUNING require access.
+robocurve/gr00t-n1.7-so101-molmoact2 (original screening notes)
+**_ 2026-08-05: DOWNLOADED (6.1 GB, both shards verified, 1030 tensors) AND
+THE SERVER WILL NOT START: _**
+RuntimeError: Cannot download the VLM backbone 'nvidia/Cosmos-Reason2-2B',
+which is a gated Hugging Face repo. EVERY GR00T CHECKPOINT (including the
+base nvidia/GR00T-N1.7-3B) loads this backbone, so BOTH zero-shot inference
+AND FINETUNING require access.
 
-  => THIS BLOCKS THE WHOLE GR00T TRACK, not just this checkpoint. S3 (fine-tune
-     on NVIDIA's data) and S5 (fine-tune on our sim data) need it too.
-  => USER ACTION: request access at huggingface.co/nvidia/Cosmos-Reason2-2B,
-     then `~/sim/Isaac-GR00T/.venv/bin/hf auth login` (the user types the token;
-     it must not appear in a transcript - project hard rule #3).
-  => UNLIKE PaliGemma, this CANNOT be recovered from the old laptop's cache -
-     GR00T was never run there.
-  The 6.1 GB we hold is the ACTION EXPERT + adapters only; the vision-language
-  backbone is a separate gated download.
+=> THIS BLOCKS THE WHOLE GR00T TRACK, not just this checkpoint. S3 (fine-tune
+on NVIDIA's data) and S5 (fine-tune on our sim data) need it too.
+=> USER ACTION: request access at huggingface.co/nvidia/Cosmos-Reason2-2B,
+then `~/sim/Isaac-GR00T/.venv/bin/hf auth login` (the user types the token;
+it must not appear in a transcript - project hard rule #3).
+=> UNLIKE PaliGemma, this CANNOT be recovered from the old laptop's cache -
+GR00T was never run there.
+The 6.1 GB we hold is the ACTION EXPERT + adapters only; the vision-language
+backbone is a separate gated download.
 
-  Protocols DO match, so this is purely an access problem:
-    GR00T PolicyServer binds ZMQ REP on port 5555 (gr00t/policy/server_client.py)
-    LeIsaac Gr00tServicePolicyClient connects ZMQ to 5555
-    run_gr00t_server.py defaults embodiment_tag=new_embodiment - matches the ckpt
-  Start command once unblocked:
-    ./.venv/bin/python -m gr00t.eval.run_gr00t_server \
-      --model_path=~/lerobot_assets/checkpoints/gr00t_n17_so101 \
-      --embodiment_tag=new_embodiment --port=5555
+Protocols DO match, so this is purely an access problem:
+GR00T PolicyServer binds ZMQ REP on port 5555 (gr00t/policy/server_client.py)
+LeIsaac Gr00tServicePolicyClient connects ZMQ to 5555
+run_gr00t_server.py defaults embodiment_tag=new_embodiment - matches the ckpt
+Start command once unblocked:
+./.venv/bin/python -m gr00t.eval.run_gr00t_server \
+ --model_path=~/lerobot_assets/checkpoints/gr00t_n17_so101 \
+ --embodiment_tag=new_embodiment --port=5555
 
-robocurve/gr00t-n1.7-so101-molmoact2  (original screening notes)
-  embodiment_tag: new_embodiment              <- the SO-101 path
-  video modality_keys: front, wrist           <- EXACTLY what LeIsaac exposes
-  action space: xdof_relative_eef_relative_joint  <- RELATIVE, gripper separate
-  Complete checkpoint: model-0000{1,2}-of-00002.safetensors + adapters/ +
-  experiment_cfg/ + processor/  (~6 GB)
-```
+robocurve/gr00t-n1.7-so101-molmoact2 (original screening notes)
+embodiment_tag: new_embodiment <- the SO-101 path
+video modality_keys: front, wrist <- EXACTLY what LeIsaac exposes
+action space: xdof_relative_eef_relative_joint <- RELATIVE, gripper separate
+Complete checkpoint: model-0000{1,2}-of-00002.safetensors + adapters/ +
+experiment_cfg/ + processor/ (~6 GB)
+
+````
 
 ### THE CHEAPEST SCREEN: does its observation space match an env we HAVE?
 
@@ -427,7 +425,7 @@ and why there is essentially only one of it for the SO-101.
         load is not the same as a format we cannot RUN. ***
      3. action space absolute vs relative     (config file, free)
      4. only then download weights
-```
+````
 
 ```text
 LESSON FROM GETTING THIS WRONG: the first pass rejected the openpi checkpoint on

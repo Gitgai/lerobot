@@ -16,7 +16,6 @@ import time
 from pathlib import Path
 
 import cv2
-
 from pi05_guarded_real_action_test import (
     CONFIG_PATH,
     SO101_MOTORS,
@@ -162,7 +161,9 @@ def main() -> None:
                 writer_csv.writeheader()
                 writer_csv.writerow({"phase": "before", **{"action_index": -1}, **before_state})
                 for action_index in range(num_actions):
-                    writer_csv.writerow({"phase": "dry_chunk", **action_row(action_index, actions[action_index])})
+                    writer_csv.writerow(
+                        {"phase": "dry_chunk", **action_row(action_index, actions[action_index])}
+                    )
             print()
             print(f"DRY_RUN_OK actions_logged={num_actions}")
             print(f"action_log: {action_log_path}")
@@ -200,7 +201,9 @@ def main() -> None:
                 while time.perf_counter() < settle_until:
                     observation = robot.get_observation()
                     if record_camera_name in observation:
-                        write_camera_frame(observation[record_camera_name], writer, show_camera=args.show_camera)
+                        write_camera_frame(
+                            observation[record_camera_name], writer, show_camera=args.show_camera
+                        )
                     time.sleep(max(1.0 / args.record_fps, 0.01))
 
             after_state = read_state(robot)

@@ -9,7 +9,6 @@ Why does replay of our recorded episodes pick/move the orange, but the fine-tune
 1. Replay proves the robot/action side works.
 
    We replayed several cleaned dataset episodes on the real follower arm. The user confirmed the replay actually picked/moved the orange. Replay does not use Pi05 or cameras; it only sends the recorded action trajectory to the follower. This proves:
-
    - the follower can physically execute the dataset actions
    - calibration/action units are good enough for these recorded trajectories
    - the cleaned dataset actions are not impossible for the robot

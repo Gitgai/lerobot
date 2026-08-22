@@ -20,7 +20,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-
 DEFAULT_ORANGE49_ROOT = Path("/data/lerobot_datasets/so101_orange_49")
 DEFAULT_FOCUS_ROOT = Path("/data/lerobot_datasets/so101_orange_49_grasp_pick_move_focus")
 DEFAULT_OUTPUT_ROOT = Path("/data/lerobot_datasets/so101_orange_49_plus_grasp_pick_move_focus")
@@ -123,7 +122,9 @@ def build_dataset(
     print(f"repo_id: {repo_id}")
     print(f"orange49 episodes/frames: {orange_episode_count}/{orange_frame_count}")
     print(f"focus episodes/frames: {focus_episode_count}/{focus_frame_count}")
-    print(f"output episodes/frames: {orange_episode_count + focus_episode_count}/{orange_frame_count + focus_frame_count}")
+    print(
+        f"output episodes/frames: {orange_episode_count + focus_episode_count}/{orange_frame_count + focus_frame_count}"
+    )
 
     if dry_run:
         print()

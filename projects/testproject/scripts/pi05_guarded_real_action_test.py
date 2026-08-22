@@ -40,7 +40,6 @@ from lerobot.transport.utils import grpc_channel_options, send_bytes_in_chunks
 from lerobot.utils.constants import OBS_STR
 from lerobot.utils.feature_utils import hw_to_dataset_features
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 CONFIG_PATH = PROJECT_ROOT / "config" / "so101.json"
 
@@ -73,7 +72,9 @@ def build_camera_config(
     fourcc_key: str | None = None,
     warmup_key: str | None = None,
 ) -> OpenCVCameraConfig:
-    warmup_s = cfg.get(warmup_key, cfg.get("camera_warmup_s", 1)) if warmup_key else cfg.get("camera_warmup_s", 1)
+    warmup_s = (
+        cfg.get(warmup_key, cfg.get("camera_warmup_s", 1)) if warmup_key else cfg.get("camera_warmup_s", 1)
+    )
     return OpenCVCameraConfig(
         index_or_path=cfg[index_key],
         width=cfg["camera_width"],
@@ -146,7 +147,7 @@ def make_robot(
 def make_lerobot_features(image_shape: tuple[int, int, int]) -> dict[str, PolicyFeature]:
     hardware_features: dict[str, type | tuple[int, int, int]] = {
         **{f"{motor}.pos": float for motor in SO101_MOTORS},
-        **{camera: image_shape for camera in PI05_CAMERA_NAMES},
+        **dict.fromkeys(PI05_CAMERA_NAMES, image_shape),
     }
     return hw_to_dataset_features(hardware_features, OBS_STR, use_video=False)
 
@@ -162,7 +163,7 @@ def resize_rgb(image: np.ndarray, width: int, height: int) -> np.ndarray:
 
 
 def fetch_remote_jpeg(url: str, timeout_s: float = 5.0) -> np.ndarray:
-    with urllib.request.urlopen(url, timeout=timeout_s) as response:
+    with urllib.request.urlopen(url, timeout=timeout_s) as response:  # nosec B310 - lab camera proxy, http only
         data = response.read()
     image_bytes = np.frombuffer(data, dtype=np.uint8)
     bgr = cv2.imdecode(image_bytes, cv2.IMREAD_COLOR)
@@ -376,7 +377,8 @@ def setup_remote_policy(
     else:
         setup_start = time.perf_counter()
         stub.SendPolicyInstructions(
-            services_pb2.PolicySetup(data=pickle.dumps(policy_config)), timeout=args.timeout_s  # nosec B301
+            services_pb2.PolicySetup(data=pickle.dumps(policy_config)),
+            timeout=args.timeout_s,  # nosec B301
         )
         print(f"policy_setup_s: {time.perf_counter() - setup_start:.3f}")
 
@@ -456,7 +458,9 @@ def clamp_first_action(
     return safe_action
 
 
-def print_action_table(current_state: dict[str, float], policy_action: torch.Tensor, safe_action: dict[str, float]) -> None:
+def print_action_table(
+    current_state: dict[str, float], policy_action: torch.Tensor, safe_action: dict[str, float]
+) -> None:
     print()
     print("motor              current      policy_first      safe_target      safe_delta")
     print("-" * 78)
@@ -634,7 +638,9 @@ def main() -> None:
     print(f"server_address: {args.server_address}")
     print(f"policy: {args.policy}")
     print(f"follower_port: {follower_port(cfg)}")
-    print(f"front camera: {cfg.get('front_camera_name', cfg['camera_name'])} index={cfg.get('front_camera_index', cfg['camera_index'])}")
+    print(
+        f"front camera: {cfg.get('front_camera_name', cfg['camera_name'])} index={cfg.get('front_camera_index', cfg['camera_index'])}"
+    )
     if "top_camera_name" in cfg and "top_camera_index" in cfg:
         print(f"top camera: {cfg['top_camera_name']} index={cfg['top_camera_index']}")
     if args.no_step_clamp:
@@ -710,7 +716,9 @@ def main() -> None:
     print("after_state:")
     for motor in SO101_MOTORS:
         key = f"{motor}.pos"
-        print(f"  {key}: {after_state[key]:.3f}  delta_from_before={after_state[key] - current_state[key]:.3f}")
+        print(
+            f"  {key}: {after_state[key]:.3f}  delta_from_before={after_state[key] - current_state[key]:.3f}"
+        )
     print("GUARDED_ONE_STEP_OK")
 
 

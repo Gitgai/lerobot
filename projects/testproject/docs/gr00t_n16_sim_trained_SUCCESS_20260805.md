@@ -1,4 +1,4 @@
-# *** A POLICY FINALLY PICKED UP THE ORANGE ***
+# **_ A POLICY FINALLY PICKED UP THE ORANGE _**
 
 Date: 2026-08-05. Checkpoint: `12e21/gr00t_n1d6_leisaac_pick_orange` (GR00T N1.6,
 fine-tuned **inside LeIsaac** on this exact task). Scene
@@ -32,14 +32,14 @@ pick_orange002: 31 TRUE steps, longest hold 23, lift +0.039 m, moved 0.115 m
    a weaker second attempt
 ```
 
-The orange rose 17 cm *during a single unbroken 59-step hold* and moved 26 cm
+The orange rose 17 cm _during a single unbroken 59-step hold_ and moved 26 cm
 sideways. Compare GR00T N1.7's best: predicate TRUE for 80 steps, object
 displaced 0.0029 m. **The displacement metric separates these instantly, and it
 is the only metric that does.**
 
-**It did NOT place** *in that 900-step run*. All three `put_*_to_plate` stayed 0.
+**It did NOT place** _in that 900-step run_. All three `put_*_to_plate` stayed 0.
 
-## 1b. *** IT PLACES. ALL THREE. THE RUN WAS JUST TOO SHORT. ***
+## 1b. **_ IT PLACES. ALL THREE. THE RUN WAS JUST TOO SHORT. _**
 
 Re-run at **3,000 steps**, everything else identical:
 
@@ -55,7 +55,7 @@ place-term steps   GR00T N1.6: 33     state machine: 16
 
 The physical sequence is exactly right and it repeats three times: **grasp →
 lift ~0.17-0.19 m → carry → place → release**. Each `put_*_to_plate` fires
-immediately *after* that orange's peak lift, and each orange comes to rest
+immediately _after_ that orange's peak lift, and each orange comes to rest
 ABOVE its table height — sitting on the plate.
 
 ```text
@@ -95,9 +95,9 @@ wrong about what they saw, but they cannot support "never does X".
 
 ## 3. What it cost, and the claim I got wrong
 
-I had told the user this comparison was effectively out of reach: *"old
+I had told the user this comparison was effectively out of reach: _"old
 checkpoint eras pin old torch, which has no sm_120, so Era 1 and Blackwell
-conflict."* **I asserted that instead of checking it.** The real pins:
+conflict."_ **I asserted that instead of checking it.** The real pins:
 
 ```text
 release          torch pin    sm_120 / Blackwell?

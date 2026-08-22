@@ -110,7 +110,7 @@ reset: orange back to a training-like spot, arm to start pose,
        gripper opened to state ~40-55
 ```
 
-Same client command with a fresh --trace-dir name (e.g. full_smooth_...).
+Same client command with a fresh --trace-dir name (e.g. full*smooth*...).
 Let it run through grasp -> lift -> carry -> place. Stop when the orange is
 placed and released, or when it clearly loops (>~700 actions like last time).
 
@@ -184,7 +184,7 @@ discovery (each with trace evidence):
 
 Final attempt (fixed camera, clean scene, defaults): the closest miss of the
 day - contact, strong close, partial lift, orange slipped out; then retry
-loop. Trace: final_attempt_* of 2026-07-29.
+loop. Trace: final*attempt*\* of 2026-07-29.
 
 Session verdict:
 

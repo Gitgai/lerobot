@@ -58,7 +58,9 @@ def main() -> None:
     for r in runs:
         lifts = "[" + ", ".join(f"{v:.3f}" for v in r["lifts"]) + "]"
         fp = str(r["first_place"]) if r["first_place"] is not None else "-"
-        print(f"{r['name']:22s} {r['steps']:>6d} {r['placed']:>5d}/3 {lifts:>26s} {r['place_steps']:>11d} {fp:>9s}")
+        print(
+            f"{r['name']:22s} {r['steps']:>6d} {r['placed']:>5d}/3 {lifts:>26s} {r['place_steps']:>11d} {fp:>9s}"
+        )
 
     placed = [r["placed"] for r in runs]
     full = sum(1 for p in placed if p == 3)
@@ -74,7 +76,9 @@ def main() -> None:
     print(f"  oranges placed         : {sum(placed)}/{3 * total} = {100 * sum(placed) / (3 * total):.0f}%")
     print(f"  real grasps (lift>0.10): {real_grasps}/{3 * total}")
     if total > 1:
-        print(f"  placed per run         : mean {statistics.mean(placed):.2f}, stdev {statistics.stdev(placed):.2f}")
+        print(
+            f"  placed per run         : mean {statistics.mean(placed):.2f}, stdev {statistics.stdev(placed):.2f}"
+        )
     firsts = [r["first_place"] for r in runs if r["first_place"] is not None]
     if firsts:
         print(f"  first place at step    : min {min(firsts)}, max {max(firsts)}")

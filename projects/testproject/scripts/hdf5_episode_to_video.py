@@ -37,7 +37,9 @@ def main() -> None:
     parser.add_argument("--camera", default="front", help="obs key, e.g. front | wrist")
     parser.add_argument("--fps", type=int, default=30)
     parser.add_argument("--out", default=None, help="output mp4 (default: logs/<episode>_<camera>.mp4)")
-    parser.add_argument("--list", action="store_true", help="list episodes and their success flags, then exit")
+    parser.add_argument(
+        "--list", action="store_true", help="list episodes and their success flags, then exit"
+    )
     args = parser.parse_args()
 
     with h5py.File(args.file, "r") as handle:
@@ -71,11 +73,26 @@ def main() -> None:
         # array (a single camera stream is ~2.2 GB).
         proc = subprocess.Popen(
             [
-                "ffmpeg", "-y", "-loglevel", "error",
-                "-f", "rawvideo", "-pix_fmt", "rgb24",
-                "-s", f"{width}x{height}", "-r", str(args.fps),
-                "-i", "-",
-                "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "23",
+                "ffmpeg",
+                "-y",
+                "-loglevel",
+                "error",
+                "-f",
+                "rawvideo",
+                "-pix_fmt",
+                "rgb24",
+                "-s",
+                f"{width}x{height}",
+                "-r",
+                str(args.fps),
+                "-i",
+                "-",
+                "-c:v",
+                "libx264",
+                "-pix_fmt",
+                "yuv420p",
+                "-crf",
+                "23",
                 str(out_path),
             ],
             stdin=subprocess.PIPE,

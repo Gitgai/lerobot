@@ -11,9 +11,9 @@ Date: 2026-08-11, kiran-AI90. Follows
 
 **Status: NOT STARTED. Steps 1–3 are pre-authorised to run unattended (§A).**
 
-> Phase 1 answered *"does 4.14B fit and step?"* — **yes, 24.74 GiB peak, 7.10 GiB
-> spare, 1.88× slower than expert-only.** It did **not** answer *"can we train a
-> model here?"* Those come apart in two specific places, and this phase closes
+> Phase 1 answered _"does 4.14B fit and step?"_ — **yes, 24.74 GiB peak, 7.10 GiB
+> spare, 1.88× slower than expert-only.** It did **not** answer _"can we train a
+> model here?"_ Those come apart in two specific places, and this phase closes
 > both.
 
 ```text
@@ -82,7 +82,7 @@ prompt", not "no reporting".
 
 ---
 
-# STEP 1 — fix checkpointing with 8-bit Adam  `[~30 min]` 🟢
+# STEP 1 — fix checkpointing with 8-bit Adam `[~30 min]` 🟢
 
 **This is the blocker. Nothing else matters until it is done.**
 
@@ -135,10 +135,10 @@ round-trip proves it. **A save that cannot be resumed from is not a fix.**
 
 ---
 
-# STEP 2 — largest batch that fits  `[~20 min]` 🟢
+# STEP 2 — largest batch that fits `[~20 min]` 🟢
 
 **The highest-value measurement available, and it is 20 minutes.** It converts
-*"it fits"* into *"it is practical"*, and it decides whether gradient
+_"it fits"_ into _"it is practical"_, and it decides whether gradient
 accumulation — an unimplemented second code change — is needed at all.
 
 ## Why it is likely to succeed
@@ -174,7 +174,7 @@ max batch 1-2     gradient accumulation IS needed → a second code change
 
 ---
 
-# STEP 3 — the LIBERO capability run  `[~8 h]` 🟢
+# STEP 3 — the LIBERO capability run `[~8 h]` 🟢
 
 **This is the run that actually answers the operator's question.**
 
@@ -224,7 +224,7 @@ across a full run, bs16 can be used afterwards with evidence rather than hope.
 
 ⚠ **bs16 is HALF LeRobot's reference batch of 32.** Effective 32 would need
 2-step gradient accumulation — the code change STEP 2 just made unnecessary for
-*fitting*. Whether it matters for *convergence* is a training-quality question
+_fitting_. Whether it matters for _convergence_ is a training-quality question
 this plan does not answer, and it should not be smuggled into a capability run.
 
 ## Instrument beyond phase 1 — long runs fail differently
@@ -246,7 +246,7 @@ loss finite and trending down · checkpoint RELOADS and produces finite actions
 
 ---
 
-# STEP 3b — DID THE MEMORY LEVERS COST QUALITY?  `[~30 min]` 🟢
+# STEP 3b — DID THE MEMORY LEVERS COST QUALITY? `[~30 min]` 🟢
 
 **Operator's question: "Adam 8 vs 32, f32 vs f16 — are we compromising quality
 or just training speed?" We do not know, because NOTHING SO FAR MEASURES
@@ -307,8 +307,8 @@ lerobot-eval --policy.path=<step-12000 checkpoint> ...   # LIBERO Spatial
 **First result: 70.0% (28/40) from `pi05_base` + 12k steps @ bs8. Against 97.0%
 that looks like a 27-point gap. IT IS NOT A VALID COMPARISON.**
 
-`docs/source/pi05.mdx` says: *"we finetuned **the libero base model** for an
-additional 6k steps"*. There is a separate Hub checkpoint,
+`docs/source/pi05.mdx` says: _"we finetuned **the libero base model** for an
+additional 6k steps"_. There is a separate Hub checkpoint,
 `lerobot/pi05_libero_base`, and its config is LIBERO-shaped where `pi05_base` is
 generic:
 
@@ -338,9 +338,9 @@ pi05_libero_base, ZERO-SHOT on LIBERO Spatial, no training:  0.0%  (0/40)
 ```
 
 ⇒ **`pi05_libero_base` was NOT trained to solve LIBERO.** It is a base model
-*shaped* for LIBERO's observation and action space (`image`/`image2`, state[8],
+_shaped_ for LIBERO's observation and action space (`image`/`image2`, state[8],
 action[7] = Franka Panda 7-DoF + gripper) with **no task competence at all**.
-"libero base" means *base model FOR libero*, not *trained ON libero*.
+"libero base" means _base model FOR libero_, not _trained ON libero_.
 
 ⇒ **My earlier claim that the reference had a capability head start is WRONG and
 is retracted.** Both runs started from zero ability. Config was not weights, and
@@ -387,8 +387,8 @@ cheap probe bs8      6,000 ×  8      48,000    ~1.7 h      NOT comparable to
 
 ⚠ **The capability question is ALREADY ANSWERED — yes.** STEP 3 proved the 5090
 trains π0.5 sustained and stable; 0%→70% proved the pipeline produces a working
-policy. A matched run answers only the narrower follow-up: *did the memory
-levers cost accuracy?* Scope it accordingly; it is not on the critical path.
+policy. A matched run answers only the narrower follow-up: _did the memory
+levers cost accuracy?_ Scope it accordingly; it is not on the critical path.
 
 ## Corrected decision rule — for the MATCHED run
 
@@ -422,7 +422,7 @@ licence, STOP** (§A).
 
 ---
 
-# STEP 3c — HOW MUCH DOES FULL FINE-TUNING FORGET?  `[~10 min]` 🟢
+# STEP 3c — HOW MUCH DOES FULL FINE-TUNING FORGET? `[~10 min]` 🟢
 
 **Operator's question: "would it learn to pick oranges, fold laundry and
 whatever LIBERO is doing? Or will it forget one task while learning another?"**
@@ -444,7 +444,7 @@ expert-only  693M trainable   VLM PRESERVED     less adaptation capacity
 full FT     4.14B trainable   VLM OVERWRITTEN   max adaptation, max forgetting
 ```
 
-We spent the day proving the 5090 *can* do the second. Whether you *want* it
+We spent the day proving the 5090 _can_ do the second. Whether you _want_ it
 depends on whether the goal is a specialist or a generalist.
 
 ## The measurement
@@ -462,11 +462,11 @@ libero_10        no            long-horizon; hardest, expect least transfer
 
 ⚠ **Confound to state up front: we do not have a "before" number.** The honest
 baseline for "did it forget?" would be `pi05_base` evaluated on `libero_object`
-*before* our training — but `pi05_base` has the wrong camera keys and action
+_before_ our training — but `pi05_base` has the wrong camera keys and action
 dims for LIBERO, and `pi05_libero_base` scores **0%** on everything (STEP 3b.0).
 ⇒ **So this measures TRANSFER, not FORGETTING.** Both start from zero
 competence, so any score above 0 on an unseen suite is capability our training
-*created* and that generalised — not capability it destroyed. Do not report this
+_created_ and that generalised — not capability it destroyed. Do not report this
 as a forgetting number.
 
 ## Interpretation, written before the result
@@ -509,7 +509,7 @@ avg_MAX_reward = 0.0                          ⇒ never even PARTIAL credit. Not
 and NOTHING ELSE** — not even neighbouring suites with the same robot, same
 cameras, same scene type, same action space. Only the objects and goals differ.
 
-⚠ **Caveat on mechanism.** This is specialisation of the *whole checkpoint*, and
+⚠ **Caveat on mechanism.** This is specialisation of the _whole checkpoint_, and
 that includes the **normalisation statistics**, which were fit on
 `libero_spatial` and ship inside the checkpoint. Different suites have different
 state/action distributions. So the 0% is not purely "the network forgot" — some
@@ -535,7 +535,7 @@ want it is now a design decision with a number attached rather than a hunch.
 
 ---
 
-# STEP 3d — THE MATCHED-DATA RUN  `[~6.8 h, overnight]` 🟢
+# STEP 3d — THE MATCHED-DATA RUN `[~6.8 h, overnight]` 🟢
 
 **The run that finally isolates the operator's original question: did 8-bit Adam
 and bf16 cost accuracy?**
@@ -628,8 +628,8 @@ systemd, or an SSH session before login would find the path missing and fail.
 
 **Why is it NTFS at all?** `nvme1n1p1` is a 16 MB partition with no filesystem —
 the signature of a Microsoft Reserved Partition. The disk was almost certainly
-partitioned by Windows or shipped preformatted. *(Inference from the layout, not
-verified.)*
+partitioned by Windows or shipped preformatted. _(Inference from the layout, not
+verified.)_
 
 ⇒ **Either drive works for this run.** Root has 1.4 TB free, ample for the
 ~180 GiB of checkpoints.
@@ -750,9 +750,9 @@ TO ISOLATE THE LEVERS a bs16 run with a scaled LR, matched data. ~6 h.
 
 ---
 
-# STEP 3e — IS THE 5090'S TRAINING ACTUALLY INFERIOR?  `[~15 lines + ~7 h]` 🟢
+# STEP 3e — IS THE 5090'S TRAINING ACTUALLY INFERIOR? `[~15 lines + ~7 h]` 🟢
 
-**Operator: *"inferior training on the 5090 is still inferior, right?"* Yes — and
+**Operator: _"inferior training on the 5090 is still inferior, right?"_ Yes — and
 an earlier revision of this plan called that gap "a confound that answers nothing
 you need". THAT WAS WRONG.** If this card yields 80% where an 80 GB card yields
 97%, the mechanism is academic and the deficit is the whole question. Framing a
@@ -850,7 +850,7 @@ intervals do NOT overlap ⇒ the difference is REAL, not sampling noise
 ### ★ MATCHING THE REFERENCE'S BATCH SIZE MADE IT 15.5 POINTS WORSE
 
 **The experiment's premise was wrong.** Batch size was never the cause of the
-gap — correcting it moved us *away* from 97%, and the gap widened from 17 to
+gap — correcting it moved us _away_ from 97%, and the gap widened from 17 to
 32.5 points.
 
 ⇒ **This is the strongest possible answer to the purchase question, and it is the
@@ -913,7 +913,7 @@ STEP 3g      pi05_libero_base  rung 2 + rung 1     bs8 × accum4   NOT RUN
 ```
 
 ⚠ **Every trained result came from `pi05_base`.** `pi05_libero_base` has only
-ever been *evaluated*, never trained from — see the verification below.
+ever been _evaluated_, never trained from — see the verification below.
 
 ```text
 rung 1  accumulation   used in ONE full run (3e)
@@ -927,8 +927,8 @@ rung 5  param offload  NEVER RUN
 ```
 
 ⛔ **CORRECTION — an earlier line here said "rung 1 hurt quality (64.5% vs 80%)".
-That is wrong.** Gradient accumulation is a *mechanism*; what hurt was what we
-used it *for*:
+That is wrong.** Gradient accumulation is a _mechanism_; what hurt was what we
+used it _for_:
 
 ```text
 3d  bs8, no accumulation   → effective batch 8  → 24,000 updates → 80.0%
@@ -937,7 +937,7 @@ used it *for*:
 
 ⇒ **Accumulation degraded nothing by itself.** It enabled effective batch 32, and
 the bigger batch — 4× fewer optimiser updates at the same data — cost the 15.5
-points. Used to *hold* effective batch at 8 while halving activation memory
+points. Used to _hold_ effective batch at 8 while halving activation memory
 (e.g. bs2 × accum 4) it should be quality-neutral. **The technique is fine; the
 configuration we chose with it was not.**
 
@@ -964,7 +964,7 @@ differ by 32.5 points.**
 
 "More updates beat bigger batches" is real **for our own two runs** (24,000
 updates → 80%, 6,000 → 64.5%). It **cannot** explain the reference, which got
-97% from the *same* 6,000 updates that gave us 64.5%.
+97% from the _same_ 6,000 updates that gave us 64.5%.
 
 ⇒ Something else is different, and it must be worth ~30 points.
 
@@ -988,7 +988,7 @@ pi05_libero_base   EVALUATED ONCE (STEP 3b.0, 0.0% zero-shot). NEVER TRAINED
 
 ⚠ **This confusion is partly my fault.** When the zero-shot came back 0% I wrote
 that it "retracts the head-start claim" and moved on — which reads as though the
-checkpoint had been *dealt with*. It had only been **evaluated**.
+checkpoint had been _dealt with_. It had only been **evaluated**.
 
 ⇒ **STEP 3g would be the FIRST time we train from the LIBERO-shaped checkpoint.**
 Every result on record — 70%, 80%, 64.5% — came from a model that had to learn
@@ -1011,8 +1011,8 @@ camera count, different action dimensionality — **as well as the task**, insid
 
 ⚠ **I RETRACTED THIS HYPOTHESIS EARLIER FOR A BAD REASON.** STEP 3b.0 measured
 `pi05_libero_base` at **0.0% zero-shot** and I concluded "no head start". That
-proves no *task competence* head start. It says **nothing** about an
-*architectural* one. Config is not capability, but config is not *nothing*
+proves no _task competence_ head start. It says **nothing** about an
+_architectural_ one. Config is not capability, but config is not _nothing_
 either — and I over-corrected.
 
 ⇒ It also explains the rest of the pattern: **more updates helped US** (we had
@@ -1035,7 +1035,7 @@ the whole lane exists to answer.
 
 ⚠ **Check the camera keys first.** `pi05_libero_base` natively expects
 `image`/`image2` — the LIBERO env's own names — so the `--rename_map` that STEP
-3e needed may be unnecessary or *inverted*. Inspect before launching; a silent
+3e needed may be unnecessary or _inverted_. Inspect before launching; a silent
 key mismatch would waste 7 hours.
 
 ## Prediction, written before the result
@@ -1058,10 +1058,10 @@ this one as settled before it runs.**
 
 # STEP 3f — THE CAPABILITY LADDER: what CAN this machine train, and at what cost?
 
-**Operator's framing, and it is better than "curiosity":** *"slower training 24/7
+**Operator's framing, and it is better than "curiosity":** _"slower training 24/7
 for a few days is better than nothing, or not having a solution at all... that
 way we are ready even if we have a 96 GB RTX PRO 6000 and 128 GB RAM, we could
-try even bigger models."*
+try even bigger models."_
 
 ⇒ **Knowing the fallbacks BEFORE they are needed changes the answer from "we
 cannot train that" to "we can, at 3× slower".** Those lead to completely
@@ -1073,7 +1073,7 @@ untested theory into a measured table.
 §5 lists paged optimizers, CPU optimizer offload and CPU parameter offload — and
 **none of it was ever entered.** 8-bit Adam alone brought us under the ceiling
 (§STEP 2), so rungs 3–5 remain unmeasured guesses. The cost estimates in this doc
-are arithmetic from PCIe link *specifications*, not measurements:
+are arithmetic from PCIe link _specifications_, not measurements:
 
 ```text
 link         theoretical BW    8-bit state offload    fp32 state offload
@@ -1101,9 +1101,9 @@ nvidia-smi --query-compute-apps=pid,used_memory --format=csv   # ← the real ch
 ```
 
 ⇒ **Query compute-apps, not just utilisation, and not a name pattern.** Starting
-a probe against a live eval would contend for GPU *and* CPU and corrupt both.
+a probe against a live eval would contend for GPU _and_ CPU and corrupt both.
 
-## 3f.1 — Measure real PCIe bandwidth  `[~2 min]` 🟢
+## 3f.1 — Measure real PCIe bandwidth `[~2 min]` 🟢
 
 Replaces the 63 GB/s spec figure with a number. Host→device, device→host, and
 pinned vs pageable memory (pinned is typically 2× faster and is what offload
@@ -1114,7 +1114,7 @@ record   H2D and D2H GB/s, pinned and pageable
 ⇒ then RECOMPUTE the table above with the measured figure
 ```
 
-## 3f.2 — Paged 8-bit optimizer (rung 3)  `[~20 min]` 🟢
+## 3f.2 — Paged 8-bit optimizer (rung 3) `[~20 min]` 🟢
 
 **Nearly free to try.** bitsandbytes ships `PagedAdamW8bit`, which spills
 optimiser state to host RAM automatically under memory pressure. Our existing
@@ -1133,7 +1133,7 @@ measure   step time vs the 1.05 s baseline · peak VRAM · does paging engage at
   STEP −1 passing does NOT imply this passes.
 ```
 
-## 3f.3 — Explicit CPU optimizer offload (rung 4)  `[~half a day]` 🟡
+## 3f.3 — Explicit CPU optimizer offload (rung 4) `[~half a day]` 🟡
 
 Real integration work — DeepSpeed ZeRO-Offload or Accelerate's offload plumbing,
 not a one-liner. **Do this only if 3f.1 and 3f.2 look promising.**
@@ -1145,7 +1145,7 @@ measure   step time · peak VRAM · peak host RAM · largest model that then fit
   fp32 state (80 GB) would NOT fit in this machine's RAM at all.
 ```
 
-## 3f.3c — CAN THE FULL fp32 STATE BE PINNED?  `[~20 min]` 🟡
+## 3f.3c — CAN THE FULL fp32 STATE BE PINNED? `[~20 min]` 🟡
 
 **The one path that could rescue fp32 offload from +785%.** 3f.3b streamed state
 through a small buffer and measured 8.0 GB/s. But **DeepSpeed pins optimiser
@@ -1212,7 +1212,7 @@ fails at 24 or 33 GB       fp32 offload is chunked-only ⇒ +785% ⇒ effectivel
 ⚠ **This only affects fp32 offload.** The 8-bit path (8.3 GB) already pins
 comfortably and was measured in 3f.3. Nothing here changes the 8-bit numbers.
 
-## 3f.3d — PROVE fp32 OFFLOAD IN A REAL TRAINING LOOP  `[~2 h + 30 min run]` 🟡
+## 3f.3d — PROVE fp32 OFFLOAD IN A REAL TRAINING LOOP `[~2 h + 30 min run]` 🟡
 
 **Operator: "is there a way to test this at least for a few checkpoints, or does
 it need work before training?"** It needs work — but far less than the DeepSpeed
@@ -1324,7 +1324,7 @@ transient       3 x 128 MB = 384 MB, INDEPENDENT of the largest tensor
 
 ⚠ **This is NOT 3f.3b's staged path and must not inherit its 8.0 GB/s.** 3f.3b
 streamed PAGEABLE state through a pinned staging buffer. Here the state is
-*fully pinned*, so a chunk is a slice of pinned storage and still transfers by
+_fully pinned_, so a chunk is a slice of pinned storage and still transfers by
 DMA at bulk rate. Correctness re-verified after the rewrite: max deviation from
 torch AdamW over 10 steps = **2.980e-08**.
 
@@ -1474,13 +1474,13 @@ resume from that same checkpoint       ⛔ OOM at 28.43 GiB
 
 **A rung that trains beautifully and writes a 26 GB checkpoint can still be
 worthless**, and no amount of watching loss or s/step would ever reveal it. This
-is the concrete justification for the standing rule *a rung is a POC until it
-CHECKPOINTS AND RESUMES*.
+is the concrete justification for the standing rule _a rung is a POC until it
+CHECKPOINTS AND RESUMES_.
 
 ### GATE E1b — ⛔ PRINT EVERY MEMORY LEVER BEFORE EVERY RUN
 
-The plan's Configuration blocks record what is *interesting* about a run and
-omit what is *default*. Defaults are exactly what changes silently between
+The plan's Configuration blocks record what is _interesting_ about a run and
+omit what is _default_. Defaults are exactly what changes silently between
 machines and versions. **Any config block that is used to reconstruct a command
 must state dtype, batch size, and optimiser explicitly, even when default.**
 
@@ -1552,7 +1552,7 @@ has been.
 
 ---
 
-## 3f.2b — DOES A PAGED RUN CHECKPOINT?  `[~10 min]` 🟢
+## 3f.2b — DOES A PAGED RUN CHECKPOINT? `[~10 min]` 🟢
 
 **Gap found when the operator asked whether rung 3 was tested with real
 training.** It was — real lerobot-train, real π0.5, real data, loss decreasing —
@@ -1573,7 +1573,7 @@ then RELOAD the checkpoint and confirm finite weights
 which matters, because a paged run's whole purpose is surviving at the memory
 edge, and long runs at the edge are precisely where checkpoints are needed.
 
-## 3f.4 — Extrapolate to hypothetical hardware  `[~1 h, desk work]` 🟢
+## 3f.4 — Extrapolate to hypothetical hardware `[~1 h, desk work]` 🟢
 
 With 3f.1–3f.3 measured, project onto configurations under consideration:
 
@@ -1617,8 +1617,8 @@ one.
 
 ## ⛔ THE GATE THAT MATTERS: CAN IT CHECKPOINT?
 
-**Operator, and it reprioritises this whole section:** *"we need training that
-produces checkpoints, otherwise it remains a POC."* Correct.
+**Operator, and it reprioritises this whole section:** _"we need training that
+produces checkpoints, otherwise it remains a POC."_ Correct.
 
 **A technique that cannot checkpoint is not a training capability — it is a
 demo.** No pause/resume, no crash recovery, no intermediate evaluation, no
@@ -1700,8 +1700,8 @@ establishing.
 
 ## Two cautions worth recording
 
-⚠ **On the warranty argument** (*"3 years, free replacement, why not utilise
-it"*) — agreed in substance: 575 W and 85 °C sustained are within spec, and 3.5 h
+⚠ **On the warranty argument** (_"3 years, free replacement, why not utilise
+it"_) — agreed in substance: 575 W and 85 °C sustained are within spec, and 3.5 h
 runs with zero throttling say the cooling is not marginal. **But a warranty
 replaces HARDWARE, not TIME.** If the card dies mid-project the RMA costs weeks,
 and every result in this document lives on this one machine. ⇒ That argues for
@@ -1716,7 +1716,7 @@ then never use it.**
 
 ---
 
-# STEP 4 — our own data  🔴 NEEDS A HUMAN DECISION
+# STEP 4 — our own data 🔴 NEEDS A HUMAN DECISION
 
 **Do not start this unattended.** Not for technical reasons — the corpus
 composition is a research decision with consequences.
@@ -2279,7 +2279,7 @@ Not a training issue, but it has cost real time and will recur.
 ⇒ **Rules.** Write long-run output to a FILE and read the file; never pipe a
 live run through `tail`/`head`. Put `stdbuf -oL` on any producer whose output is
 redirected. Put `tr '\r' '\n'` before any grep that reads a progress bar. And
-treat *silence* as unknown, never as healthy — check the process table.
+treat _silence_ as unknown, never as healthy — check the process table.
 
 ⚠ **A fifth case, different mechanism, same symptom:** LIBERO prompts on first
 import (`Do you want to specify a custom path for the dataset folder?`) and
@@ -2297,8 +2297,8 @@ should have been caught in the first minutes, not at the eval.
 
 ## ⛔ THE ORIGINAL DIAGNOSIS OF 3g WAS WRONG — corrected 2026-08-14
 
-This section previously said: *"lerobot builds input_features FROM THE DATASET's
-names ⇒ renaming an image key GUARANTEES a mismatch."* **That is false for every
+This section previously said: _"lerobot builds input_features FROM THE DATASET's
+names ⇒ renaming an image key GUARANTEES a mismatch."_ **That is false for every
 run in this project.** It is true only for a FRESH policy. lerobot states the
 real rule itself, in `configs/train.py:249`:
 
@@ -2354,7 +2354,7 @@ for _ in range(len(missing_img_keys)):
 DOWN** — 0.052 against a healthy 0.062 — which I reported at the time as
 "directionally consistent with the hypothesis".
 
-## GATE E1 — pre-flight feature check  `[seconds]` ⛔ MANDATORY
+## GATE E1 — pre-flight feature check `[seconds]` ⛔ MANDATORY
 
 ```bash
 python preflight_features.py --dataset <repo> --policy-path <ckpt> \
@@ -2379,12 +2379,12 @@ only as the record of the mistake.
 
 The first gate was built from a plausible mechanism I never tested, and it was
 wrong in the direction that matters: it said PASS for a broken config. A gate
-that encodes a *rule* inherits every error in that rule. **This one instead
+that encodes a _rule_ inherits every error in that rule. **This one instead
 reports what the model will actually receive**, derived from the same config
 objects lerobot builds — so it cannot be wrong about the rule, because it does
 not contain one.
 
-## GATE E2 — early functional eval at the FIRST checkpoint  `[~3 min + a pause]`
+## GATE E2 — early functional eval at the FIRST checkpoint `[~3 min + a pause]`
 
 Structural checks cannot catch everything. At the first checkpoint (2,000
 batches, ~8% of a run), pause and evaluate at n=40, **then compare against the

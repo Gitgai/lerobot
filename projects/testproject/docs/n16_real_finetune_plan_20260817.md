@@ -191,7 +191,6 @@ simultaneously, so testing is checkpoint-gated unless S2 shows otherwise:
   S5 arm eval            next session, operator present
 ```
 
-
 ---
 
 ## S1 RESULTS — 2026-08-17
@@ -233,7 +232,6 @@ or any dataset". It appears in this dataset, which was recorded with it. It was
 invented, then demonstrated under, which makes it real training vocabulary now.
 Do NOT edit the dataset's string instead - the demos were recorded under it and
 consistency between training and serving is all that matters.
-
 
 ---
 
@@ -375,14 +373,13 @@ these actions" would also break with wrong images. Separating those requires
 data it never trained on, and none exists - all 89 episodes were used.
 
 ⇒ Honest ceiling: **it learned this data, and it uses its eyes to do so.**
-  Whether it picks up an orange is answerable only by the arm.
+Whether it picks up an orange is answerable only by the arm.
 
 ### A note for the next session
 
 Future work should hold out ~10 episodes before training so generalisation can be
 measured directly. Not doing so here was an oversight; the recipe trains on
 everything given to it and nobody carved out a test split.
-
 
 ---
 
@@ -488,9 +485,9 @@ backbone frozen. The precedent that worked was also a partial fine-tune.
 Direct weight comparison, base `nvidia/GR00T-N1.6-3B` vs the sim-trained
 checkpoint-10000, 1106 tensors each:
 
-| group | result |
-|---|---|
-| vision backbone (40 sampled) | **40 identical, 0 changed**, max abs difference `0.00e+00` |
+| group                                | result                                                     |
+| ------------------------------------ | ---------------------------------------------------------- |
+| vision backbone (40 sampled)         | **40 identical, 0 changed**, max abs difference `0.00e+00` |
 | action head / projector (40 sampled) | **0 identical, 40 changed**, max abs difference `9.33e-02` |
 
 The simulator fine-tune never touched vision. The backbone in our starting
@@ -503,10 +500,10 @@ that was never broken.
 
 **Check 3 - would it even fit?**
 
-| | params | optimizer state (fp32 master + 8-bit Adam) |
-|---|---|---|
-| trainable now (head + projector) | 1.419 B (43.2%) | 8.5 GB |
-| full fine-tune (everything) | 3.287 B (100%) | 19.7 GB (+11.2 GB) |
+|                                  | params          | optimizer state (fp32 master + 8-bit Adam) |
+| -------------------------------- | --------------- | ------------------------------------------ |
+| trainable now (head + projector) | 1.419 B (43.2%) | 8.5 GB                                     |
+| full fine-tune (everything)      | 3.287 B (100%)  | 19.7 GB (+11.2 GB)                         |
 
 Measured peak during the current frozen run: **24.4 GB of 31.8 GB**. Adding
 11.2 GB does not fit. Full fine-tuning on this card would need gradient

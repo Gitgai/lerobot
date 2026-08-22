@@ -15,7 +15,7 @@
 --- a/lerobot/scripts/lerobot_train.py	2026-08-12 17:31:16.078270491 -0400
 +++ b/lerobot/scripts/lerobot_train.py	2026-08-12 17:21:28.154494667 -0400
 @@ -20,6 +20,7 @@
- 
+
  import dataclasses
  import logging
 +import os  # PROBE PATCH (STEP 3e): LEROBOT_GRAD_ACCUM is read from the env
@@ -25,7 +25,7 @@
 @@ -147,50 +148,66 @@
      if sample_weighter is not None:
          sample_weights, weight_stats = sample_weighter.compute_batch_weights(batch)
- 
+
 -    # Let accelerator handle mixed precision
 -    with accelerator.autocast():
 -        if sample_weights is not None:
@@ -129,7 +129,7 @@
 +        # a 6,000-update run comparable to the reference's 6,000 updates.
 +        if lr_scheduler is not None and accelerator.sync_gradients:
 +            lr_scheduler.step()
- 
+
      # Update internal buffers if policy has update method
      if has_method(accelerator.unwrap_model(policy, keep_fp32_wrapper=True), "update"):
 @@ -254,12 +271,25 @@
@@ -155,9 +155,9 @@
 +            gradient_accumulation_steps=_accum,
          )
 +        # --- END PROBE PATCH ------------------------------------------------
- 
+
      init_logging(accelerator=accelerator)
- 
+
 --- a/lerobot/optim/factory.py	2026-08-12 17:31:16.064385854 -0400
 +++ b/lerobot/optim/factory.py	2026-08-12 17:28:25.174283284 -0400
 @@ -38,5 +38,27 @@

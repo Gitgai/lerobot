@@ -39,9 +39,8 @@ class CPUOffloadAdamW(Optimizer):
     # CHUNKING note in the module docstring for why this is not optional.
     CHUNK_ELEMS = 32 * 1024 * 1024
 
-    def __init__(self, params, lr=1e-3, betas=(0.9, 0.999), eps=1e-8, weight_decay=1e-2,
-                 chunk_elems=None):
-        super().__init__(params, dict(lr=lr, betas=betas, eps=eps, weight_decay=weight_decay))
+    def __init__(self, params, lr=1e-3, betas=(0.9, 0.999), eps=1e-8, weight_decay=1e-2, chunk_elems=None):
+        super().__init__(params, {"lr": lr, "betas": betas, "eps": eps, "weight_decay": weight_decay})
         self._pinned_bytes = 0
         self.chunk_elems = chunk_elems or self.CHUNK_ELEMS
 
@@ -61,16 +60,14 @@ class CPUOffloadAdamW(Optimizer):
                 if len(st) == 0:
                     # state lives on the HOST, pinned so transfers are DMA
                     st["step"] = torch.zeros((), dtype=torch.float32)
-                    st["exp_avg"] = torch.zeros(
-                        p.shape, dtype=torch.float32, pin_memory=True)
-                    st["exp_avg_sq"] = torch.zeros(
-                        p.shape, dtype=torch.float32, pin_memory=True)
+                    st["exp_avg"] = torch.zeros(p.shape, dtype=torch.float32, pin_memory=True)
+                    st["exp_avg_sq"] = torch.zeros(p.shape, dtype=torch.float32, pin_memory=True)
                     self._pinned_bytes += 2 * p.numel() * 4
 
                 st["step"] += 1
                 t = st["step"].item()
-                bc1 = 1 - beta1 ** t
-                bc2 = 1 - beta2 ** t
+                bc1 = 1 - beta1**t
+                bc2 = 1 - beta2**t
 
                 if not p.is_contiguous() or not p.grad.is_contiguous():
                     raise RuntimeError(
@@ -92,7 +89,7 @@ class CPUOffloadAdamW(Optimizer):
                     g = gv[i:j].float()
 
                     if wd != 0:
-                        pv[i:j].mul_(1 - lr * wd)          # decoupled weight decay
+                        pv[i:j].mul_(1 - lr * wd)  # decoupled weight decay
 
                     m.mul_(beta1).add_(g, alpha=1 - beta1)
                     v.mul_(beta2).addcmul_(g, g, value=1 - beta2)
@@ -135,7 +132,7 @@ class CPUOffloadAdamW(Optimizer):
         """
         groups, saved = self.param_groups, state_dict["param_groups"]
         if len(groups) != len(saved) or any(
-            len(g["params"]) != len(s["params"]) for g, s in zip(groups, saved)
+            len(g["params"]) != len(s["params"]) for g, s in zip(groups, saved, strict=False)
         ):
             raise ValueError("loaded state dict does not match this optimizer's param groups")
 
@@ -143,6 +140,7 @@ class CPUOffloadAdamW(Optimizer):
             zip(
                 chain.from_iterable(s["params"] for s in saved),
                 chain.from_iterable(g["params"] for g in groups),
+                strict=False,
             )
         )
 
@@ -161,14 +159,16 @@ class CPUOffloadAdamW(Optimizer):
                     )
                 else:
                     host = torch.empty(val.shape, dtype=torch.float32, pin_memory=True)
-                    host.copy_(val)          # fp32, host, pinned — the invariant
+                    host.copy_(val)  # fp32, host, pinned — the invariant
                     restored[key] = host
                     self._pinned_bytes += host.numel() * 4
             state[id_map[k]] = restored
 
         # hyperparameters from the checkpoint, parameters from the live model
-        merged = [{**g, **{k: v for k, v in s.items() if k != "params"},
-                   "params": g["params"]} for g, s in zip(groups, saved)]
+        merged = [
+            {**g, **{k: v for k, v in s.items() if k != "params"}, "params": g["params"]}
+            for g, s in zip(groups, saved, strict=False)
+        ]
         self.__setstate__({"state": state, "param_groups": merged})
 
     @property

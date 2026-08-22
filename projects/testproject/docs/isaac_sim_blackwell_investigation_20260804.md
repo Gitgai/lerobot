@@ -13,6 +13,7 @@ Everything below was established the hard way on 2026-08-04. If you are deciding
 what to install, this table is the answer.
 
 > ## ✅ RESOLVED 2026-08-04: driver downgraded to 580.173.02, EVERYTHING WORKS.
+>
 > Isaac Sim 5.1 starts clean (0 crashes, was SIGSEGV) and **all 15 LeIsaac
 > SO-101 tasks register, including `LeIsaac-SO101-PickOrange-v0`.**
 > Pi05 serving did NOT regress - it improved to 143 ms/chunk (was 153 ms).
@@ -25,10 +26,10 @@ THIS MACHINE: RTX 5090 (Blackwell, sm_120) | Ubuntu 26.04
               Docker 29.7.1 + nvidia-container-toolkit 1.19.1
 ```
 
-| Isaac Sim | Isaac Lab | LeIsaac | Python | torch | Driver needed | Verified on this machine |
-|---|---|---|---|---|---|---|
-| **5.1.0** | 2.3.0 | 0.4.0 ✅ | 3.11 | 2.7.0+cu128 | **580.x** | ✅ **WORKS on 580.173.02** (❌ segfaults on 595.84) |
-| **6.0.1** | 3.0.0b2 (beta) | ❌ **none** | 3.12 | — | **595.58.03** | ✅ engine runs on 595.84, but nothing above it supports SO-101 |
+| Isaac Sim | Isaac Lab      | LeIsaac     | Python | torch       | Driver needed | Verified on this machine                                       |
+| --------- | -------------- | ----------- | ------ | ----------- | ------------- | -------------------------------------------------------------- |
+| **5.1.0** | 2.3.0          | 0.4.0 ✅    | 3.11   | 2.7.0+cu128 | **580.x**     | ✅ **WORKS on 580.173.02** (❌ segfaults on 595.84)            |
+| **6.0.1** | 3.0.0b2 (beta) | ❌ **none** | 3.12   | —           | **595.58.03** | ✅ engine runs on 595.84, but nothing above it supports SO-101 |
 
 ```text
 THE ANSWER, IF YOU READ NOTHING ELSE:
@@ -521,7 +522,7 @@ APPLIED anyway, since EPP genuinely biases sustained load:
 
 The same log also warned `IOMMU is enabled`. **Left alone deliberately** -
 disabling it is a firmware/kernel-cmdline change with security implications, and
-one public report shows the same rtx.scenedb crash occurring *after* IOMMU was
+one public report shows the same rtx.scenedb crash occurring _after_ IOMMU was
 disabled, so it would not have helped.
 
 ---

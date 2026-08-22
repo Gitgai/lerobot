@@ -105,7 +105,7 @@ The `~30-step latency` figure is the project's own, from
 ("horizon must exceed the ~30-step latency").
 
 **Hypothesis, not yet tested on the arm:** the fast-forwarding that made the arm
-move too fast was mostly *network*, not compute. If so, `RTC_EXEC_HORIZON` can
+move too fast was mostly _network_, not compute. If so, `RTC_EXEC_HORIZON` can
 drop well below 35, giving fresher observations per action. Test this before
 assuming it.
 

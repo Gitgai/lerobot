@@ -65,7 +65,7 @@ motor-limit affine remap in both directions. Writing a raw ZMQ client for GR00T
 bypassed all of it.
 
 > **Rule for the next non-LeRobot checkpoint:** LeIsaac's unit conversion is in
-> the *client*, not the env. Any new serving path must reimplement it. The
+> the _client_, not the env. Any new serving path must reimplement it. The
 > adapter now reuses LeIsaac's own limit constants (importing them inside Isaac
 > Sim, parsing the same literals outside) so there is one source of truth.
 
@@ -73,7 +73,7 @@ Round-trip `motor_to_sim(sim_to_motor(x)) == x` to 1.5e-7.
 
 ---
 
-## 2b. *** THE OVERCORRECTION: THE SERVER ALREADY COMPOSES ***
+## 2b. **_ THE OVERCORRECTION: THE SERVER ALREADY COMPOSES _**
 
 ```text
 conf.yaml says use_relative_action: true, so I made the adapter add the current
@@ -149,11 +149,11 @@ The measurement stands; only its explanation changes:
 Same checkpoint, same scene, same code — **only the sentence changed**. What
 this demonstrates is **instruction SENSITIVITY**, not "match the training string
 and it works". We cannot claim the latter, because we do not know this model's
-training strings and the winning sentence names *pens* in a scene full of
-*oranges*.
+training strings and the winning sentence names _pens_ in a scene full of
+_oranges_.
 
 The plausible reading was that `"Grab <X> and place into <Y>"` matches a common
-PHRASING PATTERN, while *"pick up the orange and move it to another place"* does
+PHRASING PATTERN, while _"pick up the orange and move it to another place"_ does
 not — the policy keying on sentence form more than on the noun.
 
 ### THAT HYPOTHESIS IS NOW TESTED — and the canonical string is KNOWN
@@ -185,10 +185,10 @@ orange at all** (0.023 m, 8x the pens run). It still holds for 3 steps and lifts
 => THE INSTRUCTION IS WORTH REAL PERFORMANCE, AND IT IS NOT ENOUGH.
 ```
 
-*(Those three rows were all measured with the doubled-target bug of section 2b,
+_(Those three rows were all measured with the doubled-target bug of section 2b,
 so treat them as a comparison BETWEEN INSTRUCTIONS under one consistent defect,
 not as absolute numbers. The instruction ordering is the finding; the values
-are superseded by the valid run below.)*
+are superseded by the valid run below.)_
 
 ### THE VALID RUN — correct units, correct absolute actions, canonical string
 
@@ -232,7 +232,7 @@ is exactly the observed freeze: the model believes it is finished.
 
 ---
 
-## 4. *** THE GROUND-TRUTH TRAP ***
+## 4. **_ THE GROUND-TRUTH TRAP _**
 
 ```text
 mdp.orange_grasped (tasks/pick_orange/mdp/observations.py) is:
@@ -249,7 +249,7 @@ TRUE - for 80 consecutive steps, as run4 did, with the orange displaced by
 This is the simulation twin of the real-arm lesson that produced
 `analyze_grasp_from_trace.py`'s finger-stall test: **"gripper closed" is not
 "object held."** We had assumed sim GT was immune because the simulator knows
-everything. It knows everything; the *predicate* is what was weak.
+everything. It knows everything; the _predicate_ is what was weak.
 
 **Every "grasp" number in this project's sim results must be read as
 proximity+closure unless object displacement is also reported.**
@@ -300,7 +300,7 @@ d_grasp_min reaches 0.021 m, under the 0.05 threshold for 984 steps.
 
 This also calibrates section 4's trap with a number. A **real** grasp lifts the
 orange **0.17-0.20 m**. GR00T's predicate-TRUE-for-80-steps lifted it
-**0.0026 m** — roughly *seventy times less*. The predicate could not tell those
+**0.0026 m** — roughly _seventy times less_. The predicate could not tell those
 apart; displacement separates them instantly.
 
 > Run the positive control again after ANY change to the scene, the env cfg or
@@ -309,8 +309,8 @@ apart; displacement separates them instantly.
 
 ### How much of this was ALREADY known — an honest accounting
 
-Fair challenge raised at the time: *we had already run the state machine several
-times; didn't we know it works?* Partly yes, and
+Fair challenge raised at the time: _we had already run the state machine several
+times; didn't we know it works?_ Partly yes, and
 `sim_place_data_generation_20260805.md` already recorded both "Episode success!"
 and that "the environment emits six scored subtask terms". **The fact that the
 state machine succeeds on this machine was established and documented.** That
@@ -330,8 +330,8 @@ What was genuinely NEW, and load-bearing:
 ```
 
 So the honest framing is narrower than "we could not tell whether the harness
-works": the *simulator* was known good; *our scoring code* was not, and the
-*discriminating magnitude* did not exist. Both now do.
+works": the _simulator_ was known good; _our scoring code_ was not, and the
+_discriminating magnitude_ did not exist. Both now do.
 
 ---
 
@@ -349,11 +349,11 @@ GR00T N1.7     trained on a BROAD community mix (2,242 eps / 39 repos) of
 
 The comparison is **not** apples-to-apples and should not be quoted as
 "GR00T beats Pi05". Pi05 is a single-task specialist doing only a sim-transfer;
-GR00T is a broad generalist doing task-transfer *and* sim-transfer at once.
+GR00T is a broad generalist doing task-transfer _and_ sim-transfer at once.
 
 ### WHAT THE N1.6 SUCCESS DID TO THIS SECTION
 
-A GR00T **N1.6** checkpoint fine-tuned *inside* LeIsaac then **grasped, lifted
+A GR00T **N1.6** checkpoint fine-tuned _inside_ LeIsaac then **grasped, lifted
 0.173 m and carried the orange 0.260 m** in this same scene, scored the same way.
 That changes how the failures above should be read:
 
@@ -371,7 +371,7 @@ That is a much stronger and much more useful conclusion than "one datapoint, no
 verdict" — and it is the first hard evidence bearing on the project's central
 bet. The bet was that a large VLA would generalise across similar SO-101 arms.
 What we can now say: **training domain dominates.** The 1.09B model trained on
-*this* simulator beats the 4.14B model trained on real frames *and* the broad
+_this_ simulator beats the 4.14B model trained on real frames _and_ the broad
 2,242-episode community generalist, in this scene, decisively.
 -> gr00t_n16_sim_trained_SUCCESS_20260805.md
 

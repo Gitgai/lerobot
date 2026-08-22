@@ -52,9 +52,9 @@ transfer.
 
 Two findings from that work carry over and materially de-risk this one:
 
-* **Quality 92 round-trip pixel error is 0.4/255** — invisible.
-* **The training frames were themselves JPEG/video-compressed**, so JPEG input
-  *matches* training conditions rather than departing from them.
+- **Quality 92 round-trip pixel error is 0.4/255** — invisible.
+- **The training frames were themselves JPEG/video-compressed**, so JPEG input
+  _matches_ training conditions rather than departing from them.
 
 And one prohibition, from a prior incident:
 
@@ -201,7 +201,6 @@ the port and should arguably precede it.
   - the 370 ms benefit assumes a delay/success curve sampled at two points.
 ```
 
-
 ---
 
 ## 7. REMEASURED 2026-08-14, after the first instrumented live run
@@ -265,8 +264,8 @@ plays no part.
 ```
 
 ⇒ **Do not expect this port to make the arm work.** It makes the system
-  operable; the bias is a separate problem. Conflating them would repeat the
-  mistake this investigation has already made several times.
+operable; the bias is a separate problem. Conflating them would repeat the
+mistake this investigation has already made several times.
 
 ### Section 6's precondition is now moot
 
@@ -289,7 +288,6 @@ battery is no longer a precondition. Worth running eventually; not a blocker.
 **Approved to implement.** Design in section 2 is unchanged and still correct.
 Validation in section 3 still applies, with V3 (scores must be statistically
 indistinguishable from the 86% baseline) as the gate.
-
 
 ---
 

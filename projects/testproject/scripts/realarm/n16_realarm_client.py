@@ -39,16 +39,18 @@ clustered 10-15 cm right; (1) clean table, nothing orange-ish; (2) LOCK white
 balance+exposure (v4l2-ctl); (3) ~2 cm mounting slack. Ctrl+C stops.
 """
 
-from dataclasses import dataclass, field
+import contextlib
 import io
 import logging
 import time
+from dataclasses import dataclass, field
 from typing import Any
 
 import draccus
 import msgpack
 import numpy as np
 import zmq
+
 
 # ---------------------------------------------------------------- wire format
 class MsgSerializer:
@@ -96,13 +98,15 @@ def jpeg_frame(rgb: np.ndarray, quality: int = 92) -> dict:
     `lead_dims` preserves the leading (batch, time) axes the wire format adds.
     """
     import cv2 as _cv
+
     lead = 0
     a = rgb
     while a.ndim > 3:
         a = a[0]
         lead += 1
-    ok, enc = _cv.imencode(".jpg", _cv.cvtColor(a, _cv.COLOR_RGB2BGR),
-                           [int(_cv.IMWRITE_JPEG_QUALITY), quality])
+    ok, enc = _cv.imencode(
+        ".jpg", _cv.cvtColor(a, _cv.COLOR_RGB2BGR), [int(_cv.IMWRITE_JPEG_QUALITY), quality]
+    )
     if not ok:
         raise RuntimeError("JPEG encode failed for an observation image")
     return {"__jpeg_ndarray__": True, "as_jpg": enc.tobytes(), "lead_dims": lead}
@@ -193,8 +197,7 @@ class So100Adapter:
         model_obs = recursive_add_extra_dim(model_obs)
         model_obs = recursive_add_extra_dim(model_obs)
         if self.jpeg_quality:
-            model_obs["video"] = {k: jpeg_frame(v, self.jpeg_quality)
-                                  for k, v in model_obs["video"].items()}
+            model_obs["video"] = {k: jpeg_frame(v, self.jpeg_quality) for k, v in model_obs["video"].items()}
         return model_obs
 
     def decode_action_chunk(self, chunk: dict, t: int) -> dict:
@@ -238,7 +241,7 @@ def run_dry(cfg) -> None:
         "front": np.zeros((480, 640, 3), np.uint8),
         "wrist": np.zeros((480, 640, 3), np.uint8),
         "lang": cfg.lang_instruction,
-        **{k: 0.0 for k in adapter.robot_state_keys},
+        **dict.fromkeys(adapter.robot_state_keys, 0.0),
     }
     t0 = time.time()
     actions = adapter.get_action(obs)
@@ -266,11 +269,11 @@ def run_dry_rtc(cfg, n_chunks: int = 25) -> None:
             "front": np.zeros((480, 640, 3), np.uint8),
             "wrist": np.zeros((480, 640, 3), np.uint8),
             "lang": cfg.lang_instruction,
-            **{k: 0.0 for k in adapter.robot_state_keys},
+            **dict.fromkeys(adapter.robot_state_keys, 0.0),
         }, {"t_obs": time.time()}
 
-    req: "queue.Queue" = queue.Queue(maxsize=1)
-    rep: "queue.Queue" = queue.Queue(maxsize=1)
+    req: queue.Queue = queue.Queue(maxsize=1)
+    rep: queue.Queue = queue.Queue(maxsize=1)
 
     def worker():
         while True:
@@ -324,16 +327,15 @@ def run_dry_rtc(cfg, n_chunks: int = 25) -> None:
     duty = exec_ticks / 30 / wall * 100
     rtts_s = sorted(rtts)
     print(f"[G0] {chunks} chunks in {wall:.1f}s")
-    print(f"[G0] rtt median {rtts_s[len(rtts_s)//2]:.0f} ms  max {rtts_s[-1]:.0f} ms")
-    print(f"[G0] chunk age at first execution: median "
-          f"{sorted(ages)[len(ages)//2]:.0f} ms")
+    print(f"[G0] rtt median {rtts_s[len(rtts_s) // 2]:.0f} ms  max {rtts_s[-1]:.0f} ms")
+    print(f"[G0] chunk age at first execution: median {sorted(ages)[len(ages) // 2]:.0f} ms")
     print(f"[G0] DUTY CYCLE {duty:.1f}%  (sequential baseline: 31%)")
-    print(f"[G0] starvation: {starve_ticks} ticks total, per-chunk runs "
-          f"{starve_runs[:8]}{'...' if len(starve_runs) > 8 else ''}")
-    ok = duty >= 90 and (not starve_runs or
-                         sorted(starve_runs)[len(starve_runs)//2] <= 2)
-    print(f"[G0] {'PASS' if ok else 'FAIL'} "
-          f"(need duty >=90% and median starvation <=2 ticks)")
+    print(
+        f"[G0] starvation: {starve_ticks} ticks total, per-chunk runs "
+        f"{starve_runs[:8]}{'...' if len(starve_runs) > 8 else ''}"
+    )
+    ok = duty >= 90 and (not starve_runs or sorted(starve_runs)[len(starve_runs) // 2] <= 2)
+    print(f"[G0] {'PASS' if ok else 'FAIL'} (need duty >=90% and median starvation <=2 ticks)")
 
 
 def main() -> None:
@@ -352,18 +354,23 @@ def main() -> None:
         return
 
     # real path - lerobot imports only here so dry_run works anywhere
-    from lerobot.cameras.opencv.configuration_opencv import OpenCVCameraConfig  # noqa: F401
-    from lerobot.robots import RobotConfig, make_robot_from_config, so_follower  # noqa: F401
-
     # register the `http` camera type (the wrist camera is the Raspberry Pi
     # stream proxied at http://127.0.0.1:8092/frame). http_camera.py lives in
     # the OLD repo on the arm machine and self-registers with draccus on import.
     import sys as _sys
 
-    _sys.path.insert(0, str(__import__("pathlib").Path.home()
-                          / "PrakashProjects/lerobot/lerobot/projects/testproject/scripts"))
+    from lerobot.cameras.opencv.configuration_opencv import OpenCVCameraConfig  # noqa: F401
+    from lerobot.robots import RobotConfig, make_robot_from_config, so_follower  # noqa: F401
+
+    _sys.path.insert(
+        0,
+        str(
+            __import__("pathlib").Path.home() / "PrakashProjects/lerobot/lerobot/projects/testproject/scripts"
+        ),
+    )
     try:
         import http_camera  # noqa: F401
+
         print("[real] http camera type registered")
     except Exception as e:
         print(f"[real] http camera type unavailable: {e}")
@@ -396,8 +403,9 @@ def main() -> None:
         assert client.ping(), "policy server unreachable"
         policy = So100Adapter(client, jpeg_quality=cfg.jpeg_quality)
         print(f'[real] running with instruction: "{cfg.lang_instruction}"  (Ctrl+C stops)')
-        import cv2 as _cv2
         from pathlib import Path as _Path
+
+        import cv2 as _cv2
 
         _fdir = _Path.home() / "run_frames"
         _fdir.mkdir(exist_ok=True)
@@ -410,7 +418,9 @@ def main() -> None:
         # Four days of analysis for facts a 30-line trace would have handed over
         # in an hour. Everything below exists so that never repeats.
         import json as _json
+
         import numpy as _np
+
         _trace = open(_Path.home() / "run_trace.jsonl", "w", buffering=1)
 
         def _fetch_wrist(url):
@@ -422,8 +432,9 @@ def main() -> None:
             serving HTTP 200 is a failure mode this rig has hit twice.
             """
             import urllib.request
+
             try:
-                with urllib.request.urlopen(url, timeout=2.0) as r:
+                with urllib.request.urlopen(url, timeout=2.0) as r:  # nosec B310 - lab camera proxy, http only
                     raw = r.read()
                     age = float(r.headers.get("X-Frame-Age-Seconds", "nan"))
                 buf = _np.frombuffer(raw, dtype=_np.uint8)
@@ -471,8 +482,8 @@ def main() -> None:
             # fed; the REP socket serialises them server-side. Replies can
             # interleave, so the consumer discards any reply older than the
             # last one applied (staleness guard).
-            _req: "_queue.Queue" = _queue.Queue(maxsize=2)
-            _rep: "_queue.Queue" = _queue.Queue(maxsize=2)
+            _req: _queue.Queue = _queue.Queue(maxsize=2)
+            _rep: _queue.Queue = _queue.Queue(maxsize=2)
 
             def _worker():
                 wclient = PolicyClient(host=cfg.policy_host, port=cfg.policy_port)
@@ -504,7 +515,7 @@ def main() -> None:
                 return obs, {"t_obs": time.time()}
 
             _req.put(_snap())
-            _req.put(_snap())          # prime both workers
+            _req.put(_snap())  # prime both workers
             _last_applied_tobs = 0.0
             actions, ai, last_action = None, 0, None
             _blend = 0
@@ -514,15 +525,12 @@ def main() -> None:
             while True:
                 tic = time.time()
                 fresh = None
-                try:
+                with contextlib.suppress(_queue.Empty):
                     fresh = _rep.get_nowait()
-                except _queue.Empty:
-                    pass
                 if fresh is not None:
                     acts, obs_used, meta = fresh
                     if acts is None:
-                        raise RuntimeError(
-                            f"policy request failed: {meta.get('error')}")
+                        raise RuntimeError(f"policy request failed: {meta.get('error')}")
                     if meta["t_obs"] <= _last_applied_tobs:
                         # stale interleaved reply - drop it, keep pipeline full
                         _req.put(_snap())
@@ -531,34 +539,49 @@ def main() -> None:
                     _last_applied_tobs = meta["t_obs"]
                     for _cam in ("front", "wrist"):
                         if hasattr(obs_used.get(_cam), "shape"):
-                            _cv2.imwrite(str(_fdir / f"c{ck:04d}_{_cam}.jpg"),
-                                         _cv2.cvtColor(obs_used[_cam],
-                                                       _cv2.COLOR_RGB2BGR))
-                    _health = (_wrist_health(obs_used["wrist"])
-                               if hasattr(obs_used.get("wrist"), "shape") else {})
+                            _cv2.imwrite(
+                                str(_fdir / f"c{ck:04d}_{_cam}.jpg"),
+                                _cv2.cvtColor(obs_used[_cam], _cv2.COLOR_RGB2BGR),
+                            )
+                    _health = (
+                        _wrist_health(obs_used["wrist"]) if hasattr(obs_used.get("wrist"), "shape") else {}
+                    )
                     if _health and _health["sharpness"] < 15:
-                        print(f"[real] *** WRIST DEGRADED chunk {ck}: "
-                              f"sharpness={_health['sharpness']} ***", flush=True)
-                    _trace.write(_json.dumps({
-                        "chunk": ck,
-                        "t": round(meta["t_obs"], 3),
-                        "rtt_ms": meta["rtt_ms"],
-                        "chunk_age_ms": round((time.time() - meta["t_obs"]) * 1000, 1),
-                        "starved_ticks": starved,
-                        "rtc": True,
-                        "state": {k: round(float(obs_used[k]), 2)
-                                  for k in policy.robot_state_keys if k in obs_used},
-                        "action0": {k: round(float(v), 2) for k, v in acts[0].items()},
-                        "chunk_len": len(acts),
-                        "executed": len(acts),
-                        "wrist": _health,
-                        "wrist_age_s": meta.get("wrist_age_s"),
-                    }) + "\n")
-                    print(f"[real] chunk {ck}: pan={acts[0]['shoulder_pan.pos']:+.1f} "
-                          f"grip={acts[0]['gripper.pos']:+.1f} "
-                          f"rtt={meta['rtt_ms']:.0f}ms "
-                          f"age={(time.time() - meta['t_obs']) * 1000:.0f}ms "
-                          f"starved={starved}", flush=True)
+                        print(
+                            f"[real] *** WRIST DEGRADED chunk {ck}: sharpness={_health['sharpness']} ***",
+                            flush=True,
+                        )
+                    _trace.write(
+                        _json.dumps(
+                            {
+                                "chunk": ck,
+                                "t": round(meta["t_obs"], 3),
+                                "rtt_ms": meta["rtt_ms"],
+                                "chunk_age_ms": round((time.time() - meta["t_obs"]) * 1000, 1),
+                                "starved_ticks": starved,
+                                "rtc": True,
+                                "state": {
+                                    k: round(float(obs_used[k]), 2)
+                                    for k in policy.robot_state_keys
+                                    if k in obs_used
+                                },
+                                "action0": {k: round(float(v), 2) for k, v in acts[0].items()},
+                                "chunk_len": len(acts),
+                                "executed": len(acts),
+                                "wrist": _health,
+                                "wrist_age_s": meta.get("wrist_age_s"),
+                            }
+                        )
+                        + "\n"
+                    )
+                    print(
+                        f"[real] chunk {ck}: pan={acts[0]['shoulder_pan.pos']:+.1f} "
+                        f"grip={acts[0]['gripper.pos']:+.1f} "
+                        f"rtt={meta['rtt_ms']:.0f}ms "
+                        f"age={(time.time() - meta['t_obs']) * 1000:.0f}ms "
+                        f"starved={starved}",
+                        flush=True,
+                    )
                     # SKIP-AHEAD (G1 fix, 2026-08-20): the chunk's early steps
                     # cover time that already executed while it was in flight.
                     # Enter it at the step matching NOW, else every switch
@@ -576,8 +599,7 @@ def main() -> None:
                         # MICRO-BLEND: 3-tick cross-fade into the new chunk to
                         # absorb residual mismatch at the seam.
                         w = (4 - _blend) / 4.0
-                        tgt = {k: last_action[k] * (1 - w) + tgt[k] * w
-                               for k in tgt}
+                        tgt = {k: last_action[k] * (1 - w) + tgt[k] * w for k in tgt}
                         _blend -= 1
                     last_action = tgt
                     robot.send_action(tgt)
@@ -587,8 +609,7 @@ def main() -> None:
                     if last_action is not None:
                         robot.send_action(last_action)  # hold position
                     if starved > 60:
-                        raise RuntimeError(
-                            "RTC starved >2 s - link or server stalled")
+                        raise RuntimeError("RTC starved >2 s - link or server stalled")
                 dt = time.time() - tic
                 if dt < 1.0 / 30:
                     time.sleep(1.0 / 30 - dt)
@@ -615,32 +636,47 @@ def main() -> None:
                 # (sim rule, applied to hardware: never diagnose blind)
                 for _cam in ("front", "wrist"):
                     if _cam in obs:
-                        _cv2.imwrite(str(_fdir / f"c{_chunk:04d}_{_cam}.jpg"),
-                                     _cv2.cvtColor(obs[_cam], _cv2.COLOR_RGB2BGR))
+                        _cv2.imwrite(
+                            str(_fdir / f"c{_chunk:04d}_{_cam}.jpg"),
+                            _cv2.cvtColor(obs[_cam], _cv2.COLOR_RGB2BGR),
+                        )
                 _a0 = actions[0]
                 _health = _wrist_health(obs["wrist"]) if "wrist" in obs else {}
                 # LOUD, not buried in a file: a wrist camera that has lost the
                 # workspace is the single failure mode we know breaks the task.
                 if _health and _health["sharpness"] < 15:
-                    print(f"[real] *** WRIST DEGRADED chunk {_chunk}: "
-                          f"sharpness={_health['sharpness']} "
-                          f"brightness={_health['brightness']} *** ", flush=True)
-                _trace.write(_json.dumps({
-                    "chunk": _chunk,
-                    "t": round(_t_obs, 3),
-                    "rtt_ms": _rtt_ms,                     # the round trip, MEASURED
-                    "state": {k: round(float(obs[k]), 2)   # what the arm actually IS
-                              for k in policy.robot_state_keys if k in obs},
-                    "action0": {k: round(float(v), 2) for k, v in _a0.items()},
-                    "chunk_len": len(actions),             # returned vs executed
-                    "executed": min(cfg.action_horizon, len(actions)),
-                    "wrist": _health,
-                    "wrist_age_s": None if _wrist_age_s is None else round(_wrist_age_s, 3),
-                }) + "\n")
-                print(f"[real] chunk {_chunk}: pan={_a0['shoulder_pan.pos']:+.1f} "
-                      f"lift={_a0['shoulder_lift.pos']:+.1f} grip={_a0['gripper.pos']:+.1f} "
-                      f"rtt={_rtt_ms:.0f}ms wrist_sharp={_health.get('sharpness', '?')}",
-                      flush=True)
+                    print(
+                        f"[real] *** WRIST DEGRADED chunk {_chunk}: "
+                        f"sharpness={_health['sharpness']} "
+                        f"brightness={_health['brightness']} *** ",
+                        flush=True,
+                    )
+                _trace.write(
+                    _json.dumps(
+                        {
+                            "chunk": _chunk,
+                            "t": round(_t_obs, 3),
+                            "rtt_ms": _rtt_ms,  # the round trip, MEASURED
+                            "state": {
+                                k: round(float(obs[k]), 2)  # what the arm actually IS
+                                for k in policy.robot_state_keys
+                                if k in obs
+                            },
+                            "action0": {k: round(float(v), 2) for k, v in _a0.items()},
+                            "chunk_len": len(actions),  # returned vs executed
+                            "executed": min(cfg.action_horizon, len(actions)),
+                            "wrist": _health,
+                            "wrist_age_s": None if _wrist_age_s is None else round(_wrist_age_s, 3),
+                        }
+                    )
+                    + "\n"
+                )
+                print(
+                    f"[real] chunk {_chunk}: pan={_a0['shoulder_pan.pos']:+.1f} "
+                    f"lift={_a0['shoulder_lift.pos']:+.1f} grip={_a0['gripper.pos']:+.1f} "
+                    f"rtt={_rtt_ms:.0f}ms wrist_sharp={_health.get('sharpness', '?')}",
+                    flush=True,
+                )
                 _chunk += 1
                 for action_dict in actions[: cfg.action_horizon]:
                     tic = time.time()
@@ -657,20 +693,27 @@ def main() -> None:
             # knows whether the run is worth analysing BEFORE walking away.
             try:
                 import json as _j
-                rows = [_j.loads(l) for l in open(_Path.home() / "run_trace.jsonl")]
+
+                rows = [_j.loads(line) for line in open(_Path.home() / "run_trace.jsonl")]
                 if rows:
                     rtt = sorted(r["rtt_ms"] for r in rows)
                     sh = [r["wrist"].get("sharpness", 0) for r in rows if r.get("wrist")]
                     bad = sum(1 for v in sh if v < 60)
-                    print(f"[real] {len(rows)} chunks | round trip median "
-                          f"{rtt[len(rtt)//2]:.0f} ms, max {rtt[-1]:.0f} ms")
+                    print(
+                        f"[real] {len(rows)} chunks | round trip median "
+                        f"{rtt[len(rtt) // 2]:.0f} ms, max {rtt[-1]:.0f} ms"
+                    )
                     if sh:
-                        print(f"[real] wrist sharpness median {sorted(sh)[len(sh)//2]:.0f}, "
-                              f"{bad}/{len(sh)} chunks degraded "
-                              f"({100*bad/len(sh):.0f}%)")
+                        print(
+                            f"[real] wrist sharpness median {sorted(sh)[len(sh) // 2]:.0f}, "
+                            f"{bad}/{len(sh)} chunks degraded "
+                            f"({100 * bad / len(sh):.0f}%)"
+                        )
                         if bad > len(sh) * 0.2:
-                            print("[real] *** WRIST CAMERA WAS DEGRADED FOR MUCH OF THIS "
-                                  "RUN - the Aug 8 failure mode. Check the mount. ***")
+                            print(
+                                "[real] *** WRIST CAMERA WAS DEGRADED FOR MUCH OF THIS "
+                                "RUN - the Aug 8 failure mode. Check the mount. ***"
+                            )
                     print(f"[real] trace: {_Path.home() / 'run_trace.jsonl'}")
             except Exception as _e:
                 print(f"[real] (summary unavailable: {_e})")

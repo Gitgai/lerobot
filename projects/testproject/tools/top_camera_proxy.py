@@ -5,7 +5,6 @@ import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse
 
-
 HOST = "127.0.0.1"
 PORT = 8094
 

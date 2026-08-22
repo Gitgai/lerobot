@@ -88,9 +88,7 @@ def build_argv(args: argparse.Namespace, cfg: dict) -> list[str]:
 
 def main() -> None:
     cfg = load_config()
-    p = argparse.ArgumentParser(
-        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
-    )
+    p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument(
         "--policy-path",
         required=True,
@@ -103,28 +101,43 @@ def main() -> None:
     )
     p.add_argument("--device", default="cpu", help="cpu (laptop) or cuda.")
     p.add_argument("--fps", type=int, default=int(cfg.get("camera_fps", 30)))
-    p.add_argument(
-        "--duration", type=float, default=30.0, help="Seconds to run the policy (one attempt)."
-    )
+    p.add_argument("--duration", type=float, default=30.0, help="Seconds to run the policy (one attempt).")
     p.add_argument(
         "--max-relative-target",
         type=float,
         default=float(cfg.get("default_max_relative_target", 5)),
         help="SAFETY: max per-command joint move. Lower = safer/slower.",
     )
-    p.add_argument("--n-action-steps", type=int, default=None,
-                   help="Override ACT open-loop chunk length (default 100). Lower = more feedback "
-                        "(e.g. 20). CPU re-plans cost ~0.4s each.")
-    p.add_argument("--temporal-ensemble", type=float, default=None,
-                   help="Enable temporal ensembling (e.g. 0.01) = smooth fully-closed-loop; forces "
-                        "n_action_steps=1. Needs GPU (CPU too slow at ~2.5Hz).")
+    p.add_argument(
+        "--n-action-steps",
+        type=int,
+        default=None,
+        help="Override ACT open-loop chunk length (default 100). Lower = more feedback "
+        "(e.g. 20). CPU re-plans cost ~0.4s each.",
+    )
+    p.add_argument(
+        "--temporal-ensemble",
+        type=float,
+        default=None,
+        help="Enable temporal ensembling (e.g. 0.01) = smooth fully-closed-loop; forces "
+        "n_action_steps=1. Needs GPU (CPU too slow at ~2.5Hz).",
+    )
     p.add_argument("--display-data", action="store_true", help="Open the Rerun viewer.")
-    p.add_argument("--record", action="store_true",
-                   help="Record the rollout to a LeRobotDataset (video+state+action) for review.")
-    p.add_argument("--run-name", default="eval_act_orange",
-                   help="Name of the recorded eval dataset (under --dataset-root).")
-    p.add_argument("--dataset-root", default="/data/act_orange_evals",
-                   help="Parent dir for recorded eval datasets (on /data; root disk is tight).")
+    p.add_argument(
+        "--record",
+        action="store_true",
+        help="Record the rollout to a LeRobotDataset (video+state+action) for review.",
+    )
+    p.add_argument(
+        "--run-name",
+        default="eval_act_orange",
+        help="Name of the recorded eval dataset (under --dataset-root).",
+    )
+    p.add_argument(
+        "--dataset-root",
+        default="/data/act_orange_evals",
+        help="Parent dir for recorded eval datasets (on /data; root disk is tight).",
+    )
     p.add_argument("--print-only", action="store_true", help="Print the rollout command and exit.")
     p.add_argument(
         "--i-understand-this-moves-robot",
@@ -157,6 +170,7 @@ def main() -> None:
 
     if args.record:
         import shutil
+
         out = Path(args.dataset_root) / args.run_name
         if out.exists():
             print(f"Removing previous recording: {out}")

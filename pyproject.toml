@@ -334,6 +334,8 @@ ignore = [
 # E402: conditional-import guards (TYPE_CHECKING / is_package_available) must precede the imports they protect
 "src/lerobot/scripts/convert_dataset_v21_to_v30.py" = ["E402"]
 "src/lerobot/policies/wall_x/**" = ["N801", "N812", "SIM102", "SIM108", "SIM210", "SIM211", "B006", "B007", "SIM118"] # Supprese these as they are coming from original Qwen2_5_vl code TODO(pepijn): refactor original
+# E402: experiment scripts set up sys.path/env before imports; N806: math-style capitalized locals; SIM115: long-lived file handles closed on process exit
+"projects/**" = ["E402", "N806", "SIM115"]
 
 [tool.ruff.lint.isort]
 combine-as-imports = true
@@ -355,18 +357,26 @@ exclude_dirs = [
     "benchmarks",
     "src/lerobot/datasets/push_dataset_to_hub",
 ]
-skips = ["B101", "B311", "B404", "B603", "B615"]
+skips = ["B101", "B311", "B404", "B603", "B607", "B615"] # B607: git/ffmpeg invoked from PATH, consistent with B404/B603 above
 
 [tool.typos]
+# Archived experiment outputs (training logs, monitor snapshots) are verbatim
+# artifacts; the `ot_train.py` filename inside them trips the checker.
+files.extend-exclude = ["projects/testproject/results/"]
 default.extend-ignore-re = [
     "(?Rm)^.*(#|//)\\s*spellchecker:disable-line$",                      # spellchecker:disable-line
     "(?s)(#|//)\\s*spellchecker:off.*?\\n\\s*(#|//)\\s*spellchecker:on", # spellchecker:<on|off>
+    "\\bot_train\\.py",  # openpi training script filename quoted in docs/logs
+    "(?i)\\bmis-",       # hyphenated prefix: mis-applied, mis-exposed, ...
+    "\\bPNGs\\b",        # plural of PNG
 ]
 default.extend-ignore-identifiers-re = [
     # Add individual words here to ignore them
     "2nd",
+    "nd",  # msgpack wire-format key: {b'nd': True, ...}
     "pn",
     "ser",
+    "SER",
     "ein",
     "thw",
     "inpt",

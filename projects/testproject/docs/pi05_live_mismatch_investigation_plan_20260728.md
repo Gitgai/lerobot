@@ -111,7 +111,7 @@ needs-data/training.
 ## 3b. Phase 1 Results (2026-07-28: trace replay on pod, training-era env)
 
 All 58 traced observations from both failure runs were replayed through 012000
-on the pod GPU. Artifacts: /workspace/trace_replay/*/replayed_chunks.jsonl
+on the pod GPU. Artifacts: /workspace/trace_replay/\*/replayed_chunks.jsonl
 (copies in local scratch; summary below).
 
 RESULT 1 - the serving path is CLEARED:

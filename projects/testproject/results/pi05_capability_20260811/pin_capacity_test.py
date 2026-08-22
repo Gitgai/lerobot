@@ -5,13 +5,20 @@ Decides fp32 offload: +112% (bulk, pinned) vs +785% (chunked, measured in 3f.3b)
 SAFETY: pinned memory is UNSWAPPABLE. Allocates incrementally, FREES between
 every step, and aborts if MemAvailable falls below the floor.
 """
-import gc, time, torch
+
+import gc
+import time
+
+import torch
 
 FLOOR_GB = 6.0
+
+
 def avail():
     for ln in open("/proc/meminfo"):
         if ln.startswith("MemAvailable"):
             return int(ln.split()[1]) / 1048576
+
 
 dev = torch.empty(int(1e9 // 4), dtype=torch.float32, device="cuda")  # 1 GB staging on GPU
 
@@ -33,17 +40,20 @@ for gb in (16, 24, 33.1):
     t_pin = time.perf_counter() - t0
     # bulk transfer rate, 1 GB at a time out of the pinned region
     n = int(1e9 // 4)
-    torch.cuda.synchronize(); t1 = time.perf_counter()
+    torch.cuda.synchronize()
+    t1 = time.perf_counter()
     reps = 5
     for i in range(reps):
-        dev.copy_(host[i*n:(i+1)*n], non_blocking=True)
+        dev.copy_(host[i * n : (i + 1) * n], non_blocking=True)
     torch.cuda.synchronize()
     rate = reps * 1.0 / (time.perf_counter() - t1)
     a = avail()
     flag = "⚠ slow pin (swapping?)" if t_pin > 10 else "✅ ok"
     print(f"  {gb:>7.1f} GB{t_pin:>9.1f}s{rate:>9.1f} GB/s{a:>11.1f} GB  {flag}")
-    del host; gc.collect()
+    del host
+    gc.collect()
     time.sleep(1)
 
-del dev; gc.collect()
+del dev
+gc.collect()
 print(f"\n  end: {avail():.1f} GB available")

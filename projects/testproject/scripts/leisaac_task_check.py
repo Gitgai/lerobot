@@ -36,7 +36,9 @@ parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--task", default="LeIsaac-SO101-PickOrange-v0")
 parser.add_argument("--construct", action="store_true", help="also try building the env (slow)")
 parser.add_argument("--device", default="cuda")
-parser.add_argument("--teleop-device", default="keyboard", help="keyboard | gamepad | so101leader | so101_state_machine")
+parser.add_argument(
+    "--teleop-device", default="keyboard", help="keyboard | gamepad | so101leader | so101_state_machine"
+)
 args = parser.parse_args()
 
 # Use Isaac Lab's AppLauncher, NOT a raw SimulationApp. LeIsaac scenes spawn
@@ -60,7 +62,7 @@ try:
 except Exception as exc:  # noqa: BLE001
     print(f"IMPORT leisaac    FAIL -> {type(exc).__name__}: {str(exc)[:160]}")
     app.close()
-    raise SystemExit(1)
+    raise SystemExit(1) from exc
 
 # 2. registration
 tasks = sorted(k for k in gym.registry if "LeIsaac" in k or "SO101" in k)

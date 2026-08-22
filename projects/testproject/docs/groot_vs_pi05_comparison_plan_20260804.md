@@ -73,7 +73,7 @@ Every outcome is informative. That is the test worth running.
 
 **Pre-register the reading before running it.** This project's habit of writing
 down wrong turns is what makes its docs trustworthy; deciding what an outcome
-means *after* seeing it is how that habit fails.
+means _after_ seeing it is how that habit fails.
 
 ---
 

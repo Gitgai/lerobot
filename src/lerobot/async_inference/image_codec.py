@@ -23,7 +23,12 @@ def compress_observation_images(observation: dict, quality: int) -> dict:
     import cv2
 
     for key, value in list(observation.items()):
-        if isinstance(value, np.ndarray) and value.ndim == 3 and value.dtype == np.uint8 and value.shape[2] == 3:
+        if (
+            isinstance(value, np.ndarray)
+            and value.ndim == 3
+            and value.dtype == np.uint8
+            and value.shape[2] == 3
+        ):
             ok, buffer = cv2.imencode(
                 ".jpg", cv2.cvtColor(value, cv2.COLOR_RGB2BGR), [cv2.IMWRITE_JPEG_QUALITY, int(quality)]
             )

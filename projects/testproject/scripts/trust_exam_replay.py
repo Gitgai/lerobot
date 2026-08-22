@@ -134,7 +134,7 @@ class ServerSession:
         self.stub.SendPolicyInstructions(services_pb2.PolicySetup(data=pickle.dumps(cfg)))
 
     def infer(self, record, timestep, jpeg_quality):
-        raw = {cam: img for cam, img in record["images"].items()}
+        raw = dict(record["images"].items())
         raw.update(record["state"])
         raw["task"] = record["task"]
 
@@ -181,8 +181,9 @@ def main():
     ap.add_argument("--n", type=int, default=12, help="how many distinct observations to replay")
     ap.add_argument("--repeats", type=int, default=3, help="repeats of one observation (noise floor)")
     ap.add_argument("--jpeg-quality", type=int, default=92)
-    ap.add_argument("--start-index", type=int, default=0,
-                    help="skip N observations; use to replay the grasp window")
+    ap.add_argument(
+        "--start-index", type=int, default=0, help="skip N observations; use to replay the grasp window"
+    )
     args = ap.parse_args()
 
     manifest, records = load_trace(args.trace_dir, args.n, args.start_index)
@@ -273,8 +274,14 @@ def main():
                 ok = False
 
     print(f"\n  latency: median {statistics.median(latencies) * 1000:.0f} ms over {len(latencies)} calls")
-    print("\n" + ("VERDICT: PASS - stack reproduces sane, input-dependent behavior" if ok
-                  else "VERDICT: FAIL - do NOT run the robot; diagnose the stack"))
+    print(
+        "\n"
+        + (
+            "VERDICT: PASS - stack reproduces sane, input-dependent behavior"
+            if ok
+            else "VERDICT: FAIL - do NOT run the robot; diagnose the stack"
+        )
+    )
     raise SystemExit(0 if ok else 1)
 
 

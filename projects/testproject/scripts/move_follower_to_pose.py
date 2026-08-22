@@ -10,7 +10,6 @@ from pathlib import Path
 
 from lerobot.robots.so_follower import SOFollower, SOFollowerRobotConfig
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 CONFIG_PATH = PROJECT_ROOT / "config" / "so101.json"
 
@@ -105,7 +104,9 @@ def main() -> int:
         if args.skip_wrist_roll:
             target_pose["wrist_roll"] = current_pose["wrist_roll"]
         else:
-            target_pose["wrist_roll"] = nearest_equivalent(target_pose["wrist_roll"], current_pose["wrist_roll"])
+            target_pose["wrist_roll"] = nearest_equivalent(
+                target_pose["wrist_roll"], current_pose["wrist_roll"]
+            )
 
         print("Current pose")
         print(format_pose(current_pose))

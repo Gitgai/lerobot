@@ -90,38 +90,38 @@ This table is based on visual inspection of the finer front/top timelines:
 /data/downloads/pi05_dataset_trim_analysis_20260630/batch03_top_timeline_fine_ffmpeg.jpg
 ```
 
-| Episode | Behavior |
-| --- | --- |
-| batch01 ep0 | Pick and move/drop elsewhere. Extra tail remains after useful motion. |
-| batch01 ep1 | Pick and move/drop elsewhere. Extra tail remains. |
-| batch01 ep2 | Pick and move/drop elsewhere. Extra tail remains. |
-| batch01 ep3 | Pick and move/drop elsewhere. Extra tail remains. |
-| batch01 ep4 | Pick and move/drop elsewhere, but final part is less clean. |
-| batch01 ep5 | Pick and move/drop elsewhere. Extra tail remains. |
-| batch01 ep6 | Pick and move/drop elsewhere. Extra tail remains. |
-| batch01 ep7 | Pick and move/drop elsewhere. Extra tail/rest-like part remains. |
-| batch01 ep8 | Pick and move/drop elsewhere. Extra tail/rest-like part remains. |
-| batch01 ep9 | Pick and move/drop elsewhere. Extra tail remains. |
-| batch02 ep0 | Pick and move/drop elsewhere. |
-| batch02 ep1 | Pick and move/drop elsewhere. |
-| batch02 ep2 | Pick and move/drop elsewhere. |
-| batch02 ep3 | Pick and move/drop elsewhere. |
-| batch02 ep4 | Pick and move/drop elsewhere. |
-| batch02 ep5 | Pick and move/drop elsewhere, but final target is less clear. |
-| batch02 ep6 | Pick and move/drop elsewhere. |
-| batch02 ep7 | Pick and move/drop elsewhere. |
-| batch02 ep8 | Pick and move/drop elsewhere. |
-| batch02 ep9 | Pick/move behavior is present, but this one should be manually reviewed because the end is less clear. |
-| batch03 ep0 | Pick and move/drop elsewhere. |
-| batch03 ep1 | Pick and move/drop elsewhere. |
-| batch03 ep2 | Pick and move/drop elsewhere. |
+| Episode     | Behavior                                                                                                      |
+| ----------- | ------------------------------------------------------------------------------------------------------------- |
+| batch01 ep0 | Pick and move/drop elsewhere. Extra tail remains after useful motion.                                         |
+| batch01 ep1 | Pick and move/drop elsewhere. Extra tail remains.                                                             |
+| batch01 ep2 | Pick and move/drop elsewhere. Extra tail remains.                                                             |
+| batch01 ep3 | Pick and move/drop elsewhere. Extra tail remains.                                                             |
+| batch01 ep4 | Pick and move/drop elsewhere, but final part is less clean.                                                   |
+| batch01 ep5 | Pick and move/drop elsewhere. Extra tail remains.                                                             |
+| batch01 ep6 | Pick and move/drop elsewhere. Extra tail remains.                                                             |
+| batch01 ep7 | Pick and move/drop elsewhere. Extra tail/rest-like part remains.                                              |
+| batch01 ep8 | Pick and move/drop elsewhere. Extra tail/rest-like part remains.                                              |
+| batch01 ep9 | Pick and move/drop elsewhere. Extra tail remains.                                                             |
+| batch02 ep0 | Pick and move/drop elsewhere.                                                                                 |
+| batch02 ep1 | Pick and move/drop elsewhere.                                                                                 |
+| batch02 ep2 | Pick and move/drop elsewhere.                                                                                 |
+| batch02 ep3 | Pick and move/drop elsewhere.                                                                                 |
+| batch02 ep4 | Pick and move/drop elsewhere.                                                                                 |
+| batch02 ep5 | Pick and move/drop elsewhere, but final target is less clear.                                                 |
+| batch02 ep6 | Pick and move/drop elsewhere.                                                                                 |
+| batch02 ep7 | Pick and move/drop elsewhere.                                                                                 |
+| batch02 ep8 | Pick and move/drop elsewhere.                                                                                 |
+| batch02 ep9 | Pick/move behavior is present, but this one should be manually reviewed because the end is less clear.        |
+| batch03 ep0 | Pick and move/drop elsewhere.                                                                                 |
+| batch03 ep1 | Pick and move/drop elsewhere.                                                                                 |
+| batch03 ep2 | Pick and move/drop elsewhere.                                                                                 |
 | batch03 ep3 | Pick/move behavior is present, but manually review because the sequence is less clear than the best episodes. |
-| batch03 ep4 | Pick and move/drop elsewhere, but object starts near the edge/partly awkwardly placed. |
-| batch03 ep5 | Pick and move/drop elsewhere. |
-| batch03 ep6 | Pick/move behavior is present, but manually review because the end is less clear. |
-| batch03 ep7 | Pick and move/drop elsewhere. |
-| batch03 ep8 | Pick and move/drop elsewhere. |
-| batch03 ep9 | Pick and move/drop elsewhere. |
+| batch03 ep4 | Pick and move/drop elsewhere, but object starts near the edge/partly awkwardly placed.                        |
+| batch03 ep5 | Pick and move/drop elsewhere.                                                                                 |
+| batch03 ep6 | Pick/move behavior is present, but manually review because the end is less clear.                             |
+| batch03 ep7 | Pick and move/drop elsewhere.                                                                                 |
+| batch03 ep8 | Pick and move/drop elsewhere.                                                                                 |
+| batch03 ep9 | Pick and move/drop elsewhere.                                                                                 |
 
 Summary:
 

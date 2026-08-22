@@ -18,8 +18,8 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from lerobot.datasets.lerobot_dataset import LeRobotDataset
 
+from lerobot.datasets.lerobot_dataset import LeRobotDataset
 
 TASK_TEXT = "pick up the orange and move it to another place"
 

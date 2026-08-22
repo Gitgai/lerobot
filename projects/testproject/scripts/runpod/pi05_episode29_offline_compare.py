@@ -20,7 +20,6 @@ from lerobot.configs import PreTrainedConfig
 from lerobot.datasets.lerobot_dataset import LeRobotDataset
 from lerobot.policies.factory import get_policy_class, make_pre_post_processors
 
-
 MOTORS = [
     "shoulder_pan",
     "shoulder_lift",
@@ -39,7 +38,7 @@ def parse_indices(raw: str | None, length: int, chunk_size: int) -> list[int]:
         fractions = [0.00, 0.10, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80]
         max_start = max(0, length - chunk_size - 1)
         indices = [round(frac * max_start) for frac in fractions]
-    return sorted(set(max(0, min(index, length - chunk_size - 1)) for index in indices))
+    return sorted({max(0, min(index, length - chunk_size - 1)) for index in indices})
 
 
 def tensor_to_list(value: torch.Tensor) -> list[float]:
@@ -52,7 +51,9 @@ def main() -> None:
     parser.add_argument("--dataset-repo-id", default="local/so101_pick_orange_episode29_overfit")
     parser.add_argument("--policy-path", required=True)
     parser.add_argument("--output-csv", required=True)
-    parser.add_argument("--indices", default=None, help="Comma-separated frame indices. Default samples the episode.")
+    parser.add_argument(
+        "--indices", default=None, help="Comma-separated frame indices. Default samples the episode."
+    )
     parser.add_argument("--chunk-size", type=int, default=50)
     parser.add_argument("--max-compare-actions", type=int, default=50)
     parser.add_argument("--device", default="cuda")

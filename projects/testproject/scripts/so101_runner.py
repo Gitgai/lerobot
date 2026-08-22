@@ -4,8 +4,8 @@
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
-import os
 import shutil
 import signal
 import subprocess
@@ -13,7 +13,6 @@ import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Any
-
 
 SIGINT_RETURN_CODE = -signal.SIGINT
 
@@ -82,7 +81,7 @@ def run(cmd: list[str], cfg: dict[str, Any], name: str, log: bool = True) -> Non
     print(f"Log file: {path}\n")
 
     with path.open("w", buffering=1) as log_file:
-        log_file.write(f"# SO-101 session log\n")
+        log_file.write("# SO-101 session log\n")
         log_file.write(f"# started: {datetime.now().isoformat(timespec='seconds')}\n")
         log_file.write(f"# cwd: {cwd}\n")
         log_file.write(f"# command: {' '.join(cmd)}\n\n")
@@ -300,7 +299,9 @@ def _load_hf_json(repo_id: str, filename: str) -> dict[str, Any] | None:
     try:
         from huggingface_hub import hf_hub_download
     except ImportError as exc:
-        raise RuntimeError("huggingface_hub is required. Install it with: pip install huggingface_hub") from exc
+        raise RuntimeError(
+            "huggingface_hub is required. Install it with: pip install huggingface_hub"
+        ) from exc
 
     try:
         path = Path(hf_hub_download(repo_id, filename))
@@ -443,7 +444,9 @@ def inspect_policy(args: argparse.Namespace, cfg: dict[str, Any]) -> None:
     print("Compatibility")
     _status_line("policy", policy_type == "pi05", f"expected pi05, got {policy_type}")
     _status_line("state", state_shape == our_state_shape, f"expected {state_shape}, ours {our_state_shape}")
-    _status_line("action", action_shape == our_action_shape, f"expected {action_shape}, ours {our_action_shape}")
+    _status_line(
+        "action", action_shape == our_action_shape, f"expected {action_shape}, ours {our_action_shape}"
+    )
 
     camera_ok = bool(visual_features) and has_our_camera and not missing_cameras
     if camera_ok:
@@ -496,10 +499,8 @@ def positions(_: argparse.Namespace, cfg: dict[str, Any]) -> None:
         print(f"Leader read: FAILED ({leader_port})")
         print(f"{type(exc).__name__}: {exc}")
     finally:
-        try:
+        with contextlib.suppress(Exception):
             leader.disconnect()
-        except Exception:
-            pass
 
     try:
         follower.connect()
@@ -509,10 +510,8 @@ def positions(_: argparse.Namespace, cfg: dict[str, Any]) -> None:
         print(f"Follower read: FAILED ({follower_port})")
         print(f"{type(exc).__name__}: {exc}")
     finally:
-        try:
+        with contextlib.suppress(Exception):
             follower.disconnect()
-        except Exception:
-            pass
 
     if leader_action is None and follower_obs is not None:
         print("\nFollower-only positions")
@@ -530,7 +529,9 @@ def positions(_: argparse.Namespace, cfg: dict[str, Any]) -> None:
         if leader_action is None:
             print("- Leader arm did not return positions. Check leader USB, cable, and calibration.")
         if follower_obs is None:
-            print("- Follower arm did not return positions. Check follower power, servo bus cables, and motor response.")
+            print(
+                "- Follower arm did not return positions. Check follower power, servo bus cables, and motor response."
+            )
         print("\nSafe next checks:")
         print("1. Run: ./bin/so101 status")
         print("2. Power-cycle the failed arm if needed.")
@@ -554,7 +555,9 @@ def main() -> None:
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     teleop_parser = subparsers.add_parser("teleop", help="Run leader/follower teleop until Ctrl+C.")
-    teleop_parser.add_argument("--max-relative-target", type=float, default=cfg["default_max_relative_target"])
+    teleop_parser.add_argument(
+        "--max-relative-target", type=float, default=cfg["default_max_relative_target"]
+    )
     teleop_parser.add_argument(
         "--no-max-relative-target",
         action="store_true",
@@ -567,7 +570,9 @@ def main() -> None:
 
     record_parser = subparsers.add_parser("record", help="Record a local dataset.")
     record_parser.add_argument("--episodes", type=int, default=5)
-    record_parser.add_argument("--max-relative-target", type=float, default=cfg["default_max_relative_target"])
+    record_parser.add_argument(
+        "--max-relative-target", type=float, default=cfg["default_max_relative_target"]
+    )
     record_parser.add_argument(
         "--no-max-relative-target",
         action="store_true",
@@ -591,12 +596,12 @@ def main() -> None:
     calibrate_leader_parser.set_defaults(func=calibrate_leader)
 
     subparsers.add_parser("ports", help="Show USB serial ports.").set_defaults(func=ports)
-    subparsers.add_parser("status", help="Show project, robot, calibration, and dataset status.").set_defaults(
-        func=status
-    )
-    subparsers.add_parser("positions", help="Read leader/follower joint positions and compare them.").set_defaults(
-        func=positions
-    )
+    subparsers.add_parser(
+        "status", help="Show project, robot, calibration, and dataset status."
+    ).set_defaults(func=status)
+    subparsers.add_parser(
+        "positions", help="Read leader/follower joint positions and compare them."
+    ).set_defaults(func=positions)
 
     inspect_parser = subparsers.add_parser("inspect-policy", help="Inspect a Hugging Face policy config.")
     inspect_parser.add_argument("repo_id", help="Hugging Face model repo, for example zz4321/so101_pi05")

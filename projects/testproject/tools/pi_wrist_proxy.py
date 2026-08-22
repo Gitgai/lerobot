@@ -19,9 +19,6 @@ import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-import cv2
-
-
 HOST = "127.0.0.1"
 PORT = 8092
 DEFAULT_PI_HOST = "raspi@192.168.1.5"
@@ -222,8 +219,6 @@ def read_mjpeg_socket(source_host: str, source_port: int) -> None:
 
 
 def reader_loop(start_stream: bool) -> None:
-    source = f"tcp://{PI_IP}:{PI_STREAM_PORT}"
-
     while True:
         try:
             if start_stream:
@@ -276,8 +271,12 @@ class Handler(BaseHTTPRequestHandler):
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--pi-host", default=DEFAULT_PI_HOST, help="SSH target, for example raspi@192.168.1.5")
-    parser.add_argument("--pi-ip", default=DEFAULT_PI_IP, help="IP address used by OpenCV to read the camera TCP stream")
+    parser.add_argument(
+        "--pi-host", default=DEFAULT_PI_HOST, help="SSH target, for example raspi@192.168.1.5"
+    )
+    parser.add_argument(
+        "--pi-ip", default=DEFAULT_PI_IP, help="IP address used by OpenCV to read the camera TCP stream"
+    )
     parser.add_argument("--pi-stream-port", type=int, default=DEFAULT_PI_STREAM_PORT)
     parser.add_argument(
         "--no-start-stream",

@@ -47,9 +47,13 @@ p = argparse.ArgumentParser()
 p.add_argument("--dataset", required=True)
 p.add_argument("--policy-path", default=None, help="omit for a FRESH policy")
 p.add_argument("--rename-map", default="{}")
-p.add_argument("--expect-padded", type=int, default=0,
-               help="how many policy cameras you INTEND to be padded (e.g. pi05_base "
-                    "has 3 camera slots but LIBERO is a 2-camera setup)")
+p.add_argument(
+    "--expect-padded",
+    type=int,
+    default=0,
+    help="how many policy cameras you INTEND to be padded (e.g. pi05_base "
+    "has 3 camera slots but LIBERO is a 2-camera setup)",
+)
 a = p.parse_args()
 
 from lerobot.configs.policies import PreTrainedConfig

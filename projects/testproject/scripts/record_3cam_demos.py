@@ -149,25 +149,45 @@ def install_timer_patch() -> None:
 
 def main() -> None:
     cfg = load_config()
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     parser.add_argument("--episodes", type=int, default=5)
-    parser.add_argument("--task", default="Pick up the orange",
-                        help="Single-task instruction stored in the dataset; should match the deploy prompt.")
+    parser.add_argument(
+        "--task",
+        default="Pick up the orange",
+        help="Single-task instruction stored in the dataset; should match the deploy prompt.",
+    )
     parser.add_argument("--fps", type=int, default=int(cfg.get("camera_fps", 30)))
-    parser.add_argument("--episode-time", type=float, default=30.0,
-                        help="Max seconds per episode (press → to end earlier).")
-    parser.add_argument("--reset-time", type=float, default=15.0,
-                        help="Max seconds to reset the scene between episodes (press → to skip).")
-    parser.add_argument("--show-timer", action="store_true",
-                        help="Print a simple terminal timer during record/reset phases.")
-    parser.add_argument("--quiet-clamp-warnings", action="store_true",
-                        help="Hide repetitive max_relative_target clamp warnings while recording.")
-    parser.add_argument("--dataset-root", default=None,
-                        help="Override the dataset output folder from config/so101.json.")
-    parser.add_argument("--dataset-repo-id", default=None,
-                        help="Override the dataset repo_id from config/so101.json.")
-    parser.add_argument("--max-relative-target", type=float, default=None,
-                        help="Optional LeRobot movement clamp. Default is no clamp.")
+    parser.add_argument(
+        "--episode-time", type=float, default=30.0, help="Max seconds per episode (press → to end earlier)."
+    )
+    parser.add_argument(
+        "--reset-time",
+        type=float,
+        default=15.0,
+        help="Max seconds to reset the scene between episodes (press → to skip).",
+    )
+    parser.add_argument(
+        "--show-timer", action="store_true", help="Print a simple terminal timer during record/reset phases."
+    )
+    parser.add_argument(
+        "--quiet-clamp-warnings",
+        action="store_true",
+        help="Hide repetitive max_relative_target clamp warnings while recording.",
+    )
+    parser.add_argument(
+        "--dataset-root", default=None, help="Override the dataset output folder from config/so101.json."
+    )
+    parser.add_argument(
+        "--dataset-repo-id", default=None, help="Override the dataset repo_id from config/so101.json."
+    )
+    parser.add_argument(
+        "--max-relative-target",
+        type=float,
+        default=None,
+        help="Optional LeRobot movement clamp. Default is no clamp.",
+    )
     parser.add_argument(
         "--display-data",
         action="store_true",

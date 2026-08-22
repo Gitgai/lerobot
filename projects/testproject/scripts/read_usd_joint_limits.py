@@ -6,6 +6,7 @@ put elbow_flex and wrist_flex OUTSIDE the motor range, while the other four
 joints landed cleanly. Either the corpus actions are not what we think, or the
 table has drifted from the asset it claims to describe. This checks the asset.
 """
+
 from pxr import Usd, UsdPhysics
 
 USD_PATH = "/home/kiran/sim/leisaac-src/assets/robots/so101_follower.usd"
@@ -28,14 +29,18 @@ found = {}
 for prim in stage.Traverse():
     if not prim.IsA(UsdPhysics.RevoluteJoint) and not prim.IsA(UsdPhysics.PrismaticJoint):
         continue
-    joint = UsdPhysics.RevoluteJoint(prim) if prim.IsA(UsdPhysics.RevoluteJoint) else UsdPhysics.PrismaticJoint(prim)
+    joint = (
+        UsdPhysics.RevoluteJoint(prim)
+        if prim.IsA(UsdPhysics.RevoluteJoint)
+        else UsdPhysics.PrismaticJoint(prim)
+    )
     lo = joint.GetLowerLimitAttr().Get()
     hi = joint.GetUpperLimitAttr().Get()
     found[prim.GetName()] = (lo, hi, prim.GetTypeName())
 
 print(f"  joints found in the USD: {len(found)}\n")
 print(f"  {'joint (USD prim)':<24}{'USD limit':<26}{'hardcoded table':<22}{'agree?'}")
-for name, (lo, hi, typ) in sorted(found.items()):
+for name, (lo, hi, _typ) in sorted(found.items()):
     key = next((k for k in HARDCODED if k in name.lower()), None)
     hard = HARDCODED.get(key)
     if lo is None or hi is None:

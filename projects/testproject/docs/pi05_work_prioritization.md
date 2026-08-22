@@ -10,7 +10,7 @@ Last updated: 2026-08-05 (banner); body 2026-07-25
 > **REFINEMENT (2026-08-04): rank by evidence value, then do the highest-value
 > AVAILABLE item.** A blocked top priority does not idle everything beneath it.
 > This matters right now because P0 is blocked on a file transfer that only the
-> user can perform - which is a queue for *them*, not a stop for *us*.
+> user can perform - which is a queue for _them_, not a stop for _us_.
 >
 > **STRATEGY CHANGE (user, 2026-08-05): SIM-FIRST.** The simulator is now the
 > REFERENCE and the real rig will be built to match it - not the reverse. So
@@ -653,23 +653,23 @@ Did it lift/move the orange?
 
 ## 8. Evidence-To-Priority Matrix
 
-| Evidence | Priority Result | Work To Do |
-| --- | --- | --- |
-| Wrist camera not readable | P0 | Fix camera before model tests |
-| ESP32 appears only as serial/JTAG | P0 | Do not use it as wrist unless it becomes UVC `/dev/videoX` |
-| Top/front/wrist precheck images bad | P0 | Fix camera placement/source |
-| Checkpoint missing weights | P0 | Use complete checkpoint |
-| Policy server not listening | P0 | Fix RunPod server |
-| Robot client fails before motion | P0 | Fix config/hardware/camera |
-| Action chunks return but queue is empty/stale | P2 | Inspect queue/timing, then consider setting changes |
-| Video shows reach/touch but no grasp | P2 | Add trace or inspect actions before collecting data |
-| Trace shows no gripper close | P3 after evidence | Collect close-range correction demos or fine-tune |
-| Trace shows close command but robot does not close | P1/P2 hardware | Inspect gripper execution and robot state |
-| Trace shows good grasp/lift once | P2 reliability | Repeat controlled runs and measure success rate |
-| Dataset review finds 35+ good grasp-pick-move windows | P2 | Build focused dataset from existing approved windows before recording more demos |
-| Dataset review finds fewer than 20 good grasp-pick-move windows | P3 data collection | Record new focused correction episodes |
-| Option A fine-tune completes | P1 | Evaluate new checkpoint on real arm with official async, three cameras, trace, and video |
-| Option A still reaches but does not lift/move | P2 | Compare new Pi05 action chunks to the previous traced failure before recording new episodes |
+| Evidence                                                        | Priority Result    | Work To Do                                                                                  |
+| --------------------------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------- |
+| Wrist camera not readable                                       | P0                 | Fix camera before model tests                                                               |
+| ESP32 appears only as serial/JTAG                               | P0                 | Do not use it as wrist unless it becomes UVC `/dev/videoX`                                  |
+| Top/front/wrist precheck images bad                             | P0                 | Fix camera placement/source                                                                 |
+| Checkpoint missing weights                                      | P0                 | Use complete checkpoint                                                                     |
+| Policy server not listening                                     | P0                 | Fix RunPod server                                                                           |
+| Robot client fails before motion                                | P0                 | Fix config/hardware/camera                                                                  |
+| Action chunks return but queue is empty/stale                   | P2                 | Inspect queue/timing, then consider setting changes                                         |
+| Video shows reach/touch but no grasp                            | P2                 | Add trace or inspect actions before collecting data                                         |
+| Trace shows no gripper close                                    | P3 after evidence  | Collect close-range correction demos or fine-tune                                           |
+| Trace shows close command but robot does not close              | P1/P2 hardware     | Inspect gripper execution and robot state                                                   |
+| Trace shows good grasp/lift once                                | P2 reliability     | Repeat controlled runs and measure success rate                                             |
+| Dataset review finds 35+ good grasp-pick-move windows           | P2                 | Build focused dataset from existing approved windows before recording more demos            |
+| Dataset review finds fewer than 20 good grasp-pick-move windows | P3 data collection | Record new focused correction episodes                                                      |
+| Option A fine-tune completes                                    | P1                 | Evaluate new checkpoint on real arm with official async, three cameras, trace, and video    |
+| Option A still reaches but does not lift/move                   | P2                 | Compare new Pi05 action chunks to the previous traced failure before recording new episodes |
 
 ## 9. Work-In-Progress Limit
 

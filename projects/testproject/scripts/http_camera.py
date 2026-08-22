@@ -17,6 +17,7 @@ Mirrors the structure of lerobot.cameras.zmq.ZMQCamera (background read thread).
 
 from __future__ import annotations
 
+import contextlib
 import logging
 import time
 import urllib.request
@@ -113,10 +114,8 @@ class HTTPCamera(Camera):
             if warmup:
                 start = time.time()
                 while time.time() - start < self.config.warmup_s:
-                    try:
+                    with contextlib.suppress(TimeoutError):
                         self.async_read(timeout_ms=self.config.warmup_s * 1000)
-                    except TimeoutError:
-                        pass
                     time.sleep(0.05)
                 with self.frame_lock:
                     if self.latest_frame is None:

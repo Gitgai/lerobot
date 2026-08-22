@@ -3,6 +3,7 @@
 This project is for building a leader/follower robot arm setup and using LeRobot to evaluate, collect, and train robot manipulation policies.
 
 > **Entry points (2026-08-03):**
+>
 > - **New machine?** → [`NEW_MACHINE_SETUP.md`](NEW_MACHINE_SETUP.md)
 > - **What is this project, what is proven, what is next?** →
 >   [`docs/agent_handoff_pi05_20260803.md`](docs/agent_handoff_pi05_20260803.md)

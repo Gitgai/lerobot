@@ -18,12 +18,10 @@ import numpy as np
 import torch
 
 from lerobot.async_inference.helpers import RemotePolicyConfig, TimedObservation
-from lerobot.configs import PolicyFeature
 from lerobot.transport import services_pb2, services_pb2_grpc
 from lerobot.transport.utils import grpc_channel_options, send_bytes_in_chunks
 from lerobot.utils.constants import OBS_STR
 from lerobot.utils.feature_utils import hw_to_dataset_features
-
 
 SO101_MOTORS = [
     "shoulder_pan",
@@ -99,7 +97,9 @@ def main() -> None:
     print(f"server_address: {args.server_address}")
     print(f"policy: {args.policy}")
 
-    channel = grpc.insecure_channel(args.server_address, grpc_channel_options(max_receive_message_length=64 * 1024 * 1024))
+    channel = grpc.insecure_channel(
+        args.server_address, grpc_channel_options(max_receive_message_length=64 * 1024 * 1024)
+    )
     stub = services_pb2_grpc.AsyncInferenceStub(channel)
 
     ready_start = time.perf_counter()
@@ -123,7 +123,8 @@ def main() -> None:
     else:
         setup_start = time.perf_counter()
         stub.SendPolicyInstructions(
-            services_pb2.PolicySetup(data=pickle.dumps(policy_config)), timeout=args.timeout_s  # nosec B301
+            services_pb2.PolicySetup(data=pickle.dumps(policy_config)),
+            timeout=args.timeout_s,  # nosec B301
         )
         print(f"policy_setup_s: {time.perf_counter() - setup_start:.3f}")
 
