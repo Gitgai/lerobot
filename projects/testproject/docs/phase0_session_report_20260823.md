@@ -56,3 +56,56 @@ gate was consumed by the tape discovery. Verdict: baseline NOT regressed
 tape condition: p0_A1 A2 B1 B2 C1 (void as baseline; distractor data)
 clean condition: p0_C2 C3 D1 D2 E1
 traces/frames: laptop ~/trace_p0_*.jsonl, ~/run_frames_p0_*
+
+---
+
+## POST-SESSION RE-ANALYSIS (same day) — Finding 1 RETRACTED
+
+Measured every trial's actual orange position from the front-camera start
+frame (tight HSV mask, detector visually verified against the frames).
+
+```text
+9/10-day placements (all 10):   camera x 183-369, y 248-324   TIGHT CLUSTER
+today:  A1 551  A2 551  B1 447  B2 451  C1 347  C2 341
+        C3  61  D1 182  D2 182  E1  59
+```
+
+EIGHT of ten trials today sat OUTSIDE the training cluster; only C1 and C2
+were inside it. That reframes everything:
+
+1. RETRACTION — "distractor sensitivity is near zero" is WITHDRAWN as a
+   conclusion. The tape claim rests on exactly one in-distribution pair:
+   C1 (tape, froze) vs C2 (clean, completed). n=1 vs n=1 is not evidence;
+   I called it decisive and that was wrong. Tape remains a live hypothesis,
+   untested.
+2. THE DOMINANT VARIABLE IS PLACEMENT. Performance tracks distance from the
+   trained cluster, not tape: inside it 1/2 completed; outside it 0/8.
+3. THE ASYMMETRY IS REAL AND SURVIVES. High-x side (operator LEFT: A,B,
+   x 447-551): 4/4 GRASPED, 0/4 carried. Low-x side (operator RIGHT: D,E
+   and the mislabeled C3, x 59-182): 1/5 grasped. So the policy can still
+   SEE and GRAB well outside its zone on one side, and cannot even approach
+   on the other. Note r10 completed from x=183 - the low-x edge is not
+   categorically unreachable, so this is a gradient, not a wall.
+4. REGION LABELS DRIFTED MID-SESSION. The trial called "C3" was measured at
+   x=61 - i.e. in E territory, not C. Labels were operator-reported and
+   unverified at the time. Future sessions: the agent measures and reports
+   the actual position from the start frame BEFORE the run is scored.
+
+### What still stands from the original report
+- The baseline is not regressed: C2, the one clean in-distribution trial,
+  completed in textbook form with timing identical to the 9/10 day.
+- Scene/setup unchanged vs the 9/10 day (camera shift 8 px, brightness
+  100 -> 104, arm base within 9 px).
+- Phase 1 demo design change stands, and is now better justified: demos
+  must cover BOTH sides and a wider placement range, because the trained
+  cluster is provably narrow (x 183-369 of a 640 px view).
+
+### Corrected next-session protocol
+1. Agent measures orange position from the start frame and states it
+   before scoring; trials outside a declared band are labeled as such.
+2. The tape question, if we want it answered, needs its own controlled
+   test: 3 trials at the SAME in-cluster position with tape, 3 without.
+   Cheap, and it settles a real ladder rung (L4 distractors).
+3. The 15-trial baseline grid must use positions INSIDE the trained
+   cluster to measure the baseline, plus deliberate outside positions
+   labeled as generalization probes - not mixed silently.
