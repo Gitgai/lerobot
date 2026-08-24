@@ -48,7 +48,9 @@ gate was consumed by the tape discovery. Verdict: baseline NOT regressed
    objects on the table at eval time. (This session's own lesson.)
 2. PHASE 1 DEMO DESIGN CHANGE (important): pickups must cover the D/E
    side and both edges - the plate round now fixes the corridor AND
-   teaches the plate. Position blocks updated accordingly.
+   teaches the plate. (CORRECTION: blocks were NOT updated when this
+   line was written; the real update landed in the runbook 2026-08-24
+   rev 2 with measured camera-x bands. Gap flagged by the operator.)
 3. The 15-trial baseline grid re-runs properly at the START of the next
    session (invisible marks, ~40 min) before plate demos.
 

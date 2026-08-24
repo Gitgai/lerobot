@@ -48,12 +48,34 @@ Bonus if time (+10 min): 5 trials, regions B-D, with a DIFFERENT orange
         sentence: ONE exact string for all demos (decided at recording,
                   recorded in the log, reused verbatim at serving)
         vary BOTH orange and plate positions per the block table:
-          4 demos short left->right | 4 near->far | 4 centre source,
-          varied plate | 4 varied source, centre plate | 4 edge-but-safe
+          ORANGE POSITIONS - measured design (rev 2026-08-24; replaces the
+          original qualitative blocks). Grounded in the Phase 0 finding that
+          the trained cluster is only camera-x 183-369 of a 640 px view:
+             8 demos  x 183-369  familiar band ....... protect what works
+             8 demos  x  60-183  operator's RIGHT .... THE MEASURED GAP
+                                 (1/5 grasps there, 2026-08-23)
+             4 demos  x 369-500  operator's LEFT ..... grasps work there,
+                                 the CARRY does not
+          PLATE: vary its position within every group - never park it in one
+          spot, or the policy learns a fixed drop point, not a target.
+          The agent measures each demo's actual orange camera-x from its
+          first frame and reports coverage before the full set is recorded.
         smooth confident motion; abort+redo a hesitant demo
 [NJ]  inspect ALL 20 (frames, sync, coverage, grasp quality) BEFORE
       any further recording. Verdict: clean -> plan the 60-80 full set
       with 5-10 held-out combos; not clean -> fix protocol, re-pilot.
+      FULL SET keeps the pilot's proportions: ~40% familiar band,
+      ~40% operator-right, ~20% operator-left.
+```
+
+ONE-VARIABLE NOTE: this round deliberately teaches TWO things (the plate,
+and a wider pickup zone) because operator recording time is the scarce
+resource and both ride in one session. The rule is preserved in EVALUATION,
+not in the data: orange-pick trials measure whether the zone widened; plate
+trials measure whether the target was learned. Never report a single blended
+success number for this checkpoint - it would be uninterpretable.
+
+```text
 ```
 
 ## 3. What happens after (no operator needed)
