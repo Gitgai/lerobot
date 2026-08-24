@@ -37,6 +37,22 @@ power, camera aim vs references, THEN compare configs.
 Bonus if time (+10 min): 5 trials, regions B-D, with a DIFFERENT orange
 = instance probe. Score separately.
 
+## 1b. Plate visibility check (~10 min, BEFORE recording anything)
+
+Added 2026-08-24 at operator request. Recording 20 demos around a target the
+cameras cannot see would waste the session AND the 3 h training that follows.
+
+```text
+[rig] put the plate at 3-4 candidate spots, one at a time, across the
+      intended drop area
+[NJ]  at each spot: capture the front camera, and drive the arm to the
+      release pose to capture the WRIST view as it would look mid-place
+[NJ]  PASS = plate clearly in the front frame at every spot, not hidden
+      behind the arm, and visible in the wrist view at the release pose.
+      FAIL = move the plate area (or the camera) and re-check before
+      any recording.
+```
+
 ## 2. Plate pilot — 20 demos (~45 min at the rig, separate session is fine)
 
 ```text
