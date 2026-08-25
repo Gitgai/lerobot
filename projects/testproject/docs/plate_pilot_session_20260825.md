@@ -67,3 +67,32 @@ run's analysis is finished.
 - convert v3.0 -> v2.1, then fine-tune from `orange_pick_baseline_v1` WITH the
   old 79 orange demos mixed in (anti-forgetting, program addendum A5)
 - evaluate orange-pick and plate SEPARATELY; never one blended number
+
+## Pipeline smoke test — PASSED (same day)
+
+Purpose: prove the chain accepts the new data BEFORE more recording time is
+spent. Not an attempt at a usable model.
+
+```text
+1 transfer      20 demos, 113 MB, arm laptop -> GPU machine
+2 convert       v3.0 -> v2.1, 20 episodes, 14,948 frames
+                every video's frame count == its parquet row count
+                rejects 1/3/6 dropped as intended
+3 merge         + the 79 orange demos = 99 episodes, 51,119 frames
+                TWO task strings survive (task 0 orange-move, task 1 plate)
+                all video symlinks resolve, global index contiguous
+4 train         150 steps from orange_pick_baseline_v1, loss 0.059 -> 0.026,
+                exit 0, checkpoint written
+5 serve         checkpoint loads; answers BOTH instructions with finite
+                16x6 action chunks
+```
+
+Two things caught by the guards rather than by luck: the GPU still held the
+policy server from arm testing (pre-flight refused to start), and the disk had
+to be cleared first. Both are now habits the scripts enforce.
+
+The merged set is the first in this project to contain more than one
+instruction - the language channel finally has something to carry.
+
+Scripts: `convert_plate_v30_to_v21.py`, `merge_orange_plus_plate.py`.
+The smoke checkpoint was deleted; it has no value beyond this test.
