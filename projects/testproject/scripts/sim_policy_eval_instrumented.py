@@ -298,9 +298,16 @@ parser.add_argument("--snapshot-at", default="30,60", help="Comma list of steps 
 
 args = parser.parse_args()
 
+import os  # noqa: E402
 from isaaclab.app import AppLauncher  # noqa: E402
 
-app_launcher = AppLauncher(headless=False, enable_cameras=True)
+# headless is now selectable. 2026-08-25: the GUI path hung at startup
+# ("DLSS increasing input dimensions: render resolution (371,278) below
+# minimum 300") and never reached step 0. Cameras still render headless,
+# which is all the policy and the snapshots need.
+app_launcher = AppLauncher(
+    headless=os.environ.get("SIM_HEADLESS", "0") == "1", enable_cameras=True
+)
 simulation_app = app_launcher.app
 
 import csv  # noqa: E402
