@@ -60,3 +60,41 @@ this null result.
 - arm test of checkpoint-6000: score orange-picking and plate-placing SEPARATELY
 - expand to 60-80 plate demos before treating the plate skill as real
 - Phase 2 must use same-scene/different-command data (see above)
+
+## First arm test of plate-v1 — INCONCLUSIVE, and it implicates the SCENE
+
+```text
+plate-v1 checkpoint-6000, plate on the table:
+  trial 1  no grasp - reached the orange, froze over it, gripper never
+           commanded below 30 (min 37). Orange in the MIDDLE band (x=213).
+  trial 2  no grasp - same signature, gripper 37-59. Orange MIDDLE (x=336).
+
+CONTROL - orange_pick_baseline_v1 (the 9/10 model), same scene, plate present:
+  trial 1  NO GRASP EITHER. gripper 36-54, pan -26..-3.
+```
+
+The model that scored 9/10 on 2026-08-20 cannot grasp on this table today.
+Same checkpoint, same client, same instruction. So plate-v1 has NOT regressed -
+something in the SCENE changed. This also vindicates the offline gate, which
+said the two models were equivalent: they now fail equivalently.
+
+Note on the gate's limits: the held-out probe measures SINGLE-STEP prediction
+accuracy against recordings. It cannot detect a closed-loop failure - a policy
+can predict well step-by-step and still stall when driving itself. Passing that
+gate is necessary, not sufficient.
+
+Two candidate causes, not yet separated:
+1. THE PLATE IS ON THE TABLE. The baseline has never seen one, and this policy
+   family's distractor tolerance measured near zero (four tape markers took it
+   90% -> 0% on 2026-08-23). A white plate is a much larger intrusion.
+2. Camera framing moved when the laptop was repositioned on 2026-08-25. It was
+   verified against the reference (whole-frame shift x -2, y 0) but "within a
+   few pixels" is not "identical", and this model is highly framing-sensitive.
+
+THE DECIDING TEST, not yet run: baseline model, PLATE REMOVED, orange only -
+exactly the 9/10 conditions. Grasps -> the plate is the disruption, and 20
+plate demos against 79 plateless ones is nowhere near enough to normalise it.
+Still fails -> the setup drifted and must be fixed before ANY model is judged.
+
+Session ended here: the arm laptop dropped off the network (the Pi on the same
+network stayed reachable, so the laptop itself went offline, not the link).
