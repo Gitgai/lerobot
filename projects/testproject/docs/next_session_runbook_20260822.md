@@ -94,6 +94,33 @@ success number for this checkpoint - it would be uninterpretable.
 ```text
 ```
 
+## 2b. Early arm check of plate-v1 (added 2026-08-26, operator chose this)
+
+Off the written order: we trained on the 20-demo pilot rather than waiting for
+the full 60-80. This 10-run check is the same "verify cheaply before scaling"
+logic the pilot itself used - 30 min of arm time can redirect two recording
+sessions.
+
+```text
+checkpoint  n16_plate_v1/checkpoint-6000   (regression gate passed:
+            held-out orange error 2.50 vs 2.41 baseline)
+instruction "pick up the orange and place it on the plate"  (byte-exact,
+            the string the plate demos were recorded with)
+runtime     --rtc=true, jpeg 92, ports resolved by SERIAL, arms NOT on USB 3-1
+scene       plate in its validated position, one orange, nothing else
+
+TWO SEPARATE SCORES, never blended:
+  A) grasp    - did it pick the orange up? Which band was the orange in?
+                the right-side band is the open question (baseline: ~1/5 there)
+  B) place    - did the orange end ON the plate? carried toward it at all?
+```
+
+Decision after 10 runs:
+- grasps improve on the right AND some plate-seeking -> record the full 60-80
+- grasps improve, no plate-seeking -> plate needs more/better demos; consider
+  whether the plate is visible enough at release (section 1b found it is)
+- no improvement anywhere -> stop and diagnose before recording more
+
 ## 3. What happens after (no operator needed)
 
 ```text
