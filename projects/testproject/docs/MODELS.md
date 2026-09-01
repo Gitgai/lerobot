@@ -28,6 +28,8 @@ LINEAGE     every checkpoint carries LINEAGE.json recording its parent,
 | `orange_pick_baseline_v1` | `n16_real79_side/checkpoint-10000` | nvidia/GR00T-N1.6-3B | 79 orange demos | **FROZEN.** 9/10 full task on the arm, 2026-08-20. Write-protected. |
 | `plate_v1` | `n16_plate_v1/checkpoint-6000` | `orange_pick_baseline_v1` | 79 orange + 20 plate (99 eps, 2 tasks) | Trained 2026-08-26. Regression gate passed (2.50 vs 2.41). One live-camera arm trial: grasped 9 s, grip +5.3, did not carry. |
 
+| `plate_v2` (training) | `n16_plate_v2c` | `plate_v1` via v2/ckpt-1500, v2b/ckpt-1000 | same 99 episodes | Continuation to global step ~12000, answering whether the held-out orange error keeps falling past 6000. Survived three systemd-oomd kills by resuming from checkpoints. |
+
 Retired / not in use: `n16_real79_top` (Brain B, lost the camera A/B),
 `gr00t_n16_leisaac_orange` (simulator-trained; blind on photographs),
 `n16_real89_20260817` (aborted run).

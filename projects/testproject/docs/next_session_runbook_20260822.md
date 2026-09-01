@@ -121,6 +121,30 @@ Decision after 10 runs:
   whether the plate is visible enough at release (section 1b found it is)
 - no improvement anywhere -> stop and diagnose before recording more
 
+## 2c. Current bench state and what unblocks it (2026-09-01)
+
+The 10-run check in 2b has NOT happened yet. plate_v1 has exactly ONE honest
+arm trial - it grasped in 9 s with a firm grip and did not carry. Every other
+trial ran with a frozen wrist camera and measures nothing.
+
+```text
+BLOCKER   the OV5647 wrist ribbon dies under arm vibration. It has frozen
+          mid-session twice and cost five trials. A replacement RIBBON is the
+          cheap fix - same sensor, so the policy sees the world it learned.
+
+READY     arm on USB 3-2 (never 3-1, which is faulty)
+          ESP32 wrist camera works but changes the images - adopt only when
+          re-recording, see docs/plate_v2_and_hardware_20260901.md
+          client guard still TODO: abort a run when wrist frame age > ~1 s
+```
+
+WHEN RECORDING THE FULL 60-80 SET, TWO CHANGES:
+  1. HOLD 5-10 PLATE DEMOS OUT of training. Without a held-out plate set,
+     "did the plate skill improve?" cannot be answered offline at all - which
+     is exactly the wall plate_v2 hit.
+  2. Switch to the ESP32 wrist camera at that session, not before. The demos
+     and the camera then match, and the ribbon problem retires permanently.
+
 ## 3. What happens after (no operator needed)
 
 ```text
