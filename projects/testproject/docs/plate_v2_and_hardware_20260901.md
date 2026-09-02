@@ -168,3 +168,51 @@ rig        arm       connected, USB 3-2 (NOT 3-1, which is faulty)
 [NJ]    client guard: abort a run the moment wrist frame age exceeds ~1 s
         (five trials have been wasted driving on a frozen camera)
 ```
+
+## 6. ESP32 as a SUBSTITUTE camera: tested and REJECTED (2026-09-02)
+
+The Pi camera was dead (Pi off the network), so the ESP32 was tried in its
+place. Control first: the BASELINE model - 9/10 on the arm with the OV5647 -
+run on the plain orange task through ESP32 images.
+
+```text
+ctrl1  baseline model, ESP32 wrist camera   NO GRASP
+t1     plate_v1,       ESP32 wrist camera   NO GRASP
+```
+
+Confirmed two independent ways: the orange never moved in the front camera
+(1 px), and the longest SUSTAINED finger-block was 7 and 4 cycles against the
+10-20 a real grasp produces.
+
+A known-good model does not even attempt to close its gripper through this
+camera. Same lesson as the simulator renders: the policy only understands the
+kind of pictures it was raised on. The ESP32's wider field of view and
+different colour rendering are enough to break recognition.
+
+>>> CONFIRMED: the ESP32 is good hardware and a bad substitute. Adopting it
+>>> REQUIRES re-recording the demonstrations. Do it at the 60-80 demo session,
+>>> never as an emergency swap mid-experiment.
+
+### Two scoring bugs found the same day - both mine
+
+1. FALSE GRASP. The finger-stall test fired while the orange never moved. A
+   stall proves something is between the fingers, not that it is the fruit.
+   FIX: a grasp now requires the orange to LEAVE its start position in the
+   front camera, not just a stall.
+
+2. FALSE JAM, then a false grasp before it. The test counted TOTAL blocked
+   cycles. Calibrated against the 2026-08-20 9/10 runs:
+
+```text
+run     min grip cmd   blocked cycles   LONGEST unbroken
+r2            26.9          19               10     <- real grasp
+r6            23.0          23               20     <- real grasp
+ctrl1         26.3         207                7     <- no grasp
+t1            19.4         196                4     <- no grasp
+```
+
+   A real hold is SUSTAINED. 207 cycles of scattered servo chatter outscored a
+   genuine 20-cycle hold. FIX: require the longest UNBROKEN block >= 10 cycles.
+
+Both were caught because the operator asked "where did it grasp?" - a proxy
+measurement was being reported without checking the thing it stood for.
