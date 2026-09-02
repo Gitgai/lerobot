@@ -107,6 +107,44 @@ Until then the OV5647 stays, and it needs a REPLACEMENT RIBBON to be trusted.
 Firmware and toolchain live on the arm laptop at `~/esp32work/`; the sketch is
 mirrored (with WiFi placeholders) at `scripts/esp32_wrist_cam/`.
 
+## 3b. RESULT: more training buys almost nothing
+
+Every checkpoint, same 10 held-out orange episodes, same probe:
+
+```text
+baseline                          2.41
+plate_v1  step 1500               3.24
+          step 3000               2.92
+          step 4500               2.72
+          step 6000               2.50
+plate_v2  global ~9500            3.08   <- restart spike
+          global ~10500           2.67
+          global ~11500           2.37   <- best of all
+          global ~12000           2.46   <- turned back up
+```
+
+ANSWER TO THE QUESTION THIS RUN EXISTED FOR: the curve turns around global
+~11500. Doubling the training moved the error 2.50 -> 2.37 at best, then it
+worsened. 6000 steps was already the right budget.
+
+Two cautions on reading that table:
+
+1. The sawtooth is the WARM RESTARTS, not learning. Each resume re-runs LR
+   warmup and knocks the model off its settled point (3.24 at v1's first save,
+   3.08 after the v2 restart), then it recovers. Artefact, not property.
+2. 2.37 vs 2.41 vs 2.46 is a 0.09 spread over 60 samples. Do not call the
+   "best" checkpoint better than baseline. The honest reading: they are
+   equivalent, and the orange skill briefly lost early in training came back.
+
+CONSEQUENCE: training longer is not the lever - DATA is. 20 plate demos against
+79 orange ones is the limit, and more passes over those 20 do not move it.
+plate_v1 (step 6000) stays the model to test on the arm; nothing here justifies
+switching to a v2 checkpoint.
+
+AND STILL INVISIBLE: every number above measures ORANGE picking. Whether the
+plate skill improved cannot be seen offline at all, because all 20 plate demos
+are in training. Hold 5-10 out next time.
+
 ## 4. State at the end of this session
 
 ```text
