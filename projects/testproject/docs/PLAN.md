@@ -130,9 +130,12 @@ gate     held-out orange error must stay near 2.41, AND the held-out PLATE
 ## Standing rules earned the hard way
 
 ```text
-CAMERA     verify LIVE before every session: three fetches, different md5,
-           age < 1 s. HTTP 200 is NOT proof - a frozen proxy returns 200.
-           Five trials were lost to this on 2026-08-26.
+CAMERA     ENFORCED IN CODE since 2026-09-03. The client refuses to start
+           unless the wrist frame is < 1.5 s old AND two fetches a second
+           apart DIFFER, and aborts mid-run after three stale frames.
+           Verified against the frozen Pi proxy and a powered-off ESP32.
+           HTTP 200 is NOT proof - a frozen proxy returns 200 forever.
+           Five trials were lost to this before the guard existed.
 USB        arms NEVER on port 3-1. Resolve ports by SERIAL, never by name.
 GRASP      a grasp requires a SUSTAINED >=10-cycle finger block AND the orange
            moving in the front camera. Total blocked cycles is NOT enough -

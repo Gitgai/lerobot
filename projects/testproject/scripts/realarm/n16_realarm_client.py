@@ -51,6 +51,10 @@ import msgpack
 import numpy as np
 import zmq
 
+# Wrist-camera staleness abort (added 2026-09-03). Healthy is ~45 ms.
+WRIST_STALE_LIMIT = 1.5  # seconds
+_stale = [0]  # consecutive stale frames; list so the worker can mutate it
+
 
 # ---------------------------------------------------------------- wire format
 class MsgSerializer:
@@ -497,6 +501,24 @@ def main() -> None:
                         if w is not None:
                             obs["wrist"] = w
                         meta["wrist_age_s"] = None if age != age else round(age, 3)
+                        # Stale-camera abort. A frozen proxy answers HTTP 200
+                        # with an old photograph; four trials on 2026-08-26 ran
+                        # blind and were scored as model failures. Three
+                        # consecutive stale frames stops the run.
+                        if age == age and age > WRIST_STALE_LIMIT:
+                            _stale[0] += 1
+                            if _stale[0] >= 3:
+                                print(
+                                    f"\n*** ABORTING: wrist camera stale, "
+                                    f"frame age {age:.1f}s (limit "
+                                    f"{WRIST_STALE_LIMIT}s), {_stale[0]} in a row.\n"
+                                    f"*** The run would be blind and its result "
+                                    f"meaningless. Fix the camera and retry.",
+                                    flush=True,
+                                )
+                                raise SystemExit(3)
+                        else:
+                            _stale[0] = 0
                     t0 = time.time()
                     try:
                         acts = wpolicy.get_action(obs)
@@ -632,6 +654,36 @@ def main() -> None:
                 dt = time.time() - tic
                 if dt < 1.0 / 30:
                     time.sleep(1.0 / 30 - dt)
+
+        # --- wrist camera pre-flight -------------------------------------
+        # Refuse to move the arm on a dead camera. A frozen proxy answers
+        # HTTP 200 with an old photograph; four trials on 2026-08-26 ran blind
+        # and were scored as model failures.
+        if cfg.wrist_url:
+            def _preflight_wrist(url):
+                import hashlib
+                a, age_a = _fetch_wrist(url)
+                if a is None:
+                    return "wrist camera not responding"
+                if age_a == age_a and age_a > WRIST_STALE_LIMIT:
+                    return f"wrist frame is {age_a:.1f}s old (limit {WRIST_STALE_LIMIT}s)"
+                time.sleep(1.0)
+                b, _ = _fetch_wrist(url)
+                if b is None:
+                    return "wrist camera stopped responding"
+                ha = hashlib.md5(np.ascontiguousarray(a)).hexdigest()
+                hb = hashlib.md5(np.ascontiguousarray(b)).hexdigest()
+                if ha == hb:
+                    return "wrist camera FROZEN - two fetches a second apart are identical"
+                return None
+
+            _why = _preflight_wrist(cfg.wrist_url)
+            if _why is not None:
+                print(f"\n*** REFUSING TO START: {_why}."
+                      f"\n*** The run would be blind and its result meaningless."
+                      f"\n*** Fix the wrist camera, then retry.", flush=True)
+                raise SystemExit(3)
+            print("[preflight] wrist camera live", flush=True)
 
         _chunk = 0
         try:
