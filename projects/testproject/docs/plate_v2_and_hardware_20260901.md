@@ -216,3 +216,50 @@ t1            19.4         196                4     <- no grasp
 
 Both were caught because the operator asked "where did it grasp?" - a proxy
 measurement was being reported without checking the thing it stood for.
+
+## 7. NEGATIVE RESULT: the model is NOT viewpoint-brittle (2026-09-03)
+
+Hypothesis under test: the ESP32 fails because training varied only COLOUR,
+never VIEWPOINT, so a camera at a different angle is outside its experience.
+The proposed fix was geometric augmentation (crop/rotate/scale) and a retrain.
+
+Tested first, offline, no training and no robot - the baseline on the 10
+held-out orange episodes, with each image deliberately transformed:
+
+```text
+reference (unmodified)                       2.21
+shift 20 px right                            2.33   +0.12
+shift 40 px right                            2.34   +0.13
+zoom in 15%                                  2.36   +0.15
+rotate 8 degrees                             2.67   +0.46
+brightness +25%  (CONTROL)                   2.22   +0.01
+```
+
+For scale: showing the model a WRONG image costs +3.3. A 40 px shift costs
++0.13, about 4% of that. The brightness control came out at +0.01 exactly as
+predicted, which shows the probe is sensitive enough to detect real damage.
+
+>>> HYPOTHESIS REJECTED. The model tolerates moderate viewpoint change fine.
+>>> Geometric augmentation would fix a weakness it does not have. Do not run it.
+
+Cost of finding out: 15 minutes. Cost had we skipped straight to the retrain:
+~2 h GPU and a wrong conclusion in the record.
+
+The ESP32 failure therefore remains UNEXPLAINED. The remaining candidate is
+that its view differs by far more than any perturbation tested here - it is not
+a shifted OV5647 view but a different vantage point showing different parts of
+the arm. Not established. Two hypotheses have now been wrong; the next step is
+measurement, not theory.
+
+### What is actually known about the ESP32 runs
+
+```text
+ctrl1  baseline 10k  plate present  NO GRASP   7 sustained cycles
+ctrl2  baseline 10k  no plate       NO GRASP   9 sustained cycles
+t1     plate_v1      plate present  NO GRASP   4 sustained cycles
+```
+
+No positive control exists: the Pi camera is dead, so we cannot show the rig
+grasps TODAY with any camera. Everything since 2026-08-20 has changed - laptop
+moved, arm replugged across ports, hardware added to the wrist. The camera is
+the most visible difference, not a demonstrated cause.
