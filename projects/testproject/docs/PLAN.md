@@ -41,6 +41,32 @@ added to the wrist. Every model question this week has run aground on this.
 
 ---
 
+## THE BLOCKER, part two: two faults, not one (found 2026-09-03)
+
+```text
+FAULT 1 - SOFTWARE, now fixed
+  timelapse.service on the Pi ("RPiCam Timelapse Loop") took a photo every few
+  seconds, grabbing the camera each time, and systemd RESTARTED IT within
+  seconds of every kill. This explains the INTERMITTENT failures we chased for
+  two weeks: mid-session freezes, "camera in use by another process", streams
+  dying after minutes.
+      sudo systemctl stop timelapse.service      (done)
+      sudo systemctl disable timelapse.service   (RECOMMENDED - the two uses of
+                                                  this camera are incompatible;
+                                                  only one process can hold it)
+
+FAULT 2 - HARDWARE, still open
+  With the camera fully free and detected, the stream still fails:
+      ERROR: Camera frontend has timed out!
+      Please check that your camera sensor connector is attached securely.
+      Alternatively, try another cable and/or sensor.
+  The sensor answers on the control bus but will not deliver pixels. That is a
+  partly-failed ribbon, and the driver names the cable itself.
+```
+
+Both were real. Fixing only the ribbon would have left the timelapse service
+stealing the camera mid-trial at random.
+
 ## Step 1 — restore the positive control (30 min at the bench)
 
 ```text
