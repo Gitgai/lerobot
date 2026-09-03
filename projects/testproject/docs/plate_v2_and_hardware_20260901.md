@@ -263,3 +263,61 @@ No positive control exists: the Pi camera is dead, so we cannot show the rig
 grasps TODAY with any camera. Everything since 2026-08-20 has changed - laptop
 moved, arm replugged across ports, hardware added to the wrist. The camera is
 the most visible difference, not a demonstrated cause.
+
+## 8. WHY the ESP32 failed - now measured, not argued (2026-09-03)
+
+The question: the 10k checkpoint scored 9/10 through the OV5647 and 0/2 through
+the ESP32. Was the camera the cause?
+
+Measured directly. Held-out orange episodes, correct FRONT camera and correct
+arm state throughout; ONLY the wrist image varied:
+
+```text
+A  correct OV5647 wrist frame          2.20     reference
+B  ESP32 wrist frame substituted       3.75     +1.55
+C  WRONG OV5647 frame, other episode   4.34     +2.13   known catastrophe
+
+the ESP32 swap costs 73% of what a completely wrong image costs
+```
+
+>>> The camera swap ALONE is sufficient to break the model. Feeding it an ESP32
+>>> wrist view is nearly as damaging as feeding it a picture from a different
+>>> episode.
+
+### This resolves the apparent contradiction with section 7
+
+Section 7 found the model tolerates viewpoint change well. Both are true:
+
+```text
+shift 40 px    +0.13
+zoom 15%       +0.15
+rotate 8 deg   +0.46
+ESP32 view     +1.55   <- ten times worse than a 40 px shift
+```
+
+Small viewpoint changes are fine. The ESP32 is not a small change - it is a
+different VANTAGE POINT on the wrist showing different parts of the arm, not a
+shifted version of the same view. The error in section 7 was assuming the
+ESP32's difference was the same KIND of difference being tested.
+
+### What differs in the image
+
+```text
+                    OV5647 (trained on)   ESP32
+brightness                129.4            144.8
+saturation                 67.4             53.3
+sharpness                  32.7             20.7
+vantage point       arm base fills left    both fingers centred,
+                    frame, fingers right   far more table visible
+```
+
+Colour and sharpness are secondary - training used colour jitter and shrugs
+those off. The VANTAGE POINT dominates, and it is the one thing training never
+varied.
+
+### Honest limit
+
+This isolates the wrist camera, which is what makes it strong. It does NOT
+prove the camera was the only problem on the arm: there is still no positive
+control, and other things changed between 2026-08-20 and 2026-09-02. It
+establishes sufficiency, not exclusivity.
