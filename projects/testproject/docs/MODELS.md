@@ -30,7 +30,7 @@ LINEAGE     every checkpoint carries LINEAGE.json recording its parent,
 
 | `plate_v2` (training) | `n16_plate_v2c` | `plate_v1` via v2/ckpt-1500, v2b/ckpt-1000 | same 99 episodes | DONE. Held-out orange error: 3.08 -> 2.67 -> 2.37 -> 2.46 (global 9500/10500/11500/12000). Curve turns ~11500; the gain over plate_v1's 2.50 is within noise. **Not worth switching to** - plate_v1 remains the model to test. |
 
-Retired / not in use: `n16_real79_top` (Brain B, lost the camera A/B),
+Retired / not in use: `n16_real79_top` (Brain B — see the caveat below),
 `gr00t_n16_leisaac_orange` (simulator-trained; blind on photographs),
 `n16_real89_20260817` (aborted run).
 
@@ -53,3 +53,19 @@ from. Nothing recorded it - not the config, not training_args, not the logs.
 It had to be established by comparing action-head weights against three
 candidates (parent 0.0016 vs 0.0032/0.0034 - conclusive, but forensics).
 A checkpoint should carry its own history.
+
+
+## A caveat on Brain B
+
+`n16_real79_top` is listed as retired because the 2026-08-21 A/B recorded
+A 10/10 against B 7/10. That document itself questions the verdict: the
+comparison ran at stutter tempo, and RTC alone later took Brain A from 4/10 to
+9/10, so B's stalls and slips may be the same tempo disease rather than a camera
+weakness. Three RTC runs of B were planned to settle it and never happened.
+
+The two models differ ONLY in which second camera was labelled "front" — the
+89 demonstrations were recorded with three cameras and split into two datasets.
+The wrist footage is identical in both.
+
+    n16_real79_side   so101_orange_89_v21_train79           front = side view
+    n16_real79_top    so101_orange_89_v21_topfront_train79  front = overhead
