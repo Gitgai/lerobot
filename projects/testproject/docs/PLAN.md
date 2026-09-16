@@ -235,3 +235,13 @@ Why does the Pune rig drop out so often?
   network rather than either machine. Availability has been roughly one third.
   This now costs more time than any technical problem in this document.
 ```
+
+---
+
+## Data preparation — see `EPISODE_TRIMMING.md`
+
+The 20 orange episodes recorded 2026-09-15 are 62% idle and are trimmed before
+training. The 10 tomato episodes are already tight and are left untouched
+(operator decision, 2026-09-15). The rule, the measured rest pose, and the
+front-camera check that confirms the fruit reached the plate are all in
+`EPISODE_TRIMMING.md`. All 30 episodes verified good; none excluded.
