@@ -120,6 +120,16 @@ if __name__ == "__main__":
     # batch size (measured: batch 8 -> 29.57 GB, batch 4 -> 29.81 GB). 8-bit Adam
     # cuts the optimizer states by ~6 GB. Default behaviour unchanged.
     config.training.optim = os.environ.get("N16_OPTIM", "adamw_torch")
+    # Env-gated gradient checkpointing (added 2026-09-15). Recomputes activations
+    # in the backward pass instead of storing them.
+    #
+    # IT DID NOT HELP HERE and is left off by default. Tried while chasing an OOM
+    # on 2026-09-15: memory went UP, 29.08 -> 29.47 GB. Kept only so the next
+    # person does not spend an hour rediscovering that. The actual fix was the
+    # per-device batch size - see the note in that run's history: the runs that
+    # fit (orange_pick_baseline_v1, plate_v1) used per_device_train_batch_size=4
+    # with gradient_accumulation_steps=8, and 64 does not fit on this card.
+    config.training.gradient_checkpointing = os.environ.get("N16_GRAD_CKPT", "0") == "1"
     config.training.global_batch_size = ft_config.global_batch_size
     config.training.dataloader_num_workers = ft_config.dataloader_num_workers
     config.training.learning_rate = ft_config.learning_rate
