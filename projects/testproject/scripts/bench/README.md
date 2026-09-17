@@ -22,6 +22,10 @@ directory. See `docs/MACHINES.md` for which machine does what.
 | `voltrace.py` | **enables torque** | log supply voltage up to the moment of a USB dropout |
 | `synctest.py` | **MOVES THE ARM** | 60 s teleoperation, measures follower tracking error |
 | `rec_esp.sh` | **MOVES THE ARM** | record demonstrations |
+| `home_arm.py` | **MOVES THE ARM** | drive the follower to the rest pose (interpolated, 5 s); run before each trial |
+| `run_trial.sh` | **MOVES THE ARM** | one policy trial: resolve devices, record frames+state to ~/trial_N_frames |
+| `prof.py` | no | numeric profile of a trial log: grasp/hold/lift-end/descend% |
+| `srv_wrap.py` | no (on the GPU box) | launch wrapper for run_gr00t_server that ignores signal 16; launch with nohup and NO `timeout` (a timeout SIGTERM-kills it mid-run) |
 | `convert_trim_v21.py` | no | v3.0 -> v2.1 conversion with trimming (runs on the Acer, where the recordings are) |
 | `plan_convert.py` | no | dry-run of the above — prints the per-episode plan, writes nothing |
 

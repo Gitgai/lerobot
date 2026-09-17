@@ -28,6 +28,8 @@ LINEAGE     every checkpoint carries LINEAGE.json recording its parent,
 | `orange_pick_baseline_v1` | `n16_real79_side/checkpoint-10000` | nvidia/GR00T-N1.6-3B | 79 orange demos | **FROZEN.** 9/10 full task on the arm, 2026-08-20. Write-protected. |
 | `plate_v1` | `n16_plate_v1/checkpoint-6000` | `orange_pick_baseline_v1` | 79 orange + 20 plate (99 eps, 2 tasks) | Trained 2026-08-26. Regression gate passed (2.50 vs 2.41). One live-camera arm trial: grasped 9 s, grip +5.3, did not carry. |
 
+| `n16_new30_v1` | `n16_new30_v1/n16_new30_v1/checkpoint-6000` | **nvidia/GR00T-N1.6-3B (stock)** | 30 new-camera eps (20 orange + 10 tomato), trimmed, NO hold-out | **Trained 2026-09-16, 12,000 steps, loss 1.115 -> 0.007. checkpoint-6000: PLACE 5/10 on the arm (10 trials, 2026-09-16), every grasp completed; only failure mode is hovering / not descending. checkpoint-12000: PLACE 1/10 - overfit the gripper-closed state, would not release. USE 6000, do not train past ~6000 steps.** Checkpoints at 3000/6000/9000/12000. |
+
 | `plate_v2` (training) | `n16_plate_v2c` | `plate_v1` via v2/ckpt-1500, v2b/ckpt-1000 | same 99 episodes | DONE. Held-out orange error: 3.08 -> 2.67 -> 2.37 -> 2.46 (global 9500/10500/11500/12000). Curve turns ~11500; the gain over plate_v1's 2.50 is within noise. **Not worth switching to** - plate_v1 remains the model to test. |
 
 Retired / not in use: `n16_real79_top` (Brain B — see the caveat below),
@@ -35,6 +37,19 @@ Retired / not in use: `n16_real79_top` (Brain B — see the caveat below),
 `n16_real89_20260817` (aborted run).
 
 ## Lineage in one view
+
+```text
+NVIDIA GR00T N1.6 (3B, off the shelf)
+  |
+  +-- 79 real orange demos (OLD wrist camera) .... orange_pick_baseline_v1  9/10
+  |     |
+  |     +-- + 20 plate demos ..................... plate_v1
+  |
+  +-- 30 demos through the NEW wrist camera ...... n16_new30_v1   1 success, 1 trial
+        (2026-09-16; a SEPARATE branch from stock, sharing no fine-tuning with
+         the baseline - the operator chose not to start from it, because the
+         baseline's skill was tied to a camera that no longer exists)
+```
 
 ```text
 NVIDIA GR00T N1.6 (3B, off the shelf)

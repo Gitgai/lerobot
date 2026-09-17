@@ -1,180 +1,227 @@
 # SO-101 — the plan
 
-Live document. Rewritten 2026-09-12 when the approach changed from "restore the
-old camera" to "record through a new one". The previous version is kept as
-`PLAN_superseded_20260912.md` for the reasoning it contains.
+Live document. Header updated **2026-09-17** after the 10-trial evaluation and
+the checkpoint comparison. Previous full rewrite 2026-09-16
+(`PLAN_superseded_20260916.md`).
 
 ---
 
-## The pivot, and why
+## Where we actually are
 
-For three weeks every arm trial failed while we tried to make a replacement
-camera imitate the one the model learned from. Measured across ALL 1,145 wrist
-frames of a working run and a failing one:
+**`n16_new30_v1/checkpoint-6000` places the orange about half the time on the
+real arm — measured 5/10 over ten trials, 2026-09-16, every verdict confirmed by
+the front camera.** That is a working model, not yet a good one, and it closes
+three weeks in which every arm trial failed.
 
 ```text
-                        orange in the wrist view
-20 Aug, grasped         27% of frame (median), BELOW the fingers, 68/68 frames
-5 Sep, failed            2% of frame,          ABOVE the fingers, 34/34 frames
-                        the two sets do not overlap on a single frame
+n16_new30_v1 / checkpoint-6000
+  parent      nvidia/GR00T-N1.6-3B          stock, NOT the frozen baseline
+  data        30 episodes recorded 2026-09-15 through the OV4689 wrist camera
+  steps       12,000, loss 1.115 -> 0.007   (but 6000 is the checkpoint to use)
+  ARM RESULT  PLACE 5/10, GRASP 5/10 — every grasp it made, it completed
+  baseline    orange_pick_baseline_v1 = 9/10, for comparison
 ```
 
-The model learned "a big orange under my fingers means descend and close". No
-substitute camera produced that picture, so the descent was never commanded.
+**The failure mode is ONE thing, and it names the next job:**
 
->>> DECISION (operator, 2026-09-10): stop matching new cameras to old pictures.
->>> Record fresh demonstrations through the camera we intend to keep.
+```text
+6000's 5 failures were all the same: the arm reaches out over the table and
+HOVERS — it never descends onto the fruit. Measured from the logs, the failing
+trials spent 5-12% of the run with the arm down; the successes 57-76%. No
+overlap. When it DOES descend, it grasps and places every time (5/5).
+```
 
-That is this plan.
+**Checkpoint 12,000 is worse: PLACE 1/10.** More training (13.3 passes vs 6.6)
+overfit the *holding* state — three of its four grasps clamped the gripper shut
+for 250-281 chunks and carried the fruit home without releasing it. 6000 never
+did this. So: use 6000, and never train past ~6,000 steps on this dataset.
+
+>>> DIRECTION (operator, 2026-09-17): the way to raise 5/10 is not more testing,
+>>> it is more demonstrations aimed at the descent. Record more episodes.
+
+---
+
+## What was actually wrong, and what fixed it
+
+Three separate faults, each mistaken for the others at some point:
+
+```text
+THE CAMERA CHANGED
+  For three weeks the model was shown a wrist view it had never seen. No amount
+  of matching a new camera to old pictures worked.
+  FIX: 30 fresh demonstrations through the camera we intend to keep.
+
+THE FOLLOWER'S USB DROPPED
+  Six disconnects in twenty minutes, on two different ports, under four
+  different programs. Ruled out software, ports, torque and supply voltage by
+  measurement; the leader's identical board never faltered.
+  FIX: physical - rewiring the follower onto port 3-3. Three trials since,
+  500+ chunks, over ten minutes under torque: ZERO disconnects.
+
+THE SCENE WAS WRONG
+  The first trial of 2026-09-16 failed with no orange on the table and the front
+  camera 262 px out of position (measured from where the plate sits in frame;
+  episode-to-episode variation is under 15 px).
+  FIX: re-aim to within 5 px, put an orange down, home the arm first.
+```
+
+**None of these were model problems.** The model was never the thing that needed
+fixing.
 
 ---
 
 ## The rig as it now stands
 
 ```text
-WRIST    OV4689 USB, /dev/video4        32 ms/frame, 60 fps available at 640x480
-         SunplusIT bridge, 92 deg FOV   sharp; orange reads 5-13% of frame
-FRONT    Logitech C270, /dev/video6     aimed across the table at the arm
-         (the Acer built-in on video0 now faces the room, not the workspace)
-ARM      follower on USB 3-2            all 6 motors respond
-LEADER   NOT CONNECTED                  required to record
+FOLLOWER   serial 5B14114209, USB port 3-3      stable under torque, powered
+LEADER     serial 5B14029688, USB (via hub)     plugged in but UNPOWERED as of
+                                                2026-09-17 - power its motor
+                                                supply before recording
+WRIST      OV4689 "AK-Camera"  /dev/video0
+FRONT      Logitech C270       /dev/video6      behind two hubs; knocked easily
+GPU BOX    kiran-AI90, RTX 5090, New Jersey     all weights and datasets
+LAPTOP     Acer, Pune                           arms and cameras, no weights
 ```
 
-### Two problems to clear before recording
-
-```text
-1  USB PORT 3-2 dropped the follower TWICE mid-recording, 2 s each time, exactly
-   as port 3-1 did in August. The device renumbers and the recorder dies with
-   "Input/output error". MOVE THE FOLLOWER to another socket.
-
-2  USB BANDWIDTH. Two cameras at 640x480 MJPEG plus two serial devices sit on
-   one controller. The OV4689 already returned no frames once when the C270 was
-   added. If the laptop has ports on both sides they are often separate
-   controllers - put the cameras on one side, the arms on the other. This may
-   turn out to be what the "faulty port" actually is.
-```
-
-### Also noted, not yet chased
-
-Motor supply reads **5.2-5.6 V**. The STS3215 is usually run nearer 7.4 V. Low
-supply fits the pattern of servos that answer at rest and drop out under load.
-Worth checking the supply before blaming anything else for a dropout.
+Resolve arms by serial (`arm_ports.py`) and cameras by name (`camfind.py`).
+Never by device number — they move. See `MACHINES.md`.
 
 ---
 
-## Step 1 — record (operator time, the expensive step)
+## Measured facts that change how trials are run
+
+### JPEG compression is free speed — use it always
+
+Tested 2026-09-16 offline, no arm movement. One frozen observation, sent ten
+times raw and ten times at quality 92. **The model is a diffusion policy, so it
+answers differently every time; that noise is the yardstick.**
 
 ```text
-esp_orange   20 episodes   "pick up the orange and place it on the plate"
-esp_apple    10 episodes   "pick up the apple and place it on the plate"
+raw  vs raw   (the model's own noise) : 1.624 deg
+jpeg vs jpeg  (the model's own noise) : 1.341 deg
+raw  vs jpeg  (the effect)            : 1.513 deg     ratio 1.02
 ```
 
-Script: `~/rec_esp.sh N dataset "instruction"` on the arm laptop. It resolves
-both arms by SERIAL and refuses to start if the wrist camera is not live - a
-frozen camera during recording poisons the dataset permanently, and unlike a
-bad trial you cannot simply rerun it.
-
-**Position spread, from the August session:**
+Every joint checked separately, none above its own noise. **Compression is
+quieter than the model's own dice roll.**
 
 ```text
-~8  middle band       where it already works
-~8  operator-right    the region it fails in
-~4  operator-left
+latency raw    936 ms      duty cycle 29%
+latency jpeg   319 ms      duty cycle 84%      2.9x faster
 ```
 
-**Two rules:**
+>>> RULING (2026-09-16): `--jpeg_quality=92` on every trial from now on.
 
-1. **HOLD 5 OF THE 20 OUT OF TRAINING.** With all of them in, "did it improve?"
-   has no offline answer at all. That is the wall plate_v2 hit and the single
-   most valuable change available.
-2. **One attempt per go.** No auto-retry. In August a retry recorded a poisoned
-   episode while the operator was still resetting the scene.
+### The arm must be homed before every trial
 
-### On the apple set
+Every training episode begins at the same rest posture. A trial starting
+elsewhere asks the model for a t=0 it has never seen.
 
-Recorded with the apple ALONE (operator's choice, 2026-09-10). This teaches the
-apple as an object. It will NOT teach the model to read the instruction: with
-one fruit in view the picture already says which to pick, so the words stay
-redundant - the same mechanism measured on 2026-08-26, where the wrong sentence
-cost -0.04. A language-grounding set needs BOTH fruits present with the command
-choosing between them. That remains a separate, later job.
+```text
+shoulder_lift  -104.3    ANCHOR, all 30 episodes within 1.0 deg
+elbow_flex       96.7    ANCHOR, within 0.1 deg
+wrist_flex       78.4    ANCHOR, within 3.3 deg
+pan / roll / gripper     vary legitimately - do NOT test these
+```
+
+`home_arm.py` drives there in interpolated steps over 5 s. Never command the
+target directly: the arm can be 35 deg away and would lunge.
+
+### Latency shapes the tempo
+
+Each chunk returns 16 actions, 8 are executed at 30 fps = **0.27 s of motion**.
+Everything else is waiting. With raw images the arm moved a third of the time
+and trial 3 needed 280 chunks; with JPEG it should need well under half that.
+
+A trial timeout must allow for this. 130 s was too short and cut a run off
+mid-grasp, which looked like failure and was not.
 
 ---
 
-## Step 2 — train
+## Step 1 — record more demonstrations, aimed at the descent (NEXT)
+
+The 5/10 evaluation and the 6000-vs-12000 comparison are DONE (see above). The
+single failure mode is the hover — the arm not committing to the descent. More
+trials measure that; they do not fix it. Demonstrations do.
 
 ```text
-from     orange_pick_baseline_v1 (the frozen 9/10 model)
-data     the new demos + the 79 old orange demos MIXED IN (anti-forgetting)
-steps    6000
+GOAL   teach a clean, committed reach-and-descend, so the model stops hovering.
+
+WHAT   ~25-30 new episodes:
+  - every episode shows a DECISIVE descent onto the fruit - no hesitation,
+    no hovering. The model copies what it sees most; give it confident descents.
+  - VARY the orange position deliberately - left, centre, right, near, far.
+    The hover clusters at some positions; spread the coverage.
+  - keep them tight: reach, grasp, place, done.
+
+HOLD OUT   keep 5 episodes out of training (the lesson relearned all session:
+           without a hold-out there is no offline measure).
+
+TRAIN      from checkpoint-6000 (NOT stock, NOT 12000), fold the new demos in
+           with the existing 30, stop at ~6,000 steps. 12000 overfit the release.
+
+TEST       held-out episodes offline first, then the arm, varied positions.
 ```
 
-6000 is measured, not assumed: doubling to 12000 moved held-out error 2.50 ->
-2.37 then back to 2.46, a spread of 1.1 standard errors on a paired test -
-indistinguishable from chance.
-
-**Caveat on mixing:** the old 79 demos carry the OV5647 wrist view; the new ones
-carry the OV4689. Mixing two camera geometries may act as useful augmentation or
-may dilute the signal. This has never been tested. If the result disappoints,
-training on the new demos alone is the obvious next variant.
+Recording rig checklist (2026-09-17): follower, both cameras, and rec_esp.sh are
+ready; **the LEADER ARM was enumerated on USB but UNPOWERED** (motors gave no
+response - the dead-but-visible pattern). Recording is blocked until the
+leader's motor supply is on. Record one episode and inspect it before the set.
 
 ---
 
-## Step 3 — test
-
-The 5 held-out demos give an offline read first, then the arm. Score GRASP and
-PLACE separately, never blended.
-
-**A grasp requires all three**, each added after a scoring bug produced a false
-positive:
+## Deferred — still open, lower priority than the descent fix
 
 ```text
-1  a SUSTAINED finger block >= 10 cycles     (chatter is not a hold)
-2  the orange MOVED in the front camera      (a stall proves nothing on its own)
-3  the arm actually TRAVERSED >= 30 deg      (a hold at the wrong height is not
-                                              a grasp - c1/c2 held 21 and 31
-                                              cycles at lift +72, a hundred
-                                              degrees from the table)
+FIRM UP THE 5/10
+  10 trials give a wide band (~25-75%). More would tighten it, but they measure,
+  they don't improve. Only worth it with VARIED positions - a batch that hammers
+  one spot (as happened 2026-09-17, trials 11-14 all bottom-left, 0/4) tells you
+  about that spot, not the model. Do this only if a firmer number is needed for
+  a decision.
+
+DOES THE TOMATO WORK?
+  Trained on 10 episodes, never tested on the arm.
+
+DOES THE MODEL READ THE INSTRUCTION AT ALL?
+  Almost certainly not yet: wrong-sentence penalty -0.04 (2026-08-26), and the
+  tomato set was recorded with the tomato ALONE, so the picture already says
+  which fruit. A language-grounding set needs BOTH fruits present with the words
+  choosing. Separate, later job.
 ```
 
 ---
 
-## What we have, for the record
-
-### Two models, differing ONLY in the front camera
+## Solved and closed — do not re-open
 
 ```text
-n16_real79_side/checkpoint-10000   = orange_pick_baseline_v1, the 9/10 model
-                                     trained on so101_orange_89_v21_train79
-n16_real79_top/checkpoint-10000    trained on so101_orange_89_v21_topfront_train79
+WHICH MODEL IS THIS PROJECT USING?
+  GR00T N1.6, settled 2026-08-19. Every checkpoint now carries LINEAGE.json AND
+  TASKS.json. Searching for train_config.json finds only dead ends - that is a
+  LeRobot convention and GR00T does not write one.
+
+THE INSTRUCTION MISMATCH
+  Every arm trial from August to mid-September sent "Grab orange and place into
+  plate", a sentence in NO training set. Fixed 2026-09-16: default corrected,
+  and the client now REFUSES an instruction the serving model was not trained on,
+  reading the list from ~/model_tasks.json. Tested against all three cases.
+
+ARE THE TWO ARMS IN SYNC?
+  Yes. Five joints agree within 0.5 deg, reached by the follower tracking the
+  leader. The gripper's apparent 61 deg gap is a trigger versus a pair of jaws -
+  different mechanisms, not a fault.
+
+WHAT BATCH SIZE FITS ON THIS CARD?
+  per_device 4 with 8 accumulation steps = effective 32. Four attempts at 64 and
+  32 died out of memory. bf16 is already the default and was never the variable.
+  Read what worked from the previous runs' training_args.bin rather than
+  reasoning about what should work.
+
+6000 vs 12000 (settled 2026-09-17, 10 arm trials each)
+  6000 PLACE 5/10, every grasp completed. 12000 PLACE 1/10 - it overfit the
+  gripper-closed state and would not release (3 grasps carried home still held).
+  USE 6000. Do not re-run this comparison; the arm settled it.
 ```
-
-Both declare the same keys, `front` and `wrist`. The 89 demonstrations were
-captured with three cameras at once; two datasets were built by choosing which
-second camera to call "front". **The wrist footage is identical in both.**
-
-- SIDE "front" = a camera across the table, arm side-on
-- TOP "front" = a camera looking down over the arm
-
-**Brain B is marked retired on a verdict its own document calls into question.**
-`n16_brainB_rtc_check_20260821.md` records A 10/10 vs B 7/10, then asks whether
-that measured camera quality or tempo tolerance, since RTC alone took A from
-4/10 to 9/10. Three RTC runs of B were planned to settle it and never run.
-
-### The old model does not transfer to the new rig
-
-Offline, at the pose from which the working model descended:
-
-```text
-new rig   C270 + OV4689     asks lift  -2.8   grip 33.8   no descent
-reference r6's own cameras  asks lift -11.6   grip 27.7   descends and closes
-```
-
-CAVEAT: the deliberately-mismatched control in that test ALSO descended and
-closed, so the test does not discriminate as cleanly as it should. What it
-supports is narrow: the new rig produces a response unlike anything else tested,
-and not the one a grasp needs. It does not prove the model "rejects" the
-cameras.
 
 ---
 
@@ -182,29 +229,45 @@ cameras.
 
 ```text
 CAMERA     ENFORCED IN CODE since 2026-09-03. The client refuses to start unless
-           the wrist frame is < 1.5 s old AND two fetches a second apart DIFFER,
-           and aborts mid-run after three stale frames. HTTP 200 is not proof -
-           a frozen proxy returns 200 forever. Five trials lost before this.
-USB        Arms NEVER on port 3-1, and now not 3-2 either. Resolve by SERIAL,
-           never by device name - a 2 s dropout renumbers them.
-GRASP      Requires all three checks above. Four separate scoring bugs produced
-           false positives before they were all in place.
-SCENE      Photograph the scene before a control run and CHECK it. A plate was
-           present during a "no plate" control on 2026-09-02, invalidating it.
-FRAMES     Verify frames by md5 against the source before analysing them. On
-           2026-09-05 a cp bug nested today's frames under August ones and an
-           entire analysis ran on the wrong day's pictures.
-DETECTION  The orange detector must require ROUNDNESS and a saturation floor
-           suited to the camera in use. Wood grain has outscored the fruit, and
-           a washed-out frame has read 0.5% when the fruit filled a third.
-SHARPNESS  Laplacian variance measures EDGES IN THE SCENE, not focus. Do not
-           compare it across frames of different content - it produced a false
-           "the lens is degrading" trend on 2026-09-09.
+           the wrist frame is < 1.5 s old AND two fetches a second apart DIFFER.
+           HTTP 200 is not proof - a frozen proxy returns 200 forever.
+INSTRUCTION ENFORCED IN CODE since 2026-09-16. The client refuses a sentence the
+           serving model was not trained on.
+USB        Resolve arms by SERIAL and cameras by NAME, never by device number.
+           /dev/ttyACM0 was the leader one morning and the follower by evening.
+TORQUE     Survives a crash. When the USB drops, disconnect() never completes and
+           the arm stays stiff and holding. Run safe.py after ANY crashed run.
+SCENE      Photograph the scene BEFORE a run and check it against a training
+           frame. Measure the camera by where the plate sits - it never moves.
+           262 px of drift cost a trial on 2026-09-16.
+SERVER     Launch the policy server with nohup and NO `timeout` wrapper. On
+           2026-09-17 a `timeout 900` wrapper sent SIGTERM at 15 min and killed
+           the server mid-trial; srv_wrap.py catches SIGINT/SIGSTKFLT but not
+           SIGTERM. The stable earlier runs used plain nohup. (Separately, the
+           box intermittently kills long GPU processes with signal 16 / exit 144;
+           srv_wrap.py ignores signal 16. Root cause of the 16-killer unknown -
+           needs auditd on kiran-AI90 or a reboot; resource tests ruled out
+           memory, oomd, and GPU/CPU limits.)
+LIGHTING   NOT a known factor. On 2026-09-17 a 0/4 batch was blamed on "dimmer
+           light"; measured frame brightness was essentially identical to the
+           morning's 5/10 (wrist ~156-161 both times). Do not chase lighting
+           without measuring it first. The real confound that day was orange
+           POSITION (all four at bottom-left).
+GRIPPER    THE GRIPPER TRACE CANNOT SCORE THE TASK. A gentle release and a failed
+           release are identical in the numbers. The camera decides.
+FRAMES     Verify frames against the source before analysing them. A cp bug once
+           nested today's frames under August's and an analysis ran on the wrong
+           day's pictures.
+DETECTION  Require ROUNDNESS and a saturation floor. Wood grain has outscored the
+           fruit. And find the PLATE by position, not size or shape: the robot
+           arm is the same colour and sometimes the larger blob.
+SHARPNESS  Laplacian variance measures EDGES IN THE SCENE, not focus. Never
+           compare it across frames of different content.
 MACHINE    The GPU box also runs the DYNUS flight campaign. EXIT=143 with a clean
-           log is systemd-oomd, not a bug. Checkpoint often; flights are the
-           priority and training gives way.
-PREMISE    Test the premise before building the fix. A 15-minute probe killed a
-           geometric-augmentation plan that would have cost 2 h of GPU.
+           log is systemd-oomd, not a bug. Flights are the priority.
+PREMISE    Test the premise before building the fix. Offline first, always, when
+           an offline test exists - the JPEG question was settled in two minutes
+           without touching the arm.
 ```
 
 ---
@@ -212,36 +275,39 @@ PREMISE    Test the premise before building the fix. A 15-minute probe killed a
 ## Open questions, honestly labelled
 
 ```text
-Does the new rig work at all?
-  UNTESTED on the arm. The offline read is unfavourable but its control was
-  faulty. The demonstrations are what settle it.
+How often does it work?
+  ONE trial. Step 1 answers this. Everything else waits on it.
 
-Does mixing two camera geometries in one training set help or hurt?
-  NEVER TESTED. Step 2 does it. If the result disappoints, train on the new
-  demos alone.
+Is 12,000 steps overfitted?
+  UNKNOWN and unmeasurable offline - all 30 episodes were trained on, by
+  operator decision, so no hold-out exists. Five fresh episodes recorded later
+  would serve as a retrospective hold-out for all four checkpoints.
+
+Would mixing the old 79+20 demos back in help?
+  NEVER TESTED. The argument for replay weakened once the old camera was gone:
+  it protects a skill that can no longer be exercised. Worth trying only if the
+  30-episode model plateaus.
 
 Was Brain B really worse, or just less tempo-tolerant?
-  UNRESOLVED since 2026-08-21. Three RTC runs would answer it. Not a priority
-  while the rig cannot deliver three uninterrupted runs.
+  UNRESOLVED since 2026-08-21. Three RTC runs would answer it. Lower priority now
+  that a working model exists.
 
 Would full fine-tuning help?
-  NEVER TESTED. 50% of the model is trained today (action head, top 4 language
-  layers, projector); the vision encoder is frozen. Unfreezing needs ~7.5 GB
-  more than the card has spare, and 99 episodes is thin for 1.87 B parameters -
-  but "we inherited NVIDIA's default" is an admission, not a justification.
+  NEVER TESTED. The vision encoder is frozen. Unfreezing needs more memory than
+  the card has spare, and 30 episodes is very thin for 1.87 B parameters.
 
-Why does the Pune rig drop out so often?
-  Both machines have vanished together repeatedly, which points at the site
-  network rather than either machine. Availability has been roughly one third.
-  This now costs more time than any technical problem in this document.
+Why does the Pune site drop off the network so often?
+  Both machines vanish together, pointing at the site network. Roughly one third
+  availability. Still costs more time than any technical problem here.
 ```
 
 ---
 
-## Data preparation — see `EPISODE_TRIMMING.md`
+## Related documents
 
-The 20 orange episodes recorded 2026-09-15 are 62% idle and are trimmed before
-training. The 10 tomato episodes are already tight and are left untouched
-(operator decision, 2026-09-15). The rule, the measured rest pose, and the
-front-camera check that confirms the fruit reached the plate are all in
-`EPISODE_TRIMMING.md`. All 30 episodes verified good; none excluded.
+```text
+MODELS.md              the model registry - authoritative on what exists
+MACHINES.md            which machine holds what, and how to reach it
+EPISODE_TRIMMING.md    the trimming rule and the front-camera scoring
+scripts/bench/         the bench scripts, and which ones move the arm
+```

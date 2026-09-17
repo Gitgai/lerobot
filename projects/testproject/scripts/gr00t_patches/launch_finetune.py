@@ -51,6 +51,24 @@ def _write_lineage(ft_config, config) -> None:
     (out / "LINEAGE.json").write_text(json.dumps(lineage, indent=2) + "\n")
     print(f"[lineage] wrote {out / 'LINEAGE.json'}  parent={resolved}")
 
+    # TASKS (added 2026-09-16). Record the sentences this model is being trained
+    # on, so the arm client can refuse an instruction the model has never seen.
+    # Every arm trial from August to September sent "Grab orange and place into
+    # plate", which appeared in NO training set. Nothing complained, because
+    # nothing knew what the model had been taught. It went unnoticed for weeks.
+    tasks_file = Path(ft_config.dataset_path) / "meta/tasks.jsonl"
+    if tasks_file.exists():
+        tasks = [json.loads(line)["task"] for line in tasks_file.read_text().splitlines() if line.strip()]
+        (out / "TASKS.json").write_text(json.dumps({
+            "dataset": ft_config.dataset_path,
+            "tasks": tasks,
+            "note": "The sentences this model was trained on. An instruction that "
+                    "is not in this list is one the model has never seen.",
+        }, indent=2) + "\n")
+        print(f"[tasks] wrote {out / 'TASKS.json'}  {tasks}")
+    else:
+        print(f"[tasks] WARNING: {tasks_file} not found - TASKS.json not written")
+
 
 def load_modality_config(modality_config_path: str):
     import importlib
