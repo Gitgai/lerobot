@@ -52,6 +52,6 @@ HF_HUB_OFFLINE=1 $V ~/record_wrapper.py \
   --teleop.type=so101_leader --teleop.port=$LEADER_PORT --teleop.id=my_so101_leader \
   --dataset.repo_id=local/$NAME --dataset.root=$ROOT \
   --dataset.single_task="$TASK" \
-  --dataset.num_episodes=$N --dataset.episode_time_s=30 --dataset.reset_time_s=12 \
+  --dataset.num_episodes=$N --dataset.episode_time_s=45 --dataset.reset_time_s=12 \
   --dataset.vcodec=h264 --dataset.push_to_hub=false --display_data=false $RESUME
 echo "  --- $NAME now holds $(python3 ~/epcount.py "$ROOT") episodes ---"

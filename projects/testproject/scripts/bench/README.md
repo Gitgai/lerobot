@@ -26,6 +26,8 @@ directory. See `docs/MACHINES.md` for which machine does what.
 | `run_trial.sh` | **MOVES THE ARM** | one policy trial: resolve devices, record frames+state to ~/trial_N_frames |
 | `prof.py` | no | numeric profile of a trial log: grasp/hold/lift-end/descend% |
 | `srv_wrap.py` | no (on the GPU box) | launch wrapper for run_gr00t_server that ignores signal 16; launch with nohup and NO `timeout` (a timeout SIGTERM-kills it mid-run) |
+| `srv_wrap_12k.py` | no (on the GPU box) | same wrapper pointed at checkpoint-12000 |
+| `trace_to_lerobot.py` | no | turn an eval trial (frames + run_trace.jsonl) into a LeRobotDataset for lerobot-dataset-viz. See EVAL_VIZ_AND_RECOVERY.md |
 | `convert_trim_v21.py` | no | v3.0 -> v2.1 conversion with trimming (runs on the Acer, where the recordings are) |
 | `plan_convert.py` | no | dry-run of the above — prints the per-episode plan, writes nothing |
 

@@ -17,4 +17,5 @@ timeout 300 $V ~/n16_realarm_client.py \
 echo "  chunks: $(grep -c '^\[real\] chunk' ~/trial_${N}.log)"
 grep -oE "rtt=[0-9]+ms" ~/trial_${N}.log | tr -d 'rtms=' | sort -n | awk '{a[NR]=$1} END{print "  median rtt: " a[int(NR/2)] " ms"}'
 rm -rf ~/trial_${N}_frames && cp -r ~/run_frames ~/trial_${N}_frames
+cp ~/run_trace.jsonl ~/trial_${N}_trace.jsonl 2>/dev/null
 echo "  frames: $(ls ~/trial_${N}_frames | wc -l)"
