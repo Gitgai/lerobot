@@ -1,7 +1,9 @@
 # SO-101 — the plan
 
-Live document. Header updated **2026-09-17** after the 10-trial evaluation and
-the checkpoint comparison. Previous full rewrite 2026-09-16
+Live document. Header updated **2026-09-18**: 30 recovery demonstrations
+recorded, folded into a 60-episode set, and `n16_recovery_v1` is fine-tuning
+from checkpoint-6000 (see "Path 2 recovery data" below). Prior header 2026-09-17
+(10-trial evaluation + checkpoint comparison); full rewrite 2026-09-16
 (`PLAN_superseded_20260916.md`).
 
 ---
@@ -38,6 +40,42 @@ did this. So: use 6000, and never train past ~6,000 steps on this dataset.
 
 >>> DIRECTION (operator, 2026-09-17): the way to raise 5/10 is not more testing,
 >>> it is more demonstrations aimed at the descent. Record more episodes.
+
+---
+
+## Path 2 recovery data — recorded, folded in, training (2026-09-18)
+
+Acting on that direction, 30 recovery demonstrations were recorded on the Acer
+into `esp_recovery` (30 s each): each reaches OFF-TARGET, CORRECTS onto the
+orange, grasps, carries, and RELEASES on the plate. This is the covariate-shift
+fix documented in `EVAL_VIZ_AND_RECOVERY.md` — teaching the descent-and-correct
+that the 30 clean demos never showed.
+
+```text
+verified   30/30 episodes place the orange on the plate
+           - 24 confirmed by the FRONT camera (automated plate-hull scorer)
+           -  6 confirmed by the WRIST camera + operator. In those 6 the plate
+             sat at the front camera's bottom-left frame EDGE, out of view; the
+             front scorer's "OFF" was a BLIND SPOT (clipped convex hull + wood-
+             grain false positives), NOT a failed place.
+```
+
+**Lesson: the front-camera plate scorer is blind to edge-of-frame plates.** Its
+"OFF" there is "cannot see", not "missed". Read the wrist camera (it looks
+straight down and shows the orange over the plate at release) before calling a
+placement a failure. An automated detector's output is a claim to verify, not
+evidence — confirmed here against the operator's own knowledge of the episodes.
+
+Folded in and training:
+```text
+dataset   new30_plus_recov30 = new30_merged (30) + recovery30 (30) = 60 eps
+          (50 orange + 10 tomato). Stats REGENERATED, not copied - ranges
+          widened to cover the off-target states (shoulder_pan max 57->84 deg,
+          gripper max 70->88), so recovery states are normalised, not clipped.
+model     n16_recovery_v1 - fine-tuned FROM checkpoint-6000 (weights only, fresh
+          step 0), 6000 steps, save 3000+6000, effective batch 32, lr 1e-4,
+          8-bit adam. Launched 2026-09-18 ~12:37 (~2 h). Test BOTH checkpoints.
+```
 
 ---
 

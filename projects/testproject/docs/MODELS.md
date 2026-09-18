@@ -30,6 +30,8 @@ LINEAGE     every checkpoint carries LINEAGE.json recording its parent,
 
 | `n16_new30_v1` | `n16_new30_v1/n16_new30_v1/checkpoint-6000` | **nvidia/GR00T-N1.6-3B (stock)** | 30 new-camera eps (20 orange + 10 tomato), trimmed, NO hold-out | **Trained 2026-09-16, 12,000 steps, loss 1.115 -> 0.007. checkpoint-6000: PLACE 5/10 on the arm (10 trials, 2026-09-16), every grasp completed; only failure mode is hovering / not descending. checkpoint-12000: PLACE 1/10 - overfit the gripper-closed state, would not release. USE 6000, do not train past ~6000 steps.** Checkpoints at 3000/6000/9000/12000. |
 
+| `n16_recovery_v1` (training) | `n16_recovery_v1/n16_recovery_v1/checkpoint-{3000,6000}` | **`n16_new30_v1` checkpoint-6000** (weights only, fresh step 0) | 60 eps = `new30_merged` (30: 20 orange + 10 tomato) + 30 recovery orange = `new30_plus_recov30`; stats REGENERATED for the 60 | **Training 2026-09-18, 6000 steps, save 3000+6000, effective batch 32, lr 1e-4, 8-bit adam.** Path 2 recovery-data fine-tune: 30 off-target->correct->place demos (30/30 verified on-plate — 24 front cam, 6 wrist cam) folded in to fix the hover / no-descent failure. Test BOTH checkpoints on the arm when done. |
+
 | `plate_v2` (training) | `n16_plate_v2c` | `plate_v1` via v2/ckpt-1500, v2b/ckpt-1000 | same 99 episodes | DONE. Held-out orange error: 3.08 -> 2.67 -> 2.37 -> 2.46 (global 9500/10500/11500/12000). Curve turns ~11500; the gain over plate_v1's 2.50 is within noise. **Not worth switching to** - plate_v1 remains the model to test. |
 
 Retired / not in use: `n16_real79_top` (Brain B — see the caveat below),

@@ -121,12 +121,12 @@ Isaac-GR00T serving path, not LeRobot's dagger.py.**
 ## 4. The plan: recovery data on N1.6
 
 ```text
-Path 2 (START HERE)  record fresh demos that go OFF-TARGET then CORRECT, then pick.
-                     No new code — rec_esp.sh already does leader->follower teleop
-                     recording. Needs the leader arm powered. Vary off-target
-                     direction and orange position. ~25 episodes -> dataset
-                     esp_recovery. episode_time_s bumped to 45 s (trimming removes
-                     the tail). Fold into training, fine-tune from 6000, ~6000 steps.
+Path 2 (DONE 2026-09-18)  record fresh demos that go OFF-TARGET then CORRECT,
+                     then pick and place. No new code — rec_esp.sh does the
+                     leader->follower teleop. Recorded 30 episodes at 30 s each
+                     into esp_recovery, kept WHOLE (not trimmed), folded into a
+                     60-episode set, fine-tuned from checkpoint-6000. See
+                     section 6 below for what actually happened.
 
 Path 1a (LATER)      HIL: run 6000, human takes over on the hover via the leader,
                      record the correction. Needs custom takeover built into the
@@ -158,3 +158,56 @@ effective bandwidth    ~10.7 Mbps
 Reducing to 256 px (needs a retrain to match) shrinks payload 160->47 KB but only
 saves ~87 ms round-trip — base latency and inference dominate, not payload.
 Related documents: `PLAN.md`, `MODELS.md`, `MACHINES.md`, `EPISODE_TRIMMING.md`.
+
+---
+
+## 6. Path 2 executed — recovery batch + training (2026-09-18)
+
+30 recovery demonstrations recorded on the Acer into `esp_recovery`, 30 s each,
+each: reach OFF-TARGET -> CORRECT onto the orange -> grasp -> carry -> RELEASE on
+the plate -> return toward rest. Varied off-target direction and orange position.
+
+### Verifying the batch — and a camera blind spot
+
+Scored every episode's final placement from the FRONT camera with a position-free
+plate detector (finds the plate's blue-grey oval anywhere, tests the orange's
+centroid against its convex hull). Two detector iterations were needed, and the
+SECOND lesson is the important one:
+
+```text
+first detector    reported 8/30 on-plate. WRONG - find_orange locked onto warm
+                  WOOD-GRAIN on the table (largest warm blob by area), not the
+                  orange. Caught by looking at the annotated montage, not the number.
+fixed detector    24/30 on-plate, 6 "OFF". Asks the direct question instead:
+                  is there a round orange blob INSIDE the plate hull?
+the 6 "OFF"       NOT failures. In all 6 the plate sat at the front camera's
+                  bottom-LEFT frame EDGE, out of view. The hull was a clipped
+                  sliver (bbox x0-84) so every orange read "out" mechanically,
+                  and the red "orange" dots were wood-grain false positives.
+                  The WRIST camera (looks straight down) shows the orange held
+                  over the blue plate at release in every one. 30/30 place.
+```
+
+**Rule: the front-camera plate scorer is BLIND to edge-of-frame plates.** Its
+"OFF" there means "cannot see", not "missed". Read the wrist camera before
+calling a placement a failure. And an automated detector's output is a claim to
+verify (montage, wrist view, operator knowledge), never evidence on its own —
+established here by over-claiming two failures that were both good places.
+
+### Folded in and training
+
+```text
+convert   esp_recovery v3.0 -> v2.1 whole-episode  (convert_recovery_v21.py on
+          the Acer; do_trim=False; integrity: video frames == parquet rows)
+merge     new30_merged (30) + recovery30_v21 (30) -> new30_plus_recov30 (60 eps,
+          50 orange + 10 tomato)  (merge_recov60.py, symlinked videos, renumbered)
+stats     REGENERATED for the 60 (gr00t.data.stats + the leisaac modality config
+          that registers new_embodiment). Ranges WIDENED vs the 30-ep set
+          (shoulder_pan max 57->84, gripper max 70->88) so off-target states are
+          normalised, not clipped. Copying the old stats would have clipped them.
+train     n16_recovery_v1 - fine-tune FROM checkpoint-6000 (AutoModel.from_pretrained
+          loads its sharded weights; fresh output dir -> trainer starts at step 0),
+          6000 steps, save 3000+6000, effective batch 32, lr 1e-4, 8-bit adam.
+          Launched 2026-09-18 ~12:37. Test BOTH checkpoints on the arm.
+```
+
