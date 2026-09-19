@@ -88,6 +88,11 @@ the cameras       OV4689 wrist ("AK-Camera"), Logitech C270 front
 ~/esp_apple/      "
 ~/PrakashProjects/lerobot/lerobot/   LeRobot install with its own .venv
 ~/*.py, ~/rec_esp.sh                 the bench scripts - see the handoff doc
+~/runs/                              eval artifacts, ORGANIZED: runs/trials/<N>/
+                                     {frames,trace.jsonl,sheet.jpg,log} + runs/
+                                     {archive,viz,logs}. Run ~/tidy.sh to sweep
+                                     loose trial_* into it (organize-only; deletes
+                                     only regenerable scratch like run_frames).
 ```
 
 ### What does NOT live here
