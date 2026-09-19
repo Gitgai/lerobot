@@ -211,3 +211,80 @@ train     n16_recovery_v1 - fine-tune FROM checkpoint-6000 (AutoModel.from_pretr
           Launched 2026-09-18 ~12:37. Test BOTH checkpoints on the arm.
 ```
 
+---
+
+## 7. Recovery model arm eval — n16_recovery_v1 / checkpoint-6000 = 5/10 (2026-09-18)
+
+Ten valid trials on the real arm (numbered 601-611; 101, 606 and one 607 voided
+for un-homed start or orange-already-on-plate). Each: home (auto-clear + retry),
+run policy, score placement from the FRONT camera, gripper trace kept.
+
+```text
+601 ✓  602 ✓  603 ✗  604 ✓  605 ✓  607 ✗  608 ✓  609 ✗  610 ✗  611 ✗   = 5/10
+```
+
+Same rate as the pre-recovery model (5/10) BUT a completely different failure mode.
+
+### The hover is gone
+All 10 trials the arm set out and descended onto the orange. Zero hovers. The
+covariate-shift failure the recovery data targeted is eliminated. The rate is
+flat only because a new bottleneck surfaced: the GRASP.
+
+### Grasp timing perfectly separates outcome (the key finding)
+```text
+success grasp at chunk:  59  67 127 148 171   (first ~55% of the trial)
+failure grasp at chunk: 201 207 233 285 317   (last ~65%) - clean gap, no overlap
+```
+
+### grip-min is a physical grasp gauge (jaws stop on the orange's diameter)
+```text
+grip-min 22-25  orange in the jaws          all 5 successes
+grip-min 13-14  closed on EMPTY AIR (miss)  609, 610
+grip-min 18-20  partial/fumble              603, 611
+grip-min 68     never closed                607
+```
+Release confirms: successes reopen 63-71; three failures stay clamped 18-20.
+
+### Position does NOT drive outcome (hypothesis refuted, by eye not the detector)
+Same orange positions gave both outcomes: far-left 601 ✓ vs 607 ✗; centre 604 ✓
+vs 609/610 ✗; far-right 608 ✓ vs 611 ✗. The failure is execution inconsistency,
+not a hard/OOD position. (The automated orange detector was UNRELIABLE here - it
+mislocated 607's far-left orange to centre on a wood-grain false positive - so
+positions were read by eye. See the blind-spot lesson, section 6.)
+
+### Two earlier claims corrected by the data
+- "The correction meanders/dithers" - WRONG. Failures UNDER-move: 603/607/611
+  had arm joint travel 262-487 deg, below every success (960-1769). They STALLED
+  (arm stuck, didn't complete); 609/610 moved a normal amount but the grasp
+  missed. No failure meandered.
+- "607 failed because far-left/OOD" - reframed: 601 succeeded from the same
+  far-left spot. Position is not the cause.
+
+### Mechanism
+Recovery data made the APPROACH reliable but the GRASP is not. Per stochastic
+rollout the model either locks on and grasps cleanly in the first half (success)
+or it doesn't get the grasp geometry early and then stalls (603, 611), never
+commits (607), or completes a motion that closes on air (609, 610). Same
+positions, variable outcomes = a grasp reliability/precision problem, not a
+coverage problem. Likely cause: the recovery demos taught "come down and try"
+but not enough PRECISE, DECISIVE grasps.
+
+### Confound not resolved
+Later trials failed more (first 5: 4/5; last 5: 1/5). Position is ruled out;
+remaining candidates are small-sample stochasticity and hardware warming
+(gripper closing hard, one overload trip) reducing precision over ~30 min.
+Homing stayed accurate (0.3-0.8 deg worst joint every trial), which argues
+against gross drift. A controlled re-test (rest arm, repeat positions) would
+settle it.
+
+### Next
+1. Test checkpoint-3000 (recovery).
+2. Next data need is PRECISE grasp demos (clean early closes at grip~22), NOT
+   more descent demos.
+3. Controlled re-test to isolate warming vs stochastic.
+
+Tooling added this session: home_and_trial.sh (home w/ retry + clear_overload.py
+before each trial), clear_overload.py (toggles TorqueEnable to clear a latched
+Feetech gripper OVERLOAD - id 6 tripped after a hard close on trial 603),
+trial_sheet.py (front+wrist contact sheet), srv_wrap_recov.py (RECOV_CKPT=3000|6000).
+
