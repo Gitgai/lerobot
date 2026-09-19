@@ -325,8 +325,12 @@ consequence of the transatlantic link and that the fix was serving on a local /
 Mumbai cloud GPU. **That was wrong.** The latency was already solved in August by
 the RTC pipeline; these trials simply didn't turn it on. The 9/10 proves this
 exact rig + link grasps reliably WHEN THE PIPELINE IS ON. A closer/faster GPU is
-a refinement, not the fix. (The 256px-payload / fewer-diffusion-steps ideas are
-also minor by comparison; diffusion steps are already at the minimum of 4.)
+UNNECESSARY, not just secondary: the live AI90->Acer ping is ~307 ms DIRECT
+(2026-09-19), essentially the 9/10 era's 321 ms — the rig is already in the regime
+that produced 9/10. depth-2 RTC keeps 2 requests in flight and HIDES the
+round-trip; it is throughput-bound, not latency-bound. (The 256px-payload /
+fewer-diffusion-steps ideas are also minor; diffusion steps are already at the
+minimum of 4. The whole local/Mumbai-GPU line of thought was a wrong turn.)
 
 ### Implication
 The recovery model's 5/10 and checkpoint-3000's 0/5 were measured CRIPPLED

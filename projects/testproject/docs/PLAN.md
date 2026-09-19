@@ -1,14 +1,63 @@
 # SO-101 — the plan
 
-Live document. Header updated **2026-09-18**: 30 recovery demonstrations
-recorded, folded into a 60-episode set, and `n16_recovery_v1` is fine-tuning
-from checkpoint-6000 (see "Path 2 recovery data" below). Prior header 2026-09-17
-(10-trial evaluation + checkpoint comparison); full rewrite 2026-09-16
+Live document. Header updated **2026-09-19**: KEY FINDING — every arm eval this
+month ran with the RTC motion pipeline OFF, and RTC (`--rtc`, depth-2) is how the
+9/10 baseline worked. The recovery model's 5/10 was measured crippled; the
+immediate next step is the gated `--rtc` re-test, NOT a GPU move (the network is
+already at the 9/10 regime, ~307 ms direct). Prior headers: 2026-09-18 (recovery
+data recorded + trained), 2026-09-17 (10-trial eval), full rewrite 2026-09-16
 (`PLAN_superseded_20260916.md`).
 
 ---
 
-## Where we actually are
+## Where we actually are (2026-09-19)
+
+**The single most important fact: every arm eval this month ran with the RTC
+motion pipeline OFF, and RTC is how the 9/10 baseline worked.** The recovery
+model is real progress (the hover is gone), but its 5/10 was measured crippled.
+
+```text
+best model   n16_recovery_v1 / checkpoint-6000  (recovery-data fine-tune of
+             n16_new30_v1/ckpt-6000; HOVER ELIMINATED, 10/10 descend)
+measured     PLACE 5/10 -- but RTC OFF (~31% duty). checkpoint-3000: 0/5, also RTC off.
+the fix      --rtc (depth-2 pipeline: two sockets + staleness guard) = the exact
+             client that scored 9/10 on 2026-08-20. It was simply never enabled
+             (run_trial.sh never passed --rtc; client default rtc=False).
+network      already fine: AI90->Acer ping ~307 ms DIRECT = the 9/10 era's 321 ms.
+             NO local/Mumbai GPU needed. An earlier read this session that blamed
+             transatlantic latency and proposed a cloud GPU was WRONG: depth-2 RTC
+             keeps 2 requests in flight and HIDES the round-trip; it is not
+             latency-bound. Verified: the client _rtc_loop uses robot.get_observation()
+             (both USB cameras), so it runs unchanged on the current rig.
+```
+
+**Why RTC is decisive (from `n16_rtc_plan_20260820.md`):** the policy has no
+velocity input, so a frame mid-sweep looks identical to one settling -- every
+extra decision-cycle is a dice roll. Sequential mode makes 30-100 decisions per
+carry (~31% duty); depth-2 RTC returns demo tempo (~5 decisions/s, ~83% duty),
+which restored demo-like grasp-and-release and produced 9/10. The SAME checkpoint
+scored 4/10 sequential.
+
+**Immediate next step -- the gated `--rtc` re-test (no new data, no GPU):**
+```text
+G0  --rtc --dry_run       duty >=90%, no deadlocks     (no arm/camera needed)
+G1  --rtc, motion only     60 s smooth, duty >=85%      (needs the C270 free of Meet)
+G2  --rtc, 3 task runs      compare vs baseline
+then a 10-run scored set of checkpoint-6000 WITH --rtc = the true recovery number
+```
+
+**The grasp-misalignment diagnosis (`EVAL_VIZ_AND_RECOVERY.md` sec 7) still
+holds** -- but it was measured at 31% duty, i.e. crippled; RTC is expected to lift
+it. Recovery data + left-side coverage remain the right DATA levers: they target
+the 9/10 baseline's OWN residuals (its one failure R7 was a left-approach miss;
+its four "meanderers" were the weak place-landmark). Details + evidence:
+`EVAL_VIZ_AND_RECOVERY.md` sec 8, `n16_rtc_plan_20260820.md`.
+
+---
+
+## Where we were (2026-09-16..17) -- pre-recovery, pre-RTC-finding
+(Note: these numbers were ALSO measured RTC-off; kept as history.)
+
 
 **`n16_new30_v1/checkpoint-6000` places the orange about half the time on the
 real arm — measured 5/10 over ten trials, 2026-09-16, every verdict confirmed by
