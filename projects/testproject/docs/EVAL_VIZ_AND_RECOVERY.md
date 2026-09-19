@@ -270,6 +270,10 @@ coverage problem. Likely cause: the recovery demos taught "come down and try"
 but not enough PRECISE, DECISIVE grasps.
 
 ### Confound not resolved
+**BIGGER confound found later — see section 8: ALL these trials ran with the RTC
+pipeline OFF (~31% duty), so the arm stalled ~650 ms between chunks. The 5/10 was
+measured CRIPPLED; the true rate is unknown until re-tested with --rtc.**
+
 Later trials failed more (first 5: 4/5; last 5: 1/5). Position is ruled out;
 remaining candidates are small-sample stochasticity and hardware warming
 (gripper closing hard, one overload trip) reducing precision over ~30 min.
@@ -287,4 +291,64 @@ Tooling added this session: home_and_trial.sh (home w/ retry + clear_overload.py
 before each trial), clear_overload.py (toggles TorqueEnable to clear a latched
 Feetech gripper OVERLOAD - id 6 tripped after a hard close on trial 603),
 trial_sheet.py (front+wrist contact sheet), srv_wrap_recov.py (RECOV_CKPT=3000|6000).
+
+---
+
+## 8. CRITICAL: those evals ran with the RTC pipeline OFF — and that's how the old 9/10 worked (2026-09-19)
+
+Surfaced by the operator's question: "how did the old model get 9/10 over this
+same transatlantic link?" The answer corrects section 7's implied cause.
+
+### The old 9/10 used RTC (real-time chunking); this session's evals did not
+`orange_pick_baseline_v1` (9/10 on the arm, 2026-08-20) ran the client with RTC
+ENABLED — a PIPELINED loop that keeps one request always in flight, so the arm
+moves continuously while the next chunk's inference happens in the background.
+The transatlantic round-trip is HIDDEN behind the arm's motion.
+
+```text
+OLD 9/10   --rtc ON   ->  95.4% duty cycle, zero starvation  (arm moves continuously)
+                          git 9e7203b7 "RTC pipelined client - G0 (95.4% duty)"
+                          git 5c2092ad "RTC ten-run set: 9/10 completions"
+THIS SESSION (601-611, 301-305, 621):  --rtc OFF (sequential)
+                          run_trial.sh never passes --rtc
+                          n16_realarm_client.py line 236: rtc=False (default)
+                          measured chunk interval 919 ms, duty ~29%
+                          == the client's own "sequential baseline 31%" (line 336)
+```
+Sequential = move 267 ms -> FREEZE ~650 ms waiting for the round-trip -> move ->
+freeze. During the freezes the arm is blind/open-loop — exactly the imprecise
+final-approach behaviour section 7 diagnosed.
+
+### Correction to the latency conclusion
+An earlier read this session concluded the ~1.1 Hz loop was an unavoidable
+consequence of the transatlantic link and that the fix was serving on a local /
+Mumbai cloud GPU. **That was wrong.** The latency was already solved in August by
+the RTC pipeline; these trials simply didn't turn it on. The 9/10 proves this
+exact rig + link grasps reliably WHEN THE PIPELINE IS ON. A closer/faster GPU is
+a refinement, not the fix. (The 256px-payload / fewer-diffusion-steps ideas are
+also minor by comparison; diffusion steps are already at the minimum of 4.)
+
+### Implication
+The recovery model's 5/10 and checkpoint-3000's 0/5 were measured CRIPPLED
+(RTC off). Their true rates are unknown until re-tested with --rtc. The whole
+"new camera -> 5/10" narrative may itself be partly confounded by RTC being off
+in those evals — to be measured, not assumed.
+
+### The fix (free, no GPU, no retrain, proven)
+```text
+add  --rtc  to run_trial.sh  ->  re-enable the ~95% duty pipeline  ->  re-test 6000
+```
+`_rtc_loop()` (client line 474, "one request always in flight") is the real arm
+path, gated at line 694 by `if cfg.rtc`. It passed gates G0-G2 and drove the 9/10
+run, so it is proven — but verify it still runs cleanly before trusting a number.
+
+Evidence: git 9e7203b7, 65eaa3ad ("skip-ahead + micro-blend + depth-2 pipeline"),
+3007e7b0, 5c2092ad; client lines 236/398/474/694; run_trial.sh (no --rtc);
+measured duty 29% ~= sequential baseline 31%.
+
+### Lesson
+Before attributing a slow control loop to network latency, CHECK WHETHER THE
+PIPELINE (RTC) IS ENABLED. A measured 1.1 Hz was read as "the link is too slow /
+needs a local GPU" when the real cause was a client flag defaulting to off. The
+operator's "but the old model worked 9/10" caught it.
 
