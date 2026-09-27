@@ -356,3 +356,88 @@ PIPELINE (RTC) IS ENABLED. A measured 1.1 Hz was read as "the link is too slow /
 needs a local GPU" when the real cause was a client flag defaulting to off. The
 operator's "but the old model worked 9/10" caught it.
 
+
+---
+
+## 9. RTC re-test DONE — demo tempo restored, but placement still ~3/7; grasp+release is the ceiling (2026-09-20)
+
+Section 8 predicted `--rtc` would lift the 5/10. It was re-tested end to end.
+Result: **RTC works exactly as designed — the arm moves at demo tempo again — but
+the placement rate did NOT improve.** 3/7 with RTC vs 5/10 sequential is the same
+rate within noise. The bottleneck is the grasp-and-release execution, not the
+control loop. The loop was necessary (it is the 9/10 loop) but is not sufficient.
+
+### Gates — all passed
+```text
+G0  --rtc --dry_run        95.4% duty, no deadlocks
+G1  --rtc, motion only      duty 85-86%, smooth continuous motion
+network  DIRECT             rtt ~345 ms every RTC trial (ZeroTier AI90->Acer)
+                            == the 9/10 era's 321 ms -> confirmed NOT latency-bound
+```
+
+### RTC IS ~5x faster than sequential — demo tempo, verified from the traces
+```text
+             run time   chunks   peak arm speed   median speed   rtt
+RTC (702)     68.7 s     337       133 deg/s        4.8 deg/s     348 ms
+SEQ (604)    294.2 s     322        27 deg/s        0.2 deg/s     632 ms
+```
+Same ~330 chunks, but RTC finishes in 69 s vs 294 s and peak joint speed is ~5x
+higher. This settles the earlier flip-flop: RTC is NOT "just smoother at the same
+speed" — it restores continuous demo-tempo motion by hiding the ~345 ms round-trip
+behind the arm's motion (depth-2, ~85-95% duty), not by commanding faster targets.
+
+### Scored set 3/7 (~43%) — the grip trace tells the whole story
+```text
+trial  grip-min @ frac   final   outcome    read
+702 v   15.6 @ 0.38       70.4    PLACE      closed EARLY, then RELEASED (final high)
+705 v   13.4 @ 0.38       60.0    PLACE      closed early, released
+707 v   17.8 @ 0.72       54.5    PLACE      closed, released
+703 x   59.2 @ 0.99       59.2    no-grasp   gripper NEVER closed (min ~59 = open)
+704 x   64.3 @ 0.99       64.5    no-grasp   never closed
+706 x   16.7 @ 0.97       16.9    STALL      closed LATE, stayed CLAMPED (never released)
+708 x   15.2 @ 0.93       15.2    STALL      closed late, clamped, orange pinned at table
+```
+**The discriminator is RELEASE, not just the grasp:** every success ends with the
+gripper reopened over the plate (final 54-70). Every failure either never closes
+(703/704, min ~60) or closes and stays clamped (706/708, final 15-17) — the orange
+is pinned but never lifted/released.
+
+### 708 re-run (708b) — a TRUE stall, not a timeout
+Re-ran 708 with a 120 s window (double). The arm reached the orange, closed at
+frac 0.65 (grip-min 10.1) but STAYED clamped (final 17.7) and never lifted — the
+orange sat in the jaws at table level start to finish. More time did not rescue
+it. So the clamp-stall is a genuine inability to complete the lift, not a window
+that was too short.
+
+### Two failure modes, both grasp-execution, neither the loop
+```text
+1. no-grasp    (703, 704)  gripper never closes
+2. clamp-stall (706, 708)  closes but never releases/lifts -> orange pinned at table
+successes      (702,705,707) close early-ish AND release over the plate
+```
+RTC removed the ~650 ms open-loop freezes, but the model still cannot reliably
+(a) close on the orange and (b) lift+release it.
+
+### Undervoltage — a real, testable contributor to the clamp-stalls
+Follower bus measured **5.4 V (nominal 7.4 V)** on 2026-09-20 (read with
+`~/voltrace.py` on the Acer). LIFTING the grasped orange (arm + payload against
+gravity) is the highest-torque moment in the task — exactly where an undervolted
+servo gives out first, and the clamp-stalls (706/708: grasped, could not lift)
+match that signature. It is NOT a hard block — 702/705/707 lifted+placed at 5.4 V
+— so it is MARGINAL, with the lift as the marginal-failure point. Cheap, high-value
+test: raise the follower to ~7.4 V and re-run; if the clamp-stalls vanish it was
+power, if they persist it is the grasp/model. (Earlier I over-stated this as a hard
+blocker and the operator correctly pushed back "it was working till now" — the
+honest read is: marginal, a candidate for the LIFT specifically, not a wall.)
+
+### Verdict — where the levers actually are
+RTC is proven and stays ON (it is the 9/10 loop). The placement ceiling is
+GRASP-AND-RELEASE precision, which is a DATA problem: precise, decisive grasp demos
+with a clean early close AND a clear release over the plate — NOT the loop, NOT a
+GPU move, NOT more descent demos. Order of operations: (1) fix the 5.4 V (free, may
+remove the clamp-stalls), (2) re-run to get the true rate, (3) if still low, record
+precise-grasp data and fold it in.
+
+Evidence: traces `trial_70{1..8}_trace.jsonl` + `trial_708b_trace.jsonl` on the
+Acer; `rtc_analyze.py` (scratchpad + Acer `~/`); grip finals 54-70 (success) vs
+15-17 / 59-64 (fail); `runs/trials/604/trace.jsonl` = the sequential speed baseline.

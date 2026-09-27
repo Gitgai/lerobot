@@ -1,57 +1,56 @@
 # SO-101 — the plan
 
-Live document. Header updated **2026-09-19**: KEY FINDING — every arm eval this
-month ran with the RTC motion pipeline OFF, and RTC (`--rtc`, depth-2) is how the
-9/10 baseline worked. The recovery model's 5/10 was measured crippled; the
-immediate next step is the gated `--rtc` re-test, NOT a GPU move (the network is
-already at the 9/10 regime, ~307 ms direct). Prior headers: 2026-09-18 (recovery
-data recorded + trained), 2026-09-17 (10-trial eval), full rewrite 2026-09-16
-(`PLAN_superseded_20260916.md`).
+Live document. Header updated **2026-09-20**: the `--rtc` re-test is DONE. RTC
+restores demo-tempo motion (verified ~5x faster than sequential) and is the 9/10
+loop — but it did NOT raise placement: 3/7 with RTC vs 5/10 sequential, same
+within noise. The ceiling is GRASP-AND-RELEASE precision, a DATA problem, plus a
+marginal 5.4 V follower supply that is the likely cause of the "clamp-stall"
+failures. Next: fix the power, re-measure, then record precise-grasp demos. Prior
+headers: 2026-09-19 (RTC-was-OFF finding), 2026-09-18 (recovery data trained),
+2026-09-17 (10-trial eval), full rewrite 2026-09-16 (`PLAN_superseded_20260916.md`).
 
 ---
 
-## Where we actually are (2026-09-19)
+## Where we actually are (2026-09-20)
 
-**The single most important fact: every arm eval this month ran with the RTC
-motion pipeline OFF, and RTC is how the 9/10 baseline worked.** The recovery
-model is real progress (the hover is gone), but its 5/10 was measured crippled.
+**RTC is on and proven; the placement ceiling is now clearly the grasp+release,
+not the loop and not the network.** Full detail + evidence in
+`EVAL_VIZ_AND_RECOVERY.md` sec 9.
 
 ```text
-best model   n16_recovery_v1 / checkpoint-6000  (recovery-data fine-tune of
-             n16_new30_v1/ckpt-6000; HOVER ELIMINATED, 10/10 descend)
-measured     PLACE 5/10 -- but RTC OFF (~31% duty). checkpoint-3000: 0/5, also RTC off.
-the fix      --rtc (depth-2 pipeline: two sockets + staleness guard) = the exact
-             client that scored 9/10 on 2026-08-20. It was simply never enabled
-             (run_trial.sh never passed --rtc; client default rtc=False).
-network      already fine: AI90->Acer ping ~307 ms DIRECT = the 9/10 era's 321 ms.
-             NO local/Mumbai GPU needed. An earlier read this session that blamed
-             transatlantic latency and proposed a cloud GPU was WRONG: depth-2 RTC
-             keeps 2 requests in flight and HIDES the round-trip; it is not
-             latency-bound. Verified: the client _rtc_loop uses robot.get_observation()
-             (both USB cameras), so it runs unchanged on the current rig.
+best model   n16_recovery_v1 / checkpoint-6000  (recovery fine-tune of
+             n16_new30_v1/ckpt-6000; HOVER ELIMINATED)
+RTC re-test  3/7 (~43%) scored, WITH --rtc, direct link ~345 ms rtt.
+             Same as 5/10 sequential within noise -> the loop was necessary but
+             NOT sufficient. RTC verified ~5x faster (69 s/run vs 294 s, peak
+             133 vs 27 deg/s) = demo tempo restored, as designed.
+ceiling      GRASP + RELEASE precision. Two failure modes, both execution:
+               no-grasp    gripper never closes (703, 704)
+               clamp-stall closes but never lifts/releases; orange pinned at
+                           table (706, 708; 708b confirmed a TRUE stall at 120 s)
+             successes close early-ish AND release over the plate (final grip 54-70).
+power        follower bus 5.4 V (nominal 7.4 V), measured 2026-09-20 via
+             ~/voltrace.py. MARGINAL not dead (702/705/707 lifted+placed at 5.4 V).
+             LIFT is the highest-torque move -> prime suspect for the clamp-stalls.
+network      settled: direct ZeroTier ~345 ms = the 9/10 regime. No GPU move needed.
 ```
 
-**Why RTC is decisive (from `n16_rtc_plan_20260820.md`):** the policy has no
-velocity input, so a frame mid-sweep looks identical to one settling -- every
-extra decision-cycle is a dice roll. Sequential mode makes 30-100 decisions per
-carry (~31% duty); depth-2 RTC returns demo tempo (~5 decisions/s, ~83% duty),
-which restored demo-like grasp-and-release and produced 9/10. The SAME checkpoint
-scored 4/10 sequential.
-
-**Immediate next step -- the gated `--rtc` re-test (no new data, no GPU):**
+**Immediate next steps (in order):**
 ```text
-G0  --rtc --dry_run       duty >=90%, no deadlocks     (no arm/camera needed)
-G1  --rtc, motion only     60 s smooth, duty >=85%      (needs the C270 free of Meet)
-G2  --rtc, 3 task runs      compare vs baseline
-then a 10-run scored set of checkpoint-6000 WITH --rtc = the true recovery number
+1. FIX POWER   get the follower to ~7.4 V (physical: supply/wiring/battery).
+               Re-read with `python3 ~/voltrace.py` on the Acer. Cheapest lever;
+               may remove the clamp-stalls outright.
+2. RE-MEASURE  re-run a scored set of checkpoint-6000 WITH --rtc at 7.4 V ->
+               the true recovery rate, clean of both confounds (RTC + power).
+3. DATA        if still low, record PRECISE-GRASP demos: clean early close on the
+               orange + a decisive release over the plate. NOT more descent demos.
+               Left-far coverage is still thin (a known baseline residual).
 ```
 
-**The grasp-misalignment diagnosis (`EVAL_VIZ_AND_RECOVERY.md` sec 7) still
-holds** -- but it was measured at 31% duty, i.e. crippled; RTC is expected to lift
-it. Recovery data + left-side coverage remain the right DATA levers: they target
-the 9/10 baseline's OWN residuals (its one failure R7 was a left-approach miss;
-its four "meanderers" were the weak place-landmark). Details + evidence:
-`EVAL_VIZ_AND_RECOVERY.md` sec 8, `n16_rtc_plan_20260820.md`.
+**What is NOT the problem (ruled out this month):** network latency (direct 345 ms
+= 9/10 regime), the RTC loop being off (now on), diffusion steps (already at min 4),
+image payload (256 px is minor). The remaining levers are power (physical) and
+grasp-precision data — nothing else.
 
 ---
 
