@@ -1,159 +1,111 @@
-# π0.5 / 5090 lane — Current Priority
+# π0.5 lane — Current Priority and Status
 
 Last updated: 2026-10-10
 
-**This file is a ROUTER: what is open, in what order, and why. It is NOT a log.**
-Detail and evidence: [`pi05_training_capability_plan_20260811.md`](pi05_training_capability_plan_20260811.md) (2,454 lines).
-Raw artefacts: `results/pi05_capability_20260811/`.
+**This file is the ROUTER and the TRACKER: what is open, in what order, and
+where each step stands. It is NOT a log.** Detail, gates and pre-registered
+readings live in the plan docs; results get written into the plan docs'
+results blocks and only the one-word status is mirrored here.
+**Hard limit ~100 lines.** Status words: `todo` `next` `running` `blocked`
+`done` `dropped`. Every step has an ID; the plan docs use the same IDs.
 
-> **Why this file exists:** priority order previously lived only in chat, so the
-> operator's own top priority — the checkpoint gate on rung 4 — got buried as a
-> footnote among seven items. **Hard limit ~100 lines.** Follows the pattern of
-> `branch1/CURRENT_PRIORITY.md`, which was written after the same failure.
-
----
-
-## ✅ THE QUESTIONS THAT PROMPTED THIS ARE ANSWERED — do not reopen
-
-```text
-can the 5090 full fine-tune π0.5?   YES — 4 long runs, zero throttling, 0%→80%
-                                     ⚠ "full" = 3.25B of 4.14B. The 2 LM heads
-                                     and the output half of PaliGemma's last
-                                     layer are UNREACHABLE from an action loss.
-is the $11K RTX PRO 6000 justified?  NO — and bigger batches, the main thing more
-                                     VRAM buys, made results WORSE (64.5 vs 80.0)
-```
+> Why this file exists: priority once lived only in chat and the top item got
+> buried. When summarising open work read the item BODY in the plan doc, not
+> this row — a stale row can outlive the ruling that killed it.
 
 ---
 
-## ✅ P0 — DONE 2026-08-15: rung 4 trains, checkpoints AND resumes
+## THE QUESTION (one line)
 
-```text
-2.33 s/step = 2.3x the 8-bit baseline · GPU 20.5 GiB · host 34.1 GB · state fp32
-⇒ FIRST rung to pass all three. Rung 3 still fails on resume, and now matters
-  less: rung 4 does everything rung 3 does, and resumes.
-detail: results/pi05_capability_20260811/step3f_3e_rung4_gate_PASS.txt
-```
-
-★ **HOST RAM IS THE NEW BINDING CONSTRAINT, not VRAM.** Rung 4 needs ~34 GB
-of the 59 GB. DYNUS is capped at 16 GB (operator, 2026-10-10; the earlier
-"~47 GB" figure is stale) and can be shut down for a run. Check `pgrep dynus`
-is empty before any long run.
-
-## ▶ P2a — PLANNED 2026-10-10: LoRA here vs openpi's full FT, on LIBERO
-
-Operator's framing is openpi's README table: LoRA (>22.5 GB, 4090) vs Full
-(>70 GB, A100). Order: (1) get openpi's JAX stack running here for the first
-time — the gate; (2) score openpi's PUBLISHED `pi05_libero` full-FT checkpoint
-in our simulator; (3) train openpi's own LoRA on LIBERO here (LeRobot PEFT
-LoRA is the fallback if JAX fails); (4) score it, same simulator, same seeds;
-(3b) reproduce their FULL fine-tune ourselves on a 72 GB GPU the operator
-will provide, recipe as published except batch size — if it does not fit,
-get a bigger machine, do not bend the recipe; (5) one table, three rows,
-n=200. LoRA vs our full FT at matched batch/steps is the clean comparison;
-the gap to their checkpoint is partly their 7.7M examples. August full-FT
-results are out of scope. Plan: `pi05_libero_openpi_vs_ours_plan_20261010.md`.
-P2 below is untouched.
-
-## ▶ P2b — PLANNED 2026-10-10: same question on the orange task, in LeIsaac
-
-After P2a. Stage 1: pick orange only — record to 450 sim episodes (LIBERO-
-equivalent frame count), train π0.5 full FT (72 GB machine) and LoRA (5090)
-on the same data with LeRobot, score 100 seeded 3000-step episodes per row
-in our LeIsaac loop (policy served over a socket; the EnvHub env pins
-lerobot 0.4.1 and cannot host π0.5). Stage 2: 10-20 instruction variants
-over the three single-arm LeIsaac scenes, one model. Stage 3: real arm,
-starting from `dongyoonkim/so101-pi05-base` (π0.5 fully fine-tuned on 16.7k
-real SO-101 episodes). Public SO-101 data surveyed 2026-10-10: ~120-200
-orange episodes in our scene, a 3,300-episode 11-task Isaac Lab corpus
-(other scene, train-only), ~14k real episodes — Appendix B of the plan.
-Plan: `pi05_leisaac_lora_vs_fullft_plan_20261010.md`.
-
-## P1 — BLOCKED ON OPERATOR: move the display to the iGPU
-
-**Verified NOT done, 2026-08-15 23:43.** The monitor is still on the 5090:
-
-```text
-card0 = amdgpu (AMD Granite Ridge iGPU)   DP-4, DP-5, HDMI-A-2 all FREE
-card1 = nvidia (RTX 5090)                 HDMI-A-1  ← CONNECTED
-recheck  for c in /sys/class/drm/card*-*/status; do ... done
-do       move the cable to a motherboard port + reboot. No BIOS change needed.
-frees    ~1.0-1.9 GiB of VRAM (varies with what the desktop is running)
-why      rung 3's paged resume fails by ~1 GiB — plausibly the exact fix
-then     rerun the 3f.2b resume test to confirm
-```
-
-⚠ Lower value than it was: **rung 4 now does everything rung 3 does AND resumes**,
-so this rescues a rung we no longer depend on. Still cheap, still worth doing.
-
-## P2 — 🔴 NEEDS AN OPERATOR DECISION before it can start
-
-**The question is still open and still worth answering: does 8-bit Adam cost
-accuracy?** Every result this project has was produced with 8-bit Adam, and
-nobody has ever compared it to real fp32 Adam — fp32 does not fit in VRAM
-(46.3 GiB vs 29.9 available). Rung 4 is what makes the comparison possible.
-
-⛔ **THE BLOCKER IS NOT THE MACHINE — IT IS THE BASELINE.**
-
-```text
-STEP 3d's exact command is UNRECOVERABLE. Searched 2026-08-15: no shell
-history, no train_config.json, checkpoints deleted.
-
-KNOWN     pi05_base · libero_spatial_image · bs8 · 24k steps · save_freq 2000
-          bf16 + gradient checkpointing (it would have OOM'd otherwise)
-NOT KNOWN the rename_map, and whether it truly used pi05_base as the doc says
-```
-
-⇒ Comparing a new fp32 arm against 3d's 80.0% may be a TWO-variable comparison,
-which is the exact failure mode that cost four launches and a 7 h run this week.
-
-```text
-OPTION A  both arms fresh from ONE known config      ~24 h   genuinely 1 variable
-OPTION B  fp32 arm only, vs 3d's 80.0%               ~17 h   ⚠ baseline unverified
-OPTION C  hold                                          —    changes no decision
-```
-
-⚠ **The $11K verdict does not depend on this.** P2 closes the original quality
-question; it does not reopen the purchase one.
-
-**Launch spec, fully explicit — do NOT reconstruct it from prose:**
-see `pi05_training_capability_plan_20260811.md` §3f.3e "P2 LAUNCH SPEC".
-
-## P3 / P4 — dormant, nothing blocking
-
-```text
-P3  3g rerun (starting-checkpoint hypothesis)  ~7 h · affects NO decision.
-    ⚠ its original premise is RETRACTED — the wrist camera was never blanked.
-    See results/.../step3g_INVALID_run.txt before planning it.
-P4  🔴 OPERATOR DECISION: our own 89 episodes (STEP 4). Research call, not a
-    technical one. Episodes still need v3.0 -> GR00T v2 conversion.
-```
+openpi says LoRA fits a consumer card and full fine-tuning needs 80 GB. Does
+the route our 32 GB card can run produce a working policy, and how does it
+stand next to the route it cannot run — on LIBERO first, then on the arm's
+real task.
 
 ---
 
-## Deliberately NOT doing
+## ▶ L — LIBERO: LoRA vs full fine-tune (plan: `pi05_libero_openpi_vs_ours_plan_20261010.md`)
 
 ```text
-rung 5 (parameter offload)   operator said ignore
-DeepSpeed integration        CPUOffloadAdamW is ~70 lines and already verified;
-                             DeepSpeed means compiling CUDA ops with uncertain
-                             Blackwell support and no lerobot hook
+ID   step                                                      status   owner/when
+L1   openpi JAX stack runs on the 5090 (venv, GPU seen,        next     ← START HERE, ~1 h
+     one forward pass). Fail → PyTorch port → LeRobot LoRA.
+L2   score THEIR pi05_libero full-FT checkpoint, our sim,      todo     after L1
+     Spatial n=200, RTC off. Expect ~98.8; <85 = fix harness.
+L3   train openpi LoRA on LIBERO here, 30k steps from          todo     after L1, ~7 h
+     pi05_base (LeRobot PEFT LoRA if L1 fell back)
+L4   reproduce THEIR full FT on the 72 GB GPU, recipe as       blocked  operator to point
+     published, batch size the only change; no fit → rent               to the machine
+     a bigger box (prefer multi-GPU node, batch 256)
+L5   score L3 and L4 at 10k/20k/30k, same sim, same seeds;     todo     after L2-L4
+     one table, three rows, RTC off
+```
+
+Answers: does LoRA work here · does full FT work when WE run it · LoRA vs
+full at matched data. A gap to their checkpoint is partly their 7.7M
+examples: reported, not attributed.
+
+## ▶ O — Orange task in LeIsaac (plan: `pi05_leisaac_lora_vs_fullft_plan_20261010.md`)
+
+```text
+ID   step                                                      status   owner/when
+O0   verify EverNorif/so101_place_orange_isaaclab is our       todo     anytime, ~30 min
+     kitchen scene (decides 120 vs 200 starting episodes)
+O1a  record to 450 pick-orange episodes (log attempts,         todo     can start before L
+     successes, s/episode from hour one; project; stop)                 finishes — sim only
+O1b  train full FT (72 GB machine) + LoRA (5090), same data,   todo     after O1a, L4 box
+     LeRobot; 100 seeded 3000-step eps per row, RTC off
+O2   10-20 instruction variants over the 3 single-arm          todo     only if O1b is clear
+     scenes; Mimic for data; 50 eps/task; one model
+O3   real arm: start from dongyoonkim/so101-pi05-base,         todo     after O1b
+     + LightwheelAI real orange + ours; async + RTC ON
+```
+
+Public data surveyed 2026-10-10 (plan Appendix B): ~120-200 orange episodes
+in our scene; 3,300-ep 11-task Isaac Lab corpus (other scene, train-only);
+~14k real SO-101 episodes incl. a 16.7k-episode full fine-tune checkpoint.
+
+## Order of work
+
+```text
+1  L1 now — it decides the stack for everything else and costs an hour
+2  O0 and O1a in parallel with L — the recorder needs no decision and no GPU
+   contention with L2/L3 if scheduled around them; days, not weeks
+3  L2, L3 on the 5090; L4 as soon as the 72 GB machine is named
+4  L5 → write-up → O1b → O3 (O2 only on a clear O1b)
+```
+
+## Standing decisions (do not reopen without a new fact)
+
+```text
+openpi stack first, LeRobot fallback          their recipe NEVER bent to fit a card
+their checkpoint evaluated, not retrained     one simulator per table
+n=200 LIBERO · 100/row LeIsaac · 50/task O2   RTC off in sim, ON on the real arm
+August full-FT results not compared           LeRobot (not openpi) for the SO-101 task
+DYNUS capped at 16 GB; shut it down for long runs (the old "47 GB" is stale)
 ```
 
 ## Standing rules for this lane
 
 ```text
-E1 preflight before ANY run >1 h    preflight_features.py — seconds
-                                    (preflight_batch_check.py is SUPERSEDED: it
-                                    encoded a rule, the rule was wrong, and it
-                                    returned a FALSE PASS on 2026-08-14)
-n=200 for any quoted eval           n=40 already produced one 5-point error
-a rung is a POC until it CHECKPOINTS AND RESUMES
-loss is NOT a proxy for capability  it has misled us three times
-a gate that encodes a RULE inherits every error in that rule — make gates
-report what will actually happen, from the same objects the tool itself builds
-NEVER rebuild a run command from a Configuration block. State every lever
-explicitly, defaults included — dtype and gradient_checkpointing BOTH default
-OFF and both silently cost a launch on 2026-08-15.
-use setsid for long runs — a bare background job died to a session teardown
+E1 preflight before ANY run >1 h (preflight_features.py) · a rung is a POC
+until it checkpoints AND resumes · loss is NOT a proxy for capability · state
+every lever explicitly, defaults included (dtype and gradient_checkpointing
+both default OFF in lerobot) · setsid for long runs · check
+nvidia-smi --query-compute-apps before launching · confirm rtc_config=None
+at every sim policy load
+```
+
+---
+
+## Legacy items (compressed; bodies in `pi05_training_capability_plan_20261010.md`)
+
+```text
+P0   rung 4 (fp32 Adam in host RAM) trains, checkpoints, resumes   done 2026-08-15
+P1   move the display to the iGPU, frees ~1-1.9 GiB VRAM           blocked on operator (cable + reboot)
+P2   8-bit vs fp32 Adam, single-variable, 24 h                     dormant — L5/O1b will
+                                                                     partly answer it
+P3   3g rerun (starting-checkpoint hypothesis)                     dormant, premise retracted
+P4   our 89 real episodes (STEP 4)                                 superseded by O3
+not doing: rung 5 parameter offload (operator) · DeepSpeed (CPUOffloadAdamW is ~70 lines, verified)
 ```

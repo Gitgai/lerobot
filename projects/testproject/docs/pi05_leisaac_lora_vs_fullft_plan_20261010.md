@@ -23,9 +23,19 @@ real arm comes last, with the winner.
 
 ---
 
-## Stage 1 — one task: pick orange
+## Status (mirrored into `PI05_CURRENT_PRIORITY.md`)
 
-### Data: 450 episodes
+```text
+O0   verify EverNorif scene                       todo
+O1a  record to 450 orange episodes                todo — can start now, sim only
+O1b  full FT + LoRA on the same data, score       todo — after O1a and the L4 machine
+O2   10-20 instruction variants, one model        todo — only on a clear O1b
+O3   real arm from dongyoonkim/so101-pi05-base    todo — after O1b
+```
+
+## Stage 1 (O1) — one task: pick orange
+
+### Data (O1a): 450 episodes
 
 ```text
 target   450 successful pick-orange episodes in LeIsaac's kitchen scene
@@ -44,7 +54,7 @@ mixing   against the LeIsaac rig (a moved camera breaks a pixel policy on
          the same robot); keep one fps
 ```
 
-### Training: two rows, same data
+### Training (O1b): two rows, same data
 
 ```text
 full FT   π0.5 from pi05_base, LeRobot's official recipe (bf16, gradient
@@ -96,7 +106,7 @@ WON'T  be comparable in difficulty to LIBERO's 98%: this is one task with
 
 ---
 
-## Stage 2 — many tasks, one model
+## Stage 2 (O2) — many tasks, one model
 
 The model is language-conditioned; one fine-tune can hold many tasks. The
 limit is how many tasks the simulator offers and how fast we can score them.
@@ -168,7 +178,7 @@ at the cost of authoring tasks, data per task, and simulator time.
 
 ---
 
-## Stage 3 — the real arm
+## Stage 3 (O3) — the real arm
 
 The winning route from Stage 1 (or the multi-task model from Stage 2) goes
 to the physical SO-101. Sim-to-real is its own question with its own plan;

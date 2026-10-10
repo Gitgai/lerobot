@@ -31,9 +31,19 @@ are comparing openpi's two routes, not revisiting ours.
 
 ---
 
+## Status (mirrored one word at a time into `PI05_CURRENT_PRIORITY.md`)
+
+```text
+L1  openpi runs on the 5090          next
+L2  score their checkpoint           todo
+L3  train LoRA here                  todo
+L4  reproduce full FT on 72 GB       blocked — operator to name the machine
+L5  score ours, one table            todo
+```
+
 ## What we will do, in order
 
-### 1. Get openpi running on this machine — first time ever
+### 1. (L1) Get openpi running on this machine — first time ever
 
 openpi is checked out at `~/sim/openpi` but has never been run here. It is a
 JAX stack, and whether its pinned jax works on the 5090 (Blackwell) is
@@ -47,7 +57,7 @@ fails  → try openpi's PyTorch port; if that fails too, the LoRA side falls
          and we say so in the result
 ```
 
-### 2. Score THEIR full fine-tune, in OUR simulator
+### 2. (L2) Score THEIR full fine-tune, in OUR simulator
 
 Download `gs://openpi-assets/checkpoints/pi05_libero`. Run it on LIBERO
 Spatial, 200 episodes, fixed seeds.
@@ -58,12 +68,12 @@ near it   our simulator agrees with theirs → the comparison is fair
 far below our setup is wrong somewhere → fix before anything else
 ```
 
-### 3. Train LoRA on LIBERO, here
+### 3. (L3) Train LoRA on LIBERO, here
 
 openpi's LoRA variants from `pi05_base`, 30k steps, on the same LIBERO data
 their full fine-tune used. Save checkpoints along the way.
 
-### 3b. Train the FULL fine-tune ourselves, on a big GPU — added 2026-10-10
+### 3b. (L4) Train the FULL fine-tune ourselves, on a big GPU — added 2026-10-10
 
 Scoring their checkpoint proves their checkpoint works. It does not prove
 the full-fine-tune ROUTE works when we run it: our data, our norm stats, our
@@ -104,12 +114,12 @@ The 72 GB machine needs its own openpi environment, so step 1's gate runs
 there too. LoRA stays on the 5090: that row exists to show what the 32 GB
 card can do.
 
-### 4. Score OUR LoRA and OUR full FT, same simulator, same seeds
+### 4. (L5) Score OUR LoRA and OUR full FT, same simulator, same seeds
 
 200 episodes at 10k, 20k and 30k steps for each, so we see the curve and not
 just the end.
 
-### 5. Put all three on one line
+### 5. (L5, the table) Put all three on one line
 
 ```text
                                      LIBERO Spatial, n=200   examples seen
@@ -155,7 +165,8 @@ their 98.8 was measured SYNCHRONOUSLY: 10-step chunk, execute 5, replan
 (examples/libero/main.py). openpi has no RTC to switch on.
 ⇒ every row in this plan is scored RTC OFF, synchronous, same replan rule.
   Turning LeRobot's guided RTC on for our rows only would add a second
-  variable to the table. Record the setting as a lever in §5.
+  variable to the table. Record the setting beside the step-5 table, and
+  confirm rtc_config=None at every LeRobot policy load.
 ```
 
 ## Decisions already made
