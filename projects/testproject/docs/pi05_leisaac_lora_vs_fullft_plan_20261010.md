@@ -28,16 +28,20 @@ real arm comes last, with the winner.
 ### Data: 450 episodes
 
 ```text
-target   450 successful pick-orange episodes recorded in LeIsaac
+target   450 successful pick-orange episodes in LeIsaac's kitchen scene
 why 450  matches the LIBERO training set in frames (~270k), so a 30k-step
          run at batch 256 passes over the data about as many times as their
          LIBERO run did (~28), instead of ~210 passes over 60 episodes
-have     60 (LightwheelAI/leisaac-pick-orange, already local) — they count
+have     ~120 verified public (LightwheelAI 60 + their Mimic 60), ~200 if
+         EverNorif's 83 turn out to be the same scene — see Appendix B
 rest     recorded by the LeIsaac data generator, running continuously
 how      log attempts, successes and seconds per episode from the FIRST
          HOUR; project the finish date from those numbers, not from
          estimates; stop at 450; transcode to video as you go so storage
          stays flat
+before   dedupe the community re-uploads; check camera pose and naming
+mixing   against the LeIsaac rig (a moved camera breaks a pixel policy on
+         the same robot); keep one fps
 ```
 
 ### Training: two rows, same data
@@ -167,6 +171,16 @@ The winning route from Stage 1 (or the multi-task model from Stage 2) goes
 to the physical SO-101. Sim-to-real is its own question with its own plan;
 this document only says it is where the answer is finally read.
 
+**Start from `dongyoonkim/so101-pi05-base`, not from `pi05_base`.** It is
+pi0.5 FULLY fine-tuned (3.62B trainable, no LoRA) on 16,687 real SO-101
+episodes from 181 public sources — effective batch 256, 40k steps, 8×A100
+for ~40 h — i.e. the real-arm full fine-tune we would otherwise be doing
+ourselves. Claimed ~90% on one pick-and-place task over an unrecorded trial
+count: treat as a starting point, not a result. Expects three camera slots
+(base_0_rgb, left_wrist_0_rgb, right_wrist_0_rgb) with masking; trained
+with VLASH on top of the openpi/LeRobot PI05 policy. Fine-tune it on our
+real orange episodes plus LightwheelAI's real orange set (Appendix B.D).
+
 ---
 
 ## Decisions already made
@@ -198,6 +212,80 @@ Stage 2 eval               ~10 days per policy serially at 50/task; less if
 ```
 
 ---
+
+## Appendix B — public SO-101 datasets (Hugging Face, surveyed 2026-10-10)
+
+Numbers from each dataset's own `meta/info.json`. Grouped by how directly
+we can use them. All Apache-2.0 where a licence was shown.
+
+### B.A — LeIsaac pick-orange, OUR evaluation scene (Stage 1 training data)
+
+```text
+LightwheelAI/leisaac-pick-orange            60 ep    36k fr   front+wrist 30fps  local
+LightwheelAI/leisaac-pick-orange-mimic-v0   60 ep    42k fr   Mimic-generated
+EverNorif/so101_place_orange_isaaclab       83 ep    20k fr   front+wrist 30fps
+                                            ⚠ scene NOT confirmed as LeIsaac's kitchen — check first
+~25 community re-uploads named leisaac-pick-orange(-v30/-prepared)
+                                            likely duplicates — dedupe, do not count
+```
+
+### B.B — LeIsaac sim, other tasks (Stage 2 candidates, same robot + rig)
+
+```text
+tshiamor/leisaac-pick-block-1000          1000 ep   766k fr  front+wrist 30fps  pick block
+aaronsu11/so101_fruit_leisaac               57 ep     8k fr  fruit
+azazdeaz/teleop_so101_leisaac_combined      30 ep    25k fr  lift cube + toyroom pick
+azazdeaz/teleop_so101_leisaac_lift_cube, _toyroom_pick_e_e        small teleop sets
+Aaronng456/leisaac_{red,blue,yellow}cube{,v2}, _bluecylinder{,v2}  small cube/cylinder sets
+```
+
+### B.C — Isaac Lab SO-101 multi-task, DIFFERENT scene (training breadth only)
+
+```text
+CoRL2026-CSI/Isaaclab-so101_11task_openpi_v21
+    3,300 ep · 1.18M fr · 11 skills · 800 instruction strings
+    ("Pick up the lime block and place it on the gray dish." …)
+    top + left_wrist 480x640 · 10 fps · v2.1 · so101_follower
+Cache-SCA/Isaaclab-so101_11task_baseCaP_3300epi(_10fps)   same corpus, other cut
+Cache-SCA/IsaacLab-SO101_<task>_baseCaP_{100,300}epi      per task: pick_place,
+    sort_by_color, stack_2_cubes, push_button, turn_on/off_lever, open/close_box,
+    push_cube, pull_cube, extract_cube, touch_cube
+Cache-SCA/isaaclab-pickplacecube-so101-1000epis-no-randomize(-baseline_10fps)
+    1,000 ep · 362k fr · one task · carries skill/subtask annotations
+Cache-SCA/SO101-teleop_multitask_7tasks_700epi(_10fps)    700 ep teleop, 7 tasks
+⚠ their environment is not published as something we can run, so these can
+  TRAIN a broader model but cannot be SCORED. Stage 2 evaluation stays on
+  our LeIsaac tasks.
+```
+
+### B.D — real SO-101 (Stage 3)
+
+```text
+dongyoonkim/so101-pi05-base-dataset   13,969 ep · 7.27M fr · 156 merged public
+    sources · 3 camera slots w/ masks · 30 fps (450 ep are really 10 fps) · v2.1
+    + the checkpoint trained on it: dongyoonkim/so101-pi05-base (see Stage 3)
+armnet/armnetbench_v01_lerobot_so101   2,499 ep · 1.13M fr · 8 tasks · 3 cams
+    (front/top 576x1024, wrist 720x1280) · AV1 20 fps · includes rollouts from
+    7 policies incl. π0.5 and GR00T N1.7 · Apache-2.0
+hungho77/so101-ai20k-multitask           455 ep · 222k fr · 9 tasks · top+wrist · v3.0
+LightwheelAI/so101-place-orange           61 ep ·  43k fr · front+wrist 30fps  ★ same
+LightwheelAI/so101-pick-pen               61 ep ·  41k fr · front+wrist 30fps    naming as our rig
+wsagi/leisaac-real-pick-orange            99 ep ·  41k fr · 3 tasks · real orange
+lerobot/svla_so101_pickplace              50 ep ·  12k fr · so100_follower · up+side cams
+```
+
+### B.E — what the survey changes
+
+```text
+Stage 1   starts from ~120-200 orange episodes, not 60
+Stage 2   a 3,300-episode multi-task sim corpus exists for breadth; evaluation
+          still needs our authored LeIsaac variants
+Stage 3   start from dongyoonkim/so101-pi05-base; add LightwheelAI's real
+          orange set and our own real episodes
+always    verify camera pose/naming against our rig · one fps per training
+          run (10 vs 30 differ across sets) · dedupe re-uploads · keep the
+          licence list
+```
 
 ## Appendix — where the facts above come from (LeIsaac 0.4.0 source at ~/sim/leisaac-src)
 
