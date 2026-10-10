@@ -1,6 +1,6 @@
 # π0.5 / 5090 lane — Current Priority
 
-Last updated: 2026-08-16
+Last updated: 2026-10-10
 
 **This file is a ROUTER: what is open, in what order, and why. It is NOT a log.**
 Detail and evidence: [`pi05_training_capability_plan_20260811.md`](pi05_training_capability_plan_20260811.md) (2,454 lines).
@@ -35,9 +35,35 @@ is the $11K RTX PRO 6000 justified?  NO — and bigger batches, the main thing m
 detail: results/pi05_capability_20260811/step3f_3e_rung4_gate_PASS.txt
 ```
 
-★ **HOST RAM IS THE NEW BINDING CONSTRAINT, not VRAM.** Rung 4 needs ~34 GB;
-dynus wants ~47 GB of the same 59 GB; swap is exhausted. Check `pgrep dynus` is
-empty before any long run.
+★ **HOST RAM IS THE NEW BINDING CONSTRAINT, not VRAM.** Rung 4 needs ~34 GB
+of the 59 GB. DYNUS is capped at 16 GB (operator, 2026-10-10; the earlier
+"~47 GB" figure is stale) and can be shut down for a run. Check `pgrep dynus`
+is empty before any long run.
+
+## ▶ P2a — PLANNED 2026-10-10: LoRA here vs openpi's full FT, on LIBERO
+
+Operator's framing is openpi's README table: LoRA (>22.5 GB, 4090) vs Full
+(>70 GB, A100). Order: (1) get openpi's JAX stack running here for the first
+time — the gate; (2) score openpi's PUBLISHED `pi05_libero` full-FT checkpoint
+in our simulator; (3) train openpi's own LoRA on LIBERO here (LeRobot PEFT
+LoRA is the fallback if JAX fails); (4) score it, same simulator, same seeds;
+(3b) reproduce their FULL fine-tune ourselves on a 72 GB GPU the operator
+will provide, recipe as published except batch size — if it does not fit,
+get a bigger machine, do not bend the recipe; (5) one table, three rows,
+n=200. LoRA vs our full FT at matched batch/steps is the clean comparison;
+the gap to their checkpoint is partly their 7.7M examples. August full-FT
+results are out of scope. Plan: `pi05_libero_openpi_vs_ours_plan_20261010.md`.
+P2 below is untouched.
+
+## ▶ P2b — PLANNED 2026-10-10: same question on the orange task, in LeIsaac
+
+After P2a. Stage 1: pick orange only — record to 450 sim episodes (LIBERO-
+equivalent frame count), train π0.5 full FT (72 GB machine) and LoRA (5090)
+on the same data with LeRobot, score 100 seeded 3000-step episodes per row
+in our LeIsaac loop (policy served over a socket; the EnvHub env pins
+lerobot 0.4.1 and cannot host π0.5). Stage 2: 10-20 instruction variants
+over the three single-arm LeIsaac scenes, one model. Stage 3: real arm.
+Plan: `pi05_leisaac_lora_vs_fullft_plan_20261010.md`.
 
 ## P1 — BLOCKED ON OPERATOR: move the display to the iGPU
 
