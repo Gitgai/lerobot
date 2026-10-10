@@ -66,6 +66,9 @@ n          100 per row, 3000 steps each   → ±8 points, separates gaps ≥15
 close call 250 per row if two rows land within 10 points AND the choice
            between them matters
 same       simulator, seeds, success predicate for every row
+RTC        OFF in sim, every row. The sim waits for each chunk, so there is
+           no inference delay to hide; guided RTC would only add a variable.
+           Confirm rtc_config=None at every policy load and log it.
 ```
 
 ### Harness decision
@@ -181,6 +184,17 @@ count: treat as a starting point, not a result. Expects three camera slots
 with VLASH on top of the openpi/LeRobot PI05 policy. Fine-tune it on our
 real orange episodes plus LightwheelAI's real orange set (Appendix B.D).
 
+**On the real arm, RTC is ON — asynchronous inference plus chunk guidance,
+for every policy alike, and recorded as a lever.** The arm cannot wait for
+inference the way the sim does: a synchronous loop froze our arm for ~650 ms
+per chunk at ~31% duty and wrecked the grasp; the pipelined loop ran at
+~95% duty. Two variants exist (see the LIBERO plan's RTC section): guided
+RTC is LeRobot's inference switch (`rtc_config`, default OFF — turn it on);
+trained RTC needs the delay simulated in training, which the dongyoonkim
+checkpoint already had (VLASH, `max_delay_steps` 8) and which neither openpi
+nor LeRobot's trainer provides. Whether our GR00T client's `--rtc` applied
+prefix guidance or only pipelined is unverified — check before comparing.
+
 ---
 
 ## Decisions already made
@@ -193,6 +207,8 @@ train on sim data, score in sim            keeps the domain out of the compariso
 LeRobot stack for this task                no SO-101 path in openpi
 policy served into Isaac, not in-process   lerobot/python pin conflict
 one task first, many tasks second          baseline before breadth
+RTC off in sim, on for the real arm        same setting for every policy in a
+                                           table; recorded as a lever
 ```
 
 ---

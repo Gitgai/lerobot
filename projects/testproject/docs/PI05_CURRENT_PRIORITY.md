@@ -62,7 +62,11 @@ equivalent frame count), train π0.5 full FT (72 GB machine) and LoRA (5090)
 on the same data with LeRobot, score 100 seeded 3000-step episodes per row
 in our LeIsaac loop (policy served over a socket; the EnvHub env pins
 lerobot 0.4.1 and cannot host π0.5). Stage 2: 10-20 instruction variants
-over the three single-arm LeIsaac scenes, one model. Stage 3: real arm.
+over the three single-arm LeIsaac scenes, one model. Stage 3: real arm,
+starting from `dongyoonkim/so101-pi05-base` (π0.5 fully fine-tuned on 16.7k
+real SO-101 episodes). Public SO-101 data surveyed 2026-10-10: ~120-200
+orange episodes in our scene, a 3,300-episode 11-task Isaac Lab corpus
+(other scene, train-only), ~14k real episodes — Appendix B of the plan.
 Plan: `pi05_leisaac_lora_vs_fullft_plan_20261010.md`.
 
 ## P1 — BLOCKED ON OPERATOR: move the display to the iGPU

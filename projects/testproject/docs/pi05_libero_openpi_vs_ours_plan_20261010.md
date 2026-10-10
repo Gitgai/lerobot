@@ -139,10 +139,30 @@ on the big machine. Long, but straightforward. Not scheduled.
 
 ---
 
+## Real-Time Chunking — OFF for every row (decided 2026-10-10)
+
+```text
+two things share the name:
+  guided RTC   inference-time only, no retraining (PI, arXiv 2506.07339):
+               steer the denoiser so the new chunk's overlap matches the
+               actions already committed. LeRobot has it (RTCConfig), default
+               OFF (rtc_config=None). openpi does NOT have it at all.
+  trained RTC  training-time (PI, arXiv 2512.05964): simulate the delay in
+               training, condition on the committed prefix, no inference
+               overhead. Not in openpi, not in LeRobot's trainer. VLASH has it.
+
+their 98.8 was measured SYNCHRONOUSLY: 10-step chunk, execute 5, replan
+(examples/libero/main.py). openpi has no RTC to switch on.
+⇒ every row in this plan is scored RTC OFF, synchronous, same replan rule.
+  Turning LeRobot's guided RTC on for our rows only would add a second
+  variable to the table. Record the setting as a lever in §5.
+```
+
 ## Decisions already made
 
 ```text
 openpi's stack first, LeRobot as fallback   operator, 2026-10-10
+RTC off for every row, synchronous eval      matches their protocol; openpi has no RTC
 their checkpoint evaluated, not retrained    their recipe does not fit here
 one simulator for all policies               or the numbers are not comparable
 n = 200 per eval                             n=40 cost us a 5-point error once
