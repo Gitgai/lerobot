@@ -10,7 +10,7 @@ CFG=pi05_libero_low_mem_finetune
 EXP=lora_libero_20261010
 CKDIR=$OPENPI/checkpoints/$CFG/$EXP
 PIDFILE=$RES/l3_train_${EXP}.pid
-WAIT_STEP=${L3_WAIT_STEP:-10000}
+WAIT_STEP=${L3_WAIT_STEP:-20000}   # armed 2026-10-11 ~08:40Z for the NEXT checkpoint (10k had passed)
 export TMPDIR=/home/kiran/tmp TMP=/home/kiran/tmp TEMP=/home/kiran/tmp
 export XLA_PYTHON_CLIENT_PREALLOCATE=false XLA_PYTHON_CLIENT_MEM_FRACTION=0.92
 export TOKENIZERS_PARALLELISM=false HF_HUB_OFFLINE=1
@@ -38,6 +38,10 @@ kill "$TPID"
 for i in $(seq 1 60); do kill -0 "$TPID" 2>/dev/null || break; sleep 1; done
 kill -0 "$TPID" 2>/dev/null && { kill -9 "$TPID"; sleep 5; }
 echo "trainer stopped"; nvidia-smi --query-gpu=memory.used --format=csv,noheader
+
+step "GPU is free: score every committed checkpoint with the L2 loop (L5) before resuming"
+L5_NO_SERVE=1 L5_STEPS="10000 $WAIT_STEP" L5_EXP="$EXP" bash "$RES/l5_eval_lora.sh"
+echo "L5 interim rc=$?"
 
 step "resuming from $WAIT_STEP with save_interval=5000 keep_period=5000"
 TRAIN_LOG=$RES/l3_train_${EXP}_resume.log

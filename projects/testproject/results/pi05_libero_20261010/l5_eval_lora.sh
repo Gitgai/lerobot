@@ -55,5 +55,6 @@ print(f"{'row':45s} {'k/n':>8s} {'rate':>6s}  CI95")
 for r in rows: print(f"{r[0]:45s} {r[1]:>3d}/{r[2]:<3d} {r[3]:6.1f}  [{r[4]:.1f},{r[5]:.1f}]")
 print("reference (their harness): openpi pi05_libero 98.8 on Spatial")
 PY
+if [ "${L5_NO_SERVE:-0}" = "1" ]; then echo "L5 done (no serve)"; exit 0; fi
 step "serving $RES on :8765"
 cd "$RES" && exec python3 -m http.server 8765 --bind 127.0.0.1

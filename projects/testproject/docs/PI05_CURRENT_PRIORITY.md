@@ -40,8 +40,9 @@ L3   train openpi LoRA on LIBERO here, 30k steps from          running  launched
      pi05_base. Gate PASS: trainable 467M of 3.40B (LoRA 50M +          batch 32, 3.5 s/step, ~29 h
      SigLIP 415M + proj 2M = openpi's own "low_mem" = "LoRA +            6.5k/30k at 10-11 02:36Z
      vision encoder"). bs32 fits, peak 31.9 of 32.6 GB.                 exp lora_libero_20261010
-     ⚠ 10k save cadence → at 10k: stop + --resume with 5k saves          l3_resume_5k.sh armed on go
-     (operator 2026-10-11). Loss lines are stdout-buffered.
+     12.6k at 10-11 08:35Z, loss 0.094→0.018, smooth.                    ARMED 11:29Z: at the 20k
+     ⚠ 10k save cadence → at 20k (≈16:00Z): stop, score 10k+20k           checkpoint l3_resume_5k.sh
+     (L5, GPU free in the gap), --resume with 5k saves. Nothing lost.      fires automatically
 L4   reproduce THEIR full FT on the 72 GB GPU, recipe as       blocked  operator to point
      published, batch size the only change; no fit → rent               to the machine
      a bigger box (prefer multi-GPU node, batch 256)

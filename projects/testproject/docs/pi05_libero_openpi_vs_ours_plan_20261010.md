@@ -67,9 +67,13 @@ L3  train LoRA here                  running since 2026-10-10 20:14Z — config
                                      --resume with save_interval=5000,
                                      keep_period=5000 (schedule continues; step
                                      counter intact; ~20 min reload+compile).
-                                     Armed by l3_resume_5k.sh on operator go.
-                                     Checkpoints then at 10k,15k,20k,25k,30k
-                                     (+5k is lost — it was never written).
+                                     10k passed un-armed (I waited for a go;
+                                     lesson: arm timed, vetoable steps and say
+                                     so). ARMED 2026-10-11 11:29Z for 20k:
+                                     stop → score 10k and 20k with the L2 loop
+                                     while the GPU is free → --resume with 5k
+                                     saves. Checkpoints then 10k,20k,25k,30k.
+                                     Loss at 12.5k: 0.018 (from 0.094), smooth.
                                      Note: openpi's "Step N: loss=" lines are
                                      stdout-buffered; the live log shows rate
                                      only. Loss is readable per checkpoint.
