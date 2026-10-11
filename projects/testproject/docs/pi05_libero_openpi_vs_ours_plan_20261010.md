@@ -34,9 +34,45 @@ are comparing openpi's two routes, not revisiting ours.
 ## Status (mirrored one word at a time into `PI05_CURRENT_PRIORITY.md`)
 
 ```text
-L1  openpi runs on the 5090          next
-L2  score their checkpoint           todo
-L3  train LoRA here                  todo
+L1  openpi runs on the 5090          done 2026-10-10 — jax 0.5.3 sees the GPU,
+                                     pi05_libero forward pass finite (10,7),
+                                     23 s cold / 59 ms warm. Record:
+                                     results/pi05_libero_20261010/l1_gate.log
+                                     ⚠ /tmp quota exhausted on this box: set
+                                     TMPDIR=/home/kiran/tmp for every run
+L2  score their checkpoint           done 2026-10-10 — 200/200 on Spatial, CI95
+                                     98.1-100, 20 trials x 10 tasks, env seed 7,
+                                     init states 0-19 per task, their replan-5
+                                     convention, RTC none, 9.2 min wall. Their
+                                     98.8 sits inside the interval → harness
+                                     agrees; L5 may be read against it.
+                                     results/pi05_libero_20261010/
+                                       L2_openpi_pi05_libero_spatial_n200/
+                                       {summary.json, per_episode.jsonl}
+                                     loop: l2_eval_openpi.py (reused for L5)
+L3  train LoRA here                  running since 2026-10-10 20:14Z — config
+                                     pi05_libero_low_mem_finetune, batch 32,
+                                     30k steps, EMA off, lr cosine 2.5e-5→2.5e-6.
+                                     Smoke: 3.5 s/step, peak 31.9 of 32.6 GB
+                                     (JAX pool high-water, GPU otherwise empty).
+                                     ETA ~29 h (finish ≈ 2026-10-12 01:40Z).
+                                     ⚠ the plan's "~7 h" was a guess; measured
+                                     is 4x that. Trainable 467M (see appendix).
+                                     02:36Z 10-11: 6,470 steps, 100% GPU, 80 °C,
+                                     575 W, 31.9 GB, rate flat at 3.5 s/step.
+                                     CHECKPOINT CADENCE (operator, 2026-10-11):
+                                     10k apart risks losing 10 h to a crash.
+                                     Decision: do NOT restart now (certain loss
+                                     of 6.4 h); at the 10k checkpoint stop and
+                                     --resume with save_interval=5000,
+                                     keep_period=5000 (schedule continues; step
+                                     counter intact; ~20 min reload+compile).
+                                     Armed by l3_resume_5k.sh on operator go.
+                                     Checkpoints then at 10k,15k,20k,25k,30k
+                                     (+5k is lost — it was never written).
+                                     Note: openpi's "Step N: loss=" lines are
+                                     stdout-buffered; the live log shows rate
+                                     only. Loss is readable per checkpoint.
 L4  reproduce full FT on 72 GB       blocked — operator to name the machine
 L5  score ours, one table            todo
 ```
@@ -204,6 +240,33 @@ nothing special. DYNUS can keep running at its 16 GB cap.
 
 ---
 
+## Run record — how the steps were actually executed (2026-10-10/11)
+
+```text
+execution path   the Bash tool was dead all session (/tmp tmpfs quota
+                 exhausted, see diag_tmp.log). Every step ran as a script
+                 under results/pi05_libero_20261010/ launched through
+                 .claude/launch.json + the preview launcher, logs watched
+                 with Monitor. Each script sets TMPDIR=/home/kiran/tmp.
+L1  l1_gate.sh        uv sync → jax.devices → pi05_libero forward pass
+L2  l2_run.sh         probe venv client (l2_eval_openpi.py) ↔ openpi server
+                      --port BEFORE policy:checkpoint; server needs
+                      XLA_PYTHON_CLIENT_PREALLOCATE=false beside other tenants
+L3  l3_prep.sh        config gate (trainable-set breakdown) → dataset +
+                      compute_norm_stats → bs32/bs16 smoke with VRAM sampling
+                      ⚠ MEM_FRACTION=0.6 made bs32 OOM at 18.9 GB — the cap,
+                        not the card; 0.92 with the GPU empty → bs32 fits
+    l3_train.sh       setsid-detached trainer, pid file, 30 s GPU sampler
+    l3_resume_5k.sh   wait for 10k → stop → --resume with 5k saves
+L5  l5_eval_lora.sh   serve each checkpoint on :8001, score with the L2 loop,
+                      print the table
+GPU tenants      a 3.5-day-old lerobot_policy_server (Oct 7 rtc-remote-draft,
+                 10 GB) was stopped with operator approval before L3
+                 (stop_stale_policy_server.sh). Desktop holds ~1.7 GB.
+openpi edits     ONE local addition to src/openpi/training/config.py
+                 (pi05_libero_low_mem_finetune), marked, nothing else touched.
+```
+
 ## Appendix — the how, for when we get there
 
 Facts already checked on disk, so the next person does not re-derive them:
@@ -215,6 +278,19 @@ their LoRA        gemma_2b_lora rank 16, gemma_300m_lora rank 32, attn+ffn
                   (models/gemma.py:88-108). No pi05 LoRA config shipped; the
                   pi0 one (config.py:669-689) is the template: *_lora
                   variants + get_freeze_filter() + ema_decay=None.
+                  ★ ADDED 2026-10-10 as `pi05_libero_low_mem_finetune` in
+                  ~/sim/openpi/src/openpi/training/config.py (local edit,
+                  marked). MEASURED (l3_prep.log, gate L3.1): openpi's "LoRA"
+                  is NOT pure LoRA — get_freeze_filter() freezes only
+                  '.*llm.*', so the trainable set is 467.0M of 3.403B (13.7%):
+                    414.8M SigLIP vision encoder   (left trainable by openpi)
+                     50.0M LoRA adapters           (Gemma attn+ffn)
+                      2.2M action/time projections (trainable)
+                  Same filter as their published pi0 low_mem config, so this
+                  IS their table row — but call it "LoRA + vision encoder".
+                  Also: openpi's pi0.5 instantiates 3.40B params, not the
+                  4.14B LeRobot's port reports; the port carries ~0.74B of
+                  LM-head/untied weights that openpi does not build.
 their full FT     pi05_libero config (config.py:734-754), batch 256, EMA
                   0.999, lr 5e-5, 30k steps. Memory, from scripts/train.py:
                   trainable params stay fp32 (only FROZEN ones are cast to
@@ -231,14 +307,23 @@ our simulator     lerobot 0.6.1 LIBERO env in the probe venv, LIBERO package
                   installed (~/.libero/config.yaml points into that venv).
                   Differences to note: 280-step cap on Spatial (theirs 220),
                   360px render, success from env.check_success().
-harness plan      run OUR LIBERO loop with two backends: lerobot policy
-                  in-process, openpi policy via its websocket server
-                  (serve_policy.py + openpi-client). Settle the step cap and
-                  image handling so both policies see what they were trained
-                  on. Their checkpoint ships its own norm stats; LoRA needs
-                  compute_norm_stats.py run first.
-LoRA gate         the trainable set must be only lora_a / lora_b tensors.
-                  If the learnable count reads 4.14B, it is not LoRA — stop.
+harness, as run   results/pi05_libero_20261010/l2_eval_openpi.py — a port
+                  of their main.py (256px, 180° rotate, pad-resize 224,
+                  replan 5, 10 settle steps, 220 cap, env seed 7, init state
+                  = trial index) run in the PROBE venv against openpi's
+                  websocket server (serve_policy.py; --port must precede
+                  policy:checkpoint). 20 trials x 10 tasks = 200. Every
+                  episode logged. Their checkpoint: 200/200 (L2). Later rows
+                  go through the SAME script by pointing the server at the
+                  new checkpoint dir. Server needs
+                  XLA_PYTHON_CLIENT_PREALLOCATE=false beside other GPU
+                  tenants, else cuBLAS fails to get a workspace.
+                  Their checkpoint ships its own norm stats; LoRA needs
+                  compute_norm_stats.py run first (done in l3_prep.sh).
+LoRA gate         (corrected 2026-10-10) no Gemma weight outside lora_a/lora_b
+                  may train; vision encoder + projections DO train under
+                  openpi's own definition. If the trainable count reads the
+                  full 3.40B, it is not LoRA — stop. Gate passed at 467M.
 rules             E1 preflight before any run >1 h · n=200 · every lever
                   explicit (dtype and grad-ckpt both default OFF in lerobot)
                   · setsid for long runs · check compute-apps before launch

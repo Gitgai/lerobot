@@ -28,12 +28,20 @@ real task.
 
 ```text
 ID   step                                                      status   owner/when
-L1   openpi JAX stack runs on the 5090 (venv, GPU seen,        next     ← START HERE, ~1 h
-     one forward pass). Fail → PyTorch port → LeRobot LoRA.
-L2   score THEIR pi05_libero full-FT checkpoint, our sim,      todo     after L1
-     Spatial n=200, RTC off. Expect ~98.8; <85 = fix harness.
-L3   train openpi LoRA on LIBERO here, 30k steps from          todo     after L1, ~7 h
-     pi05_base (LeRobot PEFT LoRA if L1 fell back)
+L1   openpi JAX stack runs on the 5090 (venv, GPU seen,        done     2026-10-10 18:15Z
+     one forward pass). jax 0.5.3 sees the GPU; pi05_libero            results/pi05_libero_20261010/
+     forward pass finite (10,7), 59 ms warm. Caveat: /tmp               l1_gate.log
+     quota exhausted → TMPDIR must be on /home for every run.
+L2   score THEIR pi05_libero full-FT checkpoint, our sim,      done     2026-10-10 18:30Z
+     Spatial n=200, RTC off. → 200/200 = 100% (CI95 98.1-100),           results/pi05_libero_20261010/
+     their 98.8 is inside the interval: HARNESS AGREES. 9.2 min          L2_openpi_pi05_libero_spatial_n200/
+     wall. Loop: l2_eval_openpi.py (their convention, logged).
+L3   train openpi LoRA on LIBERO here, 30k steps from          running  launched 2026-10-10 20:14Z
+     pi05_base. Gate PASS: trainable 467M of 3.40B (LoRA 50M +          batch 32, 3.5 s/step, ~29 h
+     SigLIP 415M + proj 2M = openpi's own "low_mem" = "LoRA +            6.5k/30k at 10-11 02:36Z
+     vision encoder"). bs32 fits, peak 31.9 of 32.6 GB.                 exp lora_libero_20261010
+     ⚠ 10k save cadence → at 10k: stop + --resume with 5k saves          l3_resume_5k.sh armed on go
+     (operator 2026-10-11). Loss lines are stdout-buffered.
 L4   reproduce THEIR full FT on the 72 GB GPU, recipe as       blocked  operator to point
      published, batch size the only change; no fit → rent               to the machine
      a bigger box (prefer multi-GPU node, batch 256)
@@ -93,12 +101,15 @@ until it checkpoints AND resumes · loss is NOT a proxy for capability · state
 every lever explicitly, defaults included (dtype and gradient_checkpointing
 both default OFF in lerobot) · setsid for long runs · check
 nvidia-smi --query-compute-apps before launching · confirm rtc_config=None
-at every sim policy load
+at every sim policy load · checkpoint at most every 5k steps on any run
+longer than ~10 h (operator, 2026-10-11) · TMPDIR=/home/kiran/tmp in every
+launched script while /tmp's quota is exhausted · never cap JAX memory below
+what the smoke needs — a 0.6 fraction masqueraded as an OOM on 2026-10-10
 ```
 
 ---
 
-## Legacy items (compressed; bodies in `pi05_training_capability_plan_20261010.md`)
+## Legacy items (compressed; bodies in `pi05_training_capability_plan_20260811.md`)
 
 ```text
 P0   rung 4 (fp32 Adam in host RAM) trains, checkpoints, resumes   done 2026-08-15
