@@ -111,6 +111,31 @@ L5  score ours, one table            LoRA side DONE 2026-10-12 15:08Z. Every
                                      than 15-20k; openpi's 30k default bought
                                      nothing measurable here.
                                      L4's row (our full FT) still pending.
+                                     FILMED 2026-10-12 (results/.../videos/): drawer
+                                     task @22.5k 17/20 on re-run (15/20 original),
+                                     @15k 19/20 (19/20); all tasks trial 0 @20k
+                                     10/10. Every drawer failure is the same: arm
+                                     reaches into the drawer, grips the bowl, never
+                                     lifts it out before the 230-step cap. Not a
+                                     perception/instruction failure; a grasp-and-
+                                     extract failure in the one confined-space task.
+                                     L5b DONE 2026-10-12 23:52Z — second 200
+                                     layouts (trials 20-39), pooled with the first:
+                                       15k    198 + 194 = 392/400 = 98.0  [96.1,99.0]
+                                       20k    199 + 197 = 396/400 = 99.0  [97.5,99.6]
+                                       22.5k  190 + 195 = 385/400 = 96.2  [93.9,97.7]
+                                     drawer task per set: 15k 19|19, 20k 20|18,
+                                     22.5k 15|19. ⇒ 20k is the checkpoint to keep.
+                                     The 22.5k dip was mostly one bad layout set
+                                     (190→195); at n=400 it still trails 20k by
+                                     ~3 points with intervals barely touching —
+                                     a mild late wobble, not a collapse. Their
+                                     98.8 sits inside 15k's and 20k's intervals.
+                                     Rerun logging added to the loop (--rerun
+                                     save|serve): cams, 8 state + 7 action series,
+                                     inference latency per chunk, outcome. One .rrd
+                                     per episode; open with `rerun <file>`. Covers
+                                     LIVE_VIZ_PLAN.md phases 1-2 for the sim path.
 ```
 
 ## What we will do, in order

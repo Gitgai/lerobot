@@ -79,7 +79,26 @@ def main():
     ap.add_argument("--out", required=True)
     ap.add_argument("--row", default="openpi_pi05_libero_fullft")
     ap.add_argument("--task-ids", default="", help="comma list to restrict tasks (debug)")
+    ap.add_argument("--trials", default="", help="comma list of trial indices to run (default: 0..trials-per-task-1)")
+    ap.add_argument("--video-dir", default="", help="if set, write one mp4 per episode (agentview | wrist, 224px, 10 fps) via ffmpeg")
+    ap.add_argument("--rerun", default="off", choices=["off", "save", "serve"],
+                    help="save: one .rrd per episode in --rerun-dir; serve: stream live to a browser (grpc 9876 / web 9090)")
+    ap.add_argument("--rerun-dir", default="")
     args = ap.parse_args()
+    rr = None
+    if args.rerun != "off":
+        import rerun as rr  # noqa
+        rerun_dir = pathlib.Path(args.rerun_dir or (args.out + "/rerun")); rerun_dir.mkdir(parents=True, exist_ok=True)
+        if args.rerun == "serve":
+            rr.init(f"libero_{args.row}", spawn=False)
+            url = rr.serve_grpc(grpc_port=9876)
+            rr.serve_web_viewer(web_port=9090, open_browser=False, connect_to=url)
+            print(f"[rerun] live viewer: http://127.0.0.1:9090/?url={url}", flush=True)
+    STATE_NAMES = ["eef_x", "eef_y", "eef_z", "rot_ax", "rot_ay", "rot_az", "grip_q0", "grip_q1"]
+    ACTION_NAMES = ["dx", "dy", "dz", "drx", "dry", "drz", "gripper"]
+    video_dir = pathlib.Path(args.video_dir) if args.video_dir else None
+    if video_dir: video_dir.mkdir(parents=True, exist_ok=True)
+    trial_list = [int(t) for t in args.trials.split(",") if t] or list(range(args.trials_per_task))
 
     out = pathlib.Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
@@ -111,7 +130,7 @@ def main():
         desc = task.language
         k = 0
         t_task = time.time()
-        for ep in range(args.trials_per_task):
+        for ep in trial_list:
             env.reset()
             obs = env.set_init_state(init_states[ep])
             plan = collections.deque()
@@ -120,16 +139,38 @@ def main():
             n_infer = 0
             infer_s = 0.0
             t_ep = time.time()
+            if rr is not None:
+                ep_id = f"task{task_id:02d}_trial{ep:02d}"
+                if args.rerun == "save":
+                    rr.init(f"libero_{args.row}", recording_id=f"{args.row}_{ep_id}", spawn=False)
+                    rr.save(str(rerun_dir / f"{ep_id}.rrd"))
+                base = "" if args.rerun == "save" else ep_id + "/"
+                rr.log(base + "meta", rr.TextDocument(f"row {args.row}\ntask {task_id}: {desc}\ntrial {ep} (init state {ep})\nreplan {args.replan_steps}, cap {max_steps}, RTC none"), static=True)
+                for i, nme in enumerate(STATE_NAMES): rr.log(base + f"state/{nme}", rr.SeriesLines(names=nme), static=True)
+                for i, nme in enumerate(ACTION_NAMES): rr.log(base + f"action/{nme}", rr.SeriesLines(names=nme), static=True)
+            vw = None
+            if video_dir:
+                import subprocess
+                vpath = video_dir / f"task{task_id:02d}_trial{ep:02d}.mp4"
+                vw = subprocess.Popen(["ffmpeg","-v","error","-y","-f","rawvideo","-pix_fmt","rgb24","-s","448x224","-r","10","-i","-","-c:v","libx264","-preset","veryfast","-pix_fmt","yuv420p",str(vpath)], stdin=subprocess.PIPE)
             while t < max_steps + args.num_steps_wait:
                 if t < args.num_steps_wait:
                     obs, _, done, _ = env.step(LIBERO_DUMMY_ACTION)
                     t += 1
                     continue
+                img = np.ascontiguousarray(obs["agentview_image"][::-1, ::-1])
+                wrist = np.ascontiguousarray(obs["robot0_eye_in_hand_image"][::-1, ::-1])
+                img = image_tools.convert_to_uint8(image_tools.resize_with_pad(img, args.resize, args.resize))
+                wrist = image_tools.convert_to_uint8(image_tools.resize_with_pad(wrist, args.resize, args.resize))
+                if vw is not None:
+                    vw.stdin.write(np.ascontiguousarray(np.concatenate([img, wrist], axis=1)).tobytes())
+                if rr is not None:
+                    rr.set_time("step", sequence=t)
+                    rr.log(base + "cam/agent", rr.Image(img).compress(jpeg_quality=85))
+                    rr.log(base + "cam/wrist", rr.Image(wrist).compress(jpeg_quality=85))
+                    st = np.concatenate((obs["robot0_eef_pos"], quat2axisangle(obs["robot0_eef_quat"]), obs["robot0_gripper_qpos"]))
+                    for i, nme in enumerate(STATE_NAMES): rr.log(base + f"state/{nme}", rr.Scalars(float(st[i])))
                 if not plan:
-                    img = np.ascontiguousarray(obs["agentview_image"][::-1, ::-1])
-                    wrist = np.ascontiguousarray(obs["robot0_eye_in_hand_image"][::-1, ::-1])
-                    img = image_tools.convert_to_uint8(image_tools.resize_with_pad(img, args.resize, args.resize))
-                    wrist = image_tools.convert_to_uint8(image_tools.resize_with_pad(wrist, args.resize, args.resize))
                     element = {
                         "observation/image": img,
                         "observation/wrist_image": wrist,
@@ -142,12 +183,26 @@ def main():
                     n_infer += 1
                     assert len(chunk) >= args.replan_steps, len(chunk)
                     plan.extend(chunk[: args.replan_steps])
+                    if rr is not None:
+                        rr.log(base + "infer/latency_ms", rr.Scalars(1000.0 * (time.time() - t0)))
+                        rr.log(base + "infer/chunk_index", rr.Scalars(float(n_infer)))
                 action = plan.popleft()
+                if rr is not None:
+                    for i, nme in enumerate(ACTION_NAMES): rr.log(base + f"action/{nme}", rr.Scalars(float(action[i])))
                 obs, _, done, _ = env.step(action.tolist())
                 if done:
                     break
                 t += 1
+            if vw is not None:
+                # hold the final frame for 1 s so the outcome is visible
+                for _ in range(10): vw.stdin.write(np.ascontiguousarray(np.concatenate([img, wrist], axis=1)).tobytes())
+                vw.stdin.close(); vw.wait()
+                final = video_dir / f"task{task_id:02d}_trial{ep:02d}_{'ok' if done else 'FAIL'}.mp4"
+                (video_dir / f"task{task_id:02d}_trial{ep:02d}.mp4").rename(final)
             check = bool(env.check_success()) if hasattr(env, "check_success") else None
+            if rr is not None:
+                rr.log(base + "outcome", rr.TextLog(f"{'SUCCESS' if done else 'FAIL (timeout)'} at step {t}, {n_infer} inferences, mean {1000*infer_s/max(n_infer,1):.0f} ms"), static=True)
+                rr.log(base + "success", rr.Scalars(1.0 if done else 0.0))
             k += int(done)
             rec = {"row": args.row, "suite": args.suite, "task_id": task_id, "task": desc, "trial": ep,
                    "init_state_index": ep, "success_done": bool(done), "check_success_at_end": check,
@@ -158,7 +213,7 @@ def main():
             print(f"[L2] task {task_id:2d} trial {ep:2d} success={int(done)} steps={t} "
                   f"infer={n_infer}x{(infer_s/max(n_infer,1))*1000:.0f}ms  ({rec['episode_s']}s)", flush=True)
         env.close()
-        n = args.trials_per_task
+        n = len(trial_list)
         lo, hi = wilson(k, n)
         summary["tasks"][str(task_id)] = {"task": desc, "k": k, "n": n, "rate": k / n, "ci95": [lo, hi],
                                           "task_s": round(time.time() - t_task)}

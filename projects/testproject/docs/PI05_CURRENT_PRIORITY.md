@@ -49,9 +49,10 @@ L5   score every checkpoint, same sim, same seeds, RTC off     done     2026-10-
        LoRA 10k/12.5k/15k   195 / 195 / 198
        LoRA 17.5k/20k/22.5k 195 / 199 / 190
        LoRA 25k/27.5k/30k   197 / 197 / 195      pooled 1761/1800 = 97.8%
-     Best 99.5% @20k; every checkpoint ≥95%; their 98.8 inside every
-     interval but 22.5k's. VERDICT: the 32 GB route WORKS; no difference
-     to full FT shown at n=200. Failures cluster on task 4 (drawer).
+     n=400 on 15k/20k/22.5k (2nd layout set): 98.0 / 99.0 / 96.2.
+     ★ KEEP 20k (396/400). VERDICT: the 32 GB route WORKS; no
+     difference to full FT shown. Failures = grasp-and-extract timeouts
+     on the drawer task (filmed). Rerun traces per episode now recorded.
 ```
 
 Answers: does LoRA work here · does full FT work when WE run it · LoRA vs

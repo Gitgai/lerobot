@@ -1,0 +1,1 @@
+{"row": "smoke_rerun", "suite": "libero_spatial", "task_id": 0, "task": "pick up the black bowl between the plate and the ramekin and place it on the plate", "trial": 20, "init_state_index": 20, "success_done": true, "check_success_at_end": true, "steps": 83, "n_infer": 15, "infer_s_mean": 0.6868407408396403, "episode_s": 11.4}

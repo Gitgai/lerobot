@@ -1,0 +1,36 @@
+{
+  "row": "smoke_rerun",
+  "suite": "libero_spatial",
+  "trials_per_task": 20,
+  "env_seed": 7,
+  "replan_steps": 5,
+  "max_steps": 220,
+  "num_steps_wait": 10,
+  "resize": 224,
+  "rtc": "none (openpi has none)",
+  "convention": "openpi examples/libero/main.py",
+  "server_metadata": "{}",
+  "started_utc": "2026-10-12T23:19:36Z",
+  "tasks": {
+    "0": {
+      "task": "pick up the black bowl between the plate and the ramekin and place it on the plate",
+      "k": 1,
+      "n": 1,
+      "rate": 1.0,
+      "ci95": [
+        0.20654329147389294,
+        1.0
+      ],
+      "task_s": 12
+    }
+  },
+  "k": 1,
+  "n": 1,
+  "rate": 1.0,
+  "ci95": [
+    0.20654329147389294,
+    1.0
+  ],
+  "wall_s": 13,
+  "finished_utc": "2026-10-12T23:19:49Z"
+}
