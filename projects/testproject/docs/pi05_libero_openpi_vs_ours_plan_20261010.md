@@ -1,6 +1,6 @@
 # LoRA vs full fine-tune of π0.5 on LIBERO — what we are doing
 
-Date: 2026-10-10, kiran-AI90. Status: **PLANNED, NOT STARTED.**
+Date: 2026-10-10, kiran-AI90. Status: **L1-L3, L5(LoRA) DONE 2026-10-12; L4 (full FT on 72 GB) open.**
 This file says WHAT and WHY. The HOW is sketched in the appendix and gets
 written properly when we start each phase.
 
@@ -74,11 +74,43 @@ L3  train LoRA here                  running since 2026-10-10 20:14Z — config
                                      while the GPU is free → --resume with 5k
                                      saves. Checkpoints then 10k,20k,25k,30k.
                                      Loss at 12.5k: 0.018 (from 0.094), smooth.
+                                     ⚠ 2026-10-11 ~16:17Z HOST REBOOT killed the
+                                     trainer at 18.8k; the 20k save (and the
+                                     armed 5k-resume) never happened; only 10k
+                                     survived (8.9 GB). 8.6 h lost. Restarted
+                                     18:40Z: score 10k → --resume from 10k with
+                                     save_interval=2500 (operator) → score all.
+                                     Checkpoints now every 2.5k from 12.5k.
                                      Note: openpi's "Step N: loss=" lines are
                                      stdout-buffered; the live log shows rate
                                      only. Loss is readable per checkpoint.
 L4  reproduce full FT on 72 GB       blocked — operator to name the machine
-L5  score ours, one table            todo
+L5  score ours, one table            LoRA side DONE 2026-10-12 15:08Z. Every
+                                     checkpoint, 200 episodes, L2 loop, seed 7:
+                                       step   success   CI95        fails/task
+                                       10000  195/200   94.3-98.9   1:2 5 6 8
+                                       12500  195/200   94.3-98.9   1:2 4 7 8
+                                       15000  198/200   96.4-99.7   4 6
+                                       17500  195/200   94.3-98.9   3 5 7 8 9
+                                       20000  199/200   97.2-99.9   7
+                                       22500  190/200   91.0-97.3   4:5 7:2 8:2 1
+                                       25000  197/200   95.7-99.5   4:2 5
+                                       27500  197/200   95.7-99.5   4:2 9
+                                       29999  195/200   94.3-98.9   4:3 8:2
+                                       pooled 1761/1800 = 97.8%
+                                     their full FT (L2): 200/200. Their published
+                                     98.8 lies inside every interval except
+                                     22.5k's. All failures are 230-step timeouts;
+                                     task 4 ("bowl in the top drawer of the
+                                     cabinet") accounts for 14 of 39 and gets
+                                     worse late (0 fails ≤12.5k, 12 from 22.5k).
+                                     No monotone trend after 15k: 99.0, 97.5,
+                                     99.5, 95.0, 98.5, 98.5, 97.5 — consistent
+                                     with ±2 points of n=200 noise plus a mild
+                                     late drift on one task. 30k is not better
+                                     than 15-20k; openpi's 30k default bought
+                                     nothing measurable here.
+                                     L4's row (our full FT) still pending.
 ```
 
 ## What we will do, in order
@@ -163,10 +195,16 @@ just the end.
 
 ```text
                                      LIBERO Spatial, n=200   examples seen
-openpi full FT (their checkpoint)    ____ %  reference 98.8   7.7M
-full FT (ours, big GPU, 3b)          ____ %                   30k x batch
-LoRA (ours, 5090)                    ____ %                   30k x batch
+openpi full FT (their checkpoint)    100.0 %  reference 98.8  7.7M
+full FT (ours, big GPU, 3b)          ____ %                   30k x batch   ← L4 pending
+LoRA (ours, 5090) best @20k          99.5 %   final @30k 97.5  960k
+                                     pooled over 9 ckpts 97.8
 ```
+
+**Reading (pre-registered bands):** LoRA ≥ 70% → "yes, LoRA works here" —
+it landed at 97.5-99.5. Gap to their checkpoint: 0.5-2.5 points, inside
+n=200 noise; reported, not attributed (they saw 8x the examples). The
+L4 row decides whether full FT at OUR volume does any better.
 
 Rows 2 and 3 at the SAME batch and steps differ only in the adapter route.
 Row 1 vs row 2 measures what their extra data and batch bought.
@@ -267,6 +305,17 @@ L5  l5_eval_lora.sh   serve each checkpoint on :8001, score with the L2 loop,
 GPU tenants      a 3.5-day-old lerobot_policy_server (Oct 7 rtc-remote-draft,
                  10 GB) was stopped with operator approval before L3
                  (stop_stale_policy_server.sh). Desktop holds ~1.7 GB.
+                 ★ DYNUS FLIGHTS SHARE THE GPU (measured 2026-10-11 14:17Z,
+                 diag_gpu2.log): while a flight runs, gzserver's sensor
+                 rendering is a GRAPHICS context at 29-59% SM; the trainer
+                 drops to 39-69% SM and its step time goes 3.5 → 5.5-5.8 s.
+                 With gzserver idle the trainer is back at 99% SM. CPU is
+                 NOT the cause (all-core 21% busy; trainer main thread at
+                 99% of one core; loaders at 4.5%). `--query-compute-apps`
+                 does not list graphics contexts — use `nvidia-smi pmon`
+                 or the full `nvidia-smi` table (type G). The interference
+                 is two-way: a saturating trainer also slows the flight's
+                 camera rendering. Budget ~1.6x step time during flights.
 openpi edits     ONE local addition to src/openpi/training/config.py
                  (pi05_libero_low_mem_finetune), marked, nothing else touched.
 ```

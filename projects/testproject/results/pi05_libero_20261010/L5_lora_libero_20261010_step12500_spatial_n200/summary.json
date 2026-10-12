@@ -1,0 +1,135 @@
+{
+  "row": "openpi_lora_lora_libero_20261010_step12500",
+  "suite": "libero_spatial",
+  "trials_per_task": 20,
+  "env_seed": 7,
+  "replan_steps": 5,
+  "max_steps": 220,
+  "num_steps_wait": 10,
+  "resize": 224,
+  "rtc": "none (openpi has none)",
+  "convention": "openpi examples/libero/main.py",
+  "server_metadata": "{}",
+  "started_utc": "2026-10-12T13:44:37Z",
+  "tasks": {
+    "0": {
+      "task": "pick up the black bowl between the plate and the ramekin and place it on the plate",
+      "k": 20,
+      "n": 20,
+      "rate": 1.0,
+      "ci95": [
+        0.8388698745050667,
+        1.0
+      ],
+      "task_s": 65
+    },
+    "1": {
+      "task": "pick up the black bowl next to the ramekin and place it on the plate",
+      "k": 18,
+      "n": 20,
+      "rate": 0.9,
+      "ci95": [
+        0.6989617935882066,
+        0.9721341060158468
+      ],
+      "task_s": 77
+    },
+    "2": {
+      "task": "pick up the black bowl from table center and place it on the plate",
+      "k": 20,
+      "n": 20,
+      "rate": 1.0,
+      "ci95": [
+        0.8388698745050667,
+        1.0
+      ],
+      "task_s": 64
+    },
+    "3": {
+      "task": "pick up the black bowl on the cookie box and place it on the plate",
+      "k": 20,
+      "n": 20,
+      "rate": 1.0,
+      "ci95": [
+        0.8388698745050667,
+        1.0
+      ],
+      "task_s": 59
+    },
+    "4": {
+      "task": "pick up the black bowl in the top drawer of the wooden cabinet and place it on the plate",
+      "k": 19,
+      "n": 20,
+      "rate": 0.95,
+      "ci95": [
+        0.7638641064874331,
+        0.9911187805671268
+      ],
+      "task_s": 81
+    },
+    "5": {
+      "task": "pick up the black bowl on the ramekin and place it on the plate",
+      "k": 20,
+      "n": 20,
+      "rate": 1.0,
+      "ci95": [
+        0.8388698745050667,
+        1.0
+      ],
+      "task_s": 73
+    },
+    "6": {
+      "task": "pick up the black bowl next to the cookie box and place it on the plate",
+      "k": 20,
+      "n": 20,
+      "rate": 1.0,
+      "ci95": [
+        0.8388698745050667,
+        1.0
+      ],
+      "task_s": 71
+    },
+    "7": {
+      "task": "pick up the black bowl on the stove and place it on the plate",
+      "k": 19,
+      "n": 20,
+      "rate": 0.95,
+      "ci95": [
+        0.7638641064874331,
+        0.9911187805671268
+      ],
+      "task_s": 81
+    },
+    "8": {
+      "task": "pick up the black bowl next to the plate and place it on the plate",
+      "k": 19,
+      "n": 20,
+      "rate": 0.95,
+      "ci95": [
+        0.7638641064874331,
+        0.9911187805671268
+      ],
+      "task_s": 69
+    },
+    "9": {
+      "task": "pick up the black bowl on the wooden cabinet and place it on the plate",
+      "k": 20,
+      "n": 20,
+      "rate": 1.0,
+      "ci95": [
+        0.8388698745050667,
+        1.0
+      ],
+      "task_s": 74
+    }
+  },
+  "k": 195,
+  "n": 200,
+  "rate": 0.975,
+  "ci95": [
+    0.9428208558483829,
+    0.9892754385292123
+  ],
+  "wall_s": 721,
+  "finished_utc": "2026-10-12T13:56:38Z"
+}

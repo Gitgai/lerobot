@@ -1,6 +1,6 @@
 # π0.5 lane — Current Priority and Status
 
-Last updated: 2026-10-10
+Last updated: 2026-10-11
 
 **This file is the ROUTER and the TRACKER: what is open, in what order, and
 where each step stands. It is NOT a log.** Detail, gates and pre-registered
@@ -36,18 +36,22 @@ L2   score THEIR pi05_libero full-FT checkpoint, our sim,      done     2026-10-
      Spatial n=200, RTC off. → 200/200 = 100% (CI95 98.1-100),           results/pi05_libero_20261010/
      their 98.8 is inside the interval: HARNESS AGREES. 9.2 min          L2_openpi_pi05_libero_spatial_n200/
      wall. Loop: l2_eval_openpi.py (their convention, logged).
-L3   train openpi LoRA on LIBERO here, 30k steps from          running  launched 2026-10-10 20:14Z
-     pi05_base. Gate PASS: trainable 467M of 3.40B (LoRA 50M +          batch 32, 3.5 s/step, ~29 h
-     SigLIP 415M + proj 2M = openpi's own "low_mem" = "LoRA +            6.5k/30k at 10-11 02:36Z
-     vision encoder"). bs32 fits, peak 31.9 of 32.6 GB.                 exp lora_libero_20261010
-     12.6k at 10-11 08:35Z, loss 0.094→0.018, smooth.                    ARMED 11:29Z: at the 20k
-     ⚠ 10k save cadence → at 20k (≈16:00Z): stop, score 10k+20k           checkpoint l3_resume_5k.sh
-     (L5, GPU free in the gap), --resume with 5k saves. Nothing lost.      fires automatically
+L3   train openpi LoRA on LIBERO here, 30k steps from          done     2026-10-12 13:43Z
+     pi05_base. Trainable 467M of 3.40B (LoRA 50M + SigLIP 415M            bs32, 3.4 s/step, ~28 h of
+     + proj 2M = openpi's own "low_mem" = "LoRA + vision encoder").         GPU incl. an 8.6 h loss to a
+     Loss 0.094 → 0.014. 9 checkpoints kept (10k, 12.5k…27.5k, 29999).      host reboot at 18.8k
 L4   reproduce THEIR full FT on the 72 GB GPU, recipe as       blocked  operator to point
      published, batch size the only change; no fit → rent               to the machine
      a bigger box (prefer multi-GPU node, batch 256)
-L5   score L3 and L4 at 10k/20k/30k, same sim, same seeds;     todo     after L2-L4
-     one table, three rows, RTC off
+L5   score every checkpoint, same sim, same seeds, RTC off     done     2026-10-12 15:08Z (L3 side)
+     ★ LoRA vs their full FT on LIBERO Spatial, n=200 each:                L4's row pending
+       their full FT        200/200 = 100%
+       LoRA 10k/12.5k/15k   195 / 195 / 198
+       LoRA 17.5k/20k/22.5k 195 / 199 / 190
+       LoRA 25k/27.5k/30k   197 / 197 / 195      pooled 1761/1800 = 97.8%
+     Best 99.5% @20k; every checkpoint ≥95%; their 98.8 inside every
+     interval but 22.5k's. VERDICT: the 32 GB route WORKS; no difference
+     to full FT shown at n=200. Failures cluster on task 4 (drawer).
 ```
 
 Answers: does LoRA work here · does full FT work when WE run it · LoRA vs
@@ -77,11 +81,10 @@ in our scene; 3,300-ep 11-task Isaac Lab corpus (other scene, train-only);
 ## Order of work
 
 ```text
-1  L1 now — it decides the stack for everything else and costs an hour
-2  O0 and O1a in parallel with L — the recorder needs no decision and no GPU
-   contention with L2/L3 if scheduled around them; days, not weeks
-3  L2, L3 on the 5090; L4 as soon as the 72 GB machine is named
-4  L5 → write-up → O1b → O3 (O2 only on a clear O1b)
+1  ✔ L1, L2, L3, L5(LoRA) done 2026-10-10..12 — LoRA works on LIBERO
+2  L4 as soon as the 72 GB machine is named (the only open LIBERO row)
+3  O0 and O1a now — the recorder needs no decision; GPU is free
+4  write-up of L → O1b → O3 (O2 only on a clear O1b)
 ```
 
 ## Standing decisions (do not reopen without a new fact)
@@ -102,8 +105,8 @@ until it checkpoints AND resumes · loss is NOT a proxy for capability · state
 every lever explicitly, defaults included (dtype and gradient_checkpointing
 both default OFF in lerobot) · setsid for long runs · check
 nvidia-smi --query-compute-apps before launching · confirm rtc_config=None
-at every sim policy load · checkpoint at most every 5k steps on any run
-longer than ~10 h (operator, 2026-10-11) · TMPDIR=/home/kiran/tmp in every
+at every sim policy load · checkpoint every 2.5k steps on any run
+longer than ~10 h (operator, 2026-10-11; a reboot cost 8.6 h the same day) · TMPDIR=/home/kiran/tmp in every
 launched script while /tmp's quota is exhausted · never cap JAX memory below
 what the smoke needs — a 0.6 fraction masqueraded as an OOM on 2026-10-10
 ```
