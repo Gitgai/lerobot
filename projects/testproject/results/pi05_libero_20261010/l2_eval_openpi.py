@@ -145,9 +145,10 @@ def main():
                     rr.init(f"libero_{args.row}", recording_id=f"{args.row}_{ep_id}", spawn=False)
                     rr.save(str(rerun_dir / f"{ep_id}.rrd"))
                 base = "" if args.rerun == "save" else ep_id + "/"
-                rr.log(base + "meta", rr.TextDocument(f"row {args.row}\ntask {task_id}: {desc}\ntrial {ep} (init state {ep})\nreplan {args.replan_steps}, cap {max_steps}, RTC none"), static=True)
+                rr.log(base + "meta", rr.TextDocument(f"row {args.row}\ntask {task_id}: {desc}\ntrial {ep} (init state {ep})\nreplan {args.replan_steps}, cap {max_steps}, RTC none\n\n3D view: ee/path = end-effector position (world, m); ee/plan = the current 10-step predicted chunk integrated from the live pose at 0.05 m per unit position delta (LIBERO OSC_POSE output_max) — an APPROXIMATION for shape, not a controller replay.\ninfer/chunk = full 10x7 predicted action array at each policy call (rows = future steps, cols = dx dy dz drx dry drz gripper)."), static=True)
                 for i, nme in enumerate(STATE_NAMES): rr.log(base + f"state/{nme}", rr.SeriesLines(names=nme), static=True)
                 for i, nme in enumerate(ACTION_NAMES): rr.log(base + f"action/{nme}", rr.SeriesLines(names=nme), static=True)
+            ee_hist = []
             vw = None
             if video_dir:
                 import subprocess
@@ -170,6 +171,9 @@ def main():
                     rr.log(base + "cam/wrist", rr.Image(wrist).compress(jpeg_quality=85))
                     st = np.concatenate((obs["robot0_eef_pos"], quat2axisangle(obs["robot0_eef_quat"]), obs["robot0_gripper_qpos"]))
                     for i, nme in enumerate(STATE_NAMES): rr.log(base + f"state/{nme}", rr.Scalars(float(st[i])))
+                    ee_hist.append(np.asarray(obs["robot0_eef_pos"], dtype=np.float32))
+                    rr.log(base + "ee/pose", rr.Points3D([ee_hist[-1]], colors=[[0, 200, 255]], radii=0.006))
+                    rr.log(base + "ee/path", rr.LineStrips3D([np.vstack(ee_hist)], colors=[[0, 120, 255]], radii=0.0015))
                 if not plan:
                     element = {
                         "observation/image": img,
@@ -186,6 +190,16 @@ def main():
                     if rr is not None:
                         rr.log(base + "infer/latency_ms", rr.Scalars(1000.0 * (time.time() - t0)))
                         rr.log(base + "infer/chunk_index", rr.Scalars(float(n_infer)))
+                        ch = np.asarray(chunk, dtype=np.float32)
+                        rr.log(base + "infer/chunk", rr.Tensor(ch, dim_names=("future_step", "action_dim")))
+                        # plan-vs-execute: how far does the gripper command at horizon 0 and 9 sit, and the vertical intent
+                        rr.log(base + "plan/gripper_h0", rr.Scalars(float(ch[0, 6])))
+                        rr.log(base + "plan/gripper_h9", rr.Scalars(float(ch[-1, 6])))
+                        rr.log(base + "plan/dz_sum", rr.Scalars(float(ch[:, 2].sum())))
+                        # 3D: the planned path, integrated from the live end-effector position (approximate scale)
+                        pos0 = np.asarray(obs["robot0_eef_pos"], dtype=np.float32)
+                        plan_pts = pos0 + np.cumsum(ch[:, :3] * 0.05, axis=0)
+                        rr.log(base + "ee/plan", rr.LineStrips3D([np.vstack([pos0, plan_pts])], colors=[[255, 160, 0]], radii=0.002))
                 action = plan.popleft()
                 if rr is not None:
                     for i, nme in enumerate(ACTION_NAMES): rr.log(base + f"action/{nme}", rr.Scalars(float(action[i])))

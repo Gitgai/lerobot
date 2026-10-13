@@ -136,6 +136,10 @@ L5  score ours, one table            LoRA side DONE 2026-10-12 15:08Z. Every
                                      inference latency per chunk, outcome. One .rrd
                                      per episode; open with `rerun <file>`. Covers
                                      LIVE_VIZ_PLAN.md phases 1-2 for the sim path.
+                                     2026-10-13: + infer/chunk (full 10x7 predicted
+                                     chunk per call), plan/* series, 3D ee/path with
+                                     the planned chunk overlaid (ee/plan). Channel
+                                     list and arm follow-ups in LIVE_VIZ_PLAN.md.
 ```
 
 ## What we will do, in order

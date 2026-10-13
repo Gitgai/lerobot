@@ -140,3 +140,51 @@ init_rerun -> connect_grpc); utils/visualization_utils.py:26-48 (init_rerun spaw
 connect_grpc), :100-129 (rr.log scalars/images); n16_realarm_client.py adapter
 ~line 187-205 (obs images + state + action0); rerun 0.26.2 dir() (serve_web/serve_grpc/
 connect_grpc present).
+
+---
+
+## 2026-10-13 UPDATE — the SIM path is instrumented; phases 1-2 are done there
+
+What landed (results/pi05_libero_20261010/l2_eval_openpi.py, the LIBERO loop
+that scored every pi0.5 row; rerun-sdk 0.26.2 now in the probe .venv312):
+
+```text
+--video-dir DIR        one mp4 per episode, agentview | wrist, 224 px, 10 fps (ffmpeg pipe)
+--rerun save           one .rrd per episode (recording_id = row + task + trial)
+--rerun serve          LIVE: grpc :9876 + web viewer :9090 (open in a browser; works
+                       over ZeroTier from the GPU box). Same channels either way.
+channels               cam/agent, cam/wrist                 JPEG q85 each step
+                       state/{eef_x,y,z,rot_ax,ay,az,grip_q0,q1}   8 series
+                       action/{dx,dy,dz,drx,dry,drz,gripper}       7 series (executed)
+                       infer/latency_ms, infer/chunk_index          per policy call
+                       infer/chunk  10x7 tensor = the WHOLE predicted chunk per call
+                       plan/gripper_h0, plan/gripper_h9, plan/dz_sum  plan-vs-execute
+                       ee/pose, ee/path  3D end-effector point + trajectory (world m)
+                       ee/plan  3D planned chunk integrated from the live pose at
+                                0.05 m/unit (OSC_POSE output_max) — shape only
+                       meta (TextDocument), outcome (TextLog), success (scalar)
+timeline               "step" = simulation step
+open                   rerun <file.rrd> [more.rrd]  (symlinked into ~/.local/bin)
+```
+
+Why these three additions (operator, 2026-10-13): the executed action is half
+the story — `infer/chunk` keeps what the policy INTENDED each call, so a stalled
+grasp can be read as "planned a lift that never ran" vs "planned nothing";
+the 3D path + planned overlay shows at a glance whether the plan points out of
+the drawer; motor loads + fault register are the arm-only equivalent (below).
+
+Verified on the drawer layout task 4 / trial 37 (22.5k fails, 20k succeeds):
+results/pi05_libero_20261010/viz_pair_task4_trial37/.
+
+### What this leaves for the ARM (Phase 2/3 of the original plan, unchanged)
+
+```text
+same logging function, called from the arm client once per chunk:
+  front + wrist frames · 6 joint positions + gripper.pos · commanded action0 vs
+  executed state · per-chunk latency · and the arm-only channels:
+  motors/<name>/load, temperature, voltage          present_* registers
+  motors/<name>/status   the fault byte (voltage=1, overload=32) as a scalar
+                         + a TextLog the moment any bit sets
+headless host → --rerun serve, viewer in the operator's browser over ZeroTier
+budget: encode JPEG, log once per chunk not per tick, keep the RTC loop clear
+```
