@@ -24,7 +24,7 @@ real task.
 
 ---
 
-## ▶ L — LIBERO: LoRA vs full fine-tune (plan: `pi05_libero_openpi_vs_ours_plan_20261010.md`)
+## ▶ L — LIBERO: LoRA vs full fine-tune (plan: `pi05_libero_openpi_vs_ours_plan_20261010.md` · **results: `RESULTS_pi05_libero_lora_vs_fullft_20261013.md`**)
 
 ```text
 ID   step                                                      status   owner/when

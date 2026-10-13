@@ -1,6 +1,7 @@
 # LoRA vs full fine-tune of π0.5 on LIBERO — what we are doing
 
 Date: 2026-10-10, kiran-AI90. Status: **L1-L3, L5(LoRA) DONE 2026-10-12; L4 (full FT on 72 GB) open.**
+➡ **Standalone write-up of what was done and found: `RESULTS_pi05_libero_lora_vs_fullft_20261013.md`.**
 This file says WHAT and WHY. The HOW is sketched in the appendix and gets
 written properly when we start each phase.
 
