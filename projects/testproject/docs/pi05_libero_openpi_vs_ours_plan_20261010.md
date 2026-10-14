@@ -85,14 +85,28 @@ L3  train LoRA here                  running since 2026-10-10 20:14Z — config
                                      Note: openpi's "Step N: loss=" lines are
                                      stdout-buffered; the live log shows rate
                                      only. Loss is readable per checkpoint.
-L4  reproduce full FT on 72 GB       next — 2026-10-14: the 72 GB GPU is GPU 1 of
-                                     kiran-AI90 (RTX PRO 5000 72GB Blackwell,
-                                     73,415 MiB). Same openpi venv and dataset;
-                                     run with CUDA_VISIBLE_DEVICES=1. Step 1 is
-                                     the 50-step smoke of the pi05_libero config
-                                     as published (fp32 weights, fp32 AdamW, EMA
-                                     0.999) at the largest batch that fits, EMA
-                                     untouched. Awaiting operator go.
+L4  reproduce full FT on 72 GB       blocked 2026-10-14 05:41Z — DOES NOT FIT.
+                                     Smoke on GPU 1 (RTX PRO 5000 72GB, 73,415 MiB
+                                     total, JAX cap 95%), recipe as published
+                                     (fp32 weights, fp32 AdamW, EMA 0.999):
+                                       batch 32  OOM at 66.1 GB used, asked +20.2 GB
+                                       batch 16  OOM at 66.1 GB used, asked +18.0 GB
+                                       batch  8  OOM at 66.0 GB used, asked +16.9 GB
+                                     Train state initialised fine (~60 GB persistent:
+                                     3.40B × (4 w + 4 g + 8 Adam + 4 EMA) ≈ 68 GB
+                                     before activations, matching the 66 GB peak);
+                                     the OOM is inside the FIRST train_step, and the
+                                     requested block barely shrinks with batch, so
+                                     no single-card batch size rescues it. Their
+                                     ">70 GB" row is honest; 72 GB is short.
+                                     Per the standing decision the recipe is NOT
+                                     bent (no EMA-off, no bf16): NEXT = a bigger
+                                     machine — ideally a multi-GPU node so
+                                     fsdp_devices>1 shards the state AND batch 256
+                                     becomes possible (a true reproduction).
+                                     Records: results/pi05_libero_20261010/
+                                     l4_smoke.log, l4_smoke_bs{32,16,8}.log.
+                                     Norm stats for pi05_libero computed (assets/).
 L5  score ours, one table            LoRA side DONE 2026-10-12 15:08Z. Every
                                      checkpoint, 200 episodes, L2 loop, seed 7:
                                        step   success   CI95        fails/task
