@@ -119,6 +119,22 @@ L4  reproduce full FT on 72 GB       blocked 2026-10-14 05:41Z — DOES NOT FIT.
                                      unsupported there). ⇒ this host cannot run
                                      the published recipe in any configuration.
                                      Record: l4_smoke_fsdp2.log.
+L4-noEMA  full FT, EMA off           running since 2026-10-14 ~20:00Z — OPERATOR
+                                     AMENDED THE DECISION: fill the row on the 72 GB
+                                     card with the SMALLEST deviation that fits.
+                                     Config pi05_libero_noema = pi05_libero with
+                                     ema_decay=None and nothing else changed
+                                     (verified: model, data, lr schedule, optimizer,
+                                     batch default all equal). fp32 weights, fp32
+                                     AdamW, cosine 5e-5 w/ 10k warmup, clip 1.0 —
+                                     training arithmetic identical; only the final
+                                     weight averaging is gone (-12.7 GiB). openpi
+                                     itself runs EMA-off for its LoRA configs.
+                                     Half precision was NOT taken (larger bend).
+                                     Smoke batch 32→16→8 on GPU 1, then 30k steps,
+                                     saves every 2500, then every checkpoint scored
+                                     with the L2 loop (server on GPU 0). Every table
+                                     carries the label "full FT, EMA off".
 L5  score ours, one table            LoRA side DONE 2026-10-12 15:08Z. Every
                                      checkpoint, 200 episodes, L2 loop, seed 7:
                                        step   success   CI95        fails/task
@@ -321,8 +337,11 @@ one simulator for all policies               or the numbers are not comparable
 n = 200 per eval                             n=40 cost us a 5-point error once
 August full-FT results not compared          operator, 2026-10-10
 full FT reproduced by us on a big GPU        operator, 2026-10-10
-their recipe is NOT bent to fit a card       if 72 GB is short, get a bigger
-                                             machine; only batch size may move
+their recipe is NOT bent to fit a card       AMENDED 2026-10-14: on the 72 GB card
+                                             EMA may be switched off (smallest
+                                             deviation; openpi does it for LoRA);
+                                             half precision still forbidden; the
+                                             row is labelled "EMA off"; batch may move
 LoRA runs on the 5090, full FT elsewhere     each row answers its own question
 ```
 

@@ -40,13 +40,11 @@ L3   train openpi LoRA on LIBERO here, 30k steps from          done     2026-10-
      pi05_base. Trainable 467M of 3.40B (LoRA 50M + SigLIP 415M            bs32, 3.4 s/step, ~28 h of
      + proj 2M = openpi's own "low_mem" = "LoRA + vision encoder").         GPU incl. an 8.6 h loss to a
      Loss 0.094 → 0.014. 9 checkpoints kept (10k, 12.5k…27.5k, 29999).      host reboot at 18.8k
-L4   reproduce THEIR full FT, recipe as published, batch       blocked  2026-10-14 05:41Z: DOES NOT
-     size the only change. Smoke on the new 72 GB GPU 1: OOM             FIT on 72 GB (3 batches tried,
-     at batch 32/16/8, all at 66 GB used + 17-20 GB asked,               same wall). NEXT: rent a
-     inside the first train step → persistent state alone ≈ 68 GB.       multi-GPU node (fsdp + batch
-     Both GPUs via fsdp_devices=2: JAX refuses mixed GPU models            256 = true reproduction),
-     (5090 + PRO 5000), fails before touching memory. Recipe NOT           or a single ≥96 GB card.
-     bent (decision stands). Norm stats done.
+L4   reproduce THEIR full FT on 72 GB: as published it does    running  L4-noEMA since 2026-10-14
+     NOT fit (OOM at 66+17 GB, every batch; both GPUs via fsdp            ~20:00Z: smoke → 30k run on
+     refused — mixed GPU models). OPERATOR AMENDED (2026-10-14):           GPU 1, saves every 2500 →
+     run it with EMA OFF, nothing else changed; row labelled              score all → 3-row table.
+     "full FT, EMA off". Half precision stays forbidden.                  ~1 day. Config pi05_libero_noema.
 L5   score every checkpoint, same sim, same seeds, RTC off     done     2026-10-12 15:08Z (L3 side)
      ★ LoRA vs their full FT on LIBERO Spatial, n=200 each:                L4's row pending
        their full FT        200/200 = 100%
@@ -100,6 +98,7 @@ in our scene; 3,300-ep 11-task Isaac Lab corpus (other scene, train-only);
 ```text
 openpi stack first, LeRobot fallback          their recipe NEVER bent to fit a card
 their checkpoint evaluated, not retrained     one simulator per table
+EMA-off allowed on 72 GB (2026-10-14); bf16 not  the "EMA off" label travels with the row
 n=200 LIBERO · 100/row LeIsaac · 50/task O2   RTC off in sim, ON on the real arm
 August full-FT results not compared           LeRobot (not openpi) for the SO-101 task
 DYNUS capped at 16 GB; shut it down for long runs (the old "47 GB" is stale)
