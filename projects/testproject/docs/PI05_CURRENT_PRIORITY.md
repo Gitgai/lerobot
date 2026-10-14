@@ -1,6 +1,6 @@
 # π0.5 lane — Current Priority and Status
 
-Last updated: 2026-10-11
+Last updated: 2026-10-14
 
 **This file is the ROUTER and the TRACKER: what is open, in what order, and
 where each step stands. It is NOT a log.** Detail, gates and pre-registered
@@ -40,9 +40,10 @@ L3   train openpi LoRA on LIBERO here, 30k steps from          done     2026-10-
      pi05_base. Trainable 467M of 3.40B (LoRA 50M + SigLIP 415M            bs32, 3.4 s/step, ~28 h of
      + proj 2M = openpi's own "low_mem" = "LoRA + vision encoder").         GPU incl. an 8.6 h loss to a
      Loss 0.094 → 0.014. 9 checkpoints kept (10k, 12.5k…27.5k, 29999).      host reboot at 18.8k
-L4   reproduce THEIR full FT on the 72 GB GPU, recipe as       blocked  operator to point
-     published, batch size the only change; no fit → rent               to the machine
-     a bigger box (prefer multi-GPU node, batch 256)
+L4   reproduce THEIR full FT on the 72 GB GPU, recipe as       next     ★ UNBLOCKED 2026-10-14: an
+     published, batch size the only change; no fit → rent a              RTX PRO 5000 72GB is now
+     bigger box (prefer multi-GPU node, batch 256).                       GPU 1 in THIS machine (idle).
+     Step 1 = 50-step smoke on GPU 1 (CUDA_VISIBLE_DEVICES=1).            Awaiting operator go.
 L5   score every checkpoint, same sim, same seeds, RTC off     done     2026-10-12 15:08Z (L3 side)
      ★ LoRA vs their full FT on LIBERO Spatial, n=200 each:                L4's row pending
        their full FT        200/200 = 100%
@@ -83,9 +84,11 @@ in our scene; 3,300-ep 11-task Isaac Lab corpus (other scene, train-only);
 
 ```text
 1  ✔ L1, L2, L3, L5(LoRA) done 2026-10-10..12 — LoRA works on LIBERO
-2  L4 as soon as the 72 GB machine is named (the only open LIBERO row)
-3  O0 and O1a now — the recorder needs no decision; GPU is free
-4  write-up of L → O1b → O3 (O2 only on a clear O1b)
+   ✔ results write-up: RESULTS_pi05_libero_lora_vs_fullft_20261013.md
+2  L4 NOW — the 72 GB card is installed (GPU 1): smoke, then the ~1-day run
+3  openpi mirror push (needs operator: create Gitgai/openpi, 3 commands)
+4  O0 and O1a in parallel on GPU 0 once the 'openpi-lora-recheck' process
+   someone started 2026-10-14 is done; then O1b → O3 (O2 only on a clear O1b)
 ```
 
 ## Standing decisions (do not reopen without a new fact)

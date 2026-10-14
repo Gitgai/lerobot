@@ -85,7 +85,14 @@ L3  train LoRA here                  running since 2026-10-10 20:14Z — config
                                      Note: openpi's "Step N: loss=" lines are
                                      stdout-buffered; the live log shows rate
                                      only. Loss is readable per checkpoint.
-L4  reproduce full FT on 72 GB       blocked — operator to name the machine
+L4  reproduce full FT on 72 GB       next — 2026-10-14: the 72 GB GPU is GPU 1 of
+                                     kiran-AI90 (RTX PRO 5000 72GB Blackwell,
+                                     73,415 MiB). Same openpi venv and dataset;
+                                     run with CUDA_VISIBLE_DEVICES=1. Step 1 is
+                                     the 50-step smoke of the pi05_libero config
+                                     as published (fp32 weights, fp32 AdamW, EMA
+                                     0.999) at the largest batch that fits, EMA
+                                     untouched. Awaiting operator go.
 L5  score ours, one table            LoRA side DONE 2026-10-12 15:08Z. Every
                                      checkpoint, 200 episodes, L2 loop, seed 7:
                                        step   success   CI95        fails/task
@@ -183,7 +190,8 @@ launch, our harness. Reproducing their number ourselves validates the whole
 pipeline end to end, and it gives the LoRA row a fair partner.
 
 ```text
-where     a 72 GB GPU the operator will point to (a different machine)
+where     GPU 1 of this machine since 2026-10-14 (RTX PRO 5000 72GB); the
+          5090 stays free for scoring / the orange recorder
 recipe    openpi's pi05_libero config AS PUBLISHED — fp32 weights, fp32
           AdamW, EMA 0.999, 30k steps — with ONE forced change: batch size.
           Their 256 is a multi-GPU number; one card runs what fits.
