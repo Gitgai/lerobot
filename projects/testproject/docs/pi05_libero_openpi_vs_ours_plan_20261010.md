@@ -107,6 +107,18 @@ L4  reproduce full FT on 72 GB       blocked 2026-10-14 05:41Z — DOES NOT FIT.
                                      Records: results/pi05_libero_20261010/
                                      l4_smoke.log, l4_smoke_bs{32,16,8}.log.
                                      Norm stats for pi05_libero computed (assets/).
+                                     BOTH GPUs TOGETHER (operator's suggestion,
+                                     2026-10-14 16:57Z): fsdp_devices=2 across the
+                                     5090 + PRO 5000 REFUSED before any memory was
+                                     touched — JAX/XLA: "executable is built for
+                                     device CUDA:0 of type RTX 5090; cannot run it
+                                     on CUDA:1 of type RTX PRO 5000". One compiled
+                                     program cannot span two different GPU models.
+                                     openpi's PyTorch port has DDP only (replicates
+                                     the full model per GPU, no memory relief; FSDP
+                                     unsupported there). ⇒ this host cannot run
+                                     the published recipe in any configuration.
+                                     Record: l4_smoke_fsdp2.log.
 L5  score ours, one table            LoRA side DONE 2026-10-12 15:08Z. Every
                                      checkpoint, 200 episodes, L2 loop, seed 7:
                                        step   success   CI95        fails/task

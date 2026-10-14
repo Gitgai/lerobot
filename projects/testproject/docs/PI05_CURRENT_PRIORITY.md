@@ -44,7 +44,9 @@ L4   reproduce THEIR full FT, recipe as published, batch       blocked  2026-10-
      size the only change. Smoke on the new 72 GB GPU 1: OOM             FIT on 72 GB (3 batches tried,
      at batch 32/16/8, all at 66 GB used + 17-20 GB asked,               same wall). NEXT: rent a
      inside the first train step → persistent state alone ≈ 68 GB.       multi-GPU node (fsdp + batch
-     Recipe NOT bent (decision stands). Norm stats done.                 256 = true reproduction).
+     Both GPUs via fsdp_devices=2: JAX refuses mixed GPU models            256 = true reproduction),
+     (5090 + PRO 5000), fails before touching memory. Recipe NOT           or a single ≥96 GB card.
+     bent (decision stands). Norm stats done.
 L5   score every checkpoint, same sim, same seeds, RTC off     done     2026-10-12 15:08Z (L3 side)
      ★ LoRA vs their full FT on LIBERO Spatial, n=200 each:                L4's row pending
        their full FT        200/200 = 100%
