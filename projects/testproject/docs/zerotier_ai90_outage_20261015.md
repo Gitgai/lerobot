@@ -55,3 +55,12 @@ Sampler log: ~/tmp/zt_sample_1041.log. STUN probe: ~/tmp/stun_probe.py.
   Lesson: the 09:22-local primaryPort change (my suggestion) correlated with the slide into
   TUNNELED mode and then total loss; revert it first. Access path independent of ZeroTier
   (reverse SSH tunnel to a host the operator controls) proposed, awaiting approval.
+
+## Resolved 17:13Z
+Operator (root) ran `sudo rm /var/lib/zerotier-one/local.conf && sudo systemctl restart zerotier-one`
+at 17:00:54Z (also truncated syslog + installed the rsyslog drop rule). ~12 min later: `ONLINE`,
+all four roots DIRECT over UDP for the first time since the outage, address 192.168.194.220 back,
+laptop (.228) and kglenova (.17) reachable. Root cause of the original "roots silent to AI90"
+still unproven; what is established: the primaryPort change made it worse (TUNNELED → no address)
+and a clean restart on the default port fixed it. If it recurs: restart zerotier-one first,
+never change ports; then capture root replies with tcpdump before anything else.
