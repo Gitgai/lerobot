@@ -135,3 +135,12 @@ systemd user units. Budget now: 310 GB free vs 7 × 31 = 217 GB to write → fit
 no further log growth assumed; the new desktop app (pid 1398552, 12:56 local) is NOT looping.
 DONE ~17:00Z (operator, root): /var/log/syslog truncated (165 GB → 0) and rsyslog drop rule
 /etc/rsyslog.d/05-claude-desktop-gpu-flood.conf installed. Root 310 → 470 GB free. Incident §5 closed.
+
+## 6. NOTE 2026-10-15 20:30Z — host RAM at checkpoint time (resumed run)
+The 15k save (first since the resume) pushed swap from 18 to 50 GB of 63 for ~1 min with
+500-700 MB/s of swap traffic; trainer unit peak = 39 GB RSS + 37 GB swap (systemd accounting).
+Orbax stages the whole 31 GB train state in host memory to write it; the resumed process seems to
+hold more host memory than the original (pre-kill saves showed swap ≤8 GB). The save committed
+at 20:31Z and the rate returned to 5.1 s/step; swap settled at 22 GB. Headroom: 59 GB RAM +
+63 GB swap vs ~76 GB peak → OK but not comfortable; 6 saves to go. Docker/DYNUS containers hold
+only MBs; the 11 GB /tmp scratch (DYNUS) is the one reclaimable block if it gets tight.
