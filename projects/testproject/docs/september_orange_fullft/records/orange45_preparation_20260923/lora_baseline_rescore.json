@@ -1,0 +1,677 @@
+{
+  "status": "rescored_saved_predictions_not_new_inference",
+  "windows": 90,
+  "seeds": [
+    1000,
+    1001
+  ],
+  "original_validation_episodes": [
+    2,
+    7,
+    12,
+    17,
+    32,
+    37,
+    42,
+    46,
+    58
+  ],
+  "mae_per_joint": [
+    7.712913513183594,
+    12.022378921508789,
+    10.36302375793457,
+    12.64880084991455,
+    2.4285871982574463,
+    3.0694234371185303
+  ],
+  "mae_percent_new_training_quantile_span": 5.496517751123651,
+  "first_action_mae_per_joint": [
+    2.7462756633758545,
+    3.543396234512329,
+    3.6200313568115234,
+    4.291294574737549,
+    1.1932425498962402,
+    1.3396819829940796
+  ],
+  "input_prediction_sha256": "34d4aea174b3ba095e8f5dca12902fe510e53bf0be0177f04ac0a8f0c5357dfa",
+  "manifest_sha256": "e17b50b475aec58209df60e5ec89a6517082f1993a2d12002e6cb7abda8af307",
+  "comparison_windows": [
+    {
+      "episode": 2,
+      "frame": 0,
+      "dataset_index": 0,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 2,
+      "frame": 101,
+      "dataset_index": 101,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 2,
+      "frame": 203,
+      "dataset_index": 203,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 2,
+      "frame": 305,
+      "dataset_index": 305,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 2,
+      "frame": 406,
+      "dataset_index": 406,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 2,
+      "frame": 508,
+      "dataset_index": 508,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 2,
+      "frame": 610,
+      "dataset_index": 610,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 2,
+      "frame": 711,
+      "dataset_index": 711,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 2,
+      "frame": 813,
+      "dataset_index": 813,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 2,
+      "frame": 915,
+      "dataset_index": 915,
+      "valid_targets": 1,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 7,
+      "frame": 0,
+      "dataset_index": 916,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 7,
+      "frame": 108,
+      "dataset_index": 1024,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 7,
+      "frame": 216,
+      "dataset_index": 1132,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 7,
+      "frame": 324,
+      "dataset_index": 1240,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 7,
+      "frame": 432,
+      "dataset_index": 1348,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 7,
+      "frame": 540,
+      "dataset_index": 1456,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 7,
+      "frame": 648,
+      "dataset_index": 1564,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 7,
+      "frame": 756,
+      "dataset_index": 1672,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 7,
+      "frame": 864,
+      "dataset_index": 1780,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 7,
+      "frame": 972,
+      "dataset_index": 1888,
+      "valid_targets": 1,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 12,
+      "frame": 0,
+      "dataset_index": 1889,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 12,
+      "frame": 121,
+      "dataset_index": 2010,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 12,
+      "frame": 242,
+      "dataset_index": 2131,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 12,
+      "frame": 364,
+      "dataset_index": 2253,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 12,
+      "frame": 485,
+      "dataset_index": 2374,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 12,
+      "frame": 607,
+      "dataset_index": 2496,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 12,
+      "frame": 728,
+      "dataset_index": 2617,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 12,
+      "frame": 850,
+      "dataset_index": 2739,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 12,
+      "frame": 971,
+      "dataset_index": 2860,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 12,
+      "frame": 1093,
+      "dataset_index": 2982,
+      "valid_targets": 1,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 17,
+      "frame": 0,
+      "dataset_index": 2983,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 17,
+      "frame": 115,
+      "dataset_index": 3098,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 17,
+      "frame": 231,
+      "dataset_index": 3214,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 17,
+      "frame": 347,
+      "dataset_index": 3330,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 17,
+      "frame": 463,
+      "dataset_index": 3446,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 17,
+      "frame": 578,
+      "dataset_index": 3561,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 17,
+      "frame": 694,
+      "dataset_index": 3677,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 17,
+      "frame": 810,
+      "dataset_index": 3793,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 17,
+      "frame": 926,
+      "dataset_index": 3909,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 17,
+      "frame": 1042,
+      "dataset_index": 4025,
+      "valid_targets": 1,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 32,
+      "frame": 0,
+      "dataset_index": 4026,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 32,
+      "frame": 99,
+      "dataset_index": 4125,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 32,
+      "frame": 199,
+      "dataset_index": 4225,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 32,
+      "frame": 298,
+      "dataset_index": 4324,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 32,
+      "frame": 398,
+      "dataset_index": 4424,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 32,
+      "frame": 497,
+      "dataset_index": 4523,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 32,
+      "frame": 597,
+      "dataset_index": 4623,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 32,
+      "frame": 696,
+      "dataset_index": 4722,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 32,
+      "frame": 796,
+      "dataset_index": 4822,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 32,
+      "frame": 896,
+      "dataset_index": 4922,
+      "valid_targets": 1,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 37,
+      "frame": 0,
+      "dataset_index": 4923,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 37,
+      "frame": 99,
+      "dataset_index": 5022,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 37,
+      "frame": 199,
+      "dataset_index": 5122,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 37,
+      "frame": 298,
+      "dataset_index": 5221,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 37,
+      "frame": 398,
+      "dataset_index": 5321,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 37,
+      "frame": 497,
+      "dataset_index": 5420,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 37,
+      "frame": 597,
+      "dataset_index": 5520,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 37,
+      "frame": 696,
+      "dataset_index": 5619,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 37,
+      "frame": 796,
+      "dataset_index": 5719,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 37,
+      "frame": 896,
+      "dataset_index": 5819,
+      "valid_targets": 1,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 42,
+      "frame": 0,
+      "dataset_index": 5820,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 42,
+      "frame": 99,
+      "dataset_index": 5919,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 42,
+      "frame": 199,
+      "dataset_index": 6019,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 42,
+      "frame": 298,
+      "dataset_index": 6118,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 42,
+      "frame": 398,
+      "dataset_index": 6218,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 42,
+      "frame": 497,
+      "dataset_index": 6317,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 42,
+      "frame": 597,
+      "dataset_index": 6417,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 42,
+      "frame": 696,
+      "dataset_index": 6516,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 42,
+      "frame": 796,
+      "dataset_index": 6616,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 42,
+      "frame": 896,
+      "dataset_index": 6716,
+      "valid_targets": 1,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 46,
+      "frame": 0,
+      "dataset_index": 6717,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 46,
+      "frame": 99,
+      "dataset_index": 6816,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 46,
+      "frame": 199,
+      "dataset_index": 6916,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 46,
+      "frame": 298,
+      "dataset_index": 7015,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 46,
+      "frame": 398,
+      "dataset_index": 7115,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 46,
+      "frame": 497,
+      "dataset_index": 7214,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 46,
+      "frame": 597,
+      "dataset_index": 7314,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 46,
+      "frame": 696,
+      "dataset_index": 7413,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 46,
+      "frame": 796,
+      "dataset_index": 7513,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 46,
+      "frame": 896,
+      "dataset_index": 7613,
+      "valid_targets": 1,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 58,
+      "frame": 0,
+      "dataset_index": 8511,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 58,
+      "frame": 99,
+      "dataset_index": 8610,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 58,
+      "frame": 199,
+      "dataset_index": 8710,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 58,
+      "frame": 298,
+      "dataset_index": 8809,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 58,
+      "frame": 398,
+      "dataset_index": 8909,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 58,
+      "frame": 497,
+      "dataset_index": 9008,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 58,
+      "frame": 597,
+      "dataset_index": 9108,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 58,
+      "frame": 696,
+      "dataset_index": 9207,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 58,
+      "frame": 796,
+      "dataset_index": 9307,
+      "valid_targets": 50,
+      "task": "pick up the orange and place it on the plate"
+    },
+    {
+      "episode": 58,
+      "frame": 896,
+      "dataset_index": 9407,
+      "valid_targets": 1,
+      "task": "pick up the orange and place it on the plate"
+    }
+  ],
+  "limitations": [
+    "90 sampled windows, not all 8511 validation timestamps",
+    "Existing LoRA uses its own saved original training normalization; do not replace it with new stats",
+    "Quantile span changed for reporting only; not directly comparable with earlier 5.58 score",
+    "Retained validation episodes unchanged; renamed indices mapped through manifest",
+    "Offline action error is not robot task success or motion safety"
+  ]
+}

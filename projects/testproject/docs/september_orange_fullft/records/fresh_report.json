@@ -1,0 +1,181 @@
+{
+  "phase": "fresh",
+  "status": "passed",
+  "updates": [
+    {
+      "loss": 0.23427948355674744,
+      "grad_norm": 13.886338233947754,
+      "seconds": 9.388284015003592,
+      "lr": 2.5e-05,
+      "state_elements": 3248572176
+    },
+    {
+      "loss": 0.11730936914682388,
+      "grad_norm": 10.5728759765625,
+      "seconds": 1.3617352799046785,
+      "lr": 2.5e-05,
+      "state_elements": 3248572176
+    },
+    {
+      "loss": 0.12995018064975739,
+      "grad_norm": 11.750133514404297,
+      "seconds": 1.3387722088955343,
+      "lr": 2.5e-05,
+      "state_elements": 3248572176
+    }
+  ],
+  "split": {
+    "train": [
+      0,
+      1,
+      3,
+      4,
+      5,
+      6,
+      8,
+      9,
+      10,
+      11,
+      13,
+      14,
+      15,
+      16,
+      18,
+      19,
+      30,
+      31,
+      33,
+      34,
+      35,
+      36,
+      38,
+      39,
+      40,
+      41,
+      43,
+      44,
+      45,
+      47,
+      48,
+      49,
+      50,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      59
+    ],
+    "validation": [
+      2,
+      7,
+      12,
+      17,
+      32,
+      37,
+      42,
+      46,
+      51,
+      58
+    ],
+    "train_frames": 37470,
+    "validation_frames": 9408
+  },
+  "parameters": {
+    "total": 4143404816,
+    "requires_grad": 4143404816
+  },
+  "tracked_weights": [
+    "model.paligemma_with_expert.paligemma.model.vision_tower.vision_model.embeddings.patch_embedding.weight",
+    "model.paligemma_with_expert.gemma_expert.model.layers.0.self_attn.q_proj.weight",
+    "model.action_in_proj.weight"
+  ],
+  "optimizer_state_entries_before_prepare": 0,
+  "first_batch": {
+    "action": {
+      "shape": [
+        1,
+        50,
+        6
+      ],
+      "std": 0.36052289605140686
+    },
+    "action_is_pad": {
+      "shape": [
+        1,
+        50
+      ],
+      "std": 0.0
+    },
+    "index": {
+      "shape": [
+        1
+      ],
+      "std": NaN
+    },
+    "task_index": {
+      "shape": [
+        1
+      ],
+      "std": NaN
+    },
+    "episode_index": {
+      "shape": [
+        1
+      ],
+      "std": NaN
+    },
+    "timestamp": {
+      "shape": [
+        1
+      ],
+      "std": NaN
+    },
+    "observation.images.front": {
+      "shape": [
+        1,
+        3,
+        480,
+        640
+      ],
+      "std": 0.20362572371959686
+    },
+    "observation.images.wrist": {
+      "shape": [
+        1,
+        3,
+        480,
+        640
+      ],
+      "std": 0.20103296637535095
+    },
+    "observation.state": {
+      "shape": [
+        1,
+        6
+      ],
+      "std": 0.4951649606227875
+    },
+    "observation.language.tokens": {
+      "shape": [
+        1,
+        200
+      ],
+      "std": 81764.703125
+    },
+    "observation.language.attention_mask": {
+      "shape": [
+        1,
+        200
+      ],
+      "std": 0.41185328364372253
+    }
+  },
+  "weight_changes": {
+    "model.paligemma_with_expert.paligemma.model.vision_tower.vision_model.embeddings.patch_embedding.weight": 677373,
+    "model.paligemma_with_expert.gemma_expert.model.layers.0.self_attn.q_proj.weight": 330135,
+    "model.action_in_proj.weight": 32764
+  },
+  "max_cuda_allocated_bytes": 17394508800
+}

@@ -133,5 +133,6 @@ P2   8-bit vs fp32 Adam, single-variable, 24 h                     dormant — L
                                                                      partly answer it
 P3   3g rerun (starting-checkpoint hypothesis)                     dormant, premise retracted
 P4   our 89 real episodes (STEP 4)                                 superseded by O3
+Sept orange full FT (15k, rung 4, 10k = candidate)                 archived: docs/september_orange_fullft/
 not doing: rung 5 parameter offload (operator) · DeepSpeed (CPUOffloadAdamW is ~70 lines, verified)
 ```

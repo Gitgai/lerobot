@@ -1,0 +1,25 @@
+{
+  "status": "worker_completed_not_checkpoint_certified",
+  "command": [
+    "/home/kiran/sim/pi05-official-20260922/.venv/bin/python",
+    "-u",
+    "/home/kiran/sim/pi05-fullft-orange50-20260922/evaluate_orange45_checkpoints.py",
+    "--step",
+    "5000"
+  ],
+  "limits": {
+    "wall_seconds": 1200,
+    "minimum_ram_bytes": 4294967296,
+    "minimum_disk_free_bytes": 53687091200,
+    "maximum_new_bytes": 2000000000
+  },
+  "output": "/home/kiran/sim/pi05-fullft-orange50-20260922/orange45_comparison_20260924/005000",
+  "baseline_output_bytes": 0,
+  "checkpoints": "not validated; never auto-resume interrupted saves",
+  "elapsed_seconds": 128.04199079517275,
+  "available_ram_bytes": 51989176320,
+  "disk_free_bytes": 633232072704,
+  "new_bytes": 334112,
+  "pid": 3943858,
+  "exit_code": 0
+}

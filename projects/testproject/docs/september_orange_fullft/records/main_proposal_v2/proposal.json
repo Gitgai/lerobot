@@ -1,0 +1,16 @@
+{
+  "status": "configuration_validated_not_launched",
+  "config_sha256": "e5bdfb217dec7f479fa41277b8f69c930e2db181baf1eb655ae02b17672f1e6b",
+  "updates": 30000,
+  "batch_size": 4,
+  "training_sample_presentations": 120000,
+  "checkpoint_count": 6,
+  "estimated_checkpoint_bytes_each": 35342908173,
+  "checkpoint_budget_bytes": 250000000000,
+  "proposed_wall_cap_hours": 26,
+  "notes": [
+    "Main uses official cosine schedule; smoke used constant LR to isolate plumbing.",
+    "No main-run launcher executed; user confirmation required for this resource budget.",
+    "Full validation every 5000; offline action comparison required before physical use."
+  ]
+}

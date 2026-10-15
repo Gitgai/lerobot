@@ -1,0 +1,200 @@
+{
+  "status": "completed",
+  "windows": 90,
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "predictions": 540,
+  "valid_positions_per_seed": 4059,
+  "raw_reference_max_difference": 0.0,
+  "metrics": {
+    "raw": {
+      "valid_mae_percent_span": 3.881871438996345,
+      "first_action_mae_percent_span": 1.3512131441488857,
+      "mae_per_joint": [
+        3.777939558029175,
+        6.46259069442749,
+        7.906517028808594,
+        8.9706449508667,
+        2.0480356216430664,
+        3.1293694972991943
+      ],
+      "per_seed": [
+        3.731646891683816,
+        3.80844070679611,
+        4.105526718509109
+      ],
+      "per_episode": {
+        "2": 3.821862602849658,
+        "7": 2.49733029802123,
+        "12": 3.284073587778424,
+        "17": 5.177251769616917,
+        "32": 2.9421255038212095,
+        "37": 4.131778419913648,
+        "42": 3.3696001070615273,
+        "46": 3.599771022018876,
+        "58": 6.1130496398856184
+      }
+    },
+    "jpeg92": {
+      "valid_mae_percent_span": 3.881570822438312,
+      "first_action_mae_percent_span": 1.3508332826964604,
+      "mae_per_joint": [
+        3.788956642150879,
+        6.462835311889648,
+        7.899050235748291,
+        8.956128120422363,
+        2.0434277057647705,
+        3.1347527503967285
+      ],
+      "per_seed": [
+        3.7300948549977426,
+        3.809038718802854,
+        4.105578893514339
+      ],
+      "per_episode": {
+        "2": 3.819744271414904,
+        "7": 2.504389254722635,
+        "12": 3.2990798629043416,
+        "17": 5.172324816256876,
+        "32": 2.933145029211916,
+        "37": 4.12731347779135,
+        "42": 3.3637601639401633,
+        "46": 3.5960685731059137,
+        "58": 6.1183119525967085
+      }
+    }
+  },
+  "change_mean_per_joint": [
+    0.09054984152317047,
+    0.1299360692501068,
+    0.13522730767726898,
+    0.13762177526950836,
+    0.0658753290772438,
+    0.05727067217230797
+  ],
+  "change_max_per_joint": [
+    0.8031387329101562,
+    0.799285888671875,
+    1.7171249389648438,
+    1.58551025390625,
+    0.5103912353515625,
+    1.0388641357421875
+  ],
+  "first_change_max_per_joint": [
+    0.48187255859375,
+    0.4795684814453125,
+    0.6483497619628906,
+    0.5424118041992188,
+    0.27752685546875,
+    0.307830810546875
+  ],
+  "worst_windows": [
+    {
+      "episode": 2,
+      "original_episode": 2,
+      "frame": 305,
+      "input_sha256": "a8ee4436505d4fce057fbdf27a7e7e6f7579e2ba0745856e3a55bd768b7dfff2",
+      "index": 3,
+      "seed": 1,
+      "action_offset": 26,
+      "joint_index": 5,
+      "max_normalized_change_percent": 1.6845708350246136,
+      "max_per_joint": [
+        0.36141204833984375,
+        0.799285888671875,
+        0.6483497619628906,
+        0.555908203125,
+        0.1786346435546875,
+        1.0388641357421875
+      ]
+    },
+    {
+      "episode": 32,
+      "original_episode": 42,
+      "frame": 398,
+      "input_sha256": "49d8567c4b6e4937e1714d029206630897b90e5c210bf0e6d13236d7c52fdb0a",
+      "index": 64,
+      "seed": 2,
+      "action_offset": 49,
+      "joint_index": 5,
+      "max_normalized_change_percent": 1.2451152876850753,
+      "max_per_joint": [
+        0.6826629638671875,
+        0.5594940185546875,
+        0.43560791015625,
+        0.39116668701171875,
+        0.5103912353515625,
+        0.7678546905517578
+      ]
+    },
+    {
+      "episode": 32,
+      "original_episode": 42,
+      "frame": 199,
+      "input_sha256": "9b64feb267ec6a6b09d6b2b6e9bdaaefc0b55f515521e26b426fd5b4e7a56e14",
+      "index": 62,
+      "seed": 1,
+      "action_offset": 27,
+      "joint_index": 5,
+      "max_normalized_change_percent": 1.2207033243446503,
+      "max_per_joint": [
+        0.44173431396484375,
+        0.41961669921875,
+        0.688873291015625,
+        0.33380126953125,
+        0.1913909912109375,
+        0.7527999877929688
+      ]
+    },
+    {
+      "episode": 12,
+      "original_episode": 12,
+      "frame": 485,
+      "input_sha256": "297039d7780ac0aa0f6ba377d5745cde2e338cfe9662e27f0a2deb77b44c7ec7",
+      "index": 24,
+      "seed": 2,
+      "action_offset": 22,
+      "joint_index": 5,
+      "max_normalized_change_percent": 1.0986280433302607,
+      "max_per_joint": [
+        0.321258544921875,
+        0.15985870361328125,
+        1.7171249389648438,
+        1.58551025390625,
+        0.27114105224609375,
+        0.6775169372558594
+      ]
+    },
+    {
+      "episode": 2,
+      "original_episode": 2,
+      "frame": 610,
+      "input_sha256": "79c183f083612c24dc319c8beeb0bbfafe557ee5a2028ad9db66b9cc36ca4c0d",
+      "index": 6,
+      "seed": 0,
+      "action_offset": 6,
+      "joint_index": 5,
+      "max_normalized_change_percent": 0.9277350213599267,
+      "max_per_joint": [
+        0.321258544921875,
+        0.5195274353027344,
+        0.773712158203125,
+        0.7992706298828125,
+        0.25519561767578125,
+        0.5721282958984375
+      ]
+    }
+  ],
+  "elapsed_seconds": 66.7552359290421,
+  "robot_connections": 0,
+  "live_config_changes": 0,
+  "limits": [
+    "Sampled validation windows, not every timestamp",
+    "No physical safety threshold or success estimate",
+    "Action changes include padded horizon positions; target errors exclude padding",
+    "No network latency or actuator integration measured in this expansion"
+  ]
+}

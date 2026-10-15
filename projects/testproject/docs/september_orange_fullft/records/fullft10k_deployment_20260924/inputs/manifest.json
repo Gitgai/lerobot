@@ -1,0 +1,143 @@
+{
+  "seed": 0,
+  "task": "pick up the orange and place it on the plate",
+  "samples": [
+    {
+      "episode": 2,
+      "original_episode": 2,
+      "frame": 101,
+      "input_sha256": "8c1f9ba88b42fc9c7d6f42acecc2e36178e6b940f2da0b591a329c72a4c5292f",
+      "comparison_index": 1,
+      "file": "input_00.npz"
+    },
+    {
+      "episode": 2,
+      "original_episode": 2,
+      "frame": 203,
+      "input_sha256": "6306b6ccd05095e9ebd7ba33f3cf3a10632249fb27ed08a967c1b72ea61bf3c0",
+      "comparison_index": 2,
+      "file": "input_01.npz"
+    },
+    {
+      "episode": 2,
+      "original_episode": 2,
+      "frame": 508,
+      "input_sha256": "885af3d59807bd0dc911e90de4a8a16d872741882940d273d1e010c29e3fa65b",
+      "comparison_index": 5,
+      "file": "input_02.npz"
+    },
+    {
+      "episode": 2,
+      "original_episode": 2,
+      "frame": 711,
+      "input_sha256": "076676617c676efc69273f8d673a036c1c799db6fd21b18de98e2e27dca43237",
+      "comparison_index": 7,
+      "file": "input_03.npz"
+    },
+    {
+      "episode": 2,
+      "original_episode": 2,
+      "frame": 813,
+      "input_sha256": "867503b909fe7d1b1bfef5bd1800b485c53a92dc8c4a79863c210dd9b2a0a765",
+      "comparison_index": 8,
+      "file": "input_04.npz"
+    },
+    {
+      "episode": 7,
+      "original_episode": 7,
+      "frame": 108,
+      "input_sha256": "9b32dafbb84f88903093516f802ee028b48d4d6dee4f603cbc8dde11aa1ece2c",
+      "comparison_index": 11,
+      "file": "input_05.npz"
+    },
+    {
+      "episode": 12,
+      "original_episode": 12,
+      "frame": 121,
+      "input_sha256": "e09d443825b74859f8db8e8d8a4bf6ca0bf73ad0be82b9cf97fa0020e42c35ae",
+      "comparison_index": 21,
+      "file": "input_06.npz"
+    },
+    {
+      "episode": 17,
+      "original_episode": 17,
+      "frame": 231,
+      "input_sha256": "d103648e16d7050ffa1918992e6282a9f4cb55875a8fc8c0d1974e146f87dcb1",
+      "comparison_index": 32,
+      "file": "input_07.npz"
+    },
+    {
+      "episode": 22,
+      "original_episode": 32,
+      "frame": 99,
+      "input_sha256": "205b1f4f1f0e81166013d7ee47d978b95f66615412e7fa69b153bdd02e2ae74a",
+      "comparison_index": 41,
+      "file": "input_08.npz"
+    },
+    {
+      "episode": 27,
+      "original_episode": 37,
+      "frame": 99,
+      "input_sha256": "c18b91e5b7c4266cb56a8517553614bfff60f714585f3b8b546f63d8657422e3",
+      "comparison_index": 51,
+      "file": "input_09.npz"
+    },
+    {
+      "episode": 32,
+      "original_episode": 42,
+      "frame": 99,
+      "input_sha256": "06e635fcabe830414d53b197dfe8f3c864a76cfe5cb22bf12f7e1b364074ac83",
+      "comparison_index": 61,
+      "file": "input_10.npz"
+    },
+    {
+      "episode": 36,
+      "original_episode": 46,
+      "frame": 99,
+      "input_sha256": "3531a42a3144e468a25acbf6e21a76026120caf74ad1840815dbc2e994f4cf66",
+      "comparison_index": 71,
+      "file": "input_11.npz"
+    },
+    {
+      "episode": 43,
+      "original_episode": 58,
+      "frame": 99,
+      "input_sha256": "fc98614976fcc265494bfa062d361bc4f999bc0f9893d8978d6e5989cfb1003c",
+      "comparison_index": 81,
+      "file": "input_12.npz"
+    },
+    {
+      "episode": 43,
+      "original_episode": 58,
+      "frame": 497,
+      "input_sha256": "379f09205a4bc3eca4fb1804dfedca5360351b6b52614c8451621cada2f714c0",
+      "comparison_index": 85,
+      "file": "input_13.npz"
+    },
+    {
+      "episode": 43,
+      "original_episode": 58,
+      "frame": 696,
+      "input_sha256": "f630d918df2614f3c4a996bdab872b5d575b5dfb7b094ef0cc6d4c514a69ed6c",
+      "comparison_index": 87,
+      "file": "input_14.npz"
+    },
+    {
+      "episode": 43,
+      "original_episode": 58,
+      "frame": 796,
+      "input_sha256": "48dbfc11b04ec9a7ddf211f2eb75a12e9a1b1384f23a92b6f45071b5c6fd9c1c",
+      "comparison_index": 88,
+      "file": "input_15.npz"
+    }
+  ],
+  "checkpoint": "/home/kiran/sim/pi05-fullft-orange50-20260922/orange45_fullft_15k_candidate/checkpoints/010000/pretrained_model",
+  "expected_model_sha256": "1ab52d540d684d837cfc71b5990b501f3fcea91d7776672d22596ff727ca766d",
+  "processor_sha256": {
+    "policy_preprocessor_step_3_normalizer_processor.safetensors": "6c3ab9a2e6d6983b459499f49939ddf04c0622e604b837d5311d841c9af33075",
+    "policy_postprocessor_step_0_unnormalizer_processor.safetensors": "c7413793958e04dc33afce5124e170bb19310cae088980a6afa29e72964f7595",
+    "policy_postprocessor.json": "8def456c1f5ae93ebf85655358fcfc58bee29c219e9d44644e61a11738aa14c9",
+    "policy_preprocessor.json": "0b4ba0da3fe00092a5f38346d83bb522a4eb8fbeb0479cafc246f298cb362113"
+  },
+  "selection": "all nine episodes, early/late windows and known high-error examples; not unbiased timing distribution"
+}

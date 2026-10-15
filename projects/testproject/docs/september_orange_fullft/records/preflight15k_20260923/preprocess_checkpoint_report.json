@@ -1,0 +1,252 @@
+{
+  "status": "passed",
+  "image_sample_count": 15,
+  "image_checks": [
+    {
+      "episode": 0,
+      "frame": 0,
+      "shape": [
+        1,
+        3,
+        224,
+        224
+      ],
+      "masks": [
+        true,
+        true
+      ]
+    },
+    {
+      "episode": 0,
+      "frame": 451,
+      "shape": [
+        1,
+        3,
+        224,
+        224
+      ],
+      "masks": [
+        true,
+        true
+      ]
+    },
+    {
+      "episode": 0,
+      "frame": 901,
+      "shape": [
+        1,
+        3,
+        224,
+        224
+      ],
+      "masks": [
+        true,
+        true
+      ]
+    },
+    {
+      "episode": 17,
+      "frame": 0,
+      "shape": [
+        1,
+        3,
+        224,
+        224
+      ],
+      "masks": [
+        true,
+        true
+      ]
+    },
+    {
+      "episode": 17,
+      "frame": 521,
+      "shape": [
+        1,
+        3,
+        224,
+        224
+      ],
+      "masks": [
+        true,
+        true
+      ]
+    },
+    {
+      "episode": 17,
+      "frame": 1042,
+      "shape": [
+        1,
+        3,
+        224,
+        224
+      ],
+      "masks": [
+        true,
+        true
+      ]
+    },
+    {
+      "episode": 40,
+      "frame": 0,
+      "shape": [
+        1,
+        3,
+        224,
+        224
+      ],
+      "masks": [
+        true,
+        true
+      ]
+    },
+    {
+      "episode": 40,
+      "frame": 448,
+      "shape": [
+        1,
+        3,
+        224,
+        224
+      ],
+      "masks": [
+        true,
+        true
+      ]
+    },
+    {
+      "episode": 40,
+      "frame": 896,
+      "shape": [
+        1,
+        3,
+        224,
+        224
+      ],
+      "masks": [
+        true,
+        true
+      ]
+    },
+    {
+      "episode": 48,
+      "frame": 0,
+      "shape": [
+        1,
+        3,
+        224,
+        224
+      ],
+      "masks": [
+        true,
+        true
+      ]
+    },
+    {
+      "episode": 48,
+      "frame": 448,
+      "shape": [
+        1,
+        3,
+        224,
+        224
+      ],
+      "masks": [
+        true,
+        true
+      ]
+    },
+    {
+      "episode": 48,
+      "frame": 896,
+      "shape": [
+        1,
+        3,
+        224,
+        224
+      ],
+      "masks": [
+        true,
+        true
+      ]
+    },
+    {
+      "episode": 51,
+      "frame": 0,
+      "shape": [
+        1,
+        3,
+        224,
+        224
+      ],
+      "masks": [
+        true,
+        true
+      ]
+    },
+    {
+      "episode": 51,
+      "frame": 448,
+      "shape": [
+        1,
+        3,
+        224,
+        224
+      ],
+      "masks": [
+        true,
+        true
+      ]
+    },
+    {
+      "episode": 51,
+      "frame": 896,
+      "shape": [
+        1,
+        3,
+        224,
+        224
+      ],
+      "masks": [
+        true,
+        true
+      ]
+    }
+  ],
+  "checkpoint_headers": [
+    {
+      "file": "pretrained_model/policy_preprocessor_step_3_normalizer_processor.safetensors",
+      "tensor_count": 84,
+      "byte_layout_valid": true
+    },
+    {
+      "file": "pretrained_model/policy_postprocessor_step_0_unnormalizer_processor.safetensors",
+      "tensor_count": 84,
+      "byte_layout_valid": true
+    },
+    {
+      "file": "pretrained_model/model.safetensors",
+      "tensor_count": 813,
+      "byte_layout_valid": true
+    },
+    {
+      "file": "training_state/rng_state.safetensors",
+      "tensor_count": 8,
+      "byte_layout_valid": true
+    },
+    {
+      "file": "training_state/optimizer_state.safetensors",
+      "tensor_count": 2415,
+      "byte_layout_valid": true
+    }
+  ],
+  "checkpoint_progress": {
+    "step": 5,
+    "num_processes": 1,
+    "batch_size": 1
+  },
+  "limitations": [
+    "Header checks are not a fresh full-tensor finite scan or a new full-model resume test; prior actual resume test retained.",
+    "Proxy invokes installed image helper only; does not test full-model forward."
+  ]
+}

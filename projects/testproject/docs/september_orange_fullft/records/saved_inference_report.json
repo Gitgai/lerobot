@@ -1,0 +1,37 @@
+{
+  "status": "passed",
+  "checkpoint": "/home/kiran/sim/pi05-fullft-orange50-20260922/smoke_training/checkpoints/000005/pretrained_model",
+  "requests": [
+    {
+      "input": 0,
+      "shape": [
+        1,
+        50,
+        6
+      ],
+      "seconds": 0.3230391792021692,
+      "finite": true
+    },
+    {
+      "input": 1,
+      "shape": [
+        1,
+        50,
+        6
+      ],
+      "seconds": 0.0912347559351474,
+      "finite": true
+    },
+    {
+      "input": 2,
+      "shape": [
+        1,
+        50,
+        6
+      ],
+      "seconds": 0.09184226510114968,
+      "finite": true
+    }
+  ],
+  "scope": "finite saved-checkpoint inference only, not task success or quality"
+}

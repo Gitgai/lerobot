@@ -1,0 +1,11 @@
+{
+  "scope": "synthetic optimizer only; not full-model training/save/resume approval",
+  "torch": "2.7.1+cu128",
+  "optimizer_sha256": "33d1e90babb85c545a3c8541347f19f57c76463934d0f0a58e4a4eb9135ad09e",
+  "fp32_adamw_12_steps_max_abs_error": 0.0,
+  "fp32_save_reload_continuation_exact": true,
+  "bf16_resume_with_accelerate_exact": true,
+  "host_fp32_pinned_state_preserved": true,
+  "max_cuda_allocated_bytes": 56832,
+  "status": "passed"
+}

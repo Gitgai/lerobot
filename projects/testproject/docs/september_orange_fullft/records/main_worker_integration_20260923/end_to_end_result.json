@@ -1,0 +1,209 @@
+{
+  "status": "technical_integration_passed_not_dataset_quality_certification",
+  "controls": {
+    "fresh": {
+      "status": "worker_completed_not_checkpoint_certified",
+      "command": [
+        "/home/kiran/sim/pi05-official-20260922/.venv/bin/python",
+        "-u",
+        "/home/kiran/sim/pi05-fullft-orange50-20260922/fullft_orange_main.py",
+        "--config_path=/home/kiran/sim/pi05-fullft-orange50-20260922/main_worker_integration_20260923/config.json"
+      ],
+      "limits": {
+        "wall_seconds": 1200,
+        "minimum_ram_bytes": 4294967296,
+        "minimum_disk_free_bytes": 85899345920,
+        "maximum_new_bytes": 85000000000
+      },
+      "output": "/home/kiran/sim/pi05-fullft-orange50-20260922/main_worker_integration_20260923/training",
+      "baseline_output_bytes": 0,
+      "checkpoints": "not validated; never auto-resume interrupted saves",
+      "elapsed_seconds": 114.0842120340094,
+      "available_ram_bytes": 57201786880,
+      "disk_free_bytes": 794947002368,
+      "new_bytes": 35342922212,
+      "pid": 109141,
+      "exit_code": 0
+    },
+    "resume": {
+      "status": "worker_completed_not_checkpoint_certified",
+      "command": [
+        "/home/kiran/sim/pi05-official-20260922/.venv/bin/python",
+        "-u",
+        "/home/kiran/sim/pi05-fullft-orange50-20260922/fullft_orange_main.py",
+        "--config_path=/home/kiran/sim/pi05-fullft-orange50-20260922/main_worker_integration_20260923/training/checkpoints/000002/pretrained_model/train_config.json",
+        "--resume=true",
+        "--steps=3",
+        "--save_freq=3",
+        "--eval_steps=3",
+        "--max_eval_samples=4"
+      ],
+      "limits": {
+        "wall_seconds": 1200,
+        "minimum_ram_bytes": 4294967296,
+        "minimum_disk_free_bytes": 85899345920,
+        "maximum_new_bytes": 85000000000
+      },
+      "output": "/home/kiran/sim/pi05-fullft-orange50-20260922/main_worker_integration_20260923/training",
+      "baseline_output_bytes": 35342908302,
+      "checkpoints": "not validated; never auto-resume interrupted saves",
+      "elapsed_seconds": 112.07037582085468,
+      "available_ram_bytes": 56937107456,
+      "disk_free_bytes": 759603970048,
+      "new_bytes": 35342922706,
+      "pid": 110415,
+      "exit_code": 0
+    },
+    "evaluation": {
+      "status": "worker_completed_not_checkpoint_certified",
+      "command": [
+        "/home/kiran/sim/pi05-official-20260922/.venv/bin/python",
+        "-u",
+        "evaluate_fullft_integration.py"
+      ],
+      "limits": {
+        "wall_seconds": 1200.0,
+        "minimum_ram_bytes": 4294967296,
+        "minimum_disk_free_bytes": 53687091200,
+        "maximum_new_bytes": 1000000000
+      },
+      "output": "/home/kiran/sim/pi05-fullft-orange50-20260922/main_worker_integration_20260923/training",
+      "baseline_output_bytes": 70685816665,
+      "checkpoints": "not validated; never auto-resume interrupted saves",
+      "elapsed_seconds": 82.03583988314494,
+      "available_ram_bytes": 55587729408,
+      "disk_free_bytes": 759603859456,
+      "new_bytes": 3160,
+      "pid": 111417,
+      "exit_code": 0
+    }
+  },
+  "workers": {
+    "fresh": {
+      "status": "trainer_returned_checkpoint_review_required",
+      "updates_this_process": 2,
+      "parameters": {
+        "total": 4143404816,
+        "requires_grad": 4143404816
+      },
+      "latest_loss": 0.2647305727005005,
+      "latest_grad_norm": 9.05810546875,
+      "latest_update_seconds": 11.823774204123765,
+      "lr": 1.3750000000000002e-05,
+      "peak_cuda_bytes": 18321772544
+    },
+    "resume": {
+      "status": "trainer_returned_checkpoint_review_required",
+      "updates_this_process": 1,
+      "parameters": {
+        "total": 4143404816,
+        "requires_grad": 4143404816
+      },
+      "latest_loss": 0.07389966398477554,
+      "latest_grad_norm": 1.4841060638427734,
+      "latest_update_seconds": 7.335709959035739,
+      "lr": 2.5e-06,
+      "peak_cuda_bytes": 18321772544
+    }
+  },
+  "checkpoint_audits": [
+    {
+      "status": "structural_check_passed",
+      "checkpoint": "/home/kiran/sim/pi05-fullft-orange50-20260922/main_worker_integration_20260923/training/checkpoints/000002",
+      "progress": {
+        "step": 2,
+        "num_processes": 1,
+        "batch_size": 4
+      },
+      "tensors": {
+        "pretrained_model/model.safetensors": {
+          "tensors": 813,
+          "bytes": 9354050752
+        },
+        "pretrained_model/policy_preprocessor_step_3_normalizer_processor.safetensors": {
+          "tensors": 84,
+          "bytes": 6992
+        },
+        "pretrained_model/policy_postprocessor_step_0_unnormalizer_processor.safetensors": {
+          "tensors": 84,
+          "bytes": 6984
+        },
+        "training_state/rng_state.safetensors": {
+          "tensors": 8,
+          "bytes": 15708
+        },
+        "training_state/optimizer_state.safetensors": {
+          "tensors": 2415,
+          "bytes": 25988800372
+        }
+      },
+      "scope": "Not a tensor-finiteness, behavioral-quality or fresh-process resume test"
+    },
+    {
+      "status": "structural_check_passed",
+      "checkpoint": "/home/kiran/sim/pi05-fullft-orange50-20260922/main_worker_integration_20260923/training/checkpoints/000003",
+      "progress": {
+        "step": 3,
+        "num_processes": 1,
+        "batch_size": 4
+      },
+      "tensors": {
+        "pretrained_model/model.safetensors": {
+          "tensors": 813,
+          "bytes": 9354050752
+        },
+        "pretrained_model/policy_preprocessor_step_3_normalizer_processor.safetensors": {
+          "tensors": 84,
+          "bytes": 6928
+        },
+        "pretrained_model/policy_postprocessor_step_0_unnormalizer_processor.safetensors": {
+          "tensors": 84,
+          "bytes": 6984
+        },
+        "training_state/rng_state.safetensors": {
+          "tensors": 8,
+          "bytes": 15708
+        },
+        "training_state/optimizer_state.safetensors": {
+          "tensors": 2415,
+          "bytes": 25988800372
+        }
+      },
+      "scope": "Not a tensor-finiteness, behavioral-quality or fresh-process resume test"
+    }
+  ],
+  "inference": {
+    "status": "passed",
+    "seeded_predictions": 90,
+    "distinct_inputs": 30,
+    "seeds": [
+      0,
+      1,
+      2
+    ],
+    "fixed_seed_repeat_max_error": 0.0,
+    "elapsed_seconds": 18.581794596044347,
+    "config_sha256": "e5b320cc17d6d545d637d772130a2f75629e416fda48d2589f9c13318efc90b6",
+    "units": [
+      "degrees",
+      "degrees",
+      "degrees",
+      "degrees",
+      "degrees",
+      "calibrated_gripper_points"
+    ],
+    "scope": "30 sampled held-out inputs; plumbing test of 3-update diagnostic checkpoint, not full-validation ranking or task-success estimate"
+  },
+  "clean_package_files_unchanged": 490,
+  "optimizer_sha256": "33d1e90babb85c545a3c8541347f19f57c76463934d0f0a58e4a4eb9135ad09e",
+  "main_15k_output_absent": true,
+  "checkpoint_total_bytes": 70685816665,
+  "disk_free_bytes": 759603851264,
+  "gpu_after": "NVIDIA GeForce RTX 5090, 23422 MiB, 0 %",
+  "scripts_sha256": {
+    "fullft_orange_main.py": "c641de4cfe6ec7185ad2c08673aae9b796ddc43cc339f6a8bf6b43d3ba0f0726",
+    "fullft_run_guard.py": "ba00435246e4b6abf483d1d1efa24a59fc96b0a8d82f6af507e990ff3da6bd2b",
+    "validate_fullft_checkpoint.py": "c2d60c9d377293e7af1c72b1215e9a2a406cea438fa2e7f90737d9b40a29b983",
+    "evaluate_fullft_integration.py": "ff635ee3c1054a0e29259c11c2b9ec0ca6ebda8f35fdeebb334ace430cecbf86"
+  }
+}

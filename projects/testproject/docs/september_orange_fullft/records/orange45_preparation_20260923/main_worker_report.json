@@ -1,0 +1,14 @@
+{
+  "status": "trainer_returned_checkpoint_review_required",
+  "updates_this_process": 15000,
+  "selection_manifest_sha256": "e17b50b475aec58209df60e5ec89a6517082f1993a2d12002e6cb7abda8af307",
+  "parameters": {
+    "total": 4143404816,
+    "requires_grad": 4143404816
+  },
+  "latest_loss": 0.005077510140836239,
+  "latest_grad_norm": 0.21783417463302612,
+  "latest_update_seconds": 1.7158623756840825,
+  "lr": 2.5e-06,
+  "peak_cuda_bytes": 18344797696
+}

@@ -1,0 +1,24 @@
+{
+  "status": "worker_completed_not_checkpoint_certified",
+  "command": [
+    "/home/kiran/sim/pi05-official-20260922/.venv/bin/python",
+    "-u",
+    "/home/kiran/sim/pi05-fullft-orange50-20260922/fullft_orange45_main.py",
+    "--config_path=/home/kiran/sim/pi05-fullft-orange50-20260922/orange45_preparation_20260923/train_config.json"
+  ],
+  "limits": {
+    "wall_seconds": 57600,
+    "minimum_ram_bytes": 4294967296,
+    "minimum_disk_free_bytes": 53687091200,
+    "maximum_new_bytes": 150000000000
+  },
+  "output": "/home/kiran/sim/pi05-fullft-orange50-20260922/orange45_fullft_15k_candidate",
+  "baseline_output_bytes": 0,
+  "checkpoints": "not validated; never auto-resume interrupted saves",
+  "elapsed_seconds": 43759.07749227295,
+  "available_ram_bytes": 54898929664,
+  "disk_free_bytes": 649479516160,
+  "new_bytes": 106029961685,
+  "pid": 137594,
+  "exit_code": 0
+}

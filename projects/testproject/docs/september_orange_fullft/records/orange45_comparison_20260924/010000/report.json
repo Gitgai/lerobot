@@ -1,0 +1,564 @@
+{
+  "status": "passed",
+  "step": 10000,
+  "samples": [
+    {
+      "episode": 2,
+      "original_episode": 2,
+      "frame": 0,
+      "input_sha256": "8367e7b06547e618cd9a20dff2bba3cf5aa8b60ff83b1a3d076dea63364f82cb"
+    },
+    {
+      "episode": 2,
+      "original_episode": 2,
+      "frame": 101,
+      "input_sha256": "8c1f9ba88b42fc9c7d6f42acecc2e36178e6b940f2da0b591a329c72a4c5292f"
+    },
+    {
+      "episode": 2,
+      "original_episode": 2,
+      "frame": 203,
+      "input_sha256": "6306b6ccd05095e9ebd7ba33f3cf3a10632249fb27ed08a967c1b72ea61bf3c0"
+    },
+    {
+      "episode": 2,
+      "original_episode": 2,
+      "frame": 305,
+      "input_sha256": "a8ee4436505d4fce057fbdf27a7e7e6f7579e2ba0745856e3a55bd768b7dfff2"
+    },
+    {
+      "episode": 2,
+      "original_episode": 2,
+      "frame": 406,
+      "input_sha256": "dc2901c0aee00b401b83f4b2280f01d1189022c6bcb427cc88e3df6bd5893fcb"
+    },
+    {
+      "episode": 2,
+      "original_episode": 2,
+      "frame": 508,
+      "input_sha256": "885af3d59807bd0dc911e90de4a8a16d872741882940d273d1e010c29e3fa65b"
+    },
+    {
+      "episode": 2,
+      "original_episode": 2,
+      "frame": 610,
+      "input_sha256": "79c183f083612c24dc319c8beeb0bbfafe557ee5a2028ad9db66b9cc36ca4c0d"
+    },
+    {
+      "episode": 2,
+      "original_episode": 2,
+      "frame": 711,
+      "input_sha256": "076676617c676efc69273f8d673a036c1c799db6fd21b18de98e2e27dca43237"
+    },
+    {
+      "episode": 2,
+      "original_episode": 2,
+      "frame": 813,
+      "input_sha256": "867503b909fe7d1b1bfef5bd1800b485c53a92dc8c4a79863c210dd9b2a0a765"
+    },
+    {
+      "episode": 2,
+      "original_episode": 2,
+      "frame": 915,
+      "input_sha256": "9348eec556607a01a2114cd6de60ae93ae2c20760ad289a0d62f8c2cbc18be17"
+    },
+    {
+      "episode": 7,
+      "original_episode": 7,
+      "frame": 0,
+      "input_sha256": "80cf275b4fadcddd63803350998d02eeb136f14741ebffa89a21459043e5cdda"
+    },
+    {
+      "episode": 7,
+      "original_episode": 7,
+      "frame": 108,
+      "input_sha256": "9b32dafbb84f88903093516f802ee028b48d4d6dee4f603cbc8dde11aa1ece2c"
+    },
+    {
+      "episode": 7,
+      "original_episode": 7,
+      "frame": 216,
+      "input_sha256": "9b2995ac6333adf9bcd897409b1bd97b60655cd16180f9f5e5558579926c0c5d"
+    },
+    {
+      "episode": 7,
+      "original_episode": 7,
+      "frame": 324,
+      "input_sha256": "94f2f3c3cd132a149b69d7b588ac36034d04e15eb7879efed531c17615579db8"
+    },
+    {
+      "episode": 7,
+      "original_episode": 7,
+      "frame": 432,
+      "input_sha256": "f50632307332dd2852de4f34e92e76501c51a27a945f0eec93d3006cfcc1425d"
+    },
+    {
+      "episode": 7,
+      "original_episode": 7,
+      "frame": 540,
+      "input_sha256": "1bd627277da5095a3c5ba512add1ae9cd3c64cc7f020031d92a9b6152e3a505c"
+    },
+    {
+      "episode": 7,
+      "original_episode": 7,
+      "frame": 648,
+      "input_sha256": "36cf6d9ee54f029ad64597d368adf6bcace1aae4d9ac327f23674c2dc90e7464"
+    },
+    {
+      "episode": 7,
+      "original_episode": 7,
+      "frame": 756,
+      "input_sha256": "4f9d62d6f6d8fed818215ee50836fc9861df28d73fa73384bfd420728534d5c2"
+    },
+    {
+      "episode": 7,
+      "original_episode": 7,
+      "frame": 864,
+      "input_sha256": "3850577b861fc105dee55e02263c810cb2db37b303abd49529ad4c2f6fb9bc85"
+    },
+    {
+      "episode": 7,
+      "original_episode": 7,
+      "frame": 972,
+      "input_sha256": "920871089b5813410ba96ba8868c85a2644ff9d202b46f443cf8f91bdd8b6659"
+    },
+    {
+      "episode": 12,
+      "original_episode": 12,
+      "frame": 0,
+      "input_sha256": "0a33d5db44137f788e5d783eb0df1f8274088d94cf8623f04e3a3709cf05c557"
+    },
+    {
+      "episode": 12,
+      "original_episode": 12,
+      "frame": 121,
+      "input_sha256": "e09d443825b74859f8db8e8d8a4bf6ca0bf73ad0be82b9cf97fa0020e42c35ae"
+    },
+    {
+      "episode": 12,
+      "original_episode": 12,
+      "frame": 242,
+      "input_sha256": "a2aa9b53d260ebbe21b8baf932dc471acf0eaf5bf4a72091abf910f923f95513"
+    },
+    {
+      "episode": 12,
+      "original_episode": 12,
+      "frame": 364,
+      "input_sha256": "e177bc9bfbe6b8f7a113695e714f2b50208685e1b52576bca1f8712d481f9a4a"
+    },
+    {
+      "episode": 12,
+      "original_episode": 12,
+      "frame": 485,
+      "input_sha256": "297039d7780ac0aa0f6ba377d5745cde2e338cfe9662e27f0a2deb77b44c7ec7"
+    },
+    {
+      "episode": 12,
+      "original_episode": 12,
+      "frame": 607,
+      "input_sha256": "55a4ae9e4fa9db4bd0ad1f670f8960713742513eb427634c20abf5caa8b4c823"
+    },
+    {
+      "episode": 12,
+      "original_episode": 12,
+      "frame": 728,
+      "input_sha256": "1d164a3da4bc8f611fb3087c37ae5f1d76715123c559fa5a118232883617df4f"
+    },
+    {
+      "episode": 12,
+      "original_episode": 12,
+      "frame": 850,
+      "input_sha256": "d77ce42c851d088cdf95e513ef6d5d70a7fc73b21c4c238bd0e831ba0dd44778"
+    },
+    {
+      "episode": 12,
+      "original_episode": 12,
+      "frame": 971,
+      "input_sha256": "4d2ee333208c0f2df2524d5e07b2c64d738521d0bc9890505758e1208dee239e"
+    },
+    {
+      "episode": 12,
+      "original_episode": 12,
+      "frame": 1093,
+      "input_sha256": "deacfe686a77d46c48416319affb3926f41cf93dccf9c148c1aeb8cab9901742"
+    },
+    {
+      "episode": 17,
+      "original_episode": 17,
+      "frame": 0,
+      "input_sha256": "60cca6de40821e6ea4ee2c62671cc2de18e040206678eb66538d283e9165c755"
+    },
+    {
+      "episode": 17,
+      "original_episode": 17,
+      "frame": 115,
+      "input_sha256": "14f7c4c7d0e00510c3e8b04d837f1f61f8d4766b38997910c9199fbd2b0dedca"
+    },
+    {
+      "episode": 17,
+      "original_episode": 17,
+      "frame": 231,
+      "input_sha256": "d103648e16d7050ffa1918992e6282a9f4cb55875a8fc8c0d1974e146f87dcb1"
+    },
+    {
+      "episode": 17,
+      "original_episode": 17,
+      "frame": 347,
+      "input_sha256": "04f95534584ea2ad837cd42703ca323df85f54b99a79d2ab6346c5f0f66712ab"
+    },
+    {
+      "episode": 17,
+      "original_episode": 17,
+      "frame": 463,
+      "input_sha256": "dc4b773de35d04b58b753380667a646184a12ad2bdefc6030e576b50ef1300c8"
+    },
+    {
+      "episode": 17,
+      "original_episode": 17,
+      "frame": 578,
+      "input_sha256": "023c3f35159ba535f30a908b7d5dc80967b0f0b517d9bece6ca73854b6cb3f70"
+    },
+    {
+      "episode": 17,
+      "original_episode": 17,
+      "frame": 694,
+      "input_sha256": "bdeea65df96e745cb6a5fd3cb4a2b2caf658bbd1b0537e58bc83709304e0cce2"
+    },
+    {
+      "episode": 17,
+      "original_episode": 17,
+      "frame": 810,
+      "input_sha256": "b0ca34258d563789337beb01b53b9c8b4cc6da98b96d203482308f0bfd37621a"
+    },
+    {
+      "episode": 17,
+      "original_episode": 17,
+      "frame": 926,
+      "input_sha256": "d9a0f016375d50aa90592ca36befcda5840d96230ca2892180eb56d1a6ed9887"
+    },
+    {
+      "episode": 17,
+      "original_episode": 17,
+      "frame": 1042,
+      "input_sha256": "d7042d5ce141259526799c4a92e0306b9bce5f6ef0e3b41a43eac30174c3f44c"
+    },
+    {
+      "episode": 22,
+      "original_episode": 32,
+      "frame": 0,
+      "input_sha256": "731a704d963e8ce349d2af1f8ac04ec832445c7a85c52a2760305701170b5786"
+    },
+    {
+      "episode": 22,
+      "original_episode": 32,
+      "frame": 99,
+      "input_sha256": "205b1f4f1f0e81166013d7ee47d978b95f66615412e7fa69b153bdd02e2ae74a"
+    },
+    {
+      "episode": 22,
+      "original_episode": 32,
+      "frame": 199,
+      "input_sha256": "e6864d3207e235d037c986988d9875d52eeb6ab178aaa52f96c230e220765342"
+    },
+    {
+      "episode": 22,
+      "original_episode": 32,
+      "frame": 298,
+      "input_sha256": "c31d1c9f4c474589312b35b14da39b6b58ec172856da59a4d533e7a3bc998706"
+    },
+    {
+      "episode": 22,
+      "original_episode": 32,
+      "frame": 398,
+      "input_sha256": "faa18c1f1414f38521a18325eb08db1c2c57da7ecb626466d9eee31807e1361b"
+    },
+    {
+      "episode": 22,
+      "original_episode": 32,
+      "frame": 497,
+      "input_sha256": "813b508b4cc18c234fe10b569310bd80d4a7d9fd437b8087a497ef838156d242"
+    },
+    {
+      "episode": 22,
+      "original_episode": 32,
+      "frame": 597,
+      "input_sha256": "350cf627f745d784b504440372204150ae69366993fdeefec066ff22d545c8a9"
+    },
+    {
+      "episode": 22,
+      "original_episode": 32,
+      "frame": 696,
+      "input_sha256": "c239baeed5612a741796d76703c03e832a87853a044e51dc4cd11cfb749e9830"
+    },
+    {
+      "episode": 22,
+      "original_episode": 32,
+      "frame": 796,
+      "input_sha256": "99dce5dc3da674cfb1b58efc0564dabe1a11decca6d33372b211f578492556ae"
+    },
+    {
+      "episode": 22,
+      "original_episode": 32,
+      "frame": 896,
+      "input_sha256": "e5d98c7eac1ab9dfb101fc158a5a5838175d0247b0822764125092f76ee619dc"
+    },
+    {
+      "episode": 27,
+      "original_episode": 37,
+      "frame": 0,
+      "input_sha256": "7714351c7cf2004e16aac78f405f4154a365b632c9a9db520246cde7ce2c4635"
+    },
+    {
+      "episode": 27,
+      "original_episode": 37,
+      "frame": 99,
+      "input_sha256": "c18b91e5b7c4266cb56a8517553614bfff60f714585f3b8b546f63d8657422e3"
+    },
+    {
+      "episode": 27,
+      "original_episode": 37,
+      "frame": 199,
+      "input_sha256": "b2c26393d91e303a4aafd6857fee1944a361e6772e711b872e48f3e51ef78632"
+    },
+    {
+      "episode": 27,
+      "original_episode": 37,
+      "frame": 298,
+      "input_sha256": "e6ae54956e14ebc30463fc08bb96766a1821839303981e1a89497a90bf5ed7db"
+    },
+    {
+      "episode": 27,
+      "original_episode": 37,
+      "frame": 398,
+      "input_sha256": "59739dc7bedad53754da5aee6707926b5fc09dcd2845d45d2480cd2f074c8b22"
+    },
+    {
+      "episode": 27,
+      "original_episode": 37,
+      "frame": 497,
+      "input_sha256": "9c08975955c0637e6549b66d73c4740336d372006b735bdd2742d82cfa2b18ab"
+    },
+    {
+      "episode": 27,
+      "original_episode": 37,
+      "frame": 597,
+      "input_sha256": "153ae8c5140cac9c17648d5dcde72cc7b6c7b6b972b6a55b42e24ebb9a6957b6"
+    },
+    {
+      "episode": 27,
+      "original_episode": 37,
+      "frame": 696,
+      "input_sha256": "604c475b61bbb25bee5974b5721edefbfdb7bccf86842823b292f318234265df"
+    },
+    {
+      "episode": 27,
+      "original_episode": 37,
+      "frame": 796,
+      "input_sha256": "d96fde7a121b2556373a82bf908f651d76041a70b95d88e689d2f93d235da454"
+    },
+    {
+      "episode": 27,
+      "original_episode": 37,
+      "frame": 896,
+      "input_sha256": "03d3a061d34612f5d462cb4738259cb852357154c0a171774ace4c50b71a63aa"
+    },
+    {
+      "episode": 32,
+      "original_episode": 42,
+      "frame": 0,
+      "input_sha256": "45832d85bff253f26b035ef025e2ac7546a8caff47eb528c09c4d98864339cd4"
+    },
+    {
+      "episode": 32,
+      "original_episode": 42,
+      "frame": 99,
+      "input_sha256": "06e635fcabe830414d53b197dfe8f3c864a76cfe5cb22bf12f7e1b364074ac83"
+    },
+    {
+      "episode": 32,
+      "original_episode": 42,
+      "frame": 199,
+      "input_sha256": "9b64feb267ec6a6b09d6b2b6e9bdaaefc0b55f515521e26b426fd5b4e7a56e14"
+    },
+    {
+      "episode": 32,
+      "original_episode": 42,
+      "frame": 298,
+      "input_sha256": "5eb089422fa50d52b6b854afba809efc89ba2b7e417d9fa99feb6168ad3b73dd"
+    },
+    {
+      "episode": 32,
+      "original_episode": 42,
+      "frame": 398,
+      "input_sha256": "49d8567c4b6e4937e1714d029206630897b90e5c210bf0e6d13236d7c52fdb0a"
+    },
+    {
+      "episode": 32,
+      "original_episode": 42,
+      "frame": 497,
+      "input_sha256": "99cff8b2900caca09494ebbd8971bfa48bf8e512d088e4bd281480a184411d65"
+    },
+    {
+      "episode": 32,
+      "original_episode": 42,
+      "frame": 597,
+      "input_sha256": "b3e52f3baa1e72e5d83b573ca6c5e529a1104ca0990159d70da8d7944cdfde0b"
+    },
+    {
+      "episode": 32,
+      "original_episode": 42,
+      "frame": 696,
+      "input_sha256": "a706d43968029e261a0b1643a5ffb0df59aca6d189f6da86f3f1a06356fc14eb"
+    },
+    {
+      "episode": 32,
+      "original_episode": 42,
+      "frame": 796,
+      "input_sha256": "da309a6d3be9256961f4a1501742509f2548a95cbfcd303062d456e26ed02445"
+    },
+    {
+      "episode": 32,
+      "original_episode": 42,
+      "frame": 896,
+      "input_sha256": "d84108b187b55f5f28a11bbec80df25ac527c35570fb4b7548512e00ce4e989d"
+    },
+    {
+      "episode": 36,
+      "original_episode": 46,
+      "frame": 0,
+      "input_sha256": "918e357bf8e8a7eb31597c687e2efbaf0b60fbbd4aed682afc932b1ce386905b"
+    },
+    {
+      "episode": 36,
+      "original_episode": 46,
+      "frame": 99,
+      "input_sha256": "3531a42a3144e468a25acbf6e21a76026120caf74ad1840815dbc2e994f4cf66"
+    },
+    {
+      "episode": 36,
+      "original_episode": 46,
+      "frame": 199,
+      "input_sha256": "d78d49b6fd4b09c18fba713492a1d3a3e5b23c07b6ffbb4c3f62d79919ec46c4"
+    },
+    {
+      "episode": 36,
+      "original_episode": 46,
+      "frame": 298,
+      "input_sha256": "a0e52156fb91b89eac28c1f3a108ca03b4cef8b9b6cf9ebd2c10064096162c9f"
+    },
+    {
+      "episode": 36,
+      "original_episode": 46,
+      "frame": 398,
+      "input_sha256": "33e3e10a2f5bad73ef5c382e65aeec3f3c00c7e3257c0a12b1fadd41f31e5840"
+    },
+    {
+      "episode": 36,
+      "original_episode": 46,
+      "frame": 497,
+      "input_sha256": "b11981996ffa6e34af1a028314a76ac8555cf84136f3bfa3ca0d3699580b885d"
+    },
+    {
+      "episode": 36,
+      "original_episode": 46,
+      "frame": 597,
+      "input_sha256": "1412e60824b532467b23f7fd39d89fa3c11c155b3fdb997684c5db341b10955b"
+    },
+    {
+      "episode": 36,
+      "original_episode": 46,
+      "frame": 696,
+      "input_sha256": "5de63a7439756481d3ac5ff4f24d3c1e10d6e9f735b62acaaed3dc835c36c5a5"
+    },
+    {
+      "episode": 36,
+      "original_episode": 46,
+      "frame": 796,
+      "input_sha256": "717918ebe40aeb2c27f31e068daa5d58c871f5092f2c8d49b09270b22d6d5498"
+    },
+    {
+      "episode": 36,
+      "original_episode": 46,
+      "frame": 896,
+      "input_sha256": "bb98e1cf8d9c0dd03a1b94ca4d670a5cc5ac84b6c979c1be420ce105b6845a59"
+    },
+    {
+      "episode": 43,
+      "original_episode": 58,
+      "frame": 0,
+      "input_sha256": "aec4808d64a983e83bf9318112b4c841b17b0e52ce1f68170433853b6461b61e"
+    },
+    {
+      "episode": 43,
+      "original_episode": 58,
+      "frame": 99,
+      "input_sha256": "fc98614976fcc265494bfa062d361bc4f999bc0f9893d8978d6e5989cfb1003c"
+    },
+    {
+      "episode": 43,
+      "original_episode": 58,
+      "frame": 199,
+      "input_sha256": "f01abf631194134eab9c5d66c762aedf6061f6b140f7bdeb76c64a10a73897e1"
+    },
+    {
+      "episode": 43,
+      "original_episode": 58,
+      "frame": 298,
+      "input_sha256": "9e2a9b000319ede88d7a06a6db9d1ee40523f6074c5de2e789c0258a91ba1fd8"
+    },
+    {
+      "episode": 43,
+      "original_episode": 58,
+      "frame": 398,
+      "input_sha256": "a7788bd733c9f5374e241d00f19036d75aab0158f96aabf1f1ff731aa0fb0509"
+    },
+    {
+      "episode": 43,
+      "original_episode": 58,
+      "frame": 497,
+      "input_sha256": "379f09205a4bc3eca4fb1804dfedca5360351b6b52614c8451621cada2f714c0"
+    },
+    {
+      "episode": 43,
+      "original_episode": 58,
+      "frame": 597,
+      "input_sha256": "3a3a0a2a5c4ff7d874097a3d35851bc2cb6117b0820dc6fb2df79e4c4133313f"
+    },
+    {
+      "episode": 43,
+      "original_episode": 58,
+      "frame": 696,
+      "input_sha256": "f630d918df2614f3c4a996bdab872b5d575b5dfb7b094ef0cc6d4c514a69ed6c"
+    },
+    {
+      "episode": 43,
+      "original_episode": 58,
+      "frame": 796,
+      "input_sha256": "48dbfc11b04ec9a7ddf211f2eb75a12e9a1b1384f23a92b6f45071b5c6fd9c1c"
+    },
+    {
+      "episode": 43,
+      "original_episode": 58,
+      "frame": 896,
+      "input_sha256": "1a40f7329121523ee46d90fe45924e632854d10076548a4e830aec11d768ed0a"
+    }
+  ],
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "predictions": 270,
+  "repeat_max_error": 0.0,
+  "all_model_parameters_finite": true,
+  "checkpoint_model_sha256": "1ab52d540d684d837cfc71b5990b501f3fcea91d7776672d22596ff727ca766d",
+  "processor_component_sha256": {
+    "policy_preprocessor_step_3_normalizer_processor.safetensors": "6c3ab9a2e6d6983b459499f49939ddf04c0622e604b837d5311d841c9af33075",
+    "policy_postprocessor_step_0_unnormalizer_processor.safetensors": "c7413793958e04dc33afce5124e170bb19310cae088980a6afa29e72964f7595",
+    "policy_postprocessor.json": "8def456c1f5ae93ebf85655358fcfc58bee29c219e9d44644e61a11738aa14c9",
+    "policy_preprocessor.json": "0b4ba0da3fe00092a5f38346d83bb522a4eb8fbeb0479cafc246f298cb362113"
+  },
+  "elapsed_eval_seconds": 50.108771743718535,
+  "scope": "90 held-out windows, three seeds; excludes padded targets; no robot or LoRA",
+  "limits": "Not all 8511 timestamps; no physical success or safety estimate; optimizer tensor contents not scanned or resumed"
+}

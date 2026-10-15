@@ -1,0 +1,13 @@
+{
+  "status": "passed",
+  "command": [
+    "/home/kiran/sim/pi05-official-20260922/.venv/bin/python",
+    "-u",
+    "/home/kiran/sim/pi05-fullft-orange50-20260922/fullft_orange_smoke.py",
+    "--config_path=/home/kiran/sim/pi05-fullft-orange50-20260922/batch4_control/config.json"
+  ],
+  "pid": 1696193,
+  "elapsed_seconds": 102.02117742714472,
+  "available_bytes": 47545016320,
+  "exit_code": 0
+}

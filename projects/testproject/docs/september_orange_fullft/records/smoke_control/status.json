@@ -1,0 +1,42 @@
+{
+  "status": "passed",
+  "phases": [
+    {
+      "phase": "fresh",
+      "command": [
+        "/home/kiran/sim/pi05-official-20260922/.venv/bin/python",
+        "-u",
+        "/home/kiran/sim/pi05-fullft-orange50-20260922/fullft_orange_smoke.py",
+        "--config_path=/home/kiran/sim/pi05-fullft-orange50-20260922/smoke_control/config.json"
+      ],
+      "pid": 1692535,
+      "elapsed_seconds": 100.07425249484368,
+      "minimum_available_bytes": 16958119936,
+      "output_bytes": 35342908173,
+      "exit_code": 0
+    },
+    {
+      "phase": "resume",
+      "command": [
+        "/home/kiran/sim/pi05-official-20260922/.venv/bin/python",
+        "-u",
+        "/home/kiran/sim/pi05-fullft-orange50-20260922/fullft_orange_smoke.py",
+        "--config_path=/home/kiran/sim/pi05-fullft-orange50-20260922/smoke_training/checkpoints/last/pretrained_model/train_config.json",
+        "--resume=true",
+        "--steps=5",
+        "--save_freq=5"
+      ],
+      "pid": 1693440,
+      "elapsed_seconds": 104.04195820097812,
+      "minimum_available_bytes": 17104265216,
+      "output_bytes": 70685816320,
+      "exit_code": 0
+    }
+  ],
+  "limits": {
+    "wall_seconds_per_phase": 1200,
+    "new_output_gib": 90,
+    "minimum_host_available_gib": 4
+  },
+  "clean_package_unchanged": true
+}

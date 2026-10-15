@@ -1,0 +1,21 @@
+{
+  "status": "passed",
+  "command": [
+    "/home/kiran/sim/pi05-official-20260922/.venv/bin/python",
+    "-u",
+    "/home/kiran/sim/pi05-fullft-orange50-20260922/fullft_orange_smoke.py",
+    "--config_path=/home/kiran/sim/pi05-fullft-orange50-20260922/smoke_training/checkpoints/000005/pretrained_model/train_config.json",
+    "--resume=true",
+    "--steps=7",
+    "--batch_size=4",
+    "--save_checkpoint=false",
+    "--output_dir=/home/kiran/sim/pi05-fullft-orange50-20260922/batch4resume_training",
+    "--eval_steps=7",
+    "--max_eval_samples=4"
+  ],
+  "pid": 1699433,
+  "elapsed_seconds": 88.02684319484979,
+  "available_bytes": 54067916800,
+  "minimum_available_bytes": 25765355520,
+  "exit_code": 0
+}

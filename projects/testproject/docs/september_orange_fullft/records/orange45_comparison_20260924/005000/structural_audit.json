@@ -1,0 +1,32 @@
+{
+  "status": "structural_check_passed",
+  "checkpoint": "/home/kiran/sim/pi05-fullft-orange50-20260922/orange45_fullft_15k_candidate/checkpoints/005000",
+  "progress": {
+    "step": 5000,
+    "num_processes": 1,
+    "batch_size": 4
+  },
+  "tensors": {
+    "pretrained_model/model.safetensors": {
+      "tensors": 813,
+      "bytes": 9354050752
+    },
+    "pretrained_model/policy_preprocessor_step_3_normalizer_processor.safetensors": {
+      "tensors": 90,
+      "bytes": 7560
+    },
+    "pretrained_model/policy_postprocessor_step_0_unnormalizer_processor.safetensors": {
+      "tensors": 90,
+      "bytes": 7552
+    },
+    "training_state/rng_state.safetensors": {
+      "tensors": 8,
+      "bytes": 15708
+    },
+    "training_state/optimizer_state.safetensors": {
+      "tensors": 2415,
+      "bytes": 25988800372
+    }
+  },
+  "scope": "Not a tensor-finiteness, behavioral-quality or fresh-process resume test"
+}

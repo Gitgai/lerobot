@@ -1,0 +1,8 @@
+{
+  "status": "passed",
+  "official_serializer_used": true,
+  "exact_continuation": true,
+  "state_host_fp32_pinned": true,
+  "scope": "tiny optimizer checkpoint only; not whole trainer or model",
+  "max_cuda_allocated_bytes": 12288
+}

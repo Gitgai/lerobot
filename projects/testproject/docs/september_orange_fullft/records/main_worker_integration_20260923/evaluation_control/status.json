@@ -1,0 +1,23 @@
+{
+  "status": "worker_completed_not_checkpoint_certified",
+  "command": [
+    "/home/kiran/sim/pi05-official-20260922/.venv/bin/python",
+    "-u",
+    "evaluate_fullft_integration.py"
+  ],
+  "limits": {
+    "wall_seconds": 1200.0,
+    "minimum_ram_bytes": 4294967296,
+    "minimum_disk_free_bytes": 53687091200,
+    "maximum_new_bytes": 1000000000
+  },
+  "output": "/home/kiran/sim/pi05-fullft-orange50-20260922/main_worker_integration_20260923/training",
+  "baseline_output_bytes": 70685816665,
+  "checkpoints": "not validated; never auto-resume interrupted saves",
+  "elapsed_seconds": 82.03583988314494,
+  "available_ram_bytes": 55587729408,
+  "disk_free_bytes": 759603859456,
+  "new_bytes": 3160,
+  "pid": 111417,
+  "exit_code": 0
+}

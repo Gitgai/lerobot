@@ -1,0 +1,24 @@
+{
+  "status": "worker_completed_not_checkpoint_certified",
+  "command": [
+    "/home/kiran/sim/pi05-official-20260922/.venv/bin/python",
+    "-u",
+    "-c",
+    "from pathlib import Path; import evaluate_orange45_checkpoints as e; e.OUT=Path('/home/kiran/sim/pi05-fullft-orange50-20260922/offline_10k_recheck_josmu_g4'); e.evaluate(10000)"
+  ],
+  "limits": {
+    "wall_seconds": 1200,
+    "minimum_ram_bytes": 4294967296,
+    "minimum_disk_free_bytes": 53687091200,
+    "maximum_new_bytes": 2000000000
+  },
+  "output": "/home/kiran/sim/pi05-fullft-orange50-20260922/offline_10k_recheck_josmu_g4/010000",
+  "baseline_output_bytes": 0,
+  "checkpoints": "not validated; never auto-resume interrupted saves",
+  "elapsed_seconds": 114.03945947997272,
+  "available_ram_bytes": 54018686976,
+  "disk_free_bytes": 447002075136,
+  "new_bytes": 332313,
+  "pid": 1020052,
+  "exit_code": 0
+}
