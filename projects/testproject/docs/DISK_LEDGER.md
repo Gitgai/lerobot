@@ -18,7 +18,8 @@ without a disk budget. Each checkpoint turned out to be 31 GB (12 GB weights +
 
 ```text
 /            1.8T  1.5T used  225G free  (88%)   nvme0n1p2
-/mnt/dynus4tb  3.6T  3.2T used  456G free  (88%)   ext4, the 4 TB
+/mnt/dynus4tb  3.6T  3.2T used  456G free  (88%)   ext4, DYNUS flight data
+/mnt/data4tb   3.6T  ~0 used   3.6T free          ext4, label data4tb — EMPTY archive drive (found 2026-10-15)
 /tmp         tmpfs 30G, 0.6G used (was 24G of DYNUS scratch until 2026-10-11)
 
 /home/kiran, largest first
@@ -58,7 +59,7 @@ without a disk budget. Each checkpoint turned out to be 31 GB (12 GB weights +
 ## 3. Removals and moves
 
 ```text
-PROPOSED 2026-10-15 (awaiting operator approval) — frees ~207 GB on root:
+PROPOSED 2026-10-15 — superseded by the DONE block below (rows 1, 3 executed; row 2 executed as a MOVE):
   rm  sim/pi05-fullft-orange50-20260922/smoke_training/checkpoints/000003            33G
   rm  sim/pi05-fullft-orange50-20260922/smoke_training/checkpoints/000005            33G
   rm  sim/pi05-fullft-orange50-20260922/main_worker_integration_20260923/training/checkpoints/000002   33G
@@ -74,7 +75,19 @@ PROPOSED, for the RUNNING full-FT: a watcher that, each time a new checkpoint co
   removes train_state/ from the previous one (12G weights kept, scoring unaffected; only
   the latest stays resumable). Remaining need drops from 310 GB to ~140 GB.
 
-DONE
+DONE 2026-10-15 (operator approved rows 1 and 3 of the proposal; row 2 changed from
+"delete" to "move" at the operator's request; no compression — measured zstd ratio 88.7%)
+  05:14Z  rm   the four September smoke checkpoints                                   −132 GB root
+  05:16Z  mv   8 spare LoRA checkpoints → /mnt/dynus4tb (WRONG drive, see below)      −74 GB root
+  05:18Z  mv   the same 8 → /mnt/data4tb/openpi-checkpoints/lora_libero_20261010/   (symlinks under
+          ~/sim/openpi/checkpoints/... re-pointed; 20000 stays on root; readable in place)
+  05:20Z  mv   orange45 {005000,010000,015000}/training_state → /mnt/data4tb/pi05-fullft-orange50-20260922/...
+          (symlinks left; pretrained_model untouched; all three still resumable)       −75 GB root
+  result  root 222 → 496 GB free (72% used); data4tb 144 GB used of 3.6 TB; dynus4tb back to 524 GB free
+  scripts results/pi05_libero_20261010/disk_cleanup_20261015.sh, disk_relocate_data4tb_20261015.sh (logs beside them)
+  the running L4-noEMA job (310 GB still to write) now fits without stripping anything
+  ⚠ there are TWO 4 TB drives: /mnt/data4tb (label data4tb, was EMPTY) is the archive drive;
+    /mnt/dynus4tb is the DYNUS flight-data drive (86% full) — do not park checkpoints there.
   2026-10-11  /tmp: ~24 GB of DYNUS scratch cleared by the operator (restored the Bash tool)
   2026-10-14  openpi smoke checkpoint dirs (smoke_bs*, smoke_fsdp2_*) removed by their own scripts
 ```
@@ -93,7 +106,7 @@ R3  CLOSE A RUN = STRIP ITS OPTIMIZER STATE. When a run is finished and its
     checkpoints scored, keep weights (+ config + normalisers) for every
     checkpoint and resume state only for the final one — with the operator's
     approval, logged here.
-R4  BIG MEDIA OFF ROOT. mp4s, .rrd traces and spare checkpoints go to the 4 TB
-    (/mnt/dynus4tb), never git, per the commit policy.
+R4  BIG MEDIA OFF ROOT. mp4s, .rrd traces and spare checkpoints go to the
+    ARCHIVE 4 TB (/mnt/data4tb), never to /mnt/dynus4tb and never to git.
 R5  THIS LEDGER IS UPDATED with every removal, move, or new run over 50 GB.
 ```
