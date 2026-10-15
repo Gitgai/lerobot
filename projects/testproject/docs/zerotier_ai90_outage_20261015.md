@@ -41,3 +41,17 @@ public IP. Not the cause: clock, planet, path, firewall logs, conntrack, wired 1
 Token copy at ~/.zeroTierOneAuthToken/authtoken.secret (created 2026-10-14 by the operator)
 lets `zerotier-cli -T"$(cat ~/.zeroTierOneAuthToken/authtoken.secret)" peers` run without sudo.
 Sampler log: ~/tmp/zt_sample_1041.log. STUN probe: ~/tmp/stun_probe.py.
+
+## Update 16:50Z — relapse, and a step of mine that made it worse
+- ~12:00-16:29Z: AI90 lost its ZeroTier data plane entirely (ARP over the overlay fails to every
+  member, even kglenova on the same LAN, although ZT control packets flow and peers are listed).
+  kglenova itself still reaches the other two house members (.93, .235) but NOT the laptop
+  (ARP FAILED) — the laptop side also appears down or on a new network.
+- 16:33Z: without root the only lever was the local API: `zerotier-cli leave/join`. Result:
+  network stuck in REQUESTING_CONFIGURATION with no assigned address for >15 min although the
+  controller exchanges packets with AI90 every few seconds. Worse than before (had an address,
+  no traffic). Not repeating it.
+- Fix needs root on AI90:  sudo rm /var/lib/zerotier-one/local.conf && sudo systemctl restart zerotier-one
+  Lesson: the 09:22-local primaryPort change (my suggestion) correlated with the slide into
+  TUNNELED mode and then total loss; revert it first. Access path independent of ZeroTier
+  (reverse SSH tunnel to a host the operator controls) proposed, awaiting approval.
