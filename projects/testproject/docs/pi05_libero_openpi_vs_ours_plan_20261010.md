@@ -135,6 +135,18 @@ L4-noEMA  full FT, EMA off           running since 2026-10-14 ~20:00Z — OPERAT
                                      saves every 2500, then every checkpoint scored
                                      with the L2 loop (server on GPU 0). Every table
                                      carries the label "full FT, EMA off".
+                                     RUN HEALTH (2026-10-15 05:26Z, step 6.4k): GPU 1
+                                     at 86-87 °C, fan 64%, 2130 of 3090 MHz with the
+                                     POWER-CAP flag active — the card sits at its
+                                     300 W rating, which is the expected steady state,
+                                     not a fault; thermal-slowdown flags inactive.
+                                     health_watch.sh (Monitor task, 5-min checks)
+                                     alerts on: trainer death · GPU1 ≥90 °C or any
+                                     thermal-slowdown flag · <60 steps in 15 min ·
+                                     root <80 GB · host RAM <8 GB · swap >20 GB;
+                                     hourly one-line heartbeat otherwise. No CPU
+                                     temperature source on this host (no lm-sensors,
+                                     no thermal zones).
 L5  score ours, one table            LoRA side DONE 2026-10-12 15:08Z. Every
                                      checkpoint, 200 episodes, L2 loop, seed 7:
                                        step   success   CI95        fails/task
