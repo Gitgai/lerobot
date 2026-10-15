@@ -6,7 +6,8 @@ PIDF=$RES/l4noema_train_fullft_noema_libero_20261014.pid; LOGF=$RES/l4noema_trai
 last_hb=0; last_step=0; last_t=$(date +%s)
 while true; do
   now=$(date +%s); ts=$(date -u +%H:%MZ)
-  IFS=', ' read -r t tmem clk hw sw pc fan < <(nvidia-smi -i 1 --query-gpu=temperature.gpu,temperature.memory,clocks.sm,clocks_event_reasons.hw_thermal_slowdown,clocks_event_reasons.sw_thermal_slowdown,clocks_event_reasons.sw_power_cap,fan.speed --format=csv,noheader,nounits)
+  # split on commas ONLY: the flag fields contain spaces ("Not Active")
+  IFS=',' read -r t clk hw sw pc fan < <(nvidia-smi -i 1 --query-gpu=temperature.gpu,clocks.sm,clocks_event_reasons.hw_thermal_slowdown,clocks_event_reasons.sw_thermal_slowdown,clocks_event_reasons.sw_power_cap,fan.speed --format=csv,noheader,nounits | tr -d ' ')
   free_gb=$(df -BG --output=avail / | tail -1 | tr -dc 0-9); swap_gb=$(free -g | awk '/Swap/{print $3}'); avail_gb=$(free -g | awk '/Mem/{print $7}'); load=$(cut -d' ' -f1 /proc/loadavg)
   step=$(tr '\r' '\n' < "$LOGF" | grep -a "Progress on: [0-9]" | tail -1 | sed 's/.*Progress on: \([0-9.]*\)kit.*/\1/'); step=${step:-0}
   alive=0; kill -0 "$(cat "$PIDF" 2>/dev/null)" 2>/dev/null && alive=1
