@@ -18,7 +18,7 @@ while true; do
   [ "$sw" = "Active" ] && msg="$msg sw thermal slowdown;"
   [ "${free_gb:-0}" -lt 80 ] && msg="$msg root ${free_gb}GB free;"
   [ "${avail_gb:-99}" -lt 8 ] && msg="$msg host RAM ${avail_gb}GB avail;"
-  [ "${swap_gb:-0}" -gt 20 ] && msg="$msg swap ${swap_gb}GB;"
+  [ "${swap_gb:-0}" -gt 45 ] && msg="$msg swap ${swap_gb}GB of 63;"
   if [ "$alive" = 1 ] && [ $((now-last_t)) -ge 900 ]; then
     ds=$(python3 -c "print(round(($step-$last_step)*1000))" 2>/dev/null || echo 0)
     [ "$ds" -lt 60 ] && msg="$msg STALLED (${ds} steps in 15 min);"
