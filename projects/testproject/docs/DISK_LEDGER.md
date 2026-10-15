@@ -133,3 +133,5 @@ stopped (0 kB/s since; file static at 165 GB — truncation still needed, root).
 took the whole process tree, trainer included (step 14.7k; last ckpt 12500). Resumed 16:59Z as
 systemd user units. Budget now: 310 GB free vs 7 × 31 = 217 GB to write → fits (~90 GB margin),
 no further log growth assumed; the new desktop app (pid 1398552, 12:56 local) is NOT looping.
+DONE ~17:00Z (operator, root): /var/log/syslog truncated (165 GB → 0) and rsyslog drop rule
+/etc/rsyslog.d/05-claude-desktop-gpu-flood.conf installed. Root 310 → 470 GB free. Incident §5 closed.
