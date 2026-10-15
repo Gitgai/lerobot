@@ -44,7 +44,9 @@ L4   reproduce THEIR full FT on 72 GB: as published it does    running  L4-noEMA
      NOT fit (OOM at 66+17 GB, every batch; both GPUs via fsdp            ~20:00Z: smoke → 30k run on
      refused — mixed GPU models). OPERATOR AMENDED (2026-10-14):           GPU 1, saves every 2500 →
      run it with EMA OFF, nothing else changed; row labelled              score all → 3-row table.
-     "full FT, EMA off". Half precision stays forbidden.                  ~1 day. Config pi05_libero_noema.
+     "full FT, EMA off". Half precision stays forbidden.                  ~41 h at 4.9 s/step. Config
+     ⚠ DISK: 31 GB/ckpt × 12 = 372 GB vs 225 GB free — will fill at         pi05_libero_noema.
+     ~22.5k. Cleanup proposal + rules in DISK_LEDGER.md (RED, awaiting go).
 L5   score every checkpoint, same sim, same seeds, RTC off     done     2026-10-12 15:08Z (L3 side)
      ★ LoRA vs their full FT on LIBERO Spatial, n=200 each:                L4's row pending
        their full FT        200/200 = 100%
@@ -115,7 +117,9 @@ nvidia-smi --query-compute-apps before launching · confirm rtc_config=None
 at every sim policy load · checkpoint every 2.5k steps on any run
 longer than ~10 h (operator, 2026-10-11; a reboot cost 8.6 h the same day) · TMPDIR=/home/kiran/tmp in every
 launched script while /tmp's quota is exhausted · never cap JAX memory below
-what the smoke needs — a 0.6 fraction masqueraded as an OOM on 2026-10-10
+what the smoke needs — a 0.6 fraction masqueraded as an OOM on 2026-10-10 ·
+disk budget before any checkpointing run; smokes delete their checkpoints;
+closed runs lose their optimizer state (DISK_LEDGER.md R1-R5, 2026-10-15)
 ```
 
 ---
