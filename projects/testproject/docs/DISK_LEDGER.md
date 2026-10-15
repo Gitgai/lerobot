@@ -110,3 +110,20 @@ R4  BIG MEDIA OFF ROOT. mp4s, .rrd traces and spare checkpoints go to the
     ARCHIVE 4 TB (/mnt/data4tb), never to /mnt/dynus4tb and never to git.
 R5  THIS LEDGER IS UPDATED with every removal, move, or new run over 50 GB.
 ```
+
+## 5. INCIDENT 2026-10-15 15:30Z — /var/log/syslog at 160 GB and growing 8 GB/h
+
+Found by the hourly health heartbeat: root free fell 8-9 GB/h between checkpoints.
+Cause: the Claude desktop app on AI90 (pid 7727, started at boot 2026-10-13 23:58 local,
+66% CPU) loops on "GPU process launch failed: error_code=1002" and rsyslog writes every
+line: 2 MB/s into /var/log/syslog (160 GB at 15:30Z; journald capped at 4 GB).
+Projection at 15:30Z: 325 GB free; 7 checkpoints x 31 GB = 217 GB still to write
+(~9 GB/h) + 8 GB/h of log = ~17 GB/h -> root FULL in ~19 h, before the run ends (~22 h).
+Cannot be fixed from this account: syslog is root-owned; the desktop app is the PARENT
+of this Claude Code session (killing it kills the session). Needs the operator:
+  sudo truncate -s 0 /var/log/syslog                      # frees 160 GB at once
+  printf ':msg, contains, "GPU process launch failed" stop\n' | sudo tee /etc/rsyslog.d/05-claude-desktop-gpu-flood.conf
+  sudo systemctl restart rsyslog                          # stops the growth, session survives
+(Restarting the desktop app would also stop it but ends this session.)
+Fallback if neither can happen in time: move landed full-FT checkpoints to /mnt/data4tb
+behind symlinks as the LoRA spares were (RED, needs approval).
