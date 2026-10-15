@@ -127,3 +127,9 @@ of this Claude Code session (killing it kills the session). Needs the operator:
 (Restarting the desktop app would also stop it but ends this session.)
 Fallback if neither can happen in time: move landed full-FT checkpoints to /mnt/data4tb
 behind symlinks as the LoRA spares were (RED, needs approval).
+
+UPDATE 16:59Z: the operator killed the Claude desktop app (pid 7727) at ~16:54Z. The syslog flood
+stopped (0 kB/s since; file static at 165 GB — truncation still needed, root). Side effect: the kill
+took the whole process tree, trainer included (step 14.7k; last ckpt 12500). Resumed 16:59Z as
+systemd user units. Budget now: 310 GB free vs 7 × 31 = 217 GB to write → fits (~90 GB margin),
+no further log growth assumed; the new desktop app (pid 1398552, 12:56 local) is NOT looping.

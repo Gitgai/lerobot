@@ -1,6 +1,6 @@
 # π0.5 lane — Current Priority and Status
 
-Last updated: 2026-10-14
+Last updated: 2026-10-15
 
 **This file is the ROUTER and the TRACKER: what is open, in what order, and
 where each step stands. It is NOT a log.** Detail, gates and pre-registered
@@ -40,13 +40,14 @@ L3   train openpi LoRA on LIBERO here, 30k steps from          done     2026-10-
      pi05_base. Trainable 467M of 3.40B (LoRA 50M + SigLIP 415M            bs32, 3.4 s/step, ~28 h of
      + proj 2M = openpi's own "low_mem" = "LoRA + vision encoder").         GPU incl. an 8.6 h loss to a
      Loss 0.094 → 0.014. 9 checkpoints kept (10k, 12.5k…27.5k, 29999).      host reboot at 18.8k
-L4   reproduce THEIR full FT on 72 GB: as published it does    running  L4-noEMA since 2026-10-14
-     NOT fit (OOM at 66+17 GB, every batch; both GPUs via fsdp            ~20:00Z: smoke → 30k run on
-     refused — mixed GPU models). OPERATOR AMENDED (2026-10-14):           GPU 1, saves every 2500 →
-     run it with EMA OFF, nothing else changed; row labelled              score all → 3-row table.
-     "full FT, EMA off". Half precision stays forbidden.                  ~41 h at 4.9 s/step. Config
-     ⚠ DISK: 31 GB/ckpt × 12 = 372 GB vs 225 GB free — will fill at         pi05_libero_noema.
-     ~22.5k. Cleanup proposal + rules in DISK_LEDGER.md (RED, awaiting go).
+L4   reproduce THEIR full FT on 72 GB: as published it does    running  L4-noEMA, GPU 1, config
+     NOT fit (OOM at 66+17 GB, every batch; both GPUs via fsdp            pi05_libero_noema, bs 32,
+     refused — mixed GPU models). OPERATOR AMENDED (2026-10-14):           4.9 s/step, saves every 2500.
+     run it with EMA OFF, nothing else changed; row labelled              KILLED 2026-10-15 16:54Z at
+     "full FT, EMA off". Half precision stays forbidden.                  14.7k (desktop-app kill took
+     Disk: fixed 2026-10-15 (DISK_LEDGER §3); syslog flood §5 stopped.     the session's process tree,
+     RESUMED 16:59Z from 12500 as systemd user units l4noema-train /       setsid was not enough).
+     l4noema-chain (l4noema_resume_and_score.sh). ETA ~17:30Z 10-16.
 L5   score every checkpoint, same sim, same seeds, RTC off     done     2026-10-12 15:08Z (L3 side)
      ★ LoRA vs their full FT on LIBERO Spatial, n=200 each:                L4's row pending
        their full FT        200/200 = 100%
@@ -88,8 +89,7 @@ in our scene; 3,300-ep 11-task Isaac Lab corpus (other scene, train-only);
 ```text
 1  ✔ L1, L2, L3, L5(LoRA) done 2026-10-10..12 — LoRA works on LIBERO
    ✔ results write-up: RESULTS_pi05_libero_lora_vs_fullft_20261013.md
-2  L4: 72 GB is SHORT for their recipe (smoke 2026-10-14) → operator decision:
-   rent a multi-GPU node (preferred, batch 256) or a single ≥96 GB card
+2  L4-noEMA running (resumed 2026-10-15 16:59Z from 12.5k); chain scores all 12 → 3-row table
 3  openpi mirror push (needs operator: create Gitgai/openpi, 3 commands)
 4  O0 and O1a in parallel on GPU 0 once the 'openpi-lora-recheck' process
    someone started 2026-10-14 is done; then O1b → O3 (O2 only on a clear O1b)
@@ -119,7 +119,9 @@ longer than ~10 h (operator, 2026-10-11; a reboot cost 8.6 h the same day) · TM
 launched script while /tmp's quota is exhausted · never cap JAX memory below
 what the smoke needs — a 0.6 fraction masqueraded as an OOM on 2026-10-10 ·
 disk budget before any checkpointing run; smokes delete their checkpoints;
-closed runs lose their optimizer state (DISK_LEDGER.md R1-R5, 2026-10-15)
+closed runs lose their optimizer state (DISK_LEDGER.md R1-R5, 2026-10-15) ·
+long jobs run as `systemd-run --user` units, never setsid/nohup from a session
+(the 2026-10-15 16:54Z app kill took setsid'd trainer+chain+watchdog with it)
 ```
 
 ---
