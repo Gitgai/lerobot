@@ -144,3 +144,9 @@ hold more host memory than the original (pre-kill saves showed swap ≤8 GB). Th
 at 20:31Z and the rate returned to 5.1 s/step; swap settled at 22 GB. Headroom: 59 GB RAM +
 63 GB swap vs ~76 GB peak → OK but not comfortable; 6 saves to go. Docker/DYNUS containers hold
 only MBs; the 11 GB /tmp scratch (DYNUS) is the one reclaimable block if it gets tight.
+
+## 7. PROPOSED 2026-10-16 (R3, RED — needs operator approval)
+L4-noEMA is closed and scored. Keep params/ (+assets) for all 12 checkpoints; strip
+train_state/ (19 GB each) from the 11 non-final ones → frees 209 GB on root (372 → 163 GB
+for the run). Alternative: MOVE the 11 train_state dirs to /mnt/data4tb behind symlinks
+(R4), freeing the same on root with nothing deleted. Either way 29999 stays fully resumable.

@@ -1,6 +1,6 @@
 # LoRA vs full fine-tune of π0.5 on LIBERO — what we are doing
 
-Date: 2026-10-10, kiran-AI90. Status: **L1-L3, L5(LoRA) DONE 2026-10-12; L4 (full FT on 72 GB) open.**
+Date: 2026-10-10, kiran-AI90. Status: **ALL DONE 2026-10-16 — L1-L3, L5(LoRA) 2026-10-12; L4 (full FT, EMA off, 72 GB) trained + scored 2026-10-16.**
 ➡ **Standalone write-up of what was done and found: `RESULTS_pi05_libero_lora_vs_fullft_20261013.md`.**
 This file says WHAT and WHY. The HOW is sketched in the appendix and gets
 written properly when we start each phase.
@@ -119,7 +119,8 @@ L4  reproduce full FT on 72 GB       blocked 2026-10-14 05:41Z — DOES NOT FIT.
                                      unsupported there). ⇒ this host cannot run
                                      the published recipe in any configuration.
                                      Record: l4_smoke_fsdp2.log.
-L4-noEMA  full FT, EMA off           running since 2026-10-14 ~20:00Z — OPERATOR
+L4-noEMA  full FT, EMA off           DONE 2026-10-16 20:08Z: final 194/200 = 97.0%,
+                                     pooled 10k-30k 90.8% (RESULTS §5.1b). Was: running since 2026-10-14 ~20:00Z — OPERATOR
                                      AMENDED THE DECISION: fill the row on the 72 GB
                                      card with the SMALLEST deviation that fits.
                                      Config pi05_libero_noema = pi05_libero with
@@ -172,7 +173,8 @@ L5  score ours, one table            LoRA side DONE 2026-10-12 15:08Z. Every
                                      late drift on one task. 30k is not better
                                      than 15-20k; openpi's 30k default bought
                                      nothing measurable here.
-                                     L4's row (our full FT) still pending.
+                                     L4's row landed 2026-10-16: 97.0% final, level
+                                     with LoRA, far noisier curve (RESULTS §5.1b).
                                      FILMED 2026-10-12 (results/.../videos/): drawer
                                      task @22.5k 17/20 on re-run (15/20 original),
                                      @15k 19/20 (19/20); all tasks trial 0 @20k
@@ -288,7 +290,7 @@ just the end.
 ```text
                                      LIBERO Spatial, n=200   examples seen
 openpi full FT (their checkpoint)    100.0 %  reference 98.8  7.7M
-full FT (ours, big GPU, 3b)          ____ %                   30k x batch   ← L4 pending
+full FT (ours, 72 GB, EMA off, bs32) 97.0 %   pooled 10k-30k 90.8  960k   ← L4 done 2026-10-16
 LoRA (ours, 5090) best @20k          99.5 %   final @30k 97.5  960k
                                      pooled over 9 ckpts 97.8
 ```
@@ -296,7 +298,9 @@ LoRA (ours, 5090) best @20k          99.5 %   final @30k 97.5  960k
 **Reading (pre-registered bands):** LoRA ≥ 70% → "yes, LoRA works here" —
 it landed at 97.5-99.5. Gap to their checkpoint: 0.5-2.5 points, inside
 n=200 noise; reported, not attributed (they saw 8x the examples). The
-L4 row decides whether full FT at OUR volume does any better.
+L4 row (2026-10-16): full FT at OUR volume does NOT do better — 97.0 final,
+level with LoRA, pooled 90.8 vs 97.8 because of large checkpoint-to-checkpoint
+swings. No advantage to full fine-tuning shown at matched data.
 
 Rows 2 and 3 at the SAME batch and steps differ only in the adapter route.
 Row 1 vs row 2 measures what their extra data and batch bought.

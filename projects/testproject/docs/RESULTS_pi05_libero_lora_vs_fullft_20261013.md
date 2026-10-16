@@ -32,13 +32,22 @@ is statistically indistinguishable from their published full fine-tune.**
 openpi full FT, their checkpoint          200/200 = 100.0%     7.68M   (30k steps × batch 256)
 ours, LoRA, best checkpoint (20k)         396/400 =  99.0%     640k    (20k steps × batch 32)
 ours, LoRA, pooled over 9 checkpoints    1761/1800 =  97.8%
+ours, FULL FT, EMA off, final (30k)       194/200 =  97.0%     960k    (30k steps × batch 32)  ← added 2026-10-16
+ours, FULL FT, EMA off, pooled 10k-30k   1635/1800 =  90.8%
 their published number (their harness)              98.8%
 ```
 
 The LoRA policy saw 8-12× fewer example presentations and still lands within
-1-2 points, inside sampling noise at these sample sizes. The one row still
-missing is OUR full fine-tune at OUR data volume (L4, needs a ≥72 GB GPU),
-which is what would separate "LoRA vs full" from "their data vs ours".
+1-2 points, inside sampling noise at these sample sizes.
+
+**The matched-data row landed 2026-10-16 (L4, 72 GB card, EMA off, batch 32,
+every other lever as published).** At the SAME data volume as our LoRA run,
+full fine-tuning ends level with LoRA (97.0 vs 97.5-99.5, intervals overlap)
+and is far noisier on the way there: its checkpoint scores swing 78.5 → 93.0 →
+82.0 → 95.5 between 10k and 20k while LoRA's stay in 95-99.5. **Full
+fine-tuning showed no advantage over LoRA here; the gap to openpi's checkpoint
+is therefore not the recipe, and the remaining suspects are their 8× data
+volume (batch 256) and EMA, which we could not run.**
 
 ## 3. What we did, in order
 
@@ -145,6 +154,37 @@ pooled   1761/1800  97.8%
 their FT  200/200  100.0%   98.1-100
 ```
 
+### 5.1b Our FULL fine-tune, EMA off, batch 32 — same loop, same layouts (added 2026-10-16)
+
+```text
+step      success   rate    CI95          failures by task (task:count)
+ 2500     137/200   68.5%   61.8-74.5     0:11 1:12 2:4 3:3 4:5 5:8 6:5 7:8 8:3 9:4   (lr warm-up)
+ 5000     181/200   90.5%   85.6-93.8     1:2 3:4 4:1 5:2 6:1 7:2 8:1 9:6
+ 7500     168/200   84.0%   78.3-88.4     0:2 1:4 2:1 3:1 4:10 7:6 8:5 9:3
+10000     157/200   78.5%   72.3-83.6     1:9 2:1 3:5 4:5 5:9 6:1 7:7 8:3 9:3       (lr peak 5e-5)
+12500     175/200   87.5%   82.2-91.4     0:2 2:1 3:2 4:12 5:5 8:2 9:1
+15000     186/200   93.0%   88.6-95.8     0:2 1:2 4:3 5:4 6:2 8:1
+17500     164/200   82.0%   76.1-86.7     0:9 1:3 2:2 3:3 4:3 5:6 6:4 8:5 9:1
+20000     191/200   95.5%   91.7-97.6     1:1 4:3 5:1 6:1 7:1 8:2
+22500     189/200   94.5%   90.4-96.9     1:1 2:1 3:1 4:2 5:1 8:1 9:4
+25000     185/200   92.5%   88.0-95.4     1:10 2:1 4:3 5:1
+27500     194/200   97.0%   93.6-98.6     4:2 5:1 7:3
+29999     194/200   97.0%   93.6-98.6     3:2 4:2 5:1 6:1
+pooled 10k-30k   1635/1800  90.8%        (LoRA, same steps: 1761/1800 = 97.8%)
+```
+
+Training loss 0.094 → 0.023 at 12.9k → 0.017 at 29.9k (no spikes). Every
+failure is a 230-step timeout, as for LoRA, but they are spread over all ten
+tasks rather than concentrated on the drawer task (4). The dips at 10k, 17.5k
+and 25k are outside the n=200 interval of their neighbours — the policy itself
+moves between checkpoints. Two facts set this run apart from the published
+recipe and are the candidate causes, unattributed: no EMA (the published run
+averages weights with decay 0.999, which smooths exactly this kind of
+checkpoint-to-checkpoint swing) and batch 32 instead of 256 at the same
+learning rate (8× noisier gradient per step). Run: pi05_libero_noema, GPU 1
+(RTX PRO 5000 72 GB), 4.9 s/step, 30k steps ≈ 41 h + 3 h lost to a session
+kill at 14.7k (resumed from 12.5k); 12 checkpoints × 31 GB.
+
 Training loss (flow-matching MSE) went 0.094 → 0.020 by 10k → 0.014 by 22k,
 smooth, no spikes. **The policy is essentially trained by 15k steps; after
 that the scores move inside the noise band with no trend.** openpi's 30k
@@ -224,9 +264,11 @@ GPU sharing       flights render on the same GPU (type G context, invisible to
 
 ## 8. Caveats, stated plainly
 
-- LoRA vs full fine-tune at EQUAL data is not tested. Their run saw 8× more
-  presentations; the L4 row (our full FT, ≥72 GB GPU) is what separates the
-  recipe from the volume.
+- LoRA vs full fine-tune at EQUAL data IS now tested (§5.1b), but with EMA
+  off and batch 32: it is "our full FT" not "their full FT". Their run saw 8×
+  more presentations and used EMA; neither could be run on 72 GB.
+- One seed per recipe. The jagged full-FT curve is one run; a second seed
+  would say whether the swings are the recipe or the draw.
 - "LoRA" here trains the vision encoder fully (415M of the 467M trainable);
   that is openpi's definition, not a pure-adapter run.
 - n=200/400 cannot separate 99 from 100. Overlapping intervals mean "no
@@ -237,8 +279,9 @@ GPU sharing       flights render on the same GPU (type G context, invisible to
 ## 9. What is open
 
 ```text
-L4   our full FT on a ≥72 GB machine (operator to name it); recipe as published,
-     batch size the only permitted change; if 72 GB is short, rent a bigger box
+L4   DONE 2026-10-16 (EMA off, batch 32 — the published recipe does not fit
+     72 GB; see plan doc). Optional follow-ups, none scheduled: EMA kept in
+     host RAM; batch 256 via gradient accumulation; a second seed.
 O    the same question on the SO-101 orange task in LeIsaac
      (pi05_leisaac_lora_vs_fullft_plan_20261010.md): O0 scene check → O1a
      record to 450 episodes → O1b full FT + LoRA → O3 real arm from
@@ -253,4 +296,6 @@ f7b03ee7 / 79214504   plans, tracker, L1 PASS, L2 200/200, L3 running
 7732e613              LoRA row complete: 9 checkpoints, 97.5-99.5%
 05057134              second layout set n=400, filmed failures, rerun traces
 17904090              full-chunk tensor, plan series, 3D path overlay
+526e8c68 … 2065c3cc   L4-noEMA: OOM ladder, EMA-off decision, 30k run, session-kill
+                      resume, 12 checkpoints scored, full-FT row added (2026-10-14..16)
 ```
