@@ -1,6 +1,6 @@
 # π0.5 lane — Current Priority and Status
 
-Last updated: 2026-10-15
+Last updated: 2026-10-16
 
 **This file is the ROUTER and the TRACKER: what is open, in what order, and
 where each step stands. It is NOT a log.** Detail, gates and pre-registered
@@ -40,17 +40,17 @@ L3   train openpi LoRA on LIBERO here, 30k steps from          done     2026-10-
      pi05_base. Trainable 467M of 3.40B (LoRA 50M + SigLIP 415M            bs32, 3.4 s/step, ~28 h of
      + proj 2M = openpi's own "low_mem" = "LoRA + vision encoder").         GPU incl. an 8.6 h loss to a
      Loss 0.094 → 0.014. 9 checkpoints kept (10k, 12.5k…27.5k, 29999).      host reboot at 18.8k
-L4   reproduce THEIR full FT on 72 GB: as published it does    running  L4-noEMA, GPU 1, config
-     NOT fit (OOM at 66+17 GB, every batch; both GPUs via fsdp            pi05_libero_noema, bs 32,
-     refused — mixed GPU models). OPERATOR AMENDED (2026-10-14):           4.9 s/step, saves every 2500.
-     run it with EMA OFF, nothing else changed; row labelled              KILLED 2026-10-15 16:54Z at
-     "full FT, EMA off". Half precision stays forbidden.                  14.7k (desktop-app kill took
-     Disk: fixed 2026-10-15 (DISK_LEDGER §3); syslog flood §5 stopped.     the session's process tree,
-     RESUMED 16:59Z from 12500 as systemd user units l4noema-train /       setsid was not enough).
-     l4noema-chain (l4noema_resume_and_score.sh). ETA ~17:30Z 10-16.
+L4   reproduce THEIR full FT on 72 GB: as published it does    done     training finished 2026-10-16
+     NOT fit (OOM at 66+17 GB, every batch; both GPUs via fsdp            17:43Z (30k steps, bs 32, EMA
+     refused — mixed GPU models). OPERATOR AMENDED (2026-10-14):           off, 4.9 s/step, ~44 h GPU incl.
+     run it with EMA OFF, nothing else changed; row labelled              a 3 h loss to the 10-15 session
+     "full FT, EMA off". Half precision stays forbidden.                  kill). Loss 0.094 → 0.017.
+     12 checkpoints (2.5k…27.5k, 29999), 31 GB each = 372 GB on root.      Scoring (L5 side) running.
+     Each save needs ~46 GB host RAM → swap peaks ≤50 GB (ledger §6).
 L5   score every checkpoint, same sim, same seeds, RTC off     done     2026-10-12 15:08Z (L3 side)
      ★ LoRA vs their full FT on LIBERO Spatial, n=200 each:                L4's row pending
        their full FT        200/200 = 100%
+       our full FT, EMA off  scoring 12 ckpts now (chain, GPU 0)
        LoRA 10k/12.5k/15k   195 / 195 / 198
        LoRA 17.5k/20k/22.5k 195 / 199 / 190
        LoRA 25k/27.5k/30k   197 / 197 / 195      pooled 1761/1800 = 97.8%
