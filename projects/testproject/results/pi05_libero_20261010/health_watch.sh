@@ -19,9 +19,9 @@ while true; do
   [ "${free_gb:-0}" -lt 80 ] && msg="$msg root ${free_gb}GB free;"
   [ "${avail_gb:-99}" -lt 8 ] && msg="$msg host RAM ${avail_gb}GB avail;"
   [ "${swap_gb:-0}" -gt 45 ] && msg="$msg swap ${swap_gb}GB of 63;"
-  if [ "$alive" = 1 ] && [ $((now-last_t)) -ge 900 ]; then
+  if [ "$alive" = 1 ] && [ $((now-last_t)) -ge 1800 ]; then
     ds=$(python3 -c "print(round(($step-$last_step)*1000))" 2>/dev/null || echo 0)
-    [ "$ds" -lt 60 ] && msg="$msg STALLED (${ds} steps in 15 min);"
+    [ "$ds" -lt 60 ] && msg="$msg STALLED (${ds} steps in 30 min);"
     last_step=$step; last_t=$now
   fi
   [ -n "$msg" ] && echo "$ts ALERT:$msg  [step ${step}k gpu1 ${t}C ${clk}MHz fan ${fan}% powercap=$pc]"
