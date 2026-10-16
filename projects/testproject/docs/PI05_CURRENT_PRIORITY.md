@@ -40,23 +40,25 @@ L3   train openpi LoRA on LIBERO here, 30k steps from          done     2026-10-
      pi05_base. Trainable 467M of 3.40B (LoRA 50M + SigLIP 415M            bs32, 3.4 s/step, ~28 h of
      + proj 2M = openpi's own "low_mem" = "LoRA + vision encoder").         GPU incl. an 8.6 h loss to a
      Loss 0.094 → 0.014. 9 checkpoints kept (10k, 12.5k…27.5k, 29999).      host reboot at 18.8k
-L4   reproduce THEIR full FT on 72 GB: as published it does    done     training finished 2026-10-16
-     NOT fit (OOM at 66+17 GB, every batch; both GPUs via fsdp            17:43Z (30k steps, bs 32, EMA
-     refused — mixed GPU models). OPERATOR AMENDED (2026-10-14):           off, 4.9 s/step, ~44 h GPU incl.
-     run it with EMA OFF, nothing else changed; row labelled              a 3 h loss to the 10-15 session
-     "full FT, EMA off". Half precision stays forbidden.                  kill). Loss 0.094 → 0.017.
-     12 checkpoints (2.5k…27.5k, 29999), 31 GB each = 372 GB on root.      Scoring (L5 side) running.
-     Each save needs ~46 GB host RAM → swap peaks ≤50 GB (ledger §6).
+L4   reproduce THEIR full FT on 72 GB: as published it does    done     trained 10-14→10-16 (30k, bs 32,
+     NOT fit (OOM at 66+17 GB; fsdp refused — mixed GPUs).               EMA off, ~44 h GPU 1); scored
+     OPERATOR AMENDED (2026-10-14): EMA OFF, nothing else changed;        10-16 20:08Z, all 12 ckpts.
+     row labelled "full FT, EMA off". bf16 stays forbidden.              ★ final 194/200 = 97.0%
+     12 ckpts × 31 GB = 372 GB on root (optimizer state stripping         pooled 10k-30k 1635/1800 = 90.8%
+     per ledger R3 proposed, RED).                                         curve jagged: 78.5…97.0
 L5   score every checkpoint, same sim, same seeds, RTC off     done     2026-10-12 15:08Z (L3 side)
      ★ LoRA vs their full FT on LIBERO Spatial, n=200 each:                L4's row pending
        their full FT        200/200 = 100%
-       our full FT, EMA off  scoring 12 ckpts now (chain, GPU 0)
+       our full FT, EMA off (bs 32): 2.5k 68.5 · 5k 90.5 · 7.5k 84.0 · 10k 78.5 ·
+         12.5k 87.5 · 15k 93.0 · 17.5k 82.0 · 20k 95.5 · 22.5k 94.5 · 25k 92.5 ·
+         27.5k 97.0 · 30k 97.0  (pooled 10k-30k 90.8% vs LoRA 97.8%)
        LoRA 10k/12.5k/15k   195 / 195 / 198
        LoRA 17.5k/20k/22.5k 195 / 199 / 190
        LoRA 25k/27.5k/30k   197 / 197 / 195      pooled 1761/1800 = 97.8%
      n=400 on 15k/20k/22.5k (2nd layout set): 98.0 / 99.0 / 96.2.
-     ★ KEEP 20k (396/400). VERDICT: the 32 GB route WORKS; no
-     difference to full FT shown. Failures = grasp-and-extract timeouts
+     ★ KEEP LoRA 20k (396/400). VERDICT: the 32 GB route WORKS. Our
+     full FT (EMA off, bs 32) ends level with LoRA (97.0 vs 97.5-99.5)
+     but its curve is far noisier; no advantage to full FT shown here. Failures = grasp-and-extract timeouts
      on the drawer task (filmed). Rerun traces per episode now recorded.
 ```
 
@@ -89,7 +91,7 @@ in our scene; 3,300-ep 11-task Isaac Lab corpus (other scene, train-only);
 ```text
 1  ✔ L1, L2, L3, L5(LoRA) done 2026-10-10..12 — LoRA works on LIBERO
    ✔ results write-up: RESULTS_pi05_libero_lora_vs_fullft_20261013.md
-2  L4-noEMA running (resumed 2026-10-15 16:59Z from 12.5k); chain scores all 12 → 3-row table
+2  ✔ L4-noEMA trained + scored 2026-10-16 → RESULTS doc updated; ledger R3 strip (RED) proposed
 3  openpi mirror push (needs operator: create Gitgai/openpi, 3 commands)
 4  O0 and O1a in parallel on GPU 0 once the 'openpi-lora-recheck' process
    someone started 2026-10-14 is done; then O1b → O3 (O2 only on a clear O1b)
