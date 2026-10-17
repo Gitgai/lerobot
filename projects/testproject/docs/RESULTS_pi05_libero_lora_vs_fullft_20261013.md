@@ -227,6 +227,28 @@ Re-runs on film reproduced the pattern: drawer task at 22.5k 17/20 (15/20 in
 the scored run), at 15k 19/20 (19/20); all ten tasks at 20k, trial 0, 10/10.
 Montages: `results/pi05_libero_20261010/videos/*/montage_last_frames.png`.
 
+### 5.5 Does inference latency change success? (L6, added 2026-10-17)
+
+The benchmark protocol freezes the world during inference, so none of the rows above can show a
+latency effect. A time-faithful mode was added to the loop (world keeps stepping at 20 Hz during
+the call; previous chunk runs out, then holds; late chunks adopted from arrival time) and the delay
+swept with the LoRA 20k policy. Operating latency for serving from AI90 to a remote robot is
+300-500 ms end to end (operator's measurement).
+
+```text
+injected delay   steps   success    rate    CI95         holds/episode   steps to success
+      0 ms        0     198/200    99.0%   96.4-99.7         0.0             113.5     (gate: frozen protocol gave 199/200)
+    100 ms        2     199/200    99.5%   97.2-99.9         2.0             113.5
+    250 ms        5     191/200    95.5%   91.7-97.6         5.0             118.0     failures: tasks 3,4,5(3),6,7(2),9 — all timeouts
+    500 ms       10       0/200     0.0%    0.0-1.9        220.0               —       delay = whole chunk: nothing usable arrives, arm holds
+   1000 ms       20       0/200     0.0%    0.0-1.9        220.0               —
+```
+
+Plain chunked execution tolerates 100 ms for free, loses ~4 points at 250 ms and fails completely
+once the delay reaches the chunk length (500 ms). The 300-500 ms operating point is on that cliff.
+Follow-up: the same sweep with RTC on, in the LeRobot/LeIsaac stage. Plan + details:
+pi05_libero_remote_eval_acer_20261016.md.
+
 ## 6. Instrumentation built along the way
 
 ```text

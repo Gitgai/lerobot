@@ -62,10 +62,11 @@ L5   score every checkpoint, same sim, same seeds, RTC off     done     2026-10-
      on the drawer task (filmed). Rerun traces per episode now recorded.
 ```
 
-L6   does inference latency change success? time-faithful    building plan: pi05_libero_remote_eval_acer_20261016.md
-     LIBERO mode (world keeps stepping during the call),                 (retitled). Acer run DROPPED 2026-10-17:
-     delay sweep 0/100/250/500/1000 ms, LoRA 20k, n=200/row;             frozen-time sim can't show latency;
-     operating point 300-500 ms (operator). RTC sweep later in LeIsaac.  operating latency already known.
+L6   does inference latency change success? time-faithful    done     2026-10-17 01:12Z (RESULTS §5.5)
+     LIBERO mode, delay sweep, LoRA 20k, n=200/row:                      0 ms 99.0 · 100 ms 99.5 · 250 ms 95.5 ·
+     plain chunking: free at 100 ms, -4 pts at 250, DEAD at 500 ms        500 ms 0.0 · 1000 ms 0.0
+     (= chunk length). Operating point 300-500 ms is on the cliff →      next: same sweep with RTC ON
+     RTC sweep in the LeIsaac stage.                                      (LeRobot stack, O-stage)
 
 Answers: does LoRA work here · does full FT work when WE run it · LoRA vs
 full at matched data. A gap to their checkpoint is partly their 7.7M

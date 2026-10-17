@@ -1,6 +1,6 @@
 # L6 — Does inference latency change the policy's success? (LIBERO, time-faithful mode, delay sweep)
 
-Date: 2026-10-16/17. Status: **building; sweep to run on AI90 (GPU 0, LoRA 20k server on :8007).**
+Date: 2026-10-16/17. Status: **DONE 2026-10-17 01:12Z — results below.**
 Supersedes the first version of this doc (sim on the Acer, policy on AI90), dropped 2026-10-17
 after discussion: a frozen-time simulator cannot show a latency effect at any distance, and the
 real operating latency is already known.
@@ -42,3 +42,23 @@ results/pi05_libero_20261010/l6_delay_sweep.sh — systemd user unit l6-delay-sw
 l6-remote-server (serve_policy.py, LoRA 20k, GPU 0, :8007). Outputs
 L6_delay{D}ms_lora20k_spatial_n200/{per_episode.jsonl,summary.json}; log l6_delay_sweep.log.
 Cost: ~10 min per row locally (holds make episodes hit the 230-step cap → ~15 min) → ~1.2 h.
+
+## Results (2026-10-17 01:12Z, l6_delay_sweep.log; LoRA 20k, Spatial layouts 0-19, n=200/row, realtime mode, stale=skip)
+```text
+injected delay   steps   success    rate    CI95         holds/episode   steps to success
+      0 ms        0     198/200    99.0%   96.4-99.7         0.0             113.5     (gate: frozen protocol gave 199/200)
+    100 ms        2     199/200    99.5%   97.2-99.9         2.0             113.5
+    250 ms        5     191/200    95.5%   91.7-97.6         5.0             118.0     failures: tasks 3,4,5(3),6,7(2),9 — all timeouts
+    500 ms       10       0/200     0.0%    0.0-1.9        220.0               —       delay = whole chunk: nothing usable arrives, arm holds
+   1000 ms       20       0/200     0.0%    0.0-1.9        220.0               —
+```
+Reading. G1 passed (198 vs 199). 100 ms is free. 250 ms costs ~4 points (interval no longer
+overlaps 100 ms) with NO holds after the first chunk — the loss is purely from acting on
+quarter-second-old plans. At 500 ms plain chunking fails structurally: the delay equals the
+10-step chunk, every action is stale on arrival and is dropped, the arm holds all episode.
+**The 300-500 ms operating point sits on this cliff: between a few points lost and total failure,
+with openpi's plain chunked execution and no RTC.** This is the gap RTC is built to close; the
+same sweep with RTC on (LeRobot stack, LeIsaac stage) is the follow-up that quantifies it.
+Caveats: injected fixed delay (no jitter); hold = zero deltas + last gripper command (a design
+choice, documented); openpi policy (no RTC); one suite; sim. Rows are a different protocol from
+the benchmark rows and are never pooled with them.
