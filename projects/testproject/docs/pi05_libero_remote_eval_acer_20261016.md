@@ -1,45 +1,44 @@
-# L6 — LIBERO evaluation with the simulator on the Acer and the policy on AI90 (over ZeroTier)
+# L6 — Does inference latency change the policy's success? (LIBERO, time-faithful mode, delay sweep)
 
-Date: 2026-10-16. Status: **AI90 side UP (server unit l6-remote-server, port 8007); Acer side
-BLOCKED on SSH access (AI90's key is not authorised on the Acer) — operator action below.**
+Date: 2026-10-16/17. Status: **building; sweep to run on AI90 (GPU 0, LoRA 20k server on :8007).**
+Supersedes the first version of this doc (sim on the Acer, policy on AI90), dropped 2026-10-17
+after discussion: a frozen-time simulator cannot show a latency effect at any distance, and the
+real operating latency is already known.
 
-## What and why
-Same LoRA policy (lora_libero_20261010 step 20000, our best: 199/200 local), same evaluation loop
-(l2_eval_openpi.py, their convention, logged), same 200 episodes (Spatial, layouts 0-19, seed 7,
-replan 5 of 10, 230-step cap) — but the SIMULATOR runs on the Acer laptop in India and every
-policy call crosses ZeroTier to AI90's GPU 0 in New Jersey. Two things it tells us that the local
-rows cannot: (1) the policy's success rate is unchanged by remote serving (it should be: the sim
-waits for each action chunk, so latency cannot change outcomes), (2) the real per-call latency
-of serving a π0.5 policy across the internet — the number that matters for the arm-side plan
-(O3: real arm with RTC on, policy possibly remote). An earlier attempt of this kind (a loopback
-server on AI90 started 2026-10-16 04:34Z from the laptop, folder openpi-full-benchmark-20261016)
-never received a client; no record exists of what failed on the Acer side.
+## The question
+Serving π0.5 from AI90 to a robot elsewhere costs **300-500 ms per call end to end (operator's
+measured figure, inference included)**. Does that delay change what the policy achieves? The
+standard LIBERO protocol cannot answer it: the simulator pauses while the policy thinks, so every
+row so far assumes an infinitely fast brain. A simulator's job is to stand in for the world, and
+time is part of the world — so we give the loop a time-faithful mode and sweep the delay.
 
-## Pre-registered reading
-success: within the n=200 interval of the local 199/200 (CI 97.2-99.9) → "remote serving does
-not change the policy". Latency: report median and p95 of (a) network round trip, (b) server
-compute (~60 ms locally), (c) end-to-end per call; and wall-clock per episode vs local (~2-5 s).
-Anything outside → investigate, do not pool with local rows.
+## Design (l2_eval_openpi.py --latency-mode realtime, added 2026-10-17)
+- Control runs at 20 Hz (LIBERO: one env.step = 50 ms). A query issued at step tq with injected
+  delay D arrives at step tq + ceil(D/50 ms). The world keeps stepping in between.
+- Query cadence unchanged: every 5 steps (openpi's replan_steps), at most one request outstanding.
+- While waiting, the arm executes what is left of the previous chunk; if that runs out it HOLDS
+  (zero position/rotation deltas, gripper command unchanged). Holds are counted (n_hold).
+- On arrival the new chunk is adopted from index d ("skip": actions whose time has passed are
+  dropped — what a timestamped async client does). "replay" (execute stale actions from 0) is
+  available as a flag, not used in the main sweep.
+- Delay is INJECTED, deterministic; the real local call time (~60 ms) is spent but not counted,
+  so rows depend only on D. At D = 0 the mode reduces exactly to the frozen protocol (gate G1).
+- openpi has no RTC; LoRA 20k policy (our best, 199/200 frozen), Spatial, layouts 0-19, n=200/row.
 
-## How (both halves are scripts in results/pi05_libero_20261010/)
-AI90: `l6-remote-server` systemd user unit — serve_policy.py, LoRA 20k, GPU 0, port 8007, binds
-      0.0.0.0 (reachable at 192.168.194.220:8007 over ZeroTier). Log: l6_remote_server.log.
-Acer: `l6_acer_bootstrap.sh` — uv + Python 3.12 venv, LIBERO (same fork/pin as AI90's probe
-      venv), openpi-client (copied from AI90's openpi checkout), MuJoCo with EGL/OSMesa; then
-      `l6_acer_run.sh` — l2_eval_openpi.py --host 192.168.194.220 --port 8007 --suite
-      libero_spatial --trials-per-task 20 --row lora20k_remote_acer, results copied back to
-      AI90 results/L6_lora20k_remote_acer_spatial_n200/.
-Output per episode adds: rtt_ms (TCP ping to AI90 at episode start), infer_s per call.
+## Sweep and pre-registered reading
+D (ms):  0 (gate)  100  250  500  1000       d (steps): 0 2 5 10 20
+- G1: D=0 realtime within the CI of frozen 199/200 (97.2-99.9) → mode is faithful; else stop.
+- Operating point 300-500 ms: the 250 and 500 rows bracket it.
+- 500 ms = 10 steps = the whole 10-step chunk: with "skip" nothing of a chunk is usable on
+  arrival → expected to collapse (every step a hold). 1000 ms likewise. Reporting them states the
+  plain-chunking limit; they are not a prediction about RTC.
+- Readings: success vs D (curve + knee), holds per episode, steps to success. Rows go in their own
+  table (different protocol) — NEVER pooled with the benchmark rows.
+- Follow-up when the orange/LeIsaac stage runs with LeRobot: the same sweep with RTC on (guided),
+  which is what RTC exists for; the difference between the curves is what RTC buys back.
 
-## Operator action needed (one-time)
-On the Acer, authorise AI90's key so I can drive the laptop side:
-  mkdir -p ~/.ssh && chmod 700 ~/.ssh && echo '<AI90 pubkey, see chat>' >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys
-Then say "key added". Alternative: run l6_acer_bootstrap.sh and l6_acer_run.sh yourself on the Acer.
-
-## Gates
-G1 Acer reachable + SSH works. G2 LIBERO env renders one frame on the Acer (CPU/EGL). G3 one
-episode end-to-end (policy call returns 10×7 chunk). G4 n=200. Each gate logged in l6_acer.log.
-
-## Cost
-Acer: CPU-only sim, ~1-2 GB venv + ~1 GB LIBERO assets. AI90: GPU 0 ~9 GB for the server.
-Per call ~0.3 s network + 0.06 s compute → ~5× slower episodes than local: ~1-1.5 h for 200.
+## How
+results/pi05_libero_20261010/l6_delay_sweep.sh — systemd user unit l6-delay-sweep; server unit
+l6-remote-server (serve_policy.py, LoRA 20k, GPU 0, :8007). Outputs
+L6_delay{D}ms_lora20k_spatial_n200/{per_episode.jsonl,summary.json}; log l6_delay_sweep.log.
+Cost: ~10 min per row locally (holds make episodes hit the 230-step cap → ~15 min) → ~1.2 h.

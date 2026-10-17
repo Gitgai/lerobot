@@ -62,9 +62,10 @@ L5   score every checkpoint, same sim, same seeds, RTC off     done     2026-10-
      on the drawer task (filmed). Rerun traces per episode now recorded.
 ```
 
-L6   LIBERO sim on the ACER, policy on AI90 over ZeroTier     blocked  plan: pi05_libero_remote_eval_acer_20261016.md
-     (LoRA 20k, same 200 episodes; success unchanged? +        AI90 server up (unit l6-remote-server :8007);
-     real internet latency per call, for O3)                            Acer SSH needs AI90's key (operator)
+L6   does inference latency change success? time-faithful    building plan: pi05_libero_remote_eval_acer_20261016.md
+     LIBERO mode (world keeps stepping during the call),                 (retitled). Acer run DROPPED 2026-10-17:
+     delay sweep 0/100/250/500/1000 ms, LoRA 20k, n=200/row;             frozen-time sim can't show latency;
+     operating point 300-500 ms (operator). RTC sweep later in LeIsaac.  operating latency already known.
 
 Answers: does LoRA work here · does full FT work when WE run it · LoRA vs
 full at matched data. A gap to their checkpoint is partly their 7.7M
