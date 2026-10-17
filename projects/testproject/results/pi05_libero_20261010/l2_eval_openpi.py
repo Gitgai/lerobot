@@ -84,7 +84,20 @@ def main():
     ap.add_argument("--rerun", default="off", choices=["off", "save", "serve"],
                     help="save: one .rrd per episode in --rerun-dir; serve: stream live to a browser (grpc 9876 / web 9090)")
     ap.add_argument("--rerun-dir", default="")
+    # L6 (2026-10-17): time-faithful mode. "frozen" = benchmark convention (world pauses during inference).
+    # "realtime" = the world keeps stepping at --control-hz while a request is in flight: a query issued at
+    # step tq with --inject-delay-ms arrives at step tq+d (d = ceil(delay/step_ms)); until then the arm keeps
+    # executing the previous chunk and HOLDS (zero deltas, gripper unchanged) if it runs out. On arrival the
+    # new chunk is adopted from index d ("skip": actions whose time has passed are dropped) or from 0
+    # ("replay": stale actions executed as-is). Queries keep the fixed --replan-steps cadence with at most one
+    # request outstanding. At delay 0 this reduces exactly to "frozen".
+    ap.add_argument("--latency-mode", default="frozen", choices=["frozen", "realtime"])
+    ap.add_argument("--inject-delay-ms", type=float, default=0.0)
+    ap.add_argument("--control-hz", type=float, default=20.0)
+    ap.add_argument("--stale-policy", default="skip", choices=["skip", "replay"])
     args = ap.parse_args()
+    step_ms = 1000.0 / args.control_hz
+    delay_steps = int(math.ceil(args.inject_delay_ms / step_ms - 1e-9)) if args.latency_mode == "realtime" else 0
     rr = None
     if args.rerun != "off":
         import rerun as rr  # noqa
@@ -116,6 +129,8 @@ def main():
     summary = {"row": args.row, "suite": args.suite, "trials_per_task": args.trials_per_task,
                "env_seed": args.seed, "replan_steps": args.replan_steps, "max_steps": max_steps,
                "num_steps_wait": args.num_steps_wait, "resize": args.resize, "rtc": "none (openpi has none)",
+               "latency_mode": args.latency_mode, "inject_delay_ms": args.inject_delay_ms, "delay_steps": delay_steps,
+               "control_hz": args.control_hz, "stale_policy": args.stale_policy,
                "convention": "openpi examples/libero/main.py", "server_metadata": str(meta),
                "started_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "tasks": {}}
     total_n = total_k = 0
@@ -138,6 +153,11 @@ def main():
             done = False
             n_infer = 0
             infer_s = 0.0
+            pending = None      # realtime: (t_query, t_arrive, chunk)
+            last_query_t = None
+            n_hold = 0
+            n_stale_exec = 0
+            last_action = np.zeros(7, dtype=np.float32); last_action[6] = -1.0  # gripper open
             t_ep = time.time()
             if rr is not None:
                 ep_id = f"task{task_id:02d}_trial{ep:02d}"
@@ -174,7 +194,19 @@ def main():
                     ee_hist.append(np.asarray(obs["robot0_eef_pos"], dtype=np.float32))
                     rr.log(base + "ee/pose", rr.Points3D([ee_hist[-1]], colors=[[0, 200, 255]], radii=0.006))
                     rr.log(base + "ee/path", rr.LineStrips3D([np.vstack(ee_hist)], colors=[[0, 120, 255]], radii=0.0015))
-                if not plan:
+                def _log_chunk(chunk, t0):
+                    if rr is None: return
+                    rr.log(base + "infer/latency_ms", rr.Scalars(1000.0 * (time.time() - t0)))
+                    rr.log(base + "infer/chunk_index", rr.Scalars(float(n_infer)))
+                    ch = np.asarray(chunk, dtype=np.float32)
+                    rr.log(base + "infer/chunk", rr.Tensor(ch, dim_names=("future_step", "action_dim")))
+                    rr.log(base + "plan/gripper_h0", rr.Scalars(float(ch[0, 6])))
+                    rr.log(base + "plan/gripper_h9", rr.Scalars(float(ch[-1, 6])))
+                    rr.log(base + "plan/dz_sum", rr.Scalars(float(ch[:, 2].sum())))
+                    pos0 = np.asarray(obs["robot0_eef_pos"], dtype=np.float32)
+                    plan_pts = pos0 + np.cumsum(ch[:, :3] * 0.05, axis=0)
+                    rr.log(base + "ee/plan", rr.LineStrips3D([np.vstack([pos0, plan_pts])], colors=[[255, 160, 0]], radii=0.002))
+                def _query():
                     element = {
                         "observation/image": img,
                         "observation/wrist_image": wrist,
@@ -183,24 +215,40 @@ def main():
                     }
                     t0 = time.time()
                     chunk = client.infer(element)["actions"]
-                    infer_s += time.time() - t0
-                    n_infer += 1
-                    assert len(chunk) >= args.replan_steps, len(chunk)
-                    plan.extend(chunk[: args.replan_steps])
-                    if rr is not None:
-                        rr.log(base + "infer/latency_ms", rr.Scalars(1000.0 * (time.time() - t0)))
-                        rr.log(base + "infer/chunk_index", rr.Scalars(float(n_infer)))
-                        ch = np.asarray(chunk, dtype=np.float32)
-                        rr.log(base + "infer/chunk", rr.Tensor(ch, dim_names=("future_step", "action_dim")))
-                        # plan-vs-execute: how far does the gripper command at horizon 0 and 9 sit, and the vertical intent
-                        rr.log(base + "plan/gripper_h0", rr.Scalars(float(ch[0, 6])))
-                        rr.log(base + "plan/gripper_h9", rr.Scalars(float(ch[-1, 6])))
-                        rr.log(base + "plan/dz_sum", rr.Scalars(float(ch[:, 2].sum())))
-                        # 3D: the planned path, integrated from the live end-effector position (approximate scale)
-                        pos0 = np.asarray(obs["robot0_eef_pos"], dtype=np.float32)
-                        plan_pts = pos0 + np.cumsum(ch[:, :3] * 0.05, axis=0)
-                        rr.log(base + "ee/plan", rr.LineStrips3D([np.vstack([pos0, plan_pts])], colors=[[255, 160, 0]], radii=0.002))
-                action = plan.popleft()
+                    return chunk, t0
+                if args.latency_mode == "frozen":
+                    if not plan:
+                        chunk, t0 = _query()
+                        infer_s += time.time() - t0
+                        n_infer += 1
+                        assert len(chunk) >= args.replan_steps, len(chunk)
+                        plan.extend(chunk[: args.replan_steps])
+                        _log_chunk(chunk, t0)
+                else:
+                    # arrival first (a chunk requested d steps ago lands now), then possibly a new request
+                    if pending is not None and t >= pending[1]:
+                        tq, _, chunk = pending
+                        elapsed = t - tq
+                        usable = chunk[elapsed:] if args.stale_policy == "skip" else chunk
+                        plan = collections.deque(usable)
+                        if args.stale_policy == "replay": n_stale_exec += min(len(usable), elapsed)
+                        pending = None
+                    if pending is None and (last_query_t is None or t - last_query_t >= args.replan_steps):
+                        chunk, t0 = _query()
+                        infer_s += time.time() - t0
+                        n_infer += 1
+                        _log_chunk(chunk, t0)
+                        last_query_t = t
+                        if delay_steps == 0:
+                            plan = collections.deque(chunk)
+                        else:
+                            pending = (t, t + delay_steps, chunk)
+                    if args.latency_mode == "realtime" and not plan:
+                        hold = np.zeros(7, dtype=np.float32); hold[6] = float(last_action[6])
+                        plan.append(hold); n_hold += 1
+                        if rr is not None: rr.log(base + "plan/hold", rr.Scalars(1.0))
+                action = np.asarray(plan.popleft(), dtype=np.float32)
+                last_action = action
                 if rr is not None:
                     for i, nme in enumerate(ACTION_NAMES): rr.log(base + f"action/{nme}", rr.Scalars(float(action[i])))
                 obs, _, done, _ = env.step(action.tolist())
@@ -221,11 +269,13 @@ def main():
             rec = {"row": args.row, "suite": args.suite, "task_id": task_id, "task": desc, "trial": ep,
                    "init_state_index": ep, "success_done": bool(done), "check_success_at_end": check,
                    "steps": t, "n_infer": n_infer, "infer_s_mean": (infer_s / n_infer) if n_infer else None,
-                   "episode_s": round(time.time() - t_ep, 1)}
+                   "episode_s": round(time.time() - t_ep, 1),
+                   "latency_mode": args.latency_mode, "inject_delay_ms": args.inject_delay_ms, "delay_steps": delay_steps,
+                   "n_hold": n_hold, "n_stale_exec": n_stale_exec, "stale_policy": args.stale_policy}
             per_ep.write(json.dumps(rec) + "\n")
             per_ep.flush()
             print(f"[L2] task {task_id:2d} trial {ep:2d} success={int(done)} steps={t} "
-                  f"infer={n_infer}x{(infer_s/max(n_infer,1))*1000:.0f}ms  ({rec['episode_s']}s)", flush=True)
+                  f"infer={n_infer}x{(infer_s/max(n_infer,1))*1000:.0f}ms hold={n_hold} ({rec['episode_s']}s)", flush=True)
         env.close()
         n = len(trial_list)
         lo, hi = wilson(k, n)
