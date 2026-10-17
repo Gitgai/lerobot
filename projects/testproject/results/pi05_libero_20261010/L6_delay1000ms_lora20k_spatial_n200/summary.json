@@ -1,0 +1,140 @@
+{
+  "row": "lora20k_delay1000ms",
+  "suite": "libero_spatial",
+  "trials_per_task": 20,
+  "env_seed": 7,
+  "replan_steps": 5,
+  "max_steps": 220,
+  "num_steps_wait": 10,
+  "resize": 224,
+  "rtc": "none (openpi has none)",
+  "latency_mode": "realtime",
+  "inject_delay_ms": 1000.0,
+  "delay_steps": 20,
+  "control_hz": 20.0,
+  "stale_policy": "skip",
+  "convention": "openpi examples/libero/main.py",
+  "server_metadata": "{}",
+  "started_utc": "2026-10-17T01:01:15Z",
+  "tasks": {
+    "0": {
+      "task": "pick up the black bowl between the plate and the ramekin and place it on the plate",
+      "k": 0,
+      "n": 20,
+      "rate": 0.0,
+      "ci95": [
+        0.0,
+        0.16113012549493322
+      ],
+      "task_s": 65
+    },
+    "1": {
+      "task": "pick up the black bowl next to the ramekin and place it on the plate",
+      "k": 0,
+      "n": 20,
+      "rate": 0.0,
+      "ci95": [
+        0.0,
+        0.16113012549493322
+      ],
+      "task_s": 64
+    },
+    "2": {
+      "task": "pick up the black bowl from table center and place it on the plate",
+      "k": 0,
+      "n": 20,
+      "rate": 0.0,
+      "ci95": [
+        0.0,
+        0.16113012549493322
+      ],
+      "task_s": 64
+    },
+    "3": {
+      "task": "pick up the black bowl on the cookie box and place it on the plate",
+      "k": 0,
+      "n": 20,
+      "rate": 0.0,
+      "ci95": [
+        0.0,
+        0.16113012549493322
+      ],
+      "task_s": 68
+    },
+    "4": {
+      "task": "pick up the black bowl in the top drawer of the wooden cabinet and place it on the plate",
+      "k": 0,
+      "n": 20,
+      "rate": 0.0,
+      "ci95": [
+        0.0,
+        0.16113012549493322
+      ],
+      "task_s": 70
+    },
+    "5": {
+      "task": "pick up the black bowl on the ramekin and place it on the plate",
+      "k": 0,
+      "n": 20,
+      "rate": 0.0,
+      "ci95": [
+        0.0,
+        0.16113012549493322
+      ],
+      "task_s": 69
+    },
+    "6": {
+      "task": "pick up the black bowl next to the cookie box and place it on the plate",
+      "k": 0,
+      "n": 20,
+      "rate": 0.0,
+      "ci95": [
+        0.0,
+        0.16113012549493322
+      ],
+      "task_s": 65
+    },
+    "7": {
+      "task": "pick up the black bowl on the stove and place it on the plate",
+      "k": 0,
+      "n": 20,
+      "rate": 0.0,
+      "ci95": [
+        0.0,
+        0.16113012549493322
+      ],
+      "task_s": 67
+    },
+    "8": {
+      "task": "pick up the black bowl next to the plate and place it on the plate",
+      "k": 0,
+      "n": 20,
+      "rate": 0.0,
+      "ci95": [
+        0.0,
+        0.16113012549493322
+      ],
+      "task_s": 64
+    },
+    "9": {
+      "task": "pick up the black bowl on the wooden cabinet and place it on the plate",
+      "k": 0,
+      "n": 20,
+      "rate": 0.0,
+      "ci95": [
+        0.0,
+        0.16113012549493322
+      ],
+      "task_s": 67
+    }
+  },
+  "k": 0,
+  "n": 200,
+  "rate": 0.0,
+  "ci95": [
+    0.0,
+    0.018846005918320894
+  ],
+  "wall_s": 668,
+  "finished_utc": "2026-10-17T01:12:23Z"
+}
