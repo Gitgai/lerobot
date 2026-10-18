@@ -150,3 +150,11 @@ L4-noEMA is closed and scored. Keep params/ (+assets) for all 12 checkpoints; st
 train_state/ (19 GB each) from the 11 non-final ones → frees 209 GB on root (372 → 163 GB
 for the run). Alternative: MOVE the 11 train_state dirs to /mnt/data4tb behind symlinks
 (R4), freeing the same on root with nothing deleted. Either way 29999 stays fully resumable.
+
+## 8. Snapshot 2026-10-18 23:26Z (changes not made by this lane)
+Root 255 → 868 GB free. Found: ~/lerobot_assets 489 → 4.6 GB and ~/.cache 176 → 50 GB; /mnt/data4tb
+now holds lerobot_assets/ and huggingface-cache/ (763 GB used of 3.6 TB) — moved by the operator
+between 10-17 and 10-18. The L4-noEMA checkpoints are untouched (12 × 31 GB = 361 GB, train_state
+still present; §7 proposal still open). /tmp (tmpfs 30 GB, user quota shared with DYNUS scratch)
+is back to 22 GB of DYNUS working trees — the condition that killed the Bash tool on 2026-10-10
+recurs at ~30 GB.
