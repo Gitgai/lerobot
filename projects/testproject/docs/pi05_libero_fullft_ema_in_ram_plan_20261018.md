@@ -51,6 +51,43 @@ G4 score all 12 with the L2 loop (same layouts, n=200), add the row to RESULTS �
   accumulation to an effective 256 (a recipe-faithful change, separate decision).
 - Final/pooled vs LoRA: same rule as before — overlapping intervals = "no difference shown".
 
+## Appendix — memory budget and the routes to batch 256 on one 72 GB card (2026-10-18)
+
+Why batch 32: it was the largest that fit, not a choice. Measured: published recipe (EMA on GPU)
+= 66 GB fixed → OOM even at batch 8; EMA off → batch 32 fits at ~66 GB allocated; the smoke went
+32 → 16 → 8 and stopped at the first fit, so 64 was never tried (it cannot fit: see table).
+
+```text
+on the card (fp32)                 L4 as run (bs 32)   optimizer + EMA in host RAM
+weights                                   13.6 GB            13.6 GB   (needed every step)
+gradients                                 13.6 GB            13.6 GB   (needed every step)
+AdamW moments                             27   GB             0
+EMA                                        0 (off)            0 (host)
+fixed                                     54   GB            27   GB
+room for activations (~68 GB usable)      ~14 GB             ~41 GB
+activations                               ~0.6 GB / example (17-20 GB at bs 32, measured)
+largest batch                             32 (tight)         ~64
+```
+Activations are the binding limit: batch 256 needs ~150 GB of them regardless of where the
+optimizer lives. Hence:
+
+```text
+route                       batch   memory   step-time       30k steps   arithmetic vs published   status
+A  EMA in host RAM (L7)      32     fits     4.9 → ~6.5 s    ~54 h       identical except batch     PROPOSED
+B  + AdamW in host RAM       ~64    fits     ~10-14 s        ~5 d        identical except batch     design only; JAX port of
+                                                                                                   our PyTorch rung-4 (2.3×)
+C  gradient accumulation     256    fits     8× (≈40 s)      ~2 weeks    IDENTICAL (true bs 256)    needs ~30 lines in openpi
+   (8 × 32 per update)                                                                             train step; not scheduled
+D  activation remat          128-   fits?    +30% / step     3-4 d       IDENTICAL (recompute only)  openpi has nnx remat hooks;
+   (+ A, + B)                256                                                                   never run here; own smokes
+E  bigger machine            256    —        4.9 s/8 GPUs    ~5 h        identical                  operator's original route
+```
+Decision rule (pre-registered): run A first because it isolates ONE variable at low cost. If A
+removes the swings → batch size was not the problem on LIBERO; B/C/D are not needed for this
+question. If the swings survive A → the batch question is live: C is the honest single-card
+answer (exact), D the faster one (exact, more engineering risk), E the simplest. B alone does
+not reach 256 and is only worth building as a component of D.
+
 ## Cost and schedule
 GPU 1 ≈ 54 h + 2.5 h scoring; runs unattended beside the orange recorder on GPU 0. Disk 372 GB
 (fits). Order proposed: start L7 first (pure compute), build the RTC sweep (L6b) meanwhile.

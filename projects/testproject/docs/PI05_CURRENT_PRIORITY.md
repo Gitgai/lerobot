@@ -72,6 +72,9 @@ L7   full FT with EMA ON, EMA copy in HOST RAM (bs 32 the     proposed plan: pi0
      only deviation left). Isolates whether L4's jagged curve             ~54 h GPU 1 + scoring; ~50-line openpi change
      (78→93→82→95) is EMA-off or batch-32. Row: "EMA on (host)".        + smoke gate; awaiting operator go
 L6b  latency sweep with RTC ON (LeRobot pi0.5, same 5 delays) proposed  decides local vs remote policy for the arm
+L8   batch-256 on one card IF L7 leaves the swings: gradient       parked   routes + budget in the L7 plan appendix;
+     accumulation (exact, ~2 wk) or activation remat (+offloads,            optimizer-to-RAM alone only reaches ~bs 64
+     exact, ~3-4 d) or a bigger machine                                     — not worth building on its own
 
 Answers: does LoRA work here · does full FT work when WE run it · LoRA vs
 full at matched data. A gap to their checkpoint is partly their 7.7M
