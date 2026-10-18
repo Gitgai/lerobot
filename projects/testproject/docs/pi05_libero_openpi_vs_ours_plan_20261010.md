@@ -343,6 +343,10 @@ their 98.8 was measured SYNCHRONOUSLY: 10-step chunk, execute 5, replan
   confirm rtc_config=None at every LeRobot policy load.
 ```
 
+## Follow-ups proposed 2026-10-18 (not started)
+L7  full FT, EMA ON with the EMA copy in host RAM, batch 32 → pi05_libero_fullft_ema_in_ram_plan_20261018.md
+L6b latency sweep with RTC on → to be planned in the LeRobot stack (see L6 doc)
+
 ## Decisions already made
 
 ```text

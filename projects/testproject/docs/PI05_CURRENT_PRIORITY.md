@@ -1,6 +1,6 @@
 # π0.5 lane — Current Priority and Status
 
-Last updated: 2026-10-16
+Last updated: 2026-10-18
 
 **This file is the ROUTER and the TRACKER: what is open, in what order, and
 where each step stands. It is NOT a log.** Detail, gates and pre-registered
@@ -68,6 +68,11 @@ L6   does inference latency change success? time-faithful    done     2026-10-17
      (= chunk length). Operating point 300-500 ms is on the cliff →      next: same sweep with RTC ON
      RTC sweep in the LeIsaac stage.                                      (LeRobot stack, O-stage)
 
+L7   full FT with EMA ON, EMA copy in HOST RAM (bs 32 the     proposed plan: pi05_libero_fullft_ema_in_ram_plan_20261018.md
+     only deviation left). Isolates whether L4's jagged curve             ~54 h GPU 1 + scoring; ~50-line openpi change
+     (78→93→82→95) is EMA-off or batch-32. Row: "EMA on (host)".        + smoke gate; awaiting operator go
+L6b  latency sweep with RTC ON (LeRobot pi0.5, same 5 delays) proposed  decides local vs remote policy for the arm
+
 Answers: does LoRA work here · does full FT work when WE run it · LoRA vs
 full at matched data. A gap to their checkpoint is partly their 7.7M
 examples: reported, not attributed.
@@ -97,7 +102,10 @@ in our scene; 3,300-ep 11-task Isaac Lab corpus (other scene, train-only);
 ```text
 1  ✔ L1, L2, L3, L5(LoRA) done 2026-10-10..12 — LoRA works on LIBERO
    ✔ results write-up: RESULTS_pi05_libero_lora_vs_fullft_20261013.md
-2  ✔ L4-noEMA trained + scored 2026-10-16 → RESULTS doc updated; ledger R3 strip (RED) proposed
+2  ✔ L4-noEMA trained + scored 2026-10-16; ✔ L6 latency sweep 2026-10-17
+2b L7 EMA-in-host-RAM full FT (GPU 1, ~2.5 d) — proposed 2026-10-18, awaiting go
+2c L6b RTC latency sweep — proposed, build while L7 trains
+2d ledger §7 optimizer-state strip (RED) — awaiting approval
 3  openpi mirror push (needs operator: create Gitgai/openpi, 3 commands)
 4  O0 and O1a in parallel on GPU 0 once the 'openpi-lora-recheck' process
    someone started 2026-10-14 is done; then O1b → O3 (O2 only on a clear O1b)
@@ -109,6 +117,7 @@ in our scene; 3,300-ep 11-task Isaac Lab corpus (other scene, train-only);
 openpi stack first, LeRobot fallback          their recipe NEVER bent to fit a card
 their checkpoint evaluated, not retrained     one simulator per table
 EMA-off allowed on 72 GB (2026-10-14); bf16 not  the "EMA off" label travels with the row
+EMA in HOST RAM proposed (2026-10-18): same formula, moved not bent; bf16 EMA and every-k-steps EMA NOT taken
 n=200 LIBERO · 100/row LeIsaac · 50/task O2   RTC off in sim, ON on the real arm
 August full-FT results not compared           LeRobot (not openpi) for the SO-101 task
 DYNUS capped at 16 GB; shut it down for long runs (the old "47 GB" is stale)

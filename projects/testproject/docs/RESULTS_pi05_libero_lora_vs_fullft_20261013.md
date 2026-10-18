@@ -302,8 +302,12 @@ GPU sharing       flights render on the same GPU (type G context, invisible to
 
 ```text
 L4   DONE 2026-10-16 (EMA off, batch 32 — the published recipe does not fit
-     72 GB; see plan doc). Optional follow-ups, none scheduled: EMA kept in
-     host RAM; batch 256 via gradient accumulation; a second seed.
+     72 GB; see plan doc).
+L7   PROPOSED 2026-10-18: the same run with EMA ON, the EMA copy kept in host
+     RAM (pi05_libero_fullft_ema_in_ram_plan_20261018.md) — isolates whether
+     the §5.1b swings are EMA-off or batch-32. Not yet approved.
+L6b  PROPOSED: the §5.5 latency sweep with RTC on (LeRobot stack).
+     Later, if wanted: batch 256 via gradient accumulation; a second seed.
 O    the same question on the SO-101 orange task in LeIsaac
      (pi05_leisaac_lora_vs_fullft_plan_20261010.md): O0 scene check → O1a
      record to 450 episodes → O1b full FT + LoRA → O3 real arm from
