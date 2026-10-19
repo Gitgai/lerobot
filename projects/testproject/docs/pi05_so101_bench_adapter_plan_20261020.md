@@ -46,6 +46,9 @@ G3  remote replay     the same probe run FROM THE ACER in Pune over ZeroTier (ne
                       the operator to run one command) → true end-to-end latency per call, jitter, and the
                       client's pipelined duty cycle at that latency; compare with the 300-500 ms figure and
                       L6's cliff (plain chunking dies at 500 ms; 20 steps @30 fps = 667 ms chunk here).
+G2b closed loop, sim  the same policy wrapper drives the LeIsaac orange task for 50+50 seeded episodes
+                      (R2 in the R plan): compounding error, grasp timing, release — the step the replay
+                      cannot test; the corpus holds ~200 LeIsaac orange episodes, so this is in-distribution
 G4  fault cases       dropped frame, stale delay hint, client reconnect → server stays up, timing logged
 G5  the bench         20 trials, RTC/pipelining on, filmed (R3 proper) — only after G1-G4
 ```

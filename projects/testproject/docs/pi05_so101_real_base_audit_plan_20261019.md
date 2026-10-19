@@ -105,9 +105,27 @@ our own August real episodes; measure latency. Ready-to-run state recorded here.
 - Status 2026-10-19: R0 metadata + sample passes done (audit.md); full parquet pull running for the
   exact-duplicate pass (R0.5); R1 done; R2 optional; R3 blocked on presence.
 
-## R2 — Zero-shot in LeIsaac (optional, a HINT not a number)
-Real-trained model on rendered images: confounded. 20 episodes, orange task, RTC off, logged as
-"hint" — only to see whether it moves toward the orange at all.
+## R2 — Closed-loop test in the LeIsaac orange simulator (PROMOTED 2026-10-20 from "hint" to a scored gate)
+Why it is worth more than I first said: the public corpus CONTAINS LeIsaac renders of this very task —
+EverNorif/so101_place_orange_isaaclab 83 ep, aaronsu11/so101_fruit_leisaac 57, omkarmayekar555 sim orange 64
+(~200 episodes, all trained on). So the model has seen the simulator's kitchen, lighting and orange; a
+sim run is not an out-of-distribution stunt. It is also CLOSED-LOOP: the model drives the arm for a whole
+attempt, so compounding error, approach, grasp timing and release are exercised — everything the open-loop
+replay (R3a G2) cannot test. What it does NOT settle: real-camera performance; sim can be better or worse.
+```text
+R2.1  serve the VLASH policy to the LeIsaac process over the socket harness we already use for sim
+      (the same wrapper as R3a A1; EnvHub pins lerobot 0.4.1 so the policy stays out of process)
+R2.2  50 seeded episodes, 3000-step cap, RTC off (sim waits; L6 showed why), front+wrist 640x480 at 30 fps
+      as the recordings had, instruction = the corpus's own string for this scene
+      ("Grab orange and place into plate" family) AND ours ("pick up the orange…") — 50 each
+R2.3  score with the harness's ground-truth success predicate; film 10; log per-episode steps and holds
+reading  ≥ 60% → the base model already does the task in sim; the bench test (R3) is about the camera gap
+         20-60% → partial competence; expect LoRA on top to be needed on the bench
+         < 20% → look for a plumbing bug first (R3a G1/G2), then conclude the base does not transfer
+cost     GPU 0: Isaac Sim ~12 GB + policy 9 GB → fits the 5090; ~2 h for 100 episodes
+```
+R2 runs BEFORE the bench and needs no one at the arm; it reuses the adapter's policy wrapper, so it is
+also the first closed-loop consumer of R3a A1.
 
 ## R3 — 20 real trials on the bench (CORRECTED 2026-10-19: the arm is in PUNE with the operator)
 The August/September arm trials ran the robot + cameras at the bench in Pune (`n16_realarm_client.py`,
@@ -154,7 +172,7 @@ data is otherwise sound, the next move is "LoRA on top with our real orange epis
 the third option and a multi-day 8-GPU job; it is not scheduled.
 
 ## Tracking
-R0 meta+sample+video DONE; R0.5 (exact duplicates + degenerate) runs automatically when the parquet pull
+R2 PROMOTED to a scored sim gate (2026-10-20). R0 meta+sample+video DONE; R0.5 (exact duplicates + degenerate) runs automatically when the parquet pull
 ends (~2026-10-20 02:30Z; armed waiter) · R4 cleaned manifest right after (~1 h, no input needed) · R1 DONE ·
 R2 optional · R3 blocked on two things: (a) the Zenoh↔VLASH serving adapter on AI90 (~1 day, awaiting go),
 (b) the operator at the bench in Pune.

@@ -96,7 +96,9 @@ R1   download + serve dongyoonkim/so101-pi05-base from AI90    done     2026-10-
 R4   cleaned manifest for OUR use: slot-swap fix (1,810 ep),   todo     after R0.5; output manifest_clean.csv
      sim out (304), 10-fps split (450), dups + degenerate out,           + survivor counts; feeds O3 fine-tune
      quality flags, real-orange subset listed                            (LoRA on top is the author's advice)
-R2   zero-shot in LeIsaac, 20 eps, logged as a HINT only       optional
+R2   CLOSED-LOOP in the LeIsaac orange sim, 50+50 seeded eps,  todo     promoted 2026-10-20: the corpus holds ~200
+     RTC off, ground-truth success; reuses the R3a policy                LeIsaac orange episodes → in-distribution;
+     wrapper over the socket harness; GPU 0, ~2 h                        tests what open-loop replay cannot
 R3a  Zenoh↔VLASH serving adapter + ARM-LESS verification     proposed plan: pi05_so101_bench_adapter_plan_20261020.md
      (loopback replay, open-loop replay of our real episodes,           ~1 day build + 2 h; GPU 0; needs AI90's key
      remote replay from the Acer, fault cases)                          on the Acer for the remote leg
@@ -139,7 +141,7 @@ in our scene; 3,300-ep 11-task Isaac Lab corpus (other scene, train-only);
 4  ✔ R0 meta/sample/video + ✔ R1 (2026-10-19); R0.5 dedup runs itself after the pull (~02:30Z 10-20),
    then R4 cleaned manifest → audit closed, no input needed
 5  AWAITING GO (independent, can all start the same day):
-   a  R3a adapter + arm-less verification (~1 day) → unblocks R3's 20 bench trials
+   a  R3a adapter + arm-less verification (~1 day) + R2 closed-loop sim gate (~2 h) → then R3 bench
    b  L7 full FT with EMA in host RAM, GPU 1, ~54 h (plan 2026-10-18)
    c  O0 + O1a orange recorder, GPU 0, days (plan 2026-10-10)
    d  ledger §7 optimizer-state strip (209 GB, RED) · empty Gitgai/openpi repo for the mirror
