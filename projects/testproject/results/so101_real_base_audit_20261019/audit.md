@@ -31,3 +31,22 @@ survey overlap     inside the merge already: LightwheelAI/so101-place-orange, Li
 camera occupancy per source (mask columns) · fps per source (timestamp) — the 450 ten-fps episodes ·
 exact duplicates (hash of action stream) · near duplicates across sources (length, mean action) ·
 degenerate episodes (motion from the stream, not stats) · then R0.6 verdicts and R0.7 video samples.
+
+## The author's own pipeline records (github jinnymo/so101-pi05-base, pipeline/artifacts/, copied to author_artifacts/)
+```text
+dedup (23_dedup_result)   210 candidate sets → 182 kept, 28 dropped as identical / strict-subset /
+                          "leakage" (train+val splits of one recording). Examples dropped: six
+                          k1000dai conveyor variants, tshiamor block variants, SGPatil table-cleanup-train,
+                          zaringleb cube "with_corrective_actions" (subset of pick_single_cube).
+per-episode drops (25)    151 episodes in 16 sources, almost all "video duration != action duration"
+                          (101 of them in one 10-fps CoRL2026 source; 13 in EverNorif orange sim); 4 empty.
+manifest (27)             211 → 181 kept (then 156 after the licence filter); 8 sources had task strings
+                          normalised; tiers: tier1 46 · tier2 115 · tier2b 5 · tier3 39 · 6 author sets.
+camera map (21)           211 sources; 68 have a NON-wrist camera in a wrist slot (card says 42 of the
+                          final 156); 2 ambiguous; 6 streams dropped.
+```
+Reading so far: the author did real work — fingerprint dedup across authors, length-mismatch drops,
+licence filter — and documented it. What the card UNDER-states: simulation data is inside (≥4 sources,
+304 ep) and real orange-fruit demonstrations are ~61 (+ part of 200 mixed-fruit). Our own checks still
+to run on the parquet: exact duplicate EPISODES across sources (the author deduped at dataset level),
+fps/occupancy from the streams, degenerate episodes.
