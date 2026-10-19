@@ -16,6 +16,11 @@ chunks; warm-up on load; per-session timing logs (timing_server.log). A saved-da
 (`probe_timing.py --recording … --count N [--measured-delay]`) replays recorded frames through the real
 codec and server with no robot driver — the arm-less test harness already exists.
 
+## Build order (agreed 2026-10-20)
+W0 the shared policy wrapper (A1 below) → R2 closed-loop sim gate (R plan) → R3a transport adapter + G1/G3/G4
+→ R3 bench. R2 goes before the transport work because it is the cheapest closed-loop evidence and a bad
+result there means a plumbing bug to fix before anything else.
+
 ## The adapter (on AI90, ~1 day)
 ```text
 A1  a policy wrapper the draft server can load: type "vlash_pi05" → VLASH PI05Policy (author's patches,

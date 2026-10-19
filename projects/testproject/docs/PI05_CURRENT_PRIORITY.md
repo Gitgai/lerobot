@@ -99,6 +99,9 @@ R4   cleaned manifest for OUR use: slot-swap fix (1,810 ep),   todo     after R0
 R2   CLOSED-LOOP in the LeIsaac orange sim, 50+50 seeded eps,  todo     promoted 2026-10-20: the corpus holds ~200
      RTC off, ground-truth success; reuses the R3a policy                LeIsaac orange episodes → in-distribution;
      wrapper over the socket harness; GPU 0, ~2 h                        tests what open-loop replay cannot
+W0   shared policy wrapper: VLASH π0.5 (author's patches,     proposed first build step (~half day); consumed by
+     empty_cameras=1, compiled) behind a socket, slot mapping            R2 (sim) and R3a (bench adapter)
+     front→base, wrist→left_wrist; 20-step chunks
 R3a  Zenoh↔VLASH serving adapter + ARM-LESS verification     proposed plan: pi05_so101_bench_adapter_plan_20261020.md
      (loopback replay, open-loop replay of our real episodes,           ~1 day build + 2 h; GPU 0; needs AI90's key
      remote replay from the Acer, fault cases)                          on the Acer for the remote leg
@@ -141,7 +144,8 @@ in our scene; 3,300-ep 11-task Isaac Lab corpus (other scene, train-only);
 4  ✔ R0 meta/sample/video + ✔ R1 (2026-10-19); R0.5 dedup runs itself after the pull (~02:30Z 10-20),
    then R4 cleaned manifest → audit closed, no input needed
 5  AWAITING GO (independent, can all start the same day):
-   a  R3a adapter + arm-less verification (~1 day) + R2 closed-loop sim gate (~2 h) → then R3 bench
+   a  W0 wrapper (½ day) → R2 sim gate (2 h, GPU 0) → R3a adapter + arm-less gates (½-1 day) → R3 bench
+      (R2 first: cheapest closed-loop evidence; a < 20% result sends us back to plumbing before any bench time)
    b  L7 full FT with EMA in host RAM, GPU 1, ~54 h (plan 2026-10-18)
    c  O0 + O1a orange recorder, GPU 0, days (plan 2026-10-10)
    d  ledger §7 optimizer-state strip (209 GB, RED) · empty Gitgai/openpi repo for the mirror

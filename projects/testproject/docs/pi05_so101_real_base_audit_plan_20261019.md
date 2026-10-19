@@ -178,6 +178,7 @@ R2 optional · R3 blocked on two things: (a) the Zenoh↔VLASH serving adapter o
 (b) the operator at the bench in Pune.
 
 Sequence from here (2026-10-20): parquet pull → R0.5 dedup pass (auto) → R4 manifest → audit closed; then,
-on the operator's go: adapter (R3 prep) · L7 EMA-in-RAM run on GPU 1 · O1a recorder on GPU 0 — independent.
+on the operator's go: W0 wrapper → R2 sim gate → R3a adapter + gates → R3 bench; in parallel L7 (GPU 1) and
+O1a recorder (GPU 0) — independent of each other and of the R work except GPU 0 sharing between R2 and O1a.
 Decisions: real sets are for the arm; sim sets are for the controlled comparison; never mix fps in
 one run; camera placement must match the rig; archive downloads go to /mnt/data4tb.
