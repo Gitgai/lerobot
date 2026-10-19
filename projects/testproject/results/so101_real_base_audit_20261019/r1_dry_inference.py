@@ -15,7 +15,8 @@ ap.add_argument("--n-action-steps", type=int, default=20); ap.add_argument("--nu
 ap.add_argument("--out", default="")
 a = ap.parse_args()
 
-from lerobot.policies.factory import get_policy_class
+from vlash.policies.factory import get_policy_class  # VLASH's PI05 (config fields state_cond/fuse_qkv/… are VLASH's, not LeRobot 0.4.1's)
+import vlash.policies.pi05.configuration_pi05  # noqa: registers 'pi05' for PreTrainedConfig
 from lerobot.configs.policies import PreTrainedConfig
 cfg = PreTrainedConfig.from_pretrained(a.ckpt)
 cfg.empty_cameras = 1; cfg.n_action_steps = a.n_action_steps; cfg.num_inference_steps = a.num_inference_steps

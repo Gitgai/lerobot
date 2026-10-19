@@ -86,6 +86,17 @@ slots, state dims, instruction format) against our rig's observation layout; ser
 socket harness with RTC ON (RTCConfig as for the arm); one dry inference on a recorded frame from
 our own August real episodes; measure latency. Ready-to-run state recorded here.
 
+### R1 run record (2026-10-19)
+- Checkpoint (7.0 GB safetensors) and dataset meta are on /mnt/data4tb/huggingface-cache. Serving env built:
+  /home/kiran/sim/vlash-venv (py3.11, VLASH @22cbabfe, LeRobot 0.4.1); author's patched run.py and
+  modeling_pi05.py applied over VLASH's copies (upstream kept as *.upstream).
+- Gotcha 1: config.json carries VLASH-only fields (state_cond, fuse_qkv, fuse_gate_up, vlm_config,
+  action_expert_config) → the policy must be loaded through vlash.policies.factory, not LeRobot's.
+- Gotcha 2: VLASH's pin pulls torch 2.7.1+cu126, which has NO Blackwell (sm_120) kernels — "no kernel
+  image is available" on the 5090. Fixed by installing torch 2.7.1+cu128 into the env.
+- Dry inference: results/so101_real_base_audit_20261019/r1_dry_inference.{py,json} (one frame pair from
+  our so101_orange_89_v21 episode 0 at t=2 s, task "pick up the orange and move it to another place").
+
 ## R2 — Zero-shot in LeIsaac (optional, a HINT not a number)
 Real-trained model on rendered images: confounded. 20 episodes, orange task, RTC off, logged as
 "hint" — only to see whether it moves toward the orange at all.
