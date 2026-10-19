@@ -89,3 +89,26 @@ is label noise on the camera channel, not fatal, but it is the single largest de
 invisible in the metadata — only the pictures show it. Fix for a retrain: swap the two slots for these
 five sources (a manifest edit, no re-encoding). The 1,314 single-camera episodes and the 274 two-external
 episodes are weaker signal, not wrong.
+
+## R0.5 + R4 — duplicates, degenerate episodes, and the cleaned manifest (2026-10-20 02:16Z, all 13,969 parquet files)
+```text
+exact duplicate episodes   1 (inside one source); cross-source near-duplicates 0  → the author's dataset-level
+                           dedup holds at the episode level; the "14k" is real, not repeats
+degenerate                 11 shorter than 60 frames, 23 nearly static (10 overlap), 0 NaN
+manifest_clean.csv         KEEP 13,292 of 13,969 = 95.2%  (real, 30 fps, not duplicate/degenerate)
+  dropped                  sim 304 · 10-fps 350 (the other 100 ten-fps are sim) · static 23 · short 11 · dup 1
+  kept but flagged         slot_swap_fix 1,809 (apply the base↔wrist swap) · dark_wrist 1,835 · hand_in_frame 920
+                           (whole sources flagged from 2 sampled episodes — a flag, not a drop) · two_external 274
+  kept by real cameras     1 cam 1,311 · 2 cams 10,880 · 3 cams 1,101
+  real orange-fruit kept   96 (LightwheelAI 61 + aaronsu11 fruit, orange tasks, 35)
+  sources kept             148 of 156
+```
+## Verdict
+The corpus is sound as data: no hidden repetition, almost no junk, 95% usable at 30 fps on real arms, and
+82% in exactly our two-camera layout. Its two real weaknesses are (1) 13% of episodes with the camera slots
+swapped — a labelling error of the merge, fixable by a manifest swap, and the one thing the pictures caught
+that no metadata could — and (2) task coverage: cube/block-heavy, 96 real orange-fruit episodes in total.
+For our purpose it is a legitimate real-SO-101 base to fine-tune FROM, not a source of orange demonstrations;
+our own 89 + 99 real orange episodes remain the task data. The checkpoint trained on it (13,519 of these
+episodes) carries the slot noise; whether that matters is what R2 (sim, closed loop) and the replay ladder
+(R3a G2, in-corpus vs held-out vs ours, as-shipped vs swapped) will measure.

@@ -1,6 +1,6 @@
 # R — The public real-SO-101 π0.5 base: audit the data, test the checkpoint, before recording our own
 
-Date: 2026-10-19. Status: **R0 metadata+sample audit DONE, duplicate pass running; R1 DONE (checkpoint serves, 137 ms/call); R3 blocked — arm not attached, needs a person in NJ.**
+Date: 2026-10-19. Status: **R0 + R4 DONE 2026-10-20 (audit.md verdict; manifest_clean.csv keeps 13,292 = 95%); R1 DONE (57 ms/call compiled); R2/R3a/R3 awaiting go.**
 Split out of pi05_leisaac_lora_vs_fullft_plan_20261010.md Stage 3 (O3), which now points here.
 
 ## Why this comes before our own recordings
@@ -80,6 +80,17 @@ hardware-evaluation rig (two 640x480 UVC cameras, 30 fps). Mapping: front → ba
 left_wrist_0_rgb, right_wrist_0_rgb = black dummy with mask 0 (empty_cameras: 1). PaliGemma tokenizer
 (gated) is accessible with our token. Serving env: /home/kiran/sim/vlash-venv (py3.11, VLASH 22cbabfe +
 LeRobot 0.4.1 + the author's patched run.py) — building.
+
+## R3a G2 extension — the replay ladder on PUBLIC episodes (proposed 2026-10-20, operator's question)
+Open-loop replay (model's next-10 actions vs the human's) run on three rungs with one metric:
+  rung 1  in-corpus, trained-on episodes (LightwheelAI real orange, 5 ep) → the model's best-case error (floor)
+  rung 2  public real SO-101 sets NOT in the corpus (armnet, hungho77, wsagi real orange; 5 ep each) → the
+          generalisation band on strangers' rigs
+  rung 3  our own 89 (5 ep) → ours vs the two rungs: near rung 1 = in-distribution; in rung 2's band = a
+          normal rig gap; far above = a plumbing/mapping bug on our side
+  bonus   the 5 slot-swapped sources replayed as-shipped vs swapped-corrected → how much the model relies on
+          slot semantics; turns the audit's biggest finding into a number
+Cost: ~20 s GPU per episode, < 1 h total; a few hundred MB of video per source; needs the W0 wrapper.
 
 ## R1 — Load and serve the checkpoint from AI90 (no arm needed)
 Download dongyoonkim/so101-pi05-base; load in the LeRobot probe venv; confirm input spec (camera
@@ -167,8 +178,8 @@ R4.6  quality flags  dark/dim wrist streams (5hadytru, y1y2y3, zacapa AVE_07), h
                      sushi) — FLAG only, decided per use
 R4.7  orange subset  the real orange-fruit episodes (LightwheelAI 61 + aaronsu11 fruit orange tasks) listed
                      separately: they are the closest public match to our task and our rig naming
-output  results/so101_real_base_audit_20261019/manifest_clean.csv (+ counts per rule) and a one-paragraph
-        verdict in audit.md: how many of 13,969 survive, by camera layout and fps
+output  DONE 2026-10-20: manifest_clean.csv — 13,292 kept (95.2%); dropped sim 304, 10-fps 350, degenerate 34,
+        dup 1; 1,809 kept episodes carry the slot-swap fix; 96 real orange-fruit; verdict in audit.md
 ```
 Decision rule after R0/R4: the public checkpoint stays the R3 bench candidate regardless (its slot
 noise is 13% and the author measured ~90% on one trained task). If R3 is poor AND the audit says the

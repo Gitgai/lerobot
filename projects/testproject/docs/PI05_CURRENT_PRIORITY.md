@@ -84,16 +84,16 @@ examples: reported, not attributed.
 
 ```text
 ID   step                                                      status   owner/when
-R0   audit all 13,969 episodes of dongyoonkim/so101-pi05-base-  running  meta+sample passes DONE 2026-10-19 (audit.md):
+R0   audit all 13,969 episodes of dongyoonkim/so101-pi05-base-  done     2026-10-20 (audit.md verdict):
      dataset: provenance (156 sources), tasks/skills, orange            406 tasks, cube-heavy; real orange-fruit
      count, cameras/fps vs our rig, exact+near duplicates,              ~61 ep (+part of 200); ≥4 SIM sources inside;
      degenerate episodes → cleaned manifest + verdict per source        82% of episodes = our 2-camera layout;
-                                                                        450 ep at 10 fps; VIDEO CHECK: 1,810 ep (13%)
-                                                                        have wrist/external SWAPPED; exact-dup pass running
+                                                                        450 ep at 10 fps; 1,810 ep (13%) with wrist/
+                                                                        external SWAPPED; dups 1, degenerate 34 — clean
 R1   download + serve dongyoonkim/so101-pi05-base from AI90    done     2026-10-19: VLASH env + author's patches;
      (input spec vs our rig, dry inference, latency)                    sane chunk on our real frame; 57 ms/call
                                                                         compiled (137 uncompiled) on the 5090
-R4   cleaned manifest for OUR use: slot-swap fix (1,810 ep),   todo     after R0.5; output manifest_clean.csv
+R4   cleaned manifest for OUR use: slot-swap fix (1,810 ep),   done     2026-10-20: manifest_clean.csv keeps 13,292
      sim out (304), 10-fps split (450), dups + degenerate out,           + survivor counts; feeds O3 fine-tune
      quality flags, real-orange subset listed                            (LoRA on top is the author's advice)
 R2   CLOSED-LOOP in the LeIsaac orange sim, 50+50 seeded eps,  todo     promoted 2026-10-20: the corpus holds ~200
@@ -141,10 +141,10 @@ in our scene; 3,300-ep 11-task Isaac Lab corpus (other scene, train-only);
 2c L6b RTC latency sweep — proposed, build while L7 trains
 2d ledger §7 optimizer-state strip (RED) — awaiting approval
 3  openpi mirror push (needs operator: create Gitgai/openpi, 3 commands)
-4  ✔ R0 meta/sample/video + ✔ R1 (2026-10-19); R0.5 dedup runs itself after the pull (~02:30Z 10-20),
-   then R4 cleaned manifest → audit closed, no input needed
+4  ✔ R0 + R4 audit CLOSED 2026-10-20 (95% usable; 13% slot-swap; 96 real orange) · ✔ R1
 5  AWAITING GO (independent, can all start the same day):
-   a  W0 wrapper (½ day) → R2 sim gate (2 h, GPU 0) → R3a adapter + arm-less gates (½-1 day) → R3 bench
+   a  W0 wrapper (½ day) → R2 sim gate (2 h, GPU 0) → R3a adapter + arm-less gates incl. the public
+      replay ladder (½-1 day) → R3 bench
       (R2 first: cheapest closed-loop evidence; a < 20% result sends us back to plumbing before any bench time)
    b  L7 full FT with EMA in host RAM, GPU 1, ~54 h (plan 2026-10-18)
    c  O0 + O1a orange recorder, GPU 0, days (plan 2026-10-10)
