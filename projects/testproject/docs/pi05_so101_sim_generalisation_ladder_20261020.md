@@ -81,6 +81,16 @@ separates that appearance gap (touch 88% survives it) from task-semantics gaps (
 - Rungs launched 03:46Z (unit so101-sim-mujoco, sequential, 50 episodes each): pick-place@200, pick-place@600,
   nexus PickLift, PickAndPlace, StackCube, Touch → results_mj_*.jsonl / results_nexus_*.jsonl, log sim_mujoco.log.
 
+## Isaac orange results (2026-10-19 ~05:30Z, 50 episodes each, headless, seeds 100-149 / 200-249)
+```text
+rung 1a  "Grab oranges and place into plate." (the corpus's own string)   38/50 = 76%  CI 63-86
+rung 1b  "pick up the orange and move it to another place" (ours)         16/50 = 32%  CI 21-46
+```
+Every failure is the 100 s time-out (all three oranges on the plate + arm at rest is the predicate). The 44-point
+gap between phrasings is outside noise on identical scenes: the model is sensitive to the instruction string, AND
+our string is genuinely less specific (it names no plate while the predicate requires the plate). Bench
+consequence: use the corpus's phrasing (or fine-tune on ours) — do not assume wording is free.
+
 ## MuJoCo results (2026-10-19 04:15Z, 50 episodes each, zero-shot, non-pipelined)
 ```text
 rung 4  namenu pick-place, 200-step cap (published)        1/50   2%
