@@ -84,12 +84,14 @@ examples: reported, not attributed.
 
 ```text
 ID   step                                                      status   owner/when
-R0   audit all 13,969 episodes of dongyoonkim/so101-pi05-base-  running  2026-10-19, AI90 CPU; meta+parquet
-     dataset: provenance (156 sources), tasks/skills, orange            to /mnt/data4tb; output
-     count, cameras/fps vs our rig, exact+near duplicates,              results/so101_real_base_audit_20261019/
-     degenerate episodes → cleaned manifest + verdict per source
-R1   download + serve dongyoonkim/so101-pi05-base from AI90    todo     after R0.1; LeRobot probe venv, RTC ON,
-     (input spec vs our rig, dry inference, latency)                    socket harness; no arm needed
+R0   audit all 13,969 episodes of dongyoonkim/so101-pi05-base-  running  meta+sample passes DONE 2026-10-19 (audit.md):
+     dataset: provenance (156 sources), tasks/skills, orange            406 tasks, cube-heavy; real orange-fruit
+     count, cameras/fps vs our rig, exact+near duplicates,              ~61 ep (+part of 200); ≥4 SIM sources inside;
+     degenerate episodes → cleaned manifest + verdict per source        82% of episodes = our 2-camera layout;
+                                                                        450 ep at 10 fps; exact-dup pass running
+R1   download + serve dongyoonkim/so101-pi05-base from AI90    done     2026-10-19: VLASH env + author's patches;
+     (input spec vs our rig, dry inference, latency)                    sane chunk on our real frame; 137 ms/call
+                                                                        (5090, no compile); arm NOT attached now
 R2   zero-shot in LeIsaac, 20 eps, logged as a HINT only       optional
 R3   20 real trials on the bench, RTC on, filmed               blocked  needs a person at the arm (NJ)
      ≥10/20 → Stage 3 starts from this checkpoint; <5/20 → record ours

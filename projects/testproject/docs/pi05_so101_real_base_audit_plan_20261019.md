@@ -1,6 +1,6 @@
 # R — The public real-SO-101 π0.5 base: audit the data, test the checkpoint, before recording our own
 
-Date: 2026-10-19. Status: **R0 (audit) starting; R1 ready to start; R2 optional; R3 needs a person at the arm.**
+Date: 2026-10-19. Status: **R0 metadata+sample audit DONE, duplicate pass running; R1 DONE (checkpoint serves, 137 ms/call); R3 blocked — arm not attached, needs a person in NJ.**
 Split out of pi05_leisaac_lora_vs_fullft_plan_20261010.md Stage 3 (O3), which now points here.
 
 ## Why this comes before our own recordings
@@ -94,8 +94,15 @@ our own August real episodes; measure latency. Ready-to-run state recorded here.
   action_expert_config) → the policy must be loaded through vlash.policies.factory, not LeRobot's.
 - Gotcha 2: VLASH's pin pulls torch 2.7.1+cu126, which has NO Blackwell (sm_120) kernels — "no kernel
   image is available" on the 5090. Fixed by installing torch 2.7.1+cu128 into the env.
-- Dry inference: results/so101_real_base_audit_20261019/r1_dry_inference.{py,json} (one frame pair from
-  our so101_orange_89_v21 episode 0 at t=2 s, task "pick up the orange and move it to another place").
+- Dry inference DONE (r1_dry_inference.json): loads in 26 s, 3.62B params bf16; on our real frame pair
+  (so101_orange_89_v21 ep 0, t=2 s, "pick up the orange and move it to another place") it returns a finite
+  20×6 chunk whose first action sits 1.4 units from the current state (recorded next action: within 0.5)
+  — plausible, not a stall, not a jump. Latency on the 5090 without compile: 137 ms median per call
+  (first call 456 ms); compiled figure pending (r1_dry_inference_compiled.json).
+- R1 status: READY TO SERVE. The arm and cameras are currently NOT attached to AI90 (no /dev/ttyACM*,
+  no /dev/video*), so R3 waits for someone at the bench to plug in and reset objects.
+- Status 2026-10-19: R0 metadata + sample passes done (audit.md); full parquet pull running for the
+  exact-duplicate pass (R0.5); R1 done; R2 optional; R3 blocked on presence.
 
 ## R2 — Zero-shot in LeIsaac (optional, a HINT not a number)
 Real-trained model on rendered images: confounded. 20 episodes, orange task, RTC off, logged as

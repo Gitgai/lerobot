@@ -50,3 +50,17 @@ licence filter — and documented it. What the card UNDER-states: simulation dat
 304 ep) and real orange-fruit demonstrations are ~61 (+ part of 200 mixed-fruit). Our own checks still
 to run on the parquet: exact duplicate EPISODES across sources (the author deduped at dataset level),
 fps/occupancy from the streams, degenerate episodes.
+
+## From the parquet sample, 3 episodes per source (R0.4, 2026-10-19)
+```text
+fps per source     151 sources at 30 fps · 5 sources at 10 fps = 450 episodes (the card's number confirmed):
+                   CoRL2026-CSI IsaacLab PullCube 100 · CoRL2026-CSI teleop stack RGB block 150 ·
+                   anvilbot-patrickhhh 3cams 50 / front_wrist 50 / relocate_cube 100
+                   → 2 of the 5 are the CoRL2026 sim/teleop sets; all 5 were EXCLUDED from the author's training run
+real cameras       sources: 1 camera 17 · 2 cameras 125 · 3 cameras 14
+                   episodes: 1 camera 1,314 (9.4%) · 2 cameras 11,504 (82%) · 3 cameras 1,151
+                   slot use: base_0_rgb real in 153 sources · left_wrist_0_rgb in 142 · right_wrist_0_rgb in 14
+                   → the dominant layout is exactly OURS (external + wrist, 2 slots); 1,314 single-camera
+                     episodes trained with one slot black
+orange sources     all 30 fps; 7 of 8 are base+left_wrist (our layout); nbirukov lego has 3 cameras
+```
