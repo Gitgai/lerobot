@@ -48,6 +48,14 @@ the wrist view → left_wrist_0_rgb (an overhead with no wrist camera = one real
 targets in degrees for namenu (matches); check nexus's units and control rate before trusting a number. Each gets a
 50-episode run through a small LeRobot-0.4.1 client (venv ~/sim/mujoco-envhub-venv312) talking to the same wrapper.
 
+## "New renderer", defined (operator's question, 2026-10-19)
+The renderer is the simulator's image generator — the part that turns the 3D scene into the camera pixels the
+policy sees. The model trained on real footage plus ~200 Isaac Sim episodes (photorealistic: wood grain, soft
+shadows, textured fruit). MuJoCo (nexus, namenu) draws flat grey or tiled surfaces, a yellow arm, hard shadows,
+no texture; the model had never seen a MuJoCo image. "New renderer" = same robot and joint space, same kind of
+task, images in a visual style it has no experience of — the sim-to-sim gap, a cousin of sim-to-real. The ladder
+separates that appearance gap (touch 88% survives it) from task-semantics gaps (a painted green disc as target).
+
 ## MuJoCo rungs — set-up record (2026-10-20)
 - venv ~/sim/mujoco-envhub-venv312 (Python 3.12: so101-nexus 0.10.0 requires it; LeRobot 0.4.1, MuJoCo 3.16, grpcio).
   The numpy==1.26 pin from the LeIsaac EnvHub guide is unsatisfiable with lerobot 0.4.1 — dropped.
