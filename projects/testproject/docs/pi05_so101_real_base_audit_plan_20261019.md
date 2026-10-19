@@ -38,6 +38,39 @@ Reading: if ≥ ~30% of episodes are duplicates/degenerate, the "14k" is really 
 checkpoint was trained on repeats → weigh its result accordingly; if orange/fruit episodes are
 few, do not expect zero-shot orange picking.
 
+## Facts from the dataset card, model card and build repo (read 2026-10-19)
+```text
+dataset   150 Hub sources + 6 of the author's; 13,969 ep / 7.27M fr; v2.1; 3 camera slots + masks;
+          per-episode source_dataset in meta/episodes.jsonl, ranges in meta/sources.json, licences in
+          ATTRIBUTION.md. Funnel: 11,270 repos crawled → 1,724 SO-10x → 408 (≥50 ep, sim removed) →
+          307 (action-space match, leader-frame + bimanual rejected) → 296 (quality) → 205 (camera
+          classification + MANUAL duplicate removal, 91 dropped) → 181 (fingerprint dedup: multiset of
+          (episode length, mean action); equal or strict-subset → dropped, 30 removed) → 156 licensed.
+          The TRAINING corpus was 181 sources / 17,137 ep; 3,168 unlicensed ep are not released and
+          the 450 ten-fps ep were excluded from training → 13,519 of the released episodes were trained on.
+          Camera slots are positions, not viewpoints: 42 sources (4,704 ep) have a non-wrist camera in
+          a "wrist" slot; 17 sources have one real camera, 125 two, 14 three; empty slots are black
+          video with mask 0 (a trainer that ignores masks learns on black frames; stats code must
+          exclude the mask columns). Resolutions vary; the author resized to 224 pad at load.
+          Build scripts + artifacts: github.com/jinnymo/so101-pi05-base (pipeline/, pipeline/artifacts/).
+checkpoint lerobot/pi05_base → 40k steps, effective batch 256 (8×A100, per-GPU 8 × accum 4), lr 5e-5
+          cosine → 2.5e-6, 1k warmup, bf16 (adaRMS dense fp32), NO EMA, ~40 h; loss 0.10 → 0.0065.
+          Inputs: base_0_rgb / left_wrist_0_rgb / right_wrist_0_rgb at 224 pad + per-slot masks,
+          state/action 6-D MEAN_STD, chunk 50, n_action_steps 20, num_inference_steps 15, fps 30.
+          Stack: LeRobot 0.4.1 + VLASH (trained-RTC / concurrent inference) at commit 22cbabfe, FOUR
+          patched files (run.py, modeling_pi05.py, train.py, video_utils.py); empty_cameras: 1 for a
+          two-camera rig. Licence: Gemma Terms of Use.
+          Author's own evaluation: ONE task on ONE physical SO-101 (two 640x480 UVC cams), "about 90%"
+          over an unrecorded number of trials, a task with 14 demos in the corpus; task scoping and
+          termination the weakest behaviour; "a base for fine-tuning, not a deployable task policy";
+          per-task LoRA recommended (docs/07-lora-finetuning.md).
+```
+What this changes: zero-shot orange picking is NOT expected (the author says so); R3's reading is
+re-weighted — the checkpoint's value is as a real-data STARTING POINT for our fine-tune, which is
+exactly O3's design. R3 stays worth 20 trials (cheap, tells us the floor). The 7.5 GB download and
+the serving stack (0.4.1 + VLASH + patches) are in hand; our probe venv is 0.6.1 → serve it from a
+separate 0.4.1 env, as the EnvHub harness already does.
+
 ## R1 — Load and serve the checkpoint from AI90 (no arm needed)
 Download dongyoonkim/so101-pi05-base; load in the LeRobot probe venv; confirm input spec (camera
 slots, state dims, instruction format) against our rig's observation layout; serve over the existing
