@@ -48,6 +48,21 @@ the wrist view → left_wrist_0_rgb (an overhead with no wrist camera = one real
 targets in degrees for namenu (matches); check nexus's units and control rate before trusting a number. Each gets a
 50-episode run through a small LeRobot-0.4.1 client (venv ~/sim/mujoco-envhub-venv312) talking to the same wrapper.
 
+## MuJoCo rungs — set-up record (2026-10-20)
+- venv ~/sim/mujoco-envhub-venv312 (Python 3.12: so101-nexus 0.10.0 requires it; LeRobot 0.4.1, MuJoCo 3.16, grpcio).
+  The numpy==1.26 pin from the LeIsaac EnvHub guide is unsatisfiable with lerobot 0.4.1 — dropped.
+- Client: results/so101_base_sim_test_20261020/mujoco_envhub_eval.py (our gRPC client to the wrapper; one JSON line per
+  episode). A SECOND wrapper instance serves these rungs (unit so101-base-server-b, :8081, GPU 1) so they never share
+  a server with the Isaac run — the stock server keeps one observation queue per process.
+- Units verified from the envs' own code: namenu reports/accepts LeRobot degrees; nexus is radians both ways, converted
+  with so101_nexus.sim_qpos_to_dataset_row / dataset_row_to_sim_qpos. Camera maps: namenu up→front, side→wrist (no
+  wrist camera: the "wrist" slot carries a second external view); nexus overhead→front, wrist→wrist; nexus renders 224×224.
+- Smokes (2 episodes each, 03:44Z): namenu pick-place 0/2 at its registered 200-step cap (10 s at 20 Hz — the policy
+  plans at 30 Hz, so the cap is tight; a 600-step variant is in the run); nexus MuJoCoPickLift 1/2 — one zero-shot
+  success in a simulator the corpus never saw.
+- Rungs launched 03:46Z (unit so101-sim-mujoco, sequential, 50 episodes each): pick-place@200, pick-place@600,
+  nexus PickLift, PickAndPlace, StackCube, Touch → results_mj_*.jsonl / results_nexus_*.jsonl, log sim_mujoco.log.
+
 ## Outputs
 results/so101_base_sim_test_20261020/results_<tag>.jsonl per rung (tags: corpusA, oursB, liftcube, toytable, mj_pickplace,
 nexus_<task>), frames_scored/, and a ladder table in this doc when all rungs are in.
