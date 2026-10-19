@@ -24,6 +24,16 @@ rung  simulator   task (env id)                               instruction       
 Pre-registered reading per rung: ≥60% → the base does it; 20-60% partial; <20% does not transfer (check plumbing
 first: camera mapping, action units, control rate). Compare rungs, not to LIBERO.
 
+## LeIsaac environment coverage (the EnvHub table, decided 2026-10-19)
+```text
+PickOrange-v0                    running (50 corpus instruction + 50 ours)
+LiftCube-v0                      queued, auto after the orange run (unit so101-sim-other), 50 eps
+CleanToyTable-v0 (single arm)    queued behind the cube, 50 eps
+PickOrange-Direct-v0, LiftCube-Direct-v0   SKIPPED: same scene, cameras and success rule as -v0; "Direct" is
+                                 Isaac Lab's other env code path for the identical task — no new information
+CleanToyTable-BiArm-v0 / -BiArm-Direct-v0, FoldCloth-BiArm   OUT: two arms; the checkpoint is single-arm only
+```
+
 ## Live-window evidence (2026-10-20)
 Rung 1a, 2 episodes with the Isaac Sim window on the desktop: 2/2 — three oranges placed in sequence and the arm
 returned to rest (montage_live_ep1.jpg, montage_live_ep2.jpg), ~50 s each, 75 policy calls, 132-180 ms/call.
