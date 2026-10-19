@@ -97,16 +97,19 @@ R1   download + serve dongyoonkim/so101-pi05-base from AI90    done     2026-10-
 R4   cleaned manifest for OUR use: slot-swap fix (1,810 ep),   done     2026-10-20: manifest_clean.csv keeps 13,292
      sim out (304), 10-fps split (450), dups + degenerate out,           + survivor counts; feeds O3 fine-tune
      quality flags, real-orange subset listed                            (LoRA on top is the author's advice)
-R2   CLOSED-LOOP in the LeIsaac orange sim, 50+50 seeded eps,  todo     promoted 2026-10-20: the corpus holds ~200
-     RTC off, ground-truth success; reuses the R3a policy                LeIsaac orange episodes → in-distribution;
+R2   "simulator test": the public checkpoint driving the       todo     promoted 2026-10-20: the corpus holds ~200
+     LeIsaac orange task, 50+50 seeded eps, RTC off, ground-             LeIsaac orange episodes → in-distribution;
+     truth success; reuses the W0 policy wrapper over the socket
      wrapper over the socket harness; GPU 0, ~2 h                        tests what open-loop replay cannot
-W0   shared policy wrapper: VLASH π0.5 (author's patches,     proposed first build step (~half day); consumed by
+W0   "policy wrapper": the public π0.5 (VLASH, author's      proposed first build step (~half day); consumed by
      empty_cameras=1, compiled) behind a socket, slot mapping            R2 (sim) and R3a (bench adapter)
      front→base, wrist→left_wrist; 20-step chunks
-R3a  Zenoh↔VLASH serving adapter + ARM-LESS verification     proposed plan: pi05_so101_bench_adapter_plan_20261020.md
+R3a  "bench serving adapter": the wrapper behind the bench   proposed plan: pi05_so101_bench_adapter_plan_20261020.md
+     client's Zenoh protocol + ARM-LESS verification
      (loopback replay, open-loop replay of our real episodes,           ~1 day build + 2 h; GPU 0; needs AI90's key
      remote replay from the Acer, fault cases)                          on the Acer for the remote leg
-R3   20 real trials on the bench, NON-PIPELINED client, filmed blocked  arm is in PUNE with the operator; needs a
+R3   "bench trials": 20 real attempts in Pune, NON-PIPELINED  blocked
+     client, filmed  arm is in PUNE with the operator; needs a
                                                                         serving adapter (VLASH policy behind the
                                                                         bench client's Zenoh protocol) — operator's call
      ≥10/20 → Stage 3 starts from this checkpoint; <5/20 → record ours
@@ -118,8 +121,9 @@ R3   20 real trials on the bench, NON-PIPELINED client, filmed blocked  arm is i
 ID   step                                                      status   owner/when
 O0   verify EverNorif/so101_place_orange_isaaclab is our       todo     anytime, ~30 min
      kitchen scene (decides 120 vs 200 starting episodes)
-O1a  record to 450 pick-orange episodes (log attempts,         todo     can start before L
-     successes, s/episode from hour one; project; stop)                 finishes — sim only
+O1a  "orange recorder": record to 450 pick-orange episodes     todo     GPU 0 or 1; can run beside the
+     (log attempts, successes, s/episode from hour one;                 simulator test / adapter work
+     project; stop) — sim only
 O1b  train full FT (72 GB machine) + LoRA (5090), same data,   todo     after O1a, L4 box
      LeRobot; 100 seeded 3000-step eps per row, RTC off
 O2   10-20 instruction variants over the 3 single-arm          todo     only if O1b is clear
