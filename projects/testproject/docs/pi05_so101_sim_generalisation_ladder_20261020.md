@@ -63,6 +63,22 @@ targets in degrees for namenu (matches); check nexus's units and control rate be
 - Rungs launched 03:46Z (unit so101-sim-mujoco, sequential, 50 episodes each): pick-place@200, pick-place@600,
   nexus PickLift, PickAndPlace, StackCube, Touch → results_mj_*.jsonl / results_nexus_*.jsonl, log sim_mujoco.log.
 
+## MuJoCo results (2026-10-19 04:15Z, 50 episodes each, zero-shot, non-pipelined)
+```text
+rung 4  namenu pick-place, 200-step cap (published)        1/50   2%
+        namenu pick-place, 600-step cap                     1/50   2%   → not the time cap; the env itself
+rung 5  nexus Touch the red cube                           44/50  88%
+        nexus PickLift (grasp and lift)                     13/50  26%
+        nexus PickAndPlace (place on the blue circle)        3/50   6%
+        nexus StackCube                                      1/50   2%
+```
+Reading: in a renderer the corpus never saw, the base reaches and touches reliably (88%), grasps and lifts a
+quarter of the time, and almost never completes a placement. The namenu environment is the outlier at 2%:
+it has NO wrist camera (its second view is another external camera fed into the wrist slot) and a different
+look; the frames in frames_mujoco/ are the next thing to inspect before blaming the model. Compare with
+LeIsaac orange at ~85% (in-distribution renderer, trained-on task) — the gap is the sim-to-sim gap plus task
+difficulty, not plumbing: the same wrapper, units and client produced 88% on Touch.
+
 ## Outputs
 results/so101_base_sim_test_20261020/results_<tag>.jsonl per rung (tags: corpusA, oursB, liftcube, toytable, mj_pickplace,
 nexus_<task>), frames_scored/, and a ladder table in this doc when all rungs are in.
