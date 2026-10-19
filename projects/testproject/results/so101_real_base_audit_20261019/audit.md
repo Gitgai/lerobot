@@ -64,3 +64,28 @@ real cameras       sources: 1 camera 17 · 2 cameras 125 · 3 cameras 14
                      episodes trained with one slot black
 orange sources     all 30 fps; 7 of 8 are base+left_wrist (our layout); nbirukov lego has 3 cameras
 ```
+
+## Visual pass (R0.7, 2026-10-19): 2 episodes × 22 sources (20 largest + all orange) — montages/ (54 PNG, not in git)
+Top row of each sheet = base_0_rgb slot, bottom = left_wrist_0_rgb slot, 6 frames across the episode.
+```text
+SLOTS SWAPPED (wrist view sits in base_0_rgb, external view in the wrist slot):
+  5hadytru/so101_grasp_1, _2, _3     1,360 ep   uploader's "front" IS the wrist camera, "overhead" the external;
+                                                the author's keyword rule mapped front→base, overhead→wrist
+  y1y2y3/so101_test8                   250 ep   "fixed"/"handeye" keys, content is the other way round
+  sabinMlminator/so101_pickplace_cubes 200 ep   same symptom
+  total                              1,810 ep = 13.0% of the release, 3 of the 15 largest sources
+TWO EXTERNAL CAMERAS, NO WRIST VIEW (the card's "non-wrist in a wrist slot" case, seen):
+  TzuShian/so101_white_chess           274 ep   overhead green-screen + table-level side view
+CORRECT (external top, wrist bottom): LightwheelAI orange · aaronsu11 fruit · zacapa chess + AVE_07 ·
+  observabot die · k1000dai conveyor · nbirukov lego · wantobcm box2bowl · SurajChess marker · aiden-li
+  picktape + drawers · CoRL2026 teleop stack · hackathon sushi · zaringleb ×2 · geekscape · self/stack_cube
+SIM (rendered, obvious): EverNorif orange · aaronsu11 leisaac · omkarmayekar orange — also correct slots
+QUALITY NOTES: 5hadytru wrist stream is very dark (black table, underexposed) and partly occluded by a
+  person's hand in frame 1 of ep 3196; y1y2y3 and zacapa AVE_07 are dim; sushi set shows a hand in frame.
+```
+Why it matters: the author's slot semantics ("base = external, left_wrist = wrist") is what the policy
+learned on 87% of the data; 13% taught it the opposite pairing. For a policy that reads both views this
+is label noise on the camera channel, not fatal, but it is the single largest defect found and it is
+invisible in the metadata — only the pictures show it. Fix for a retrain: swap the two slots for these
+five sources (a manifest edit, no re-encoding). The 1,314 single-camera episodes and the 274 two-external
+episodes are weaker signal, not wrong.

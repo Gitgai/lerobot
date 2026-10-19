@@ -31,7 +31,8 @@ R0.5  duplicates: exact (identical state/action streams → hash), near (same so
 R0.6  value verdict per source: KEEP / KEEP-WITH-CAVEAT / DROP, with the reason; a cleaned manifest
       (episode ids) is the output, plus a one-page summary table in this doc
 R0.7  sample videos: 2 episodes from each of the 20 largest sources, watched (montage), to confirm
-      the metadata story matches the pictures
+      the metadata story matches the pictures  ← DONE: found 1,810 ep (13%) with SWAPPED camera slots
+      (5hadytru ×3, y1y2y3, sabinMlminator) — invisible in metadata; see audit.md
 ```
 Output: `results/so101_real_base_audit_20261019/` (manifest.csv, sources.csv, tasks.csv, audit.md).
 Reading: if ≥ ~30% of episodes are duplicates/degenerate, the "14k" is really smaller and the
@@ -97,8 +98,8 @@ our own August real episodes; measure latency. Ready-to-run state recorded here.
 - Dry inference DONE (r1_dry_inference.json): loads in 26 s, 3.62B params bf16; on our real frame pair
   (so101_orange_89_v21 ep 0, t=2 s, "pick up the orange and move it to another place") it returns a finite
   20×6 chunk whose first action sits 1.4 units from the current state (recorded next action: within 0.5)
-  — plausible, not a stall, not a jump. Latency on the 5090 without compile: 137 ms median per call
-  (first call 456 ms); compiled figure pending (r1_dry_inference_compiled.json).
+  — plausible, not a stall, not a jump. Latency on the 5090: 137 ms/call uncompiled; COMPILED (the author's
+  serving setting) 57 ms median, 58 ms p95, after a 7.5-minute first-call compile (r1_dry_inference_compiled.json).
 - R1 status: READY TO SERVE. The arm and cameras are currently NOT attached to AI90 (no /dev/ttyACM*,
   no /dev/video*), so R3 waits for someone at the bench to plug in and reset objects.
 - Status 2026-10-19: R0 metadata + sample passes done (audit.md); full parquet pull running for the

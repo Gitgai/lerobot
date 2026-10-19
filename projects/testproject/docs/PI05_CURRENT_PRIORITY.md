@@ -88,10 +88,11 @@ R0   audit all 13,969 episodes of dongyoonkim/so101-pi05-base-  running  meta+sa
      dataset: provenance (156 sources), tasks/skills, orange            406 tasks, cube-heavy; real orange-fruit
      count, cameras/fps vs our rig, exact+near duplicates,              ~61 ep (+part of 200); ≥4 SIM sources inside;
      degenerate episodes → cleaned manifest + verdict per source        82% of episodes = our 2-camera layout;
-                                                                        450 ep at 10 fps; exact-dup pass running
+                                                                        450 ep at 10 fps; VIDEO CHECK: 1,810 ep (13%)
+                                                                        have wrist/external SWAPPED; exact-dup pass running
 R1   download + serve dongyoonkim/so101-pi05-base from AI90    done     2026-10-19: VLASH env + author's patches;
-     (input spec vs our rig, dry inference, latency)                    sane chunk on our real frame; 137 ms/call
-                                                                        (5090, no compile); arm NOT attached now
+     (input spec vs our rig, dry inference, latency)                    sane chunk on our real frame; 57 ms/call
+                                                                        compiled (137 uncompiled) on the 5090
 R2   zero-shot in LeIsaac, 20 eps, logged as a HINT only       optional
 R3   20 real trials on the bench, RTC on, filmed               blocked  arm is in PUNE with the operator; needs a
                                                                         serving adapter (VLASH policy behind the
