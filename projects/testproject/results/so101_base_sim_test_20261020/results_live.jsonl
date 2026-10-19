@@ -1,0 +1,2 @@
+{"episode": 1, "success": true, "time_out": false, "steps": 1515, "policy_calls": 76, "wall_s": 109.7, "seed": 7, "task": "LeIsaac-SO101-PickOrange-v0", "instruction": "Grab oranges and place into plate.", "utc": "2026-10-19T03:13:54Z"}
+{"episode": 2, "success": true, "time_out": false, "steps": 1470, "policy_calls": 74, "wall_s": 106.3, "seed": 8, "task": "LeIsaac-SO101-PickOrange-v0", "instruction": "Grab oranges and place into plate.", "utc": "2026-10-19T03:15:40Z"}

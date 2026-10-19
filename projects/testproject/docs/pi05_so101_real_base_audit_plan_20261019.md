@@ -142,6 +142,11 @@ the policy tracks the simulated arm (first action within 0.5-3 units of the stat
 Operator asks (2026-10-20): (1) a LIVE-WINDOW run — 2 episodes with the Isaac Sim viewport on the desktop,
 same policy and task, before the 100 headless episodes; (2) frames recorded by the wrapper (front + wrist,
 every Nth call) for every headless episode, for review and montages. Both adopted.
+LIVE RUN 2026-10-20 03:12-03:16Z (Isaac Sim window on the desktop, seeds 7, 8): 2/2 SUCCESS — the public
+checkpoint picked an orange and placed it on the plate zero-shot, 1,515 and 1,470 sim steps (~50 s each),
+76 and 74 policy calls, 132-180 ms/call. results_live.jsonl; 61 frame pairs in frames_live/.
+Scored run launched 03:16Z: 50 episodes with the corpus instruction (seeds 100..149) then 50 with ours
+("pick up the orange and move it to another place", seeds 200..249), headless, frames every 10th call.
 Note: the 8.8 GB process on GPU 0 port 18916 is the operator's own LIBERO LoRA server from 10-16 (no client
 ever connected); not part of this work.
 

@@ -97,8 +97,8 @@ R1   download + serve dongyoonkim/so101-pi05-base from AI90    done     2026-10-
 R4   cleaned manifest for OUR use: slot-swap fix (1,810 ep),   done     2026-10-20: manifest_clean.csv keeps 13,292
      sim out (304), 10-fps split (450), dups + degenerate out,           + survivor counts; feeds O3 fine-tune
      quality flags, real-orange subset listed                            (LoRA on top is the author's advice)
-R2   "simulator test": the public checkpoint driving the       running  smoke (2 eps, headless) 2026-10-20 → 2 eps
-     LIVE WINDOW on the desktop (operator) → 50+50 headless with frames recorded;
+R2   "simulator test": the public checkpoint driving the       running  LIVE 2/2 SUCCESS zero-shot (2026-10-20 03:15Z);
+     LeIsaac orange task; smoke 2 eps, live-window 2 eps,                50+50 headless scored run in progress;
      LeIsaac orange task, 50+50 seeded eps, RTC off, ground-             LeIsaac orange episodes → in-distribution;
      truth success; reuses the W0 policy wrapper over the socket
      wrapper over the socket harness; GPU 0, ~2 h                        tests what open-loop replay cannot
