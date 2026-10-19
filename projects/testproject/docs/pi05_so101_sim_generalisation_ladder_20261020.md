@@ -95,6 +95,13 @@ consequence: use the corpus's phrasing (or fine-tune on ours) — do not assume 
 First cube attempt (11:11Z) used the orange run's 100 s cap: each failed episode ran 6,000 steps = 16 min wall
 (0/2 before I stopped it; kept as results_liftcube_cap100_aborted.jsonl). Relaunched 12:05Z with task-sized caps:
 cube 30 s (a lift takes seconds; success = cube 20 cm above the base), toy-table 60 s, 50 and 40 episodes.
+BOTH cube attempts were INVALID (found 12:25Z): LiftCube-v0 has no wrist camera (its cfg deletes it), the
+wrapper raised KeyError('wrist'), the server answered Empty, and LeIsaac's client silently replayed its last
+action for the whole episode (899 and 353 "Received Empty" lines) — the arm never moved. Fix: the wrapper now
+picks the external and wrist views by key name and loads the policy with empty_cameras=2, so one- or two-camera
+clients both work (a one-camera client gets two masked slots). Relaunched 12:28Z; the invalid files are kept as
+*_INVALID_no_wrist_key.*. Lesson: a client that falls back to "repeat last action" on a server error turns a
+plumbing fault into a silent 0% — the wrapper now logs its camera mapping per client and never raises on a missing key.
 
 ## MuJoCo results (2026-10-19 04:15Z, 50 episodes each, zero-shot, non-pipelined)
 ```text

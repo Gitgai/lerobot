@@ -77,7 +77,7 @@ def main():
             self.lerobot_features = specs.lerobot_features; self.actions_per_chunk = int(specs.actions_per_chunk)
             if getattr(self, "policy", None) is None:
                 cfg = PreTrainedConfig.from_pretrained(a.ckpt)
-                cfg.empty_cameras = 1; cfg.device = "cuda"; cfg.compile_model = bool(a.compile)
+                cfg.empty_cameras = 2; cfg.device = "cuda"; cfg.compile_model = bool(a.compile)   # fill up to 2 missing slots (1- or 2-camera clients)
                 cfg.n_action_steps = min(self.actions_per_chunk, cfg.chunk_size); cfg.num_inference_steps = a.num_inference_steps
                 t0 = time.perf_counter()
                 self.policy = get_policy_class(cfg.type).from_pretrained(a.ckpt, config=cfg); self.policy.eval()
@@ -100,7 +100,19 @@ def main():
         def _predict_action_chunk(self, observation_t: TimedObservation):
             raw = observation_t.get_observation(); t0 = time.perf_counter()
             obs = {}
-            for k, slot in SLOTS.items():
+            # camera keys vary per environment: pick the external and the wrist view by name; missing slots are
+            # filled with masked dummies by the policy (empty_cameras). Found 2026-10-19: LeIsaac LiftCube sends no
+            # "wrist" key, the old code raised KeyError and the client silently replayed its last action.
+            img_keys = [k for k, v in raw.items() if hasattr(v, "shape") and getattr(v, "ndim", 0) == 3 and v.shape[-1] == 3]
+            is_wrist = lambda k: any(t in k.lower() for t in ("wrist", "handeye", "gripper", "endeff", "hand", "ego"))
+            wrist_keys = [k for k in img_keys if is_wrist(k)]; ext_keys = [k for k in img_keys if not is_wrist(k)]
+            mapping = {}
+            if ext_keys: mapping[ext_keys[0]] = "observation.images.base_0_rgb"
+            if wrist_keys: mapping[wrist_keys[0]] = "observation.images.left_wrist_0_rgb"
+            elif len(ext_keys) > 1: mapping[ext_keys[1]] = "observation.images.left_wrist_0_rgb"   # second external view in the wrist slot (as the corpus did)
+            if not hasattr(self, "_mapping_logged") or self._mapping_logged != mapping:
+                log.info("camera mapping for this client: %s (image keys seen: %s)", mapping, img_keys); self._mapping_logged = mapping
+            for k, slot in mapping.items():
                 img = raw[k]
                 if not isinstance(img, torch.Tensor): img = torch.from_numpy(np.ascontiguousarray(img))
                 if img.ndim == 3 and img.shape[-1] == 3: img = img.permute(2, 0, 1)       # HWC -> CHW
