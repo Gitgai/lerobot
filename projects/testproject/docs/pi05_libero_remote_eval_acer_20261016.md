@@ -69,4 +69,7 @@ flight (pipelined without RTC). A stop-and-wait client sees no staleness at all 
 standard protocol with a longer wall clock. So the cliff is a statement about pipelined-without-RTC clients,
 not about latency per se. Operator's question: why replan every 5 of 10 — what does executing the WHOLE
 chunk before asking again cost? Measured as L6b (frozen protocol, --replan-steps 10, LoRA 20k, n=200):
-result in results/pi05_libero_20261010/L6b_replan10_lora20k_spatial_n200/ (running 2026-10-20).
+RESULT (2026-10-20): execute the whole 10-step chunk, then ask = 198/200 = 99.0% (CI 96.4-99.7), failures on
+tasks 5 and 8, 11 policy calls per episode instead of ~22, wall 470 s vs ~650 s. Identical to replanning every
+5 (199/200, 198/200). On LIBERO the extra corrections buy nothing measurable; a stop-and-wait client that
+runs each chunk to the end loses no success here — it only halves the number of calls.

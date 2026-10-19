@@ -35,6 +35,8 @@ A2  Client mode — DEFINITIONS LOCKED 2026-10-20 (operator):
                and without knowing what the arm did since → the join is a GUESS unless the model is told
                the committed actions. That is what RTC (guided or trained) does.
       RULE: pipelined only WITH RTC; without RTC we run non-pipelined. R3 default = NON-PIPELINED.
+      EVIDENCE: in LIBERO, executing the whole chunk before asking again scored 198/200 vs 199/200 for
+      replan-every-5 (L6b, 2026-10-20) — the stop-and-wait pattern costs no success in a static scene.
       ACCEPTED COST (operator 2026-10-20): the non-pipelined client will be slower and stop-start; that is
       fine for R3 — we are testing whether the task gets done, not how smoothly. Success criterion and the
       time cap are set for a stop-and-wait arm (see R3 protocol); speed is recorded, not judged.
