@@ -114,6 +114,9 @@ R3a  "bench serving adapter": the wrapper behind the bench   proposed plan: pi05
      client's Zenoh protocol + ARM-LESS verification
      (loopback replay, open-loop replay of our real episodes,           ~1 day build + 2 h; GPU 0; needs AI90's key
      remote replay from the Acer, fault cases)                          on the Acer for the remote leg
+R5   "LoRA on top": fine-tune the public checkpoint on our    proposed after R3; VLASH LoRA (author's docs/07);
+     real orange episodes (89 + 99), score in Isaac (R2 harness)         Isaac score before any bench time
+     then on the bench
 R3   "bench trials": 20 real attempts in Pune, NON-PIPELINED  blocked
      client, filmed  arm is in PUNE with the operator; needs a
                                                                         serving adapter (VLASH policy behind the

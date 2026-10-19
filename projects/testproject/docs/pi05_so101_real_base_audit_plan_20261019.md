@@ -201,6 +201,14 @@ data is otherwise sound, the next move is "LoRA on top with our real orange epis
 (the author's own recommendation), not a retrain. A full retrain from pi05_base on the R4 manifest is
 the third option and a multi-day 8-GPU job; it is not scheduled.
 
+## R5 — LoRA on top of the public checkpoint with our real orange data (proposed 2026-10-19)
+The simulator ladder says the base's transferable skill is approach + grasp (88% / 26% even in an unseen renderer)
+and its gap is placement and task semantics. That is what our 89 (so101_orange_89_v21) + 99 (orange79_plus_plate20)
+real episodes teach. Plan: VLASH LoRA fine-tune of dongyoonkim/so101-pi05-base on those episodes (author's
+docs/07-lora-finetuning.md recipe), served by the same wrapper; score 50 Isaac orange episodes with the R2
+harness as the gate (the base's own number is the control), then the bench. Not started; after R3a/R3 or in
+parallel on GPU 1 when the operator says go.
+
 ## Tracking
 R2 PROMOTED to a scored sim gate (2026-10-20). R0 meta+sample+video DONE; R0.5 (exact duplicates + degenerate) runs automatically when the parquet pull
 ends (~2026-10-20 02:30Z; armed waiter) · R4 cleaned manifest right after (~1 h, no input needed) · R1 DONE ·
