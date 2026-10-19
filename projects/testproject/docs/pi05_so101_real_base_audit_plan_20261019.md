@@ -71,6 +71,15 @@ exactly O3's design. R3 stays worth 20 trials (cheap, tells us the floor). The 7
 the serving stack (0.4.1 + VLASH + patches) are in hand; our probe venv is 0.6.1 → serve it from a
 separate 0.4.1 env, as the EnvHub harness already does.
 
+## Our rig vs the checkpoint's inputs (checked 2026-10-19)
+Our real recordings (e.g. lerobot_assets/datasets/so101_orange_89_v21, 89 ep): so101_follower, 30 fps,
+front + wrist cameras at 480x640, joint names/order shoulder_pan, shoulder_lift, elbow_flex, wrist_flex,
+wrist_roll, gripper (.pos) — IDENTICAL to the checkpoint's 6-D state/action and to the author's own
+hardware-evaluation rig (two 640x480 UVC cameras, 30 fps). Mapping: front → base_0_rgb, wrist →
+left_wrist_0_rgb, right_wrist_0_rgb = black dummy with mask 0 (empty_cameras: 1). PaliGemma tokenizer
+(gated) is accessible with our token. Serving env: /home/kiran/sim/vlash-venv (py3.11, VLASH 22cbabfe +
+LeRobot 0.4.1 + the author's patched run.py) — building.
+
 ## R1 — Load and serve the checkpoint from AI90 (no arm needed)
 Download dongyoonkim/so101-pi05-base; load in the LeRobot probe venv; confirm input spec (camera
 slots, state dims, instruction format) against our rig's observation layout; serve over the existing
