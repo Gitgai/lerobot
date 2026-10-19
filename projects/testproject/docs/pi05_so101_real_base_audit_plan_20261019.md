@@ -127,7 +127,32 @@ success = orange in the bowl, no contact with anything else; filmed; the pipelin
 (--rtc) before blaming latency. Reading: ≥ 10/20 → start Stage 3 from this checkpoint;
 < 5/20 → our own data is needed and R0 tells us what kind.
 
+## R4 — Cleaned manifest for OUR use of this corpus (added 2026-10-19, after the visual pass)
+The audit's product is not a verdict on the author; it is the version of this corpus WE would train on
+(O3 real-arm fine-tune starts from the public checkpoint and adds data; a later full retrain from
+pi05_base on cleaned data is the fallback if the checkpoint's slot noise shows on the bench).
+```text
+R4.1  slot fix       swap base_0_rgb ↔ left_wrist_0_rgb for 5hadytru grasp_1/2/3, y1y2y3/so101_test8,
+                     sabinMlminator/so101_pickplace_cubes_test1 (1,810 ep) — manifest-level, no re-encode;
+                     TzuShian chess (274 ep, two externals): keep, flag wrist slot as "external #2"
+R4.2  sim out        drop the ≥4 simulation sources (304 ep) from the REAL corpus; keep them listed for sim work
+R4.3  fps split      the 5 ten-fps sources (450 ep) go to a separate 10 fps manifest or are dropped (author dropped)
+R4.4  dups out       exact-duplicate episodes from R0.5 (pending) dropped; near-dups across sources reviewed
+R4.5  degenerate out episodes < 60 frames, static (< 2.0 summed action std), NaN
+R4.6  quality flags  dark/dim wrist streams (5hadytru, y1y2y3, zacapa AVE_07), hands in frame (5hadytru ep,
+                     sushi) — FLAG only, decided per use
+R4.7  orange subset  the real orange-fruit episodes (LightwheelAI 61 + aaronsu11 fruit orange tasks) listed
+                     separately: they are the closest public match to our task and our rig naming
+output  results/so101_real_base_audit_20261019/manifest_clean.csv (+ counts per rule) and a one-paragraph
+        verdict in audit.md: how many of 13,969 survive, by camera layout and fps
+```
+Decision rule after R0/R4: the public checkpoint stays the R3 bench candidate regardless (its slot
+noise is 13% and the author measured ~90% on one trained task). If R3 is poor AND the audit says the
+data is otherwise sound, the next move is "LoRA on top with our real orange episodes + the R4.7 subset"
+(the author's own recommendation), not a retrain. A full retrain from pi05_base on the R4 manifest is
+the third option and a multi-day 8-GPU job; it is not scheduled.
+
 ## Tracking
-R0 todo→running today · R1 todo (after R0.1 pull, same day) · R2 optional · R3 blocked on presence.
+R0 meta+sample+video DONE, exact-dup pass running · R1 DONE · R2 optional · R3 blocked (adapter + operator at bench) · R4 after R0.5.
 Decisions: real sets are for the arm; sim sets are for the controlled comparison; never mix fps in
 one run; camera placement must match the rig; archive downloads go to /mnt/data4tb.

@@ -93,6 +93,9 @@ R0   audit all 13,969 episodes of dongyoonkim/so101-pi05-base-  running  meta+sa
 R1   download + serve dongyoonkim/so101-pi05-base from AI90    done     2026-10-19: VLASH env + author's patches;
      (input spec vs our rig, dry inference, latency)                    sane chunk on our real frame; 57 ms/call
                                                                         compiled (137 uncompiled) on the 5090
+R4   cleaned manifest for OUR use: slot-swap fix (1,810 ep),   todo     after R0.5; output manifest_clean.csv
+     sim out (304), 10-fps split (450), dups + degenerate out,           + survivor counts; feeds O3 fine-tune
+     quality flags, real-orange subset listed                            (LoRA on top is the author's advice)
 R2   zero-shot in LeIsaac, 20 eps, logged as a HINT only       optional
 R3   20 real trials on the bench, RTC on, filmed               blocked  arm is in PUNE with the operator; needs a
                                                                         serving adapter (VLASH policy behind the
