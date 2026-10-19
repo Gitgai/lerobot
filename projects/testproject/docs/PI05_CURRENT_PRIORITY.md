@@ -116,9 +116,10 @@ R3a  "bench serving adapter": the wrapper behind the bench   done     2026-10-19
      client + ARM-LESS verification                                      wrapper speaks LeRobot gRPC and the bench
      (remote dry run from the Acer done; replay ladder                   client (bench_client.py) talks to it from
      G1/G2/G4 not run — superseded by the live trial)                     Pune at 0.67–0.92 s per call
-R5   "LoRA on top": fine-tune the public checkpoint on our    proposed after R3; VLASH LoRA (author's docs/07);
-     real orange episodes (89 + 99), score in Isaac (R2 harness)         Isaac score before any bench time
-     then on the bench
+R5   "LoRA on top": freeze the public checkpoint, add rank-16  next     plan: pi05_so101_lora_on_top_plan_20261019.md
+     LoRA trained on our 188 real orange episodes; Isaac gate            (split out 2026-10-19); ½ day build + hours
+     vs the base's 76% ("did not break it"), then 20 bench               of training on a free 5090; awaiting go;
+     trials on the same grid as the base's 20                            bench 0/2 is NOT yet evidence for it
 R3   "bench trials": 20 real attempts in Pune, NON-PIPELINED  running  2026-10-19: 0/2 — trial 1 jaws beside the
      client, frames recorded server-side                                 fruit; trial 2 jaws ON the fruit, no enclosure,
      record: results/so101_bench_20261019/bench_runs.md                  no lift (0.92 s RTT, 42% duty). Fruit looks too
@@ -159,9 +160,11 @@ in our scene; 3,300-ep 11-task Isaac Lab corpus (other scene, train-only);
 3  openpi mirror push (needs operator: create Gitgai/openpi, 3 commands)
 4  ✔ R0 + R4 audit CLOSED 2026-10-20 (95% usable; 13% slot-swap; 96 real orange) · ✔ R1
 5  AWAITING GO (independent, can all start the same day):
-   a  ✔ W0 wrapper → ✔ R2 sim gate → ✔ R3a (no adapter needed) → R3 bench RUNNING: trial 1 of 20 done
-      2026-10-19 (FAIL); trials 2–20 run whenever the operator is at the bench to re-place the fruit
-      (one ssh command per trial from AI90; client returns the arm to its start pose itself)
+   a  ✔ W0 wrapper → ✔ R2 sim gate → ✔ R3a (no adapter needed) → R3 bench RUNNING: 0/2 on 2026-10-19;
+      trials 3–20 run whenever the operator is at the bench (measure jaw vs fruit first — object-fit rule
+      proposed; one ssh command per trial from AI90; the client returns the arm to start itself)
+      → R5 LoRA on top (plan split out 2026-10-19): can START beside the bench on a free 5090, its Isaac
+      gate needs no arm; its bench row waits for the base's 20 as the control
    b  L7 full FT with EMA in host RAM, GPU 1, ~54 h (plan 2026-10-18)
    c  O0 + O1a orange recorder, GPU 0, days (plan 2026-10-10)
    d  ledger §7 optimizer-state strip (209 GB, RED) · empty Gitgai/openpi repo for the mirror
@@ -176,6 +179,7 @@ EMA-off allowed on 72 GB (2026-10-14); bf16 not  the "EMA off" label travels wit
 EMA in HOST RAM proposed (2026-10-18): same formula, moved not bent; bf16 EMA and every-k-steps EMA NOT taken
 n=200 LIBERO · 100/row LeIsaac · 50/task O2   RTC off in sim; on the arm: non-pipelined first, pipelined only WITH RTC (2026-10-20)
 August full-FT results not compared           LeRobot (not openpi) for the SO-101 task
+two data stories (2026-10-19): sim episodes (O1a) → the method comparison, scored in sim; OUR real episodes → the arm (R5/O3); never mixed in one run
 DYNUS capped at 16 GB; shut it down for long runs (the old "47 GB" is stale)
 ```
 

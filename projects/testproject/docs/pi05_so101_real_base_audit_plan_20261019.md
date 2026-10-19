@@ -192,6 +192,11 @@ trials 3–20 pending — operator re-places the fruit per placement; the client
             pose itself (--return-start). Still open: jaw opening vs fruit diameter (measure; a corpus-sized
             orange or a mandarin is the fair test — the citrus fills the fully-open jaws in the wrist frames).
 ```
+Protocol amendment PROPOSED 2026-10-19 (operator to confirm): **object-fit rule.** A trial run with a fruit
+that does not fit between the fully open jaws is an object failure, not a policy result. Such trials are
+logged in bench_runs.md with result EXCLUDED and do not count toward the 20; the 20 are run with a fruit
+that fits (measured once, written in the record). If the measurement shows the trial-1/2 citrus does fit,
+trials 1–2 stand as counted FAILs.
 
 ## R4 — Cleaned manifest for OUR use of this corpus (added 2026-10-19, after the visual pass)
 The audit's product is not a verdict on the author; it is the version of this corpus WE would train on
@@ -218,13 +223,15 @@ data is otherwise sound, the next move is "LoRA on top with our real orange epis
 (the author's own recommendation), not a retrain. A full retrain from pi05_base on the R4 manifest is
 the third option and a multi-day 8-GPU job; it is not scheduled.
 
-## R5 — LoRA on top of the public checkpoint with our real orange data (proposed 2026-10-19)
-The simulator ladder says the base's transferable skill is approach + grasp (88% / 26% even in an unseen renderer)
-and its gap is placement and task semantics. That is what our 89 (so101_orange_89_v21) + 99 (orange79_plus_plate20)
-real episodes teach. Plan: VLASH LoRA fine-tune of dongyoonkim/so101-pi05-base on those episodes (author's
-docs/07-lora-finetuning.md recipe), served by the same wrapper; score 50 Isaac orange episodes with the R2
-harness as the gate (the base's own number is the control), then the bench. Not started; after R3a/R3 or in
-parallel on GPU 1 when the operator says go.
+## R5 — LoRA on top of the public checkpoint with our real orange data (proposed 2026-10-19; SPLIT OUT)
+Own plan: **pi05_so101_lora_on_top_plan_20261019.md** (what it means in plain words, the 188-episode data
+table, the author's LoRA recipe read from VLASH's async_lora.yaml, the Isaac "did not break it" gate with
+readings, the bench comparison against the base's 20 trials). Summary: freeze dongyoonkim/so101-pi05-base,
+add rank-16 LoRA trained on so101_orange_89_v21 (89) + orange79_plus_plate20 (99), serve through the same
+wrapper, gate on the Isaac orange task against the base's 76% (a forgetting check, not a bench prediction),
+then 20 bench trials on the same grid as the base. Correction recorded 2026-10-19: bench trials 1–2 (0/2)
+are consistent with needing this step but are not evidence for it — the rule needs 20, and both may be an
+object-size failure. Not started; after R3 or beside it on a free 5090 when the operator says go.
 
 ## Tracking
 R2/R2b DONE 2026-10-19 (orange 76% / 32% by wording; cube 0; toy-table 0; MuJoCo touch 88 / lift 26 / place 6) — see the ladder doc. R0 meta+sample+video DONE; R0.5 (exact duplicates + degenerate) runs automatically when the parquet pull

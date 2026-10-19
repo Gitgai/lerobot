@@ -54,6 +54,24 @@ mixing   against the LeIsaac rig (a moved camera breaks a pixel policy on
          the same robot); keep one fps
 ```
 
+What varies and what does not (clarified 2026-10-19, operator's question):
+```text
+varies       object placements — LeIsaac's scripted generator respawns the three oranges and the plate
+             each episode (utils/domain_randomization.py: object pose; camera-pose jitter is available in
+             the same module and is a DECISION at O0, ranges recorded there — not yet taken)
+fixed        the scene: one kitchen, same oranges, plate, lighting, robot, 640x480 front + wrist cameras
+looks like   NOT our real episodes, by design. These episodes serve the Stage 1 comparison (LoRA vs full
+our real     fine-tune), which is trained AND scored in simulation so the real-to-sim gap stays out of the
+data?        comparison. They are not meant to reach the bench.
+variety vs   for the controlled comparison, variety in placements is what matters (the eval is 100 seeded
+matching     random placements). For the real arm it is the reverse: a pixel policy breaks when the camera
+             moves, so matching our rig matters more than variety, and useful variety there is variety
+             INSIDE real data (placements, fruit, lighting on our own setup).
+two data     simulated data → the clean method comparison (O1); our 188 real episodes → the arm (R5 / O3).
+stories      Mixing them in one run is ruled out (standing decision below: real sets for the arm, sim sets
+             for the comparison).
+```
+
 ### Training (O1b): two rows, same data
 
 ```text
