@@ -21,6 +21,15 @@ W0 the shared policy wrapper (A1 below) → R2 closed-loop sim gate (R plan) →
 → R3 bench. R2 goes before the transport work because it is the cheapest closed-loop evidence and a bad
 result there means a plumbing bug to fix before anything else.
 
+## Build record — policy wrapper (W0), 2026-10-20
+- scripts/so101_base_policy_server.py: subclass of LeRobot 0.4.1's gRPC PolicyServer with LeIsaac's pickle
+  module aliases; loads the VLASH π0.5 once, maps front→base_0_rgb / wrist→left_wrist_0_rgb / six .pos → state,
+  bypasses LeRobot's pre/post-processors (VLASH normalises itself); unit so101-base-server, GPU 1, :8080.
+- LeIsaac's client connected and exchanged policy instructions on the first attempt.
+- Gotcha 3: `compile_model=True` (the author's bench setting) RETRACES on every call in this loop — 415 s per
+  call, i.e. unusable — so the wrapper serves EAGER (137 ms/call). For the bench, compile would have to be
+  made shape-stable (fixed prompt tokenisation, static shapes) or left off; in sim it does not matter.
+
 ## The adapter (on AI90, ~1 day)
 ```text
 A1  a policy wrapper the draft server can load: type "vlash_pi05" → VLASH PI05Policy (author's patches,
