@@ -109,6 +109,12 @@ def main():
             # camera keys vary per environment: pick the external and the wrist view by name; missing slots are
             # filled with masked dummies by the policy (empty_cameras). Found 2026-10-19: LeIsaac LiftCube sends no
             # "wrist" key, the old code raised KeyError and the client silently replayed its last action.
+            # JPEG bytes (bench client over a slow link) → decode to HxWx3 RGB first
+            for k, v in list(raw.items()):
+                if isinstance(v, (bytes, bytearray)) and len(v) > 1000 and v[:2] == b"\xff\xd8":
+                    import cv2
+                    bgr = cv2.imdecode(np.frombuffer(v, dtype=np.uint8), cv2.IMREAD_COLOR)
+                    if bgr is not None: raw[k] = np.ascontiguousarray(bgr[:, :, ::-1])
             img_keys = [k for k, v in raw.items() if hasattr(v, "shape") and getattr(v, "ndim", 0) == 3 and v.shape[-1] == 3]
             is_wrist = lambda k: any(t in k.lower() for t in ("wrist", "handeye", "gripper", "endeff", "hand", "ego"))
             wrist_keys = [k for k in img_keys if is_wrist(k)]; ext_keys = [k for k in img_keys if not is_wrist(k)]

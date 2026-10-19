@@ -30,8 +30,12 @@ def grpc_client(server, actions_per_chunk):
     stub.Ready(services_pb2.Empty()); stub.SendPolicyInstructions(services_pb2.PolicySetup(data=pickle.dumps(cfg)))
     state = {"t": 0}
 
+    import cv2
+    def jpg(img):   # JPEG over the wire: ~100 KB instead of 920 KB per image; the server decodes bytes back to RGB
+        ok, buf = cv2.imencode(".jpg", np.ascontiguousarray(img[:, :, ::-1]), [int(cv2.IMWRITE_JPEG_QUALITY), 85]); return buf.tobytes()
+
     def act(front, wrist, joints, task):
-        raw = {"front": front, "wrist": wrist, "task": task}
+        raw = {"front": jpg(front), "wrist": jpg(wrist), "task": task}
         for j, v in zip(JOINTS, joints): raw[f"{j}.pos"] = float(v)
         state["t"] += 1
         obs = H.TimedObservation(timestamp=time.time(), observation=raw, timestep=state["t"])
@@ -74,11 +78,18 @@ def main():
     ap.add_argument("--actions-per-chunk", type=int, default=20); ap.add_argument("--max-chunks", type=int, default=90, help="per episode (90 x 20 steps at 30 fps = 60 s of motion)")
     ap.add_argument("--episodes", type=int, default=1); ap.add_argument("--max-delta-deg", type=float, default=8.0); ap.add_argument("--max-delta-grip", type=float, default=15.0)
     ap.add_argument("--out", default="bench_log.jsonl"); ap.add_argument("--dry-run", action="store_true", help="read cameras + arm, query the policy, do NOT send actions")
+    ap.add_argument("--no-robot", action="store_true", help="dry run without the arm: cameras + network + policy only (state = zeros)")
     a = ap.parse_args()
+    if a.no_robot: a.dry_run = True
 
-    from lerobot.robots.so101_follower import SO101Follower, SO101FollowerConfig
-    robot = SO101Follower(SO101FollowerConfig(port=a.port, id=a.robot_id, cameras={}))   # cameras handled here, not by lerobot
-    robot.connect(calibrate=False)
+    robot = None
+    if not a.no_robot:
+        try:
+            from lerobot.robots.so_follower import SO101Follower, SO101FollowerConfig        # lerobot 0.5.x (the Acer's rig venv)
+        except ImportError:
+            from lerobot.robots.so101_follower import SO101Follower, SO101FollowerConfig     # lerobot 0.4.x / 0.6.x
+        robot = SO101Follower(SO101FollowerConfig(port=a.port, id=a.robot_id, cameras={}))   # cameras handled here, not by lerobot
+        robot.connect(calibrate=False)
     front, wrist = Cam(a.front), Cam(a.wrist)
     act = grpc_client(a.server, a.actions_per_chunk)
     out = open(a.out, "a"); stop = {"flag": False}
@@ -95,11 +106,13 @@ def main():
     threading.Thread(target=key_watch, daemon=True).start()
 
     def joints_now():
+        if robot is None: return np.zeros(6, dtype=np.float32)
         o = robot.get_observation(); return np.array([float(o[f"{j}.pos"]) for j in JOINTS], dtype=np.float32)
 
     try:
         for ep in range(a.episodes):
-            print(f"\n=== episode {ep+1}: place the orange, then press Enter (q/ESC stops) ===", flush=True); input()
+            if not a.dry_run:
+                print(f"\n=== episode {ep+1}: place the orange, then press Enter (q/ESC stops) ===", flush=True); input()
             t_ep = time.time(); n_chunks = 0; lat = []
             for ci in range(a.max_chunks):
                 if stop["flag"]: break
@@ -123,7 +136,8 @@ def main():
             if res == "a": break
     finally:
         stop["flag"] = True
-        try: robot.disconnect()
+        try:
+            if robot is not None: robot.disconnect()
         except Exception: pass
 
 
