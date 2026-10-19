@@ -95,7 +95,7 @@ R1   download + serve dongyoonkim/so101-pi05-base from AI90    done     2026-10-
 R2   zero-shot in LeIsaac, 20 eps, logged as a HINT only       optional
 R3   20 real trials on the bench, RTC on, filmed               blocked  arm is in PUNE with the operator; needs a
                                                                         serving adapter (VLASH policy behind the
-                                                                        bench client's gRPC async protocol) — operator's call
+                                                                        bench client's Zenoh protocol) — operator's call
      ≥10/20 → Stage 3 starts from this checkpoint; <5/20 → record ours
 ```
 

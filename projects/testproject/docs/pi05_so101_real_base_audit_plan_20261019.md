@@ -116,7 +116,7 @@ trip ~633 ms, hidden behind the arm's motion by the client's `--rtc` pipelined l
 waits for (a) the operator at the bench and (b) a serving path the bench client can talk to:
   option 1  VLASH `run` AT THE BENCH (policy local to the robot): needs a GPU at the bench — none known.
   option 2  serve the VLASH-stack π0.5 from AI90 behind the protocol the bench client speaks
-            (the operator's draft pi05-rtc-remote-draft-20261007 = LeRobot async_inference, gRPC, with
+            (the operator's draft pi05-rtc-remote-draft-20261007 = a ZENOH policy server on LeRobot 0.5.2, with
             timing captures) → a thin adapter: VLASH policy.predict_action_chunk inside LeRobot's
             policy_server, chunk 50 → n_action_steps 20, RTC on at the client. ~1 day, operator's call.
   The 300-500 ms figure the operator quoted is this path; L6 showed plain chunking dies at 500 ms,
