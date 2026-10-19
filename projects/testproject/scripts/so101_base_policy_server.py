@@ -134,7 +134,7 @@ def main():
                 os.makedirs(RECORD_DIR, exist_ok=True)
                 self._rec = getattr(self, "_rec", 0) + 1
                 if self._n % RECORD_EVERY == 1 or RECORD_EVERY == 1:
-                    for k in SLOTS:
+                    for k in mapping:                                   # only the cameras this client actually sends
                         img = raw[k]; img = img.cpu().numpy() if isinstance(img, torch.Tensor) else np.asarray(img)
                         Image.fromarray(img.astype(np.uint8)).save(os.path.join(RECORD_DIR, f"c{getattr(self, '_conn', 0):02d}_call{self._n:06d}_{k}.jpg"), quality=85)
                 with open(os.path.join(RECORD_DIR, "calls.csv"), "a", newline="") as f:
