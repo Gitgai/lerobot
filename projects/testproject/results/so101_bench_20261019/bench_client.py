@@ -72,13 +72,14 @@ class Cam:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--server", default="192.168.194.220:8080"); ap.add_argument("--port", default="/dev/ttyACM0"); ap.add_argument("--robot-id", default="follower")
+    ap.add_argument("--server", default="192.168.194.220:8080"); ap.add_argument("--port", default="/dev/ttyACM0"); ap.add_argument("--robot-id", default="my_so101_follower")
     ap.add_argument("--front", required=True); ap.add_argument("--wrist", required=True)
     ap.add_argument("--task", default="Grab oranges and place into plate."); ap.add_argument("--fps", type=float, default=30.0)
     ap.add_argument("--actions-per-chunk", type=int, default=20); ap.add_argument("--max-chunks", type=int, default=90, help="per episode (90 x 20 steps at 30 fps = 60 s of motion)")
     ap.add_argument("--episodes", type=int, default=1); ap.add_argument("--max-delta-deg", type=float, default=8.0); ap.add_argument("--max-delta-grip", type=float, default=15.0)
     ap.add_argument("--out", default="bench_log.jsonl"); ap.add_argument("--dry-run", action="store_true", help="read cameras + arm, query the policy, do NOT send actions")
     ap.add_argument("--no-robot", action="store_true", help="dry run without the arm: cameras + network + policy only (state = zeros)")
+    ap.add_argument("--auto", action="store_true", help="no prompts: start the episode immediately, record the result as 'unscored' (operator scores it afterwards)")
     a = ap.parse_args()
     if a.no_robot: a.dry_run = True
 
@@ -111,8 +112,10 @@ def main():
 
     try:
         for ep in range(a.episodes):
-            if not a.dry_run:
+            if not a.dry_run and not a.auto:
                 print(f"\n=== episode {ep+1}: place the orange, then press Enter (q/ESC stops) ===", flush=True); input()
+            elif not a.dry_run:
+                print(f"\n=== episode {ep+1}: starting in 5 s (auto) ===", flush=True); time.sleep(5)
             t_ep = time.time(); n_chunks = 0; lat = []
             for ci in range(a.max_chunks):
                 if stop["flag"]: break
@@ -131,7 +134,7 @@ def main():
                     robot.send_action({f"{j}.pos": float(v) for j, v in zip(JOINTS, tgt)})
                     prev = tgt; time.sleep(1.0 / a.fps)
                 n_chunks += 1
-            res = input("result? [s]uccess / [f]ail / [a]bort: ").strip().lower()[:1] if not a.dry_run else "d"
+            res = "d" if a.dry_run else ("unscored" if a.auto else input("result? [s]uccess / [f]ail / [a]bort: ").strip().lower()[:1])
             out.write(json.dumps({"ep": ep + 1, "result": res, "chunks": n_chunks, "wall_s": round(time.time() - t_ep, 1), "latency_median_s": round(float(np.median(lat)), 3) if lat else None, "task": a.task, "utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}) + "\n"); out.flush()
             if res == "a": break
     finally:
