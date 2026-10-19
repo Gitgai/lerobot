@@ -73,6 +73,12 @@ def main():
             specs = pickle.loads(request.data)  # nosec - trusted client on our own network
             log.info("client policy request: type=%s path=%s actions_per_chunk=%s device=%s (path IGNORED, serving %s)",
                      specs.policy_type, specs.pretrained_name_or_path, specs.actions_per_chunk, specs.device, a.ckpt)
+            # Reply pickles must use the module layout THIS client has: LeIsaac pins lerobot.scripts.server.helpers
+            # (0.4.2 layout); a stock LeRobot 0.4.x bench client expects lerobot.async_inference.helpers.
+            client_layout = type(specs).__module__
+            for name in ("TimedAction", "TimedData"):
+                getattr(H, name).__module__ = client_layout
+            log.info("reply pickle layout set to %s", client_layout)
             self.device = "cuda"; self.policy_type = "pi05"
             self.lerobot_features = specs.lerobot_features; self.actions_per_chunk = int(specs.actions_per_chunk)
             if getattr(self, "policy", None) is None:

@@ -16,6 +16,18 @@ chunks; warm-up on load; per-session timing logs (timing_server.log). A saved-da
 (`probe_timing.py --recording … --count N [--measured-delay]`) replays recorded frames through the real
 codec and server with no robot driver — the arm-less test harness already exists.
 
+## 2026-10-19 — simplification found while building: no Zenoh adapter may be needed
+The wrapper IS a LeRobot gRPC async policy server. Any LeRobot-0.4.x async client — the stock
+`lerobot.async_inference.robot_client`, or the small bench_client.py in results/so101_bench_20261019/ — can drive the
+real arm against it directly over ZeroTier (AI90 192.168.194.220:8080). The Zenoh route is only needed if the
+operator's existing bench client must be kept. The wrapper now sets its reply-pickle module layout from the client's
+own request, so LeIsaac (0.4.2 layout) and stock 0.4.x clients both work. Bench quick-start (operator at the Acer):
+  1. from the Acer: `nc -vz 192.168.194.220 8080` (or `python -c "import socket;print(socket.create_connection(('192.168.194.220',8080),5))"`)
+  2. a LeRobot 0.4.x env with lerobot[feetech], grpcio, opencv; copy bench_client.py; `--dry-run` first (reads cameras +
+     arm, queries the policy, moves nothing; prints state vs first action per chunk)
+  3. then `--episodes 1 --max-chunks 90`, non-pipelined, per-step clamp 8° / gripper 15, q or ESC stops.
+  Wrapper on AI90 records every frame it receives (RECORD_EVERY=1) under results/so101_bench_20261019/frames/.
+
 ## Build order (agreed 2026-10-20)
 W0 the shared policy wrapper (A1 below) → R2 closed-loop sim gate (R plan) → R3a transport adapter + G1/G3/G4
 → R3 bench. R2 goes before the transport work because it is the cheapest closed-loop evidence and a bad
