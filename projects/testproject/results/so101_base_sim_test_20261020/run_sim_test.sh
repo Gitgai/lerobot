@@ -16,7 +16,7 @@ until /home/kiran/sim/leisaac-venv/bin/python -c "import socket,sys;s=socket.soc
 echo "policy server port open $(date -u +%H:%M:%SZ)"
 cd $LEISAAC && /home/kiran/sim/leisaac-venv/bin/python $R/sim_eval_logged.py \
   --task=$TASK $HFLAG --enable_cameras --device cuda:0 --seed "$SEED" --reseed_each_episode \
-  --step_hz 30 --episode_length_s 100 --eval_rounds "$ROUNDS" \
+  --step_hz 30 --episode_length_s "${EP_LEN:-100}" --eval_rounds "$ROUNDS" \
   --policy_type=lerobot-pi05 --policy_host=127.0.0.1 --policy_port=8080 --policy_timeout_ms 60000 \
   --policy_action_horizon 20 --policy_language_instruction "$INSTR" \
   --policy_checkpoint_path /mnt/data4tb/huggingface-cache/models--dongyoonkim--so101-pi05-base \

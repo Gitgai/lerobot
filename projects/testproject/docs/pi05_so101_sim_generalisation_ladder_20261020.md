@@ -91,6 +91,11 @@ gap between phrasings is outside noise on identical scenes: the model is sensiti
 our string is genuinely less specific (it names no plate while the predicate requires the plate). Bench
 consequence: use the corpus's phrasing (or fine-tune on ours) — do not assume wording is free.
 
+## Cube / toy-table run record
+First cube attempt (11:11Z) used the orange run's 100 s cap: each failed episode ran 6,000 steps = 16 min wall
+(0/2 before I stopped it; kept as results_liftcube_cap100_aborted.jsonl). Relaunched 12:05Z with task-sized caps:
+cube 30 s (a lift takes seconds; success = cube 20 cm above the base), toy-table 60 s, 50 and 40 episodes.
+
 ## MuJoCo results (2026-10-19 04:15Z, 50 episodes each, zero-shot, non-pipelined)
 ```text
 rung 4  namenu pick-place, 200-step cap (published)        1/50   2%
