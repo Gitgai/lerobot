@@ -158,3 +158,12 @@ between 10-17 and 10-18. The L4-noEMA checkpoints are untouched (12 × 31 GB = 3
 still present; §7 proposal still open). /tmp (tmpfs 30 GB, user quota shared with DYNUS scratch)
 is back to 22 GB of DYNUS working trees — the condition that killed the Bash tool on 2026-10-10
 recurs at ~30 GB.
+
+## 9. INCIDENT 2026-10-20 ~02:00Z — /tmp user quota exhausted again (second time; first 2026-10-10)
+Measured from the kernel (quotactl_fd on /tmp): uid 1000 hard = soft limit 23.68 GiB, used 23.68 GiB; the
+tmpfs itself is 30 GB with 6 GB free. Content: DYNUS working trees (dynus_a2b2_git, dynus-l2-original,
+attempt-lineage-port, route-rebase, tmp.*; 1-2 GB each; 11,323 files). Effect: the Claude Bash tool fails
+every command (it writes under /tmp/claude-1000); Read/Write under /home and systemd units are unaffected;
+short commands still run through the Monitor tool. Not touched by this lane (DYNUS files). Fix = operator
+clears stale scratch or raises the quota. Rule R6: this lane's scripts keep TMPDIR=/home/kiran/tmp; a /tmp
+usage above ~20 GiB is an alert condition for the health watchdog on the next long run.
