@@ -21,8 +21,11 @@ What it changes relative to the stock server (everything else is the stock 0.4.1
 import argparse, logging, pickle, sys, time, types
 import numpy as np, torch
 
+import os
 JOINTS = ["shoulder_pan", "shoulder_lift", "elbow_flex", "wrist_flex", "wrist_roll", "gripper"]
 SLOTS = {"front": "observation.images.base_0_rgb", "wrist": "observation.images.left_wrist_0_rgb"}
+RECORD_DIR = os.environ.get("RECORD_DIR", "")          # if set: JPEG frame pairs every RECORD_EVERY calls + calls.csv
+RECORD_EVERY = int(os.environ.get("RECORD_EVERY", "5"))
 
 
 def alias_modules():
@@ -108,6 +111,17 @@ def main():
             actions = list(chunk.squeeze(0))
             dt = time.perf_counter() - t0; self._n += 1
             a0 = actions[0].numpy(); s0 = state[0].cpu().numpy()
+            # optional recording for review: every RECORD_EVERY-th call, the two images as JPEG + a CSV row per call
+            if RECORD_DIR:
+                import csv, os
+                from PIL import Image
+                os.makedirs(RECORD_DIR, exist_ok=True)
+                if self._n % RECORD_EVERY == 1 or RECORD_EVERY == 1:
+                    for k in SLOTS:
+                        img = raw[k]; img = img.cpu().numpy() if isinstance(img, torch.Tensor) else np.asarray(img)
+                        Image.fromarray(img.astype(np.uint8)).save(os.path.join(RECORD_DIR, f"call{self._n:06d}_{k}.jpg"), quality=85)
+                with open(os.path.join(RECORD_DIR, "calls.csv"), "a", newline="") as f:
+                    csv.writer(f).writerow([self._n, round(time.time(), 3), round(1000 * dt, 1), obs["task"]] + np.round(s0, 2).tolist() + np.round(a0, 2).tolist())
             if self._n <= 5 or self._n % 50 == 0:
                 log.info("call %d: %.0f ms | task=%r | state=%s | a0=%s | max|a0-s|=%.1f | n=%d",
                          self._n, 1000 * dt, obs["task"][:60], np.round(s0, 1).tolist(), np.round(a0, 1).tolist(),
