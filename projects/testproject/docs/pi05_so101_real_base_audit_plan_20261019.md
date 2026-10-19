@@ -116,7 +116,8 @@ trip ~633 ms, hidden behind the arm's motion by the client's `--rtc` pipelined l
 31% duty and the grasp fails — memory rtc-pipeline-for-grasp). So R3 does NOT wait for anyone in NJ; it
 waits for (a) the operator at the bench and (b) a serving path the bench client can talk to:
   option 1  VLASH `run` AT THE BENCH (policy local to the robot): needs a GPU at the bench — none known.
-  option 2  serve the VLASH-stack π0.5 from AI90 behind the protocol the bench client speaks
+  option 2  (PLANNED as R3a: pi05_so101_bench_adapter_plan_20261020.md, with arm-less gates G1-G4)
+            serve the VLASH-stack π0.5 from AI90 behind the protocol the bench client speaks
             (the operator's draft pi05-rtc-remote-draft-20261007 = a ZENOH policy server on LeRobot 0.5.2, with
             timing captures) → a thin adapter: VLASH policy.predict_action_chunk inside LeRobot's
             policy_server, chunk 50 → n_action_steps 20, RTC on at the client. ~1 day, operator's call.
