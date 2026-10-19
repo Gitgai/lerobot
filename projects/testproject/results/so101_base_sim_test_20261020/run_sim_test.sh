@@ -5,7 +5,7 @@ set -u
 ROUNDS=${1:-2}; TAG=${2:-smoke}; INSTR=${3:-"Grab oranges and place into plate."}; SEED=${4:-7}
 R=/home/kiran/projects/git/nvidia/lerobot/projects/testproject/results/so101_base_sim_test_20261020
 LEISAAC=/home/kiran/sim/leisaac-src; IL=$LEISAAC/dependencies/IsaacLab/source
-export OMNI_KIT_ACCEPT_EULA=YES ACCEPT_EULA=Y TMPDIR=/home/kiran/tmp CUDA_VISIBLE_DEVICES=0
+export OMNI_KIT_ACCEPT_EULA=YES ACCEPT_EULA=Y TMPDIR=/home/kiran/tmp CUDA_VISIBLE_DEVICES=0 PYTHONUNBUFFERED=1
 export PYTHONPATH=$IL/isaaclab_tasks:$IL/isaaclab_assets:$IL/isaaclab_mimic:$IL/isaaclab_rl${PYTHONPATH:+:$PYTHONPATH}
 LOG=$R/sim_${TAG}.log; exec >> "$LOG" 2>&1
 echo "=== $(date -u +%FT%TZ) sim test: rounds=$ROUNDS tag=$TAG seed=$SEED instr='$INSTR'"

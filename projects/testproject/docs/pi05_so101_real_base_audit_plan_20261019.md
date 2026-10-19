@@ -137,6 +137,13 @@ cost     GPU 0: Isaac Sim ~12 GB + policy 9 GB → fits the 5090; ~2 h for 100 e
 ```
 R2 runs BEFORE the bench and needs no one at the arm; it reuses the adapter's policy wrapper, so it is
 also the first closed-loop consumer of R3a A1.
+Run record 2026-10-20: wrapper up (eager, 137-180 ms/call, GPU 1); 2-episode headless smoke running on GPU 0;
+the policy tracks the simulated arm (first action within 0.5-3 units of the state on every logged call).
+Operator asks (2026-10-20): (1) a LIVE-WINDOW run — 2 episodes with the Isaac Sim viewport on the desktop,
+same policy and task, before the 100 headless episodes; (2) frames recorded by the wrapper (front + wrist,
+every Nth call) for every headless episode, for review and montages. Both adopted.
+Note: the 8.8 GB process on GPU 0 port 18916 is the operator's own LIBERO LoRA server from 10-16 (no client
+ever connected); not part of this work.
 
 ## R3 — 20 real trials on the bench (CORRECTED 2026-10-19: the arm is in PUNE with the operator)
 The August/September arm trials ran the robot + cameras at the bench in Pune (`n16_realarm_client.py`,
