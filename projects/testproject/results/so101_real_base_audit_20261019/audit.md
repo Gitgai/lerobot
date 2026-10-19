@@ -112,3 +112,23 @@ For our purpose it is a legitimate real-SO-101 base to fine-tune FROM, not a sou
 our own 89 + 99 real orange episodes remain the task data. The checkpoint trained on it (13,519 of these
 episodes) carries the slot noise; whether that matters is what R2 (sim, closed loop) and the replay ladder
 (R3a G2, in-corpus vs held-out vs ours, as-shipped vs swapped) will measure.
+
+## What the tasks are (grouped from the 406 strings; episodes, share of 13,969)
+```text
+pick-and-place into a bin/box/cup/bowl/tray    6,264  44.8%   "Place each object in the plastic bin" (1,360), lego into bin …
+pick / grasp with no stated target             2,346  16.8%   "Grasp the die and put it on the mat", "Pick red cube"
+pick-and-place onto a marked spot              1,524  10.9%   "Put the green cube in the area with the black tape"
+chess piece moves                                851   6.1%   "Move the Brown Queen to the Blue Square"
+pick-and-place onto a plate/dish                 777   5.6%   "Pick up the toy and place it on the plate"
+other                                            702   5.0%   "Put the black cube into pen holder"
+open/close drawer or door                        610   4.4%   "Open the upper drawer"
+fruit pick-and-place                             465   3.3%   "Grab a banana and put it on the plate" (incl. sim orange)
+stacking                                         299   2.1%
+push/pull/button · conveyor · clean-up           131   0.9%
+objects (overlapping): cube/block/lego 4,709 · pen/marker/eraser 1,710 · tool/plug/bottle/cup 1,209 ·
+toy/figure/die 918 · chess piece 851 · tape roll 781 · fruit 553
+```
+Reading: ~90% is single-object pick-and-place of a small rigid object into or onto a target — the same
+motor skill as our orange-on-plate task, with the plate variant at 5.6% (777 ep) and fruit at 3.3%. What
+is thin: deformables, two-handed, long-horizon, and precise insertion. For a base model this is the right
+shape; the orange itself is just under-represented.
