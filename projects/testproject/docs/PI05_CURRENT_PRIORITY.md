@@ -105,7 +105,7 @@ W0   shared policy wrapper: VLASH π0.5 (author's patches,     proposed first bu
 R3a  Zenoh↔VLASH serving adapter + ARM-LESS verification     proposed plan: pi05_so101_bench_adapter_plan_20261020.md
      (loopback replay, open-loop replay of our real episodes,           ~1 day build + 2 h; GPU 0; needs AI90's key
      remote replay from the Acer, fault cases)                          on the Acer for the remote leg
-R3   20 real trials on the bench, RTC on, filmed               blocked  arm is in PUNE with the operator; needs a
+R3   20 real trials on the bench, NON-PIPELINED client, filmed blocked  arm is in PUNE with the operator; needs a
                                                                         serving adapter (VLASH policy behind the
                                                                         bench client's Zenoh protocol) — operator's call
      ≥10/20 → Stage 3 starts from this checkpoint; <5/20 → record ours
@@ -158,7 +158,7 @@ openpi stack first, LeRobot fallback          their recipe NEVER bent to fit a c
 their checkpoint evaluated, not retrained     one simulator per table
 EMA-off allowed on 72 GB (2026-10-14); bf16 not  the "EMA off" label travels with the row
 EMA in HOST RAM proposed (2026-10-18): same formula, moved not bent; bf16 EMA and every-k-steps EMA NOT taken
-n=200 LIBERO · 100/row LeIsaac · 50/task O2   RTC off in sim, ON on the real arm
+n=200 LIBERO · 100/row LeIsaac · 50/task O2   RTC off in sim; on the arm: non-pipelined first, pipelined only WITH RTC (2026-10-20)
 August full-FT results not compared           LeRobot (not openpi) for the SO-101 task
 DYNUS capped at 16 GB; shut it down for long runs (the old "47 GB" is stale)
 ```

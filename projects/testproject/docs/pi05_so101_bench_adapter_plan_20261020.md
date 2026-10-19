@@ -35,6 +35,9 @@ A2  Client mode — DEFINITIONS LOCKED 2026-10-20 (operator):
                and without knowing what the arm did since → the join is a GUESS unless the model is told
                the committed actions. That is what RTC (guided or trained) does.
       RULE: pipelined only WITH RTC; without RTC we run non-pipelined. R3 default = NON-PIPELINED.
+      ACCEPTED COST (operator 2026-10-20): the non-pipelined client will be slower and stop-start; that is
+      fine for R3 — we are testing whether the task gets done, not how smoothly. Success criterion and the
+      time cap are set for a stop-and-wait arm (see R3 protocol); speed is recorded, not judged.
       The word "pipelined" is reserved for the definition above and not used loosely elsewhere.
       RTC inside the adapter: guided RTC (LeRobot's prefix-conditioned denoising) only if VLASH's sampler
       exposes its loop cleanly — a later step, not R3's first run.

@@ -143,10 +143,13 @@ waits for (a) the operator at the bench and (b) a serving path the bench client 
   on a static bench the pause costs time (~57% duty at 500 ms) and stop-start dynamics, not stale
   observations. Pipelining is used only together with RTC (definitions locked in the R3a plan, 2026-10-20).
   The August claim that the sequential loop 'crippled' the grasp is a hypothesis, not a measured A/B.
-Protocol as the September arm trials (RTC on, ~95% duty): 20 placements of the orange on a grid,
-success = orange in the bowl, no contact with anything else; filmed; the pipeline flag checked
-(--rtc) before blaming latency. Reading: ≥ 10/20 → start Stage 3 from this checkpoint;
-< 5/20 → our own data is needed and R0 tells us what kind.
+Protocol (revised 2026-10-20): client NON-PIPELINED (stop-and-wait, definitions in the R3a plan); 20
+placements of the orange on a grid; success = orange on the plate/in the bowl with no contact with anything
+else, within a time cap sized for a stop-and-wait arm (duty ~57% at 500 ms RTT → cap = 2× the pipelined
+cap used in September); filmed; per-trial wall time, number of chunks and stall time logged. Slow and jerky
+is ACCEPTED — the question is whether the task gets done. Reading: ≥ 10/20 → start Stage 3 from this
+checkpoint; < 5/20 → our own data is needed and R0 tells us what kind. Pipelined + RTC comes later as its
+own comparison, not mixed into these 20.
 
 ## R4 — Cleaned manifest for OUR use of this corpus (added 2026-10-19, after the visual pass)
 The audit's product is not a verdict on the author; it is the version of this corpus WE would train on
