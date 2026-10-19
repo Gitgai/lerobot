@@ -97,11 +97,13 @@ R1   download + serve dongyoonkim/so101-pi05-base from AI90    done     2026-10-
 R4   cleaned manifest for OUR use: slot-swap fix (1,810 ep),   done     2026-10-20: manifest_clean.csv keeps 13,292
      sim out (304), 10-fps split (450), dups + degenerate out,           + survivor counts; feeds O3 fine-tune
      quality flags, real-orange subset listed                            (LoRA on top is the author's advice)
-R2   "simulator test": the public checkpoint driving the       todo     promoted 2026-10-20: the corpus holds ~200
+R2   "simulator test": the public checkpoint driving the       running  smoke (2 eps) 2026-10-20; then 50+50;
      LeIsaac orange task, 50+50 seeded eps, RTC off, ground-             LeIsaac orange episodes → in-distribution;
      truth success; reuses the W0 policy wrapper over the socket
      wrapper over the socket harness; GPU 0, ~2 h                        tests what open-loop replay cannot
-W0   "policy wrapper": the public π0.5 (VLASH, author's      proposed first build step (~half day); consumed by
+W0   "policy wrapper": the public π0.5 (VLASH, author's      built    2026-10-20: scripts/so101_base_policy_server.py,
+     patches) behind LeRobot's gRPC async policy server,               unit so101-base-server :8080 on GPU 1; LeIsaac's
+     slot mapping front→base, wrist→left_wrist                          client connected first try; consumed by
      empty_cameras=1, compiled) behind a socket, slot mapping            R2 (sim) and R3a (bench adapter)
      front→base, wrist→left_wrist; 20-step chunks
 R3a  "bench serving adapter": the wrapper behind the bench   proposed plan: pi05_so101_bench_adapter_plan_20261020.md
