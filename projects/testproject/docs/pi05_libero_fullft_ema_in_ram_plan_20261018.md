@@ -1,6 +1,6 @@
 # L7 — Full fine-tune with EMA ON, the EMA copy kept in host RAM (LIBERO, 72 GB card)
 
-Date: 2026-10-18. Status: **PROPOSED — awaiting operator go. Not built, not launched.**
+Date: 2026-10-18. Status: **PARKED 2026-10-20 (operator): run after everything the simulator can answer is done. Not built, not launched.**
 Parent: pi05_libero_openpi_vs_ours_plan_20261010.md (L4 row) · results: RESULTS_pi05_libero_lora_vs_fullft_20261013.md §5.1b
 
 ## Why

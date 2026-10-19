@@ -68,7 +68,8 @@ L6   does inference latency change success? time-faithful    done     2026-10-17
      (= chunk length). Operating point 300-500 ms is on the cliff →      next: same sweep with RTC ON
      RTC sweep in the LeIsaac stage.                                      (LeRobot stack, O-stage)
 
-L7   full FT with EMA ON, EMA copy in HOST RAM (bs 32 the     proposed plan: pi05_libero_fullft_ema_in_ram_plan_20261018.md
+L7   "EMA-in-RAM full fine-tune": full FT with EMA ON, EMA    parked   2026-10-20: after the simulator work;
+     copy in HOST RAM (bs 32 the only deviation left).                 plan: pi05_libero_fullft_ema_in_ram_plan_20261018.md
      only deviation left). Isolates whether L4's jagged curve             ~54 h GPU 1 + scoring; ~50-line openpi change
      (78→93→82→95) is EMA-off or batch-32. Row: "EMA on (host)".        + smoke gate; awaiting operator go
 L6b  latency sweep with RTC ON (LeRobot pi0.5, same 5 delays) proposed  decides local vs remote policy for the arm
@@ -137,7 +138,7 @@ in our scene; 3,300-ep 11-task Isaac Lab corpus (other scene, train-only);
 1  ✔ L1, L2, L3, L5(LoRA) done 2026-10-10..12 — LoRA works on LIBERO
    ✔ results write-up: RESULTS_pi05_libero_lora_vs_fullft_20261013.md
 2  ✔ L4-noEMA trained + scored 2026-10-16; ✔ L6 latency sweep 2026-10-17
-2b L7 EMA-in-host-RAM full FT (GPU 1, ~2.5 d) — proposed 2026-10-18, awaiting go
+2b EMA-in-RAM full fine-tune (GPU 1, ~2.5 d) — PARKED 2026-10-20 until the simulator work is done
 2c L6b RTC latency sweep — proposed, build while L7 trains
 2d ledger §7 optimizer-state strip (RED) — awaiting approval
 3  openpi mirror push (needs operator: create Gitgai/openpi, 3 commands)
