@@ -1,6 +1,6 @@
 # π0.5 lane — Current Priority and Status
 
-Last updated: 2026-10-18
+Last updated: 2026-10-19
 
 **This file is the ROUTER and the TRACKER: what is open, in what order, and
 where each step stands. It is NOT a log.** Detail, gates and pre-registered
@@ -80,6 +80,21 @@ Answers: does LoRA work here · does full FT work when WE run it · LoRA vs
 full at matched data. A gap to their checkpoint is partly their 7.7M
 examples: reported, not attributed.
 
+## ▶ R — Public real-SO-101 π0.5 base: audit + test BEFORE recording our own (plan: `pi05_so101_real_base_audit_plan_20261019.md`)
+
+```text
+ID   step                                                      status   owner/when
+R0   audit all 13,969 episodes of dongyoonkim/so101-pi05-base-  running  2026-10-19, AI90 CPU; meta+parquet
+     dataset: provenance (156 sources), tasks/skills, orange            to /mnt/data4tb; output
+     count, cameras/fps vs our rig, exact+near duplicates,              results/so101_real_base_audit_20261019/
+     degenerate episodes → cleaned manifest + verdict per source
+R1   download + serve dongyoonkim/so101-pi05-base from AI90    todo     after R0.1; LeRobot probe venv, RTC ON,
+     (input spec vs our rig, dry inference, latency)                    socket harness; no arm needed
+R2   zero-shot in LeIsaac, 20 eps, logged as a HINT only       optional
+R3   20 real trials on the bench, RTC on, filmed               blocked  needs a person at the arm (NJ)
+     ≥10/20 → Stage 3 starts from this checkpoint; <5/20 → record ours
+```
+
 ## ▶ O — Orange task in LeIsaac (plan: `pi05_leisaac_lora_vs_fullft_plan_20261010.md`)
 
 ```text
@@ -92,8 +107,8 @@ O1b  train full FT (72 GB machine) + LoRA (5090), same data,   todo     after O1
      LeRobot; 100 seeded 3000-step eps per row, RTC off
 O2   10-20 instruction variants over the 3 single-arm          todo     only if O1b is clear
      scenes; Mimic for data; 50 eps/task; one model
-O3   real arm: start from dongyoonkim/so101-pi05-base,         todo     after O1b
-     + LightwheelAI real orange + ours; async + RTC ON
+O3   real arm: start from dongyoonkim/so101-pi05-base,         todo     now gated by R0-R3 (plan split out
+     + LightwheelAI real orange + ours; async + RTC ON                   2026-10-19); after O1b or earlier
 ```
 
 Public data surveyed 2026-10-10 (plan Appendix B): ~120-200 orange episodes
@@ -110,8 +125,9 @@ in our scene; 3,300-ep 11-task Isaac Lab corpus (other scene, train-only);
 2c L6b RTC latency sweep — proposed, build while L7 trains
 2d ledger §7 optimizer-state strip (RED) — awaiting approval
 3  openpi mirror push (needs operator: create Gitgai/openpi, 3 commands)
-4  O0 and O1a in parallel on GPU 0 once the 'openpi-lora-recheck' process
-   someone started 2026-10-14 is done; then O1b → O3 (O2 only on a clear O1b)
+4  R0 audit (today, CPU) → R1 serve the public checkpoint → R3 when someone is at the arm
+5  O0 and O1a (recorder, GPU 0) — now BEHIND R0/R1 by operator preference 2026-10-19;
+   then O1b → O3 (O2 only on a clear O1b)
 ```
 
 ## Standing decisions (do not reopen without a new fact)

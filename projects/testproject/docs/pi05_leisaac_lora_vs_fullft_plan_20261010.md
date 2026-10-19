@@ -180,6 +180,10 @@ at the cost of authoring tasks, data per task, and simulator time.
 
 ## Stage 3 (O3) — the real arm
 
+> 2026-10-19: the public real-SO-101 base (dongyoonkim) is audited and tested FIRST, before our own
+> recordings — split out to `pi05_so101_real_base_audit_plan_20261019.md` (R0-R3). This section
+> remains the plan for what follows R3.
+
 The winning route from Stage 1 (or the multi-task model from Stage 2) goes
 to the physical SO-101. Sim-to-real is its own question with its own plan;
 this document only says it is where the answer is finally read.
