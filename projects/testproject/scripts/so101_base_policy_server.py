@@ -90,7 +90,11 @@ def main():
                     for _ in range(3): self.policy.predict_action_chunk(dummy)
                 log.info("warm-up done")
             self.preprocessor = None; self.postprocessor = None
+            # per-connection counter for logging; the RECORDING index never resets (a reset made later runs
+            # overwrite earlier runs' frames — found 2026-10-19), and each connection gets its own prefix
             self._n = 0
+            self._conn = getattr(self, "_conn", 0) + 1
+            self._rec = getattr(self, "_rec", 0)
             return services_pb2.Empty()
 
         def _predict_action_chunk(self, observation_t: TimedObservation):
@@ -116,12 +120,13 @@ def main():
                 import csv, os
                 from PIL import Image
                 os.makedirs(RECORD_DIR, exist_ok=True)
+                self._rec = getattr(self, "_rec", 0) + 1
                 if self._n % RECORD_EVERY == 1 or RECORD_EVERY == 1:
                     for k in SLOTS:
                         img = raw[k]; img = img.cpu().numpy() if isinstance(img, torch.Tensor) else np.asarray(img)
-                        Image.fromarray(img.astype(np.uint8)).save(os.path.join(RECORD_DIR, f"call{self._n:06d}_{k}.jpg"), quality=85)
+                        Image.fromarray(img.astype(np.uint8)).save(os.path.join(RECORD_DIR, f"c{getattr(self, '_conn', 0):02d}_call{self._n:06d}_{k}.jpg"), quality=85)
                 with open(os.path.join(RECORD_DIR, "calls.csv"), "a", newline="") as f:
-                    csv.writer(f).writerow([self._n, round(time.time(), 3), round(1000 * dt, 1), obs["task"]] + np.round(s0, 2).tolist() + np.round(a0, 2).tolist())
+                    csv.writer(f).writerow([getattr(self, "_conn", 0), self._n, round(time.time(), 3), round(1000 * dt, 1), obs["task"]] + np.round(s0, 2).tolist() + np.round(a0, 2).tolist())
             if self._n <= 5 or self._n % 50 == 0:
                 log.info("call %d: %.0f ms | task=%r | state=%s | a0=%s | max|a0-s|=%.1f | n=%d",
                          self._n, 1000 * dt, obs["task"][:60], np.round(s0, 1).tolist(), np.round(a0, 1).tolist(),
