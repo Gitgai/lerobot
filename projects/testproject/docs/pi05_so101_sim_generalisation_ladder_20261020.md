@@ -1,6 +1,6 @@
 # R2b — Generalisation ladder for the public SO-101 π0.5 base, in simulation (zero-shot, no fine-tuning)
 
-Date: 2026-10-20. Status: **running** (orange scored run in progress; cube and toy-table queued; MuJoCo rungs being set up).
+Date: 2026-10-20. Status: **DONE 2026-10-19 17:40Z — all rungs scored; table and verdict below.**
 Parent: pi05_so101_real_base_audit_plan_20261019.md (R2). Policy: dongyoonkim/so101-pi05-base served by our wrapper
 (scripts/so101_base_policy_server.py, GPU 1, :8080). Operator's go: 2026-10-20 ("go ahead with all").
 
@@ -134,6 +134,34 @@ it has NO wrist camera (its second view is another external camera fed into the 
 look; the frames in frames_mujoco/ are the next thing to inspect before blaming the model. Compare with
 LeIsaac orange at ~85% (in-distribution renderer, trained-on task) — the gap is the sim-to-sim gap plus task
 difficulty, not plumbing: the same wrapper, units and client produced 88% on Touch.
+
+## THE LADDER — final table (zero-shot, non-pipelined client, one policy: dongyoonkim/so101-pi05-base)
+```text
+simulator   task                                      instruction                          cameras       n    success   CI95
+Isaac       PickOrange (3 oranges → plate + rest)     corpus wording                       front+wrist   50   38  76%    63-86
+Isaac       PickOrange                                ours ("…move it to another place")   front+wrist   50   16  32%    21-46
+Isaac       LiftCube (cube 20 cm up)                  "Lift the red cube up."              front only    50    0   0%     0-7
+Isaac       CleanToyTable (2 letter-e → box + rest)   corpus wording                       front+wrist   40    0   0%     0-9
+MuJoCo      nexus Touch                               "Touch the red cube."                overhead+wrist 50  44  88%    76-94
+MuJoCo      nexus PickLift                            "Pick up the red cube."              overhead+wrist 50  13  26%    16-40
+MuJoCo      nexus PickAndPlace (blue circle)          corpus-style                         overhead+wrist 50   3   6%     2-16
+MuJoCo      nexus StackCube                           "Stack the red cube on the blue cube." overhead+wrist 50  1   2%     0-10
+MuJoCo      namenu pick-place (green disc), 200 & 600 steps                                up+side        50   1   2%     0-10
+```
+## Verdict
+1. The base model is a competent REACHER and a fragile GRASPER. Reaching/touching survives a renderer it never
+   saw (88%); grasping drops to a quarter there and to zero with one camera; placing on anything but a familiar
+   container is rare.
+2. It completes the ONE task it had seen in this simulator (orange, 76%) and nothing else in Isaac — the cube
+   (one camera, no wrist view) and the cluttered toy table (unfamiliar instruction, 20 distractors; the arm barely
+   moves) are both 0%.
+3. Wording matters a lot: the same scenes go from 76% to 32% when the instruction changes; one wording per
+   scene in training is the likely cause.
+4. None of the zeros is plumbing: every run used the same wrapper, units and client that produced 76% and 88%,
+   and the server logged moving joint states on every call.
+Implication for the arm: expect it to reach for the orange on the bench; grasp+place will depend on how close our
+table and wording are to the 96 real orange episodes it saw. The dependable path is R5: LoRA on this checkpoint
+with our own orange episodes, scored with this same harness (orange 76% is the control) before any bench time.
 
 ## Outputs
 results/so101_base_sim_test_20261020/results_<tag>.jsonl per rung (tags: corpusA, oursB, liftcube, toytable, mj_pickplace,

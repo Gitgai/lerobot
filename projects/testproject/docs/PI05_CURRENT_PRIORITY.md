@@ -97,9 +97,9 @@ R1   download + serve dongyoonkim/so101-pi05-base from AI90    done     2026-10-
 R4   cleaned manifest for OUR use: slot-swap fix (1,810 ep),   done     2026-10-20: manifest_clean.csv keeps 13,292
      sim out (304), 10-fps split (450), dups + degenerate out,           + survivor counts; feeds O3 fine-tune
      quality flags, real-orange subset listed                            (LoRA on top is the author's advice)
-R2   "simulator test": the public checkpoint driving the       running  orange DONE: corpus wording 38/50 = 76%,
+R2   "simulator test": the public checkpoint driving the       done     orange: corpus wording 38/50 = 76%,
      ours 16/50 = 32% (instruction matters); cube 0/50 (one
-     camera, no wrist view); toy-table running;
+     camera); toy-table 0/40 (clutter, new wording). 2026-10-19
      LeIsaac orange task; smoke 2 eps, live-window 2 eps,                50+50 headless scored run in progress;
      LeIsaac orange task, 50+50 seeded eps, RTC off, ground-             LeIsaac orange episodes → in-distribution;
      truth success; reuses the W0 policy wrapper over the socket
@@ -109,7 +109,7 @@ W0   "policy wrapper": the public π0.5 (VLASH, author's      built    2026-10-2
      slot mapping front→base, wrist→left_wrist                          client connected first try; consumed by
      empty_cameras=1, compiled) behind a socket, slot mapping            R2 (sim) and R3a (bench adapter)
      front→base, wrist→left_wrist; 20-step chunks
-R2b  "generalisation ladder": same checkpoint zero-shot on   running  plan: pi05_so101_sim_generalisation_ladder_20261020.md
+R2b  "generalisation ladder": same checkpoint zero-shot on   done     2026-10-19: table + verdict in the plan;
      LeIsaac LiftCube + CleanToyTable (queued behind the orange           scenes downloaded; MuJoCo venv building;
      run), then MuJoCo EnvHub envs (namenu pick-place, nexus 6)           50 eps per rung, same wrapper
 R3a  "bench serving adapter": the wrapper behind the bench   proposed plan: pi05_so101_bench_adapter_plan_20261020.md

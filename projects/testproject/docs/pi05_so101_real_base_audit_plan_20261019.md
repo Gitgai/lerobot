@@ -210,7 +210,7 @@ harness as the gate (the base's own number is the control), then the bench. Not 
 parallel on GPU 1 when the operator says go.
 
 ## Tracking
-R2 PROMOTED to a scored sim gate (2026-10-20). R0 meta+sample+video DONE; R0.5 (exact duplicates + degenerate) runs automatically when the parquet pull
+R2/R2b DONE 2026-10-19 (orange 76% / 32% by wording; cube 0; toy-table 0; MuJoCo touch 88 / lift 26 / place 6) — see the ladder doc. R0 meta+sample+video DONE; R0.5 (exact duplicates + degenerate) runs automatically when the parquet pull
 ends (~2026-10-20 02:30Z; armed waiter) · R4 cleaned manifest right after (~1 h, no input needed) · R1 DONE ·
 R2 optional · R3 blocked on two things: (a) the Zenoh↔VLASH serving adapter on AI90 (~1 day, awaiting go),
 (b) the operator at the bench in Pune.
