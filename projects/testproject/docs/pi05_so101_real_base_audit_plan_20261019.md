@@ -153,6 +153,12 @@ data is otherwise sound, the next move is "LoRA on top with our real orange epis
 the third option and a multi-day 8-GPU job; it is not scheduled.
 
 ## Tracking
-R0 meta+sample+video DONE, exact-dup pass running · R1 DONE · R2 optional · R3 blocked (adapter + operator at bench) · R4 after R0.5.
+R0 meta+sample+video DONE; R0.5 (exact duplicates + degenerate) runs automatically when the parquet pull
+ends (~2026-10-20 02:30Z; armed waiter) · R4 cleaned manifest right after (~1 h, no input needed) · R1 DONE ·
+R2 optional · R3 blocked on two things: (a) the Zenoh↔VLASH serving adapter on AI90 (~1 day, awaiting go),
+(b) the operator at the bench in Pune.
+
+Sequence from here (2026-10-20): parquet pull → R0.5 dedup pass (auto) → R4 manifest → audit closed; then,
+on the operator's go: adapter (R3 prep) · L7 EMA-in-RAM run on GPU 1 · O1a recorder on GPU 0 — independent.
 Decisions: real sets are for the arm; sim sets are for the controlled comparison; never mix fps in
 one run; camera placement must match the rig; archive downloads go to /mnt/data4tb.

@@ -1,6 +1,6 @@
 # π0.5 lane — Current Priority and Status
 
-Last updated: 2026-10-19
+Last updated: 2026-10-20
 
 **This file is the ROUTER and the TRACKER: what is open, in what order, and
 where each step stands. It is NOT a log.** Detail, gates and pre-registered
@@ -133,9 +133,13 @@ in our scene; 3,300-ep 11-task Isaac Lab corpus (other scene, train-only);
 2c L6b RTC latency sweep — proposed, build while L7 trains
 2d ledger §7 optimizer-state strip (RED) — awaiting approval
 3  openpi mirror push (needs operator: create Gitgai/openpi, 3 commands)
-4  R0 audit (today, CPU) → R1 serve the public checkpoint → R3 when someone is at the arm
-5  O0 and O1a (recorder, GPU 0) — now BEHIND R0/R1 by operator preference 2026-10-19;
-   then O1b → O3 (O2 only on a clear O1b)
+4  ✔ R0 meta/sample/video + ✔ R1 (2026-10-19); R0.5 dedup runs itself after the pull (~02:30Z 10-20),
+   then R4 cleaned manifest → audit closed, no input needed
+5  AWAITING GO (independent, can all start the same day):
+   a  Zenoh↔VLASH serving adapter on AI90 (~1 day) → unblocks R3's 20 bench trials
+   b  L7 full FT with EMA in host RAM, GPU 1, ~54 h (plan 2026-10-18)
+   c  O0 + O1a orange recorder, GPU 0, days (plan 2026-10-10)
+   d  ledger §7 optimizer-state strip (209 GB, RED) · empty Gitgai/openpi repo for the mirror
 ```
 
 ## Standing decisions (do not reopen without a new fact)
