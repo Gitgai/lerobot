@@ -72,6 +72,13 @@ rung 5  nexus Touch the red cube                           44/50  88%
         nexus PickAndPlace (place on the blue circle)        3/50   6%
         nexus StackCube                                      1/50   2%
 ```
+Frames (montage_mujoco_namenu.jpg, montage_mujoco_nexus.jpg): namenu is a blue-tiled room with a yellow arm, an
+orange cube and a flat green disc as the target; its "wrist" slot is a SIDE camera, not a wrist view. The policy
+reaches the cube, hovers and closes on it, and never carries it to the green disc — it has no notion of a flat
+green disc as a target (the corpus places things in bins/boxes/on plates). nexus is a flat grey world, yellow arm,
+red cube, a real wrist camera at 224×224; there the reach/touch is near-perfect and the lift works a quarter of the time.
+Recorder bug found on the way: the frame index reset per client connection, so later rungs overwrote earlier
+rungs' frames (fixed in the wrapper 2026-10-19; the namenu frames above come from a 3-episode replay).
 Reading: in a renderer the corpus never saw, the base reaches and touches reliably (88%), grasps and lifts a
 quarter of the time, and almost never completes a placement. The namenu environment is the outlier at 2%:
 it has NO wrist camera (its second view is another external camera fed into the wrist slot) and a different
