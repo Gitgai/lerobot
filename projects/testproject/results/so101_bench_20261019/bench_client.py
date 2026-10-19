@@ -61,6 +61,14 @@ class Cam:
             self.cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG")); self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, w); self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, h); self.cap.set(cv2.CAP_PROP_FPS, 30)
         if not self.cap.isOpened(): raise RuntimeError(f"camera {src} did not open")
         self.w, self.h = w, h
+        # warm-up: the C270 returns fully black frames for its first ~1 s after open (bench ep1 2026-10-19: policy
+        # calls 1-2 saw a black front image). Read until a frame has signal, at most 3 s.
+        t0 = time.time(); mean = 0.0
+        while time.time() - t0 < 3.0:
+            ok, bgr = self.cap.read()
+            if ok and bgr is not None and bgr.mean() > 5.0: mean = float(bgr.mean()); break
+        print(f"[cam {src}] warm-up {time.time()-t0:.2f} s, frame mean {mean:.0f}", flush=True)
+        if mean == 0.0: raise RuntimeError(f"camera {src} still black after 3 s")
 
     def read(self):
         for _ in range(3): self.cap.grab()                      # drop stale frames
@@ -80,6 +88,8 @@ def main():
     ap.add_argument("--out", default="bench_log.jsonl"); ap.add_argument("--dry-run", action="store_true", help="read cameras + arm, query the policy, do NOT send actions")
     ap.add_argument("--no-robot", action="store_true", help="dry run without the arm: cameras + network + policy only (state = zeros)")
     ap.add_argument("--auto", action="store_true", help="no prompts: start the episode immediately, record the result as 'unscored' (operator scores it afterwards)")
+    ap.add_argument("--home-to", default="", help="six comma-separated joint targets (LeRobot units): move there slowly (1.5 deg/step, 3 grip/step at --fps) and exit; no cameras, no policy")
+    ap.add_argument("--return-start", action="store_true", help="after each episode move slowly back to the pose the episode started from")
     a = ap.parse_args()
     if a.no_robot: a.dry_run = True
 
@@ -91,6 +101,31 @@ def main():
             from lerobot.robots.so101_follower import SO101Follower, SO101FollowerConfig     # lerobot 0.4.x / 0.6.x
         robot = SO101Follower(SO101FollowerConfig(port=a.port, id=a.robot_id, cameras={}))   # cameras handled here, not by lerobot
         robot.connect(calibrate=False)
+
+    def joints_now():
+        if robot is None: return np.zeros(6, dtype=np.float32)
+        o = robot.get_observation(); return np.array([float(o[f"{j}.pos"]) for j in JOINTS], dtype=np.float32)
+
+    def move_to(target, step_deg=1.5, step_grip=3.0):
+        """Slow clamped joint-space move (no policy). Prints start/end; q/ESC in the key thread does not apply here, use Ctrl-C."""
+        if robot is None: return
+        target = np.asarray(target, dtype=np.float32); cur = joints_now()
+        lim = np.array([step_deg] * 5 + [step_grip], dtype=np.float32)
+        print(f"[move] from {cur.round(0).tolist()} to {target.round(0).tolist()}", flush=True)
+        for _ in range(int(20 * a.fps)):                                    # ≤ 20 s
+            d = target - cur
+            if np.abs(d).max() < 0.5: break
+            cur = cur + np.clip(d, -lim, lim)
+            robot.send_action({f"{j}.pos": float(v) for j, v in zip(JOINTS, cur)}); time.sleep(1.0 / a.fps)
+        time.sleep(0.3); print(f"[move] now at {joints_now().round(0).tolist()}", flush=True)
+
+    if a.home_to:
+        try:
+            move_to([float(x) for x in a.home_to.split(",")])
+        finally:
+            robot.disconnect()
+        return
+
     front, wrist = Cam(a.front), Cam(a.wrist)
     act = grpc_client(a.server, a.actions_per_chunk)
     out = open(a.out, "a"); stop = {"flag": False}
@@ -106,17 +141,13 @@ def main():
         except Exception: pass
     threading.Thread(target=key_watch, daemon=True).start()
 
-    def joints_now():
-        if robot is None: return np.zeros(6, dtype=np.float32)
-        o = robot.get_observation(); return np.array([float(o[f"{j}.pos"]) for j in JOINTS], dtype=np.float32)
-
     try:
         for ep in range(a.episodes):
             if not a.dry_run and not a.auto:
                 print(f"\n=== episode {ep+1}: place the orange, then press Enter (q/ESC stops) ===", flush=True); input()
             elif not a.dry_run:
                 print(f"\n=== episode {ep+1}: starting in 5 s (auto) ===", flush=True); time.sleep(5)
-            t_ep = time.time(); n_chunks = 0; lat = []
+            t_ep = time.time(); n_chunks = 0; lat = []; q_start = joints_now()
             for ci in range(a.max_chunks):
                 if stop["flag"]: break
                 q = joints_now(); f, w = front.read(), wrist.read()
@@ -135,7 +166,8 @@ def main():
                     prev = tgt; time.sleep(1.0 / a.fps)
                 n_chunks += 1
             res = "d" if a.dry_run else ("unscored" if a.auto else input("result? [s]uccess / [f]ail / [a]bort: ").strip().lower()[:1])
-            out.write(json.dumps({"ep": ep + 1, "result": res, "chunks": n_chunks, "wall_s": round(time.time() - t_ep, 1), "latency_median_s": round(float(np.median(lat)), 3) if lat else None, "task": a.task, "utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}) + "\n"); out.flush()
+            out.write(json.dumps({"ep": ep + 1, "result": res, "chunks": n_chunks, "wall_s": round(time.time() - t_ep, 1), "latency_median_s": round(float(np.median(lat)), 3) if lat else None, "start_state": q_start.round(1).tolist(), "end_state": joints_now().round(1).tolist(), "task": a.task, "utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}) + "\n"); out.flush()
+            if a.return_start and not a.dry_run: move_to(q_start)
             if res == "a": break
     finally:
         stop["flag"] = True

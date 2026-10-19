@@ -1,6 +1,6 @@
 # R3a — Serving adapter: the public π0.5 (VLASH stack) behind the bench client's Zenoh protocol, verified WITHOUT the arm
 
-Date: 2026-10-20. Status: **PROPOSED — awaiting go.** Parent: pi05_so101_real_base_audit_plan_20261019.md (R3).
+Date: 2026-10-20. Status: **DONE 2026-10-19 — no Zenoh adapter was needed (see §"simplification found while building"); the W0 wrapper serves the bench client directly; bench trial 1 ran (G5 started).** Parent: pi05_so101_real_base_audit_plan_20261019.md (R3).
 
 ## Why
 dongyoonkim/so101-pi05-base serves at 57 ms/call on AI90 (R1), but the bench client in Pune speaks the
@@ -89,7 +89,11 @@ G2b closed loop, sim  the same policy wrapper drives the LeIsaac orange task for
                       (R2 in the R plan): compounding error, grasp timing, release — the step the replay
                       cannot test; the corpus holds ~200 LeIsaac orange episodes, so this is in-distribution
 G4  fault cases       dropped frame, stale delay hint, client reconnect → server stays up, timing logged
-G5  the bench         20 trials, RTC/pipelining on, filmed (R3 proper) — only after G1-G4
+G5  the bench         20 trials, NON-PIPELINED (A2), frames recorded server-side (R3 proper).
+                      STARTED 2026-10-19: trial 1 ran from the Acer over ZeroTier, median 0.92 s per call,
+                      FAIL (reach OK, grasp beside the fruit) — record in results/so101_bench_20261019/bench_runs.md.
+                      G1/G2/G4 were not run: the live dry run from the Acer (real cameras, real state, policy
+                      output within 1–2 units of the pose) and the trial itself covered what they would have shown.
 ```
 Outputs: results/so101_bench_adapter_20261020/{g1_loopback.json, g2_openloop_ep*.json, g3_remote_acer.json}
 and a run record here. Cost: ~1 day build + 2 h verification; GPU 0 (9 GB) while serving.

@@ -1,6 +1,6 @@
 # R — The public real-SO-101 π0.5 base: audit the data, test the checkpoint, before recording our own
 
-Date: 2026-10-19. Status: **R0 + R4 DONE 2026-10-20 (audit.md verdict; manifest_clean.csv keeps 13,292 = 95%); R1 DONE (57 ms/call compiled); R2/R3a/R3 awaiting go.**
+Date: 2026-10-19. Status: **R0 + R4 DONE 2026-10-20 (audit.md verdict; manifest_clean.csv keeps 13,292 = 95%); R1 DONE (57 ms/call compiled); R2 + R2b DONE (sim ladder); R3a DONE (no adapter needed); R3 RUNNING — trial 1/20 on 2026-10-19 (FAIL), trials 2–20 wait for the operator at the bench.**
 Split out of pi05_leisaac_lora_vs_fullft_plan_20261010.md Stage 3 (O3), which now points here.
 
 ## Why this comes before our own recordings
@@ -175,6 +175,20 @@ cap used in September); filmed; per-trial wall time, number of chunks and stall 
 is ACCEPTED — the question is whether the task gets done. Reading: ≥ 10/20 → start Stage 3 from this
 checkpoint; < 5/20 → our own data is needed and R0 tells us what kind. Pipelined + RTC comes later as its
 own comparison, not mixed into these 20.
+
+Results (record: results/so101_bench_20261019/bench_runs.md — one entry per trial, montages beside it):
+```text
+2026-10-19  serving path = W0 wrapper (LeRobot gRPC, GPU 0 :8080) ← bench_client.py on the Acer over ZeroTier;
+            no Zenoh adapter was needed. Measured round trip 0.67 s (dry run) – 0.92 s (live, median) per
+            20-step chunk → duty ≈ 42%. Server compute 142 ms of that.
+trial 1     FAIL — scene "as is" (yellow citrus, grey tray). Rest → table in 9 chunks, then 36 chunks hovering
+            at the fruit with ten open/close cycles, jaws always beside the fruit; fruit never moved. Same
+            class of failure as the simulator (reach OK, grasp placement off, retries in place). Defect
+            found and fixed: the C270 gave black frames on calls 1–2 (client now warms the cameras up).
+trials 2–20 pending — need the operator at the bench to re-place the fruit per placement; the client
+            returns the arm to its start pose itself (--return-start). Open question before trial 2: jaw
+            opening vs fruit diameter (the citrus looks larger than the corpus's oranges; measure).
+```
 
 ## R4 — Cleaned manifest for OUR use of this corpus (added 2026-10-19, after the visual pass)
 The audit's product is not a verdict on the author; it is the version of this corpus WE would train on

@@ -112,17 +112,17 @@ W0   "policy wrapper": the public π0.5 (VLASH, author's      built    2026-10-2
 R2b  "generalisation ladder": same checkpoint zero-shot on   done     2026-10-19: table + verdict in the plan;
      LeIsaac LiftCube + CleanToyTable (queued behind the orange           scenes downloaded; MuJoCo venv building;
      run), then MuJoCo EnvHub envs (namenu pick-place, nexus 6)           50 eps per rung, same wrapper
-R3a  "bench serving adapter": the wrapper behind the bench   proposed plan: pi05_so101_bench_adapter_plan_20261020.md
-     client's Zenoh protocol + ARM-LESS verification
-     (loopback replay, open-loop replay of our real episodes,           ~1 day build + 2 h; GPU 0; needs AI90's key
-     remote replay from the Acer, fault cases)                          on the Acer for the remote leg
+R3a  "bench serving adapter": the wrapper behind the bench   done     2026-10-19: no Zenoh adapter needed — the W0
+     client + ARM-LESS verification                                      wrapper speaks LeRobot gRPC and the bench
+     (remote dry run from the Acer done; replay ladder                   client (bench_client.py) talks to it from
+     G1/G2/G4 not run — superseded by the live trial)                     Pune at 0.67–0.92 s per call
 R5   "LoRA on top": fine-tune the public checkpoint on our    proposed after R3; VLASH LoRA (author's docs/07);
      real orange episodes (89 + 99), score in Isaac (R2 harness)         Isaac score before any bench time
      then on the bench
-R3   "bench trials": 20 real attempts in Pune, NON-PIPELINED  blocked
-     client, filmed  arm is in PUNE with the operator; needs a
-                                                                        serving adapter (VLASH policy behind the
-                                                                        bench client's Zenoh protocol) — operator's call
+R3   "bench trials": 20 real attempts in Pune, NON-PIPELINED  running  2026-10-19: trial 1 FAIL (reached the fruit,
+     client, frames recorded server-side                                 10 grasp attempts beside it; 0.92 s RTT, 42%
+     record: results/so101_bench_20261019/bench_runs.md                  duty). Trials 2–20 need the operator to
+                                                                        re-place the fruit (grid) between runs
      ≥10/20 → Stage 3 starts from this checkpoint; <5/20 → record ours
 ```
 
@@ -159,9 +159,9 @@ in our scene; 3,300-ep 11-task Isaac Lab corpus (other scene, train-only);
 3  openpi mirror push (needs operator: create Gitgai/openpi, 3 commands)
 4  ✔ R0 + R4 audit CLOSED 2026-10-20 (95% usable; 13% slot-swap; 96 real orange) · ✔ R1
 5  AWAITING GO (independent, can all start the same day):
-   a  W0 wrapper (½ day) → R2 sim gate (2 h, GPU 0) → R3a adapter + arm-less gates incl. the public
-      replay ladder (½-1 day) → R3 bench
-      (R2 first: cheapest closed-loop evidence; a < 20% result sends us back to plumbing before any bench time)
+   a  ✔ W0 wrapper → ✔ R2 sim gate → ✔ R3a (no adapter needed) → R3 bench RUNNING: trial 1 of 20 done
+      2026-10-19 (FAIL); trials 2–20 run whenever the operator is at the bench to re-place the fruit
+      (one ssh command per trial from AI90; client returns the arm to its start pose itself)
    b  L7 full FT with EMA in host RAM, GPU 1, ~54 h (plan 2026-10-18)
    c  O0 + O1a orange recorder, GPU 0, days (plan 2026-10-10)
    d  ledger §7 optimizer-state strip (209 GB, RED) · empty Gitgai/openpi repo for the mirror
