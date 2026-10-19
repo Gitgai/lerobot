@@ -108,7 +108,19 @@ our own August real episodes; measure latency. Ready-to-run state recorded here.
 Real-trained model on rendered images: confounded. 20 episodes, orange task, RTC off, logged as
 "hint" — only to see whether it moves toward the orange at all.
 
-## R3 — 20 real trials on the bench (needs a person at the arm in NJ; operator is in India)
+## R3 — 20 real trials on the bench (CORRECTED 2026-10-19: the arm is in PUNE with the operator)
+The August/September arm trials ran the robot + cameras at the bench in Pune (`n16_realarm_client.py`,
+front = laptop /dev/video0, wrist = Pi camera) against a policy served from AI90 in NJ: measured round
+trip ~633 ms, hidden behind the arm's motion by the client's `--rtc` pipelined loop (95% duty; without it
+31% duty and the grasp fails — memory rtc-pipeline-for-grasp). So R3 does NOT wait for anyone in NJ; it
+waits for (a) the operator at the bench and (b) a serving path the bench client can talk to:
+  option 1  VLASH `run` AT THE BENCH (policy local to the robot): needs a GPU at the bench — none known.
+  option 2  serve the VLASH-stack π0.5 from AI90 behind the protocol the bench client speaks
+            (the operator's draft pi05-rtc-remote-draft-20261007 = LeRobot async_inference, gRPC, with
+            timing captures) → a thin adapter: VLASH policy.predict_action_chunk inside LeRobot's
+            policy_server, chunk 50 → n_action_steps 20, RTC on at the client. ~1 day, operator's call.
+  The 300-500 ms figure the operator quoted is this path; L6 showed plain chunking dies at 500 ms,
+  so the bench client's RTC/pipelining is not optional for R3.
 Protocol as the September arm trials (RTC on, ~95% duty): 20 placements of the orange on a grid,
 success = orange in the bowl, no contact with anything else; filmed; the pipeline flag checked
 (--rtc) before blaming latency. Reading: ≥ 10/20 → start Stage 3 from this checkpoint;

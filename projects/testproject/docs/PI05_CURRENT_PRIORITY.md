@@ -93,7 +93,9 @@ R1   download + serve dongyoonkim/so101-pi05-base from AI90    done     2026-10-
      (input spec vs our rig, dry inference, latency)                    sane chunk on our real frame; 137 ms/call
                                                                         (5090, no compile); arm NOT attached now
 R2   zero-shot in LeIsaac, 20 eps, logged as a HINT only       optional
-R3   20 real trials on the bench, RTC on, filmed               blocked  needs a person at the arm (NJ)
+R3   20 real trials on the bench, RTC on, filmed               blocked  arm is in PUNE with the operator; needs a
+                                                                        serving adapter (VLASH policy behind the
+                                                                        bench client's gRPC async protocol) — operator's call
      ≥10/20 → Stage 3 starts from this checkpoint; <5/20 → record ours
 ```
 
