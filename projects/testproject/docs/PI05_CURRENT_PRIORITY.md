@@ -107,6 +107,9 @@ W0   "policy wrapper": the public π0.5 (VLASH, author's      built    2026-10-2
      slot mapping front→base, wrist→left_wrist                          client connected first try; consumed by
      empty_cameras=1, compiled) behind a socket, slot mapping            R2 (sim) and R3a (bench adapter)
      front→base, wrist→left_wrist; 20-step chunks
+R2b  "generalisation ladder": same checkpoint zero-shot on   running  plan: pi05_so101_sim_generalisation_ladder_20261020.md
+     LeIsaac LiftCube + CleanToyTable (queued behind the orange           scenes downloaded; MuJoCo venv building;
+     run), then MuJoCo EnvHub envs (namenu pick-place, nexus 6)           50 eps per rung, same wrapper
 R3a  "bench serving adapter": the wrapper behind the bench   proposed plan: pi05_so101_bench_adapter_plan_20261020.md
      client's Zenoh protocol + ARM-LESS verification
      (loopback replay, open-loop replay of our real episodes,           ~1 day build + 2 h; GPU 0; needs AI90's key
