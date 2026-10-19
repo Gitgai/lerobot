@@ -103,6 +103,15 @@ clients both work (a one-camera client gets two masked slots). Relaunched 12:28Z
 *_INVALID_no_wrist_key.*. Lesson: a client that falls back to "repeat last action" on a server error turns a
 plumbing fault into a silent 0% — the wrapper now logs its camera mapping per client and never raises on a missing key.
 
+## Isaac cube result (2026-10-19 ~15:50Z)
+```text
+rung 2  LiftCube-v0, "Lift the red cube up.", ONE camera (the task deletes the wrist camera), 30 s cap   0/50 = 0%  CI 0-7
+```
+Frames (montage_liftcube_ep1.jpg): the arm reaches the cube and hovers/nudges, never closes and lifts. Reading: the
+grasp is the weak point again, now with the added handicap of no wrist view (the corpus has 1,314 one-camera
+episodes, 9%). Not a plumbing fault: the same wrapper served the orange task at 76% minutes earlier and the
+server logged a one-camera mapping with moving joint states on every call.
+
 ## MuJoCo results (2026-10-19 04:15Z, 50 episodes each, zero-shot, non-pipelined)
 ```text
 rung 4  namenu pick-place, 200-step cap (published)        1/50   2%
