@@ -63,12 +63,14 @@ class Cam:
         self.w, self.h = w, h
         # warm-up: the C270 returns fully black frames for its first ~1 s after open (bench ep1 2026-10-19: policy
         # calls 1-2 saw a black front image). Read until a frame has signal, at most 3 s.
-        t0 = time.time(); mean = 0.0
-        while time.time() - t0 < 3.0:
+        # The AK wrist camera's first frame is under-exposed (mean 10 on trial 2) → need two consecutive frames > 40.
+        t0 = time.time(); mean = 0.0; good = 0
+        while time.time() - t0 < 4.0:
             ok, bgr = self.cap.read()
-            if ok and bgr is not None and bgr.mean() > 5.0: mean = float(bgr.mean()); break
+            good = good + 1 if (ok and bgr is not None and bgr.mean() > 40.0) else 0
+            if good >= 2: mean = float(bgr.mean()); break
         print(f"[cam {src}] warm-up {time.time()-t0:.2f} s, frame mean {mean:.0f}", flush=True)
-        if mean == 0.0: raise RuntimeError(f"camera {src} still black after 3 s")
+        if mean == 0.0: raise RuntimeError(f"camera {src} still dark after 4 s")
 
     def read(self):
         for _ in range(3): self.cap.grab()                      # drop stale frames

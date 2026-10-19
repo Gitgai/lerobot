@@ -185,9 +185,12 @@ trial 1     FAIL — scene "as is" (yellow citrus, grey tray). Rest → table in
             at the fruit with ten open/close cycles, jaws always beside the fruit; fruit never moved. Same
             class of failure as the simulator (reach OK, grasp placement off, retries in place). Defect
             found and fixed: the C270 gave black frames on calls 1–2 (client now warms the cameras up).
-trials 2–20 pending — need the operator at the bench to re-place the fruit per placement; the client
-            returns the arm to its start pose itself (--return-start). Open question before trial 2: jaw
-            opening vs fruit diameter (the citrus looks larger than the corpus's oranges; measure).
+trial 2     FAIL — fruit re-placed closer, front-left. Reached in 8 chunks; from call 13 the fruit sat between
+            the jaws and the gripper bottomed at 10–17 on eight closes (2 on air in trial 1) → squeezing the
+            fruit's equator, no enclosure, no lift; fruit nudged a few cm. Supports the size hypothesis.
+trials 3–20 pending — operator re-places the fruit per placement; the client returns the arm to its start
+            pose itself (--return-start). Still open: jaw opening vs fruit diameter (measure; a corpus-sized
+            orange or a mandarin is the fair test — the citrus fills the fully-open jaws in the wrist frames).
 ```
 
 ## R4 — Cleaned manifest for OUR use of this corpus (added 2026-10-19, after the visual pass)

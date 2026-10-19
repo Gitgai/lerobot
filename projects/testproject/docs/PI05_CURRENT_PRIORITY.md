@@ -119,10 +119,10 @@ R3a  "bench serving adapter": the wrapper behind the bench   done     2026-10-19
 R5   "LoRA on top": fine-tune the public checkpoint on our    proposed after R3; VLASH LoRA (author's docs/07);
      real orange episodes (89 + 99), score in Isaac (R2 harness)         Isaac score before any bench time
      then on the bench
-R3   "bench trials": 20 real attempts in Pune, NON-PIPELINED  running  2026-10-19: trial 1 FAIL (reached the fruit,
-     client, frames recorded server-side                                 10 grasp attempts beside it; 0.92 s RTT, 42%
-     record: results/so101_bench_20261019/bench_runs.md                  duty). Trials 2–20 need the operator to
-                                                                        re-place the fruit (grid) between runs
+R3   "bench trials": 20 real attempts in Pune, NON-PIPELINED  running  2026-10-19: 0/2 — trial 1 jaws beside the
+     client, frames recorded server-side                                 fruit; trial 2 jaws ON the fruit, no enclosure,
+     record: results/so101_bench_20261019/bench_runs.md                  no lift (0.92 s RTT, 42% duty). Fruit looks too
+                                                                        big for the jaws — measure before trial 3
      ≥10/20 → Stage 3 starts from this checkpoint; <5/20 → record ours
 ```
 

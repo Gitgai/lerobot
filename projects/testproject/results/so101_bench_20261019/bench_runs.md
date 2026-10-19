@@ -38,7 +38,29 @@ Fixes made after trial 1 (bench_client.py, copied to the Acer, md5 88d872a8…):
   back to the pose it started from
 - episode record now carries start_state / end_state
 
+## Trial 2 — 2026-10-19 20:10–20:12 UTC — FAIL (jaws on the fruit, could not close around it, no lift)
+Operator re-placed the citrus closer to the base, front-left (tray unchanged). Start pose = rest (returned by
+`--home-to`). 45 chunks, 72.8 s, median RTT 0.918 s. Front camera warm-up worked (frame mean 163 on call 1);
+the wrist camera's first frame was under-exposed (mean 10, calls 2+ fine) → warm-up now wants two frames > 40.
+
+What the arm did (frames c06_call*, Acer ~/bench_ep2.jsonl):
+- calls 1–8: rest → table in 8 chunks, gripper held open (42–43)
+- calls 9–45: hovered at the fruit (pan 6–12, lift 38–45, elbow −18 to −33) and cycled the gripper eight
+  times. Unlike trial 1 the fruit sits BETWEEN the jaws in the wrist frames from call 13 on, and the gripper
+  bottomed at 10–17 on every close (it reached 2 on empty air in trial 1) → the jaws were squeezing the fruit
+  but could not enclose it; shoulder_lift never went back up, so no lift attempt; the fruit was nudged a few
+  cm toward the tray by the jaw contacts (front frames 17 → 45)
+- ended extended at [9, 36, −20, 100, −31, 30]; `--return-start` brought it to [0, −105, 92, 76, −1, 49]
+  (elbow/wrist 5° and 3° short of the target — the 20 s move budget or servo stall under gravity; harmless)
+
+Reading: closer than trial 1 — contact and squeeze, no enclosure, no lift. Evidence for the size hypothesis:
+the gripper floor of 10–17 units on the fruit vs 2 on air says the jaws stop on the fruit's equator. Whether
+a lift would have followed with a graspable orange is not answerable from this trial.
+
+Montages: montages/ep2_front_every4.jpg, montages/ep2_wrist_key.jpg.
+
 ## Running tally
 | trial | utc | result | chunks | wall s | median RTT s | note |
 |---|---|---|---|---|---|---|
 | 1 | 2026-10-19T19:58:52Z | FAIL | 45 | 74.1 | 0.917 | reached, 10 grasp attempts beside the fruit, black front frames on calls 1–2 |
+| 2 | 2026-10-19T20:12:03Z | FAIL | 45 | 72.8 | 0.918 | reached, jaws on the fruit (gripper floor 10–17), no enclosure, no lift, fruit nudged |
