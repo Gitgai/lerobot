@@ -62,3 +62,11 @@ same sweep with RTC on (LeRobot stack, LeIsaac stage) is the follow-up that quan
 Caveats: injected fixed delay (no jitter); hold = zero deltas + last gripper command (a design
 choice, documented); openpi policy (no RTC); one suite; sim. Rows are a different protocol from
 the benchmark rows and are never pooled with them.
+
+## Scope note + follow-up question (2026-10-20, operator)
+The sweep's "realtime" mode models a client that KEEPS EXECUTING the old chunk while the new request is in
+flight (pipelined without RTC). A stop-and-wait client sees no staleness at all in a frozen sim — it is the
+standard protocol with a longer wall clock. So the cliff is a statement about pipelined-without-RTC clients,
+not about latency per se. Operator's question: why replan every 5 of 10 — what does executing the WHOLE
+chunk before asking again cost? Measured as L6b (frozen protocol, --replan-steps 10, LoRA 20k, n=200):
+result in results/pi05_libero_20261010/L6b_replan10_lora20k_spatial_n200/ (running 2026-10-20).

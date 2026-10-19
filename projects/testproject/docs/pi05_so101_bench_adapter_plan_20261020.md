@@ -26,11 +26,18 @@ result there means a plumbing bug to fix before anything else.
 A1  a policy wrapper the draft server can load: type "vlash_pi05" → VLASH PI05Policy (author's patches,
     empty_cameras=1, compiled) exposing predict_action_chunk(obs[, delay, prefix]); slot mapping
     front→base_0_rgb, wrist→left_wrist_0_rgb; state/action 6-D as recorded; chunk 50 → return 20
-A2  RTC mode — a design decision, default chosen now:
-      default  NO guided RTC inside the adapter (prefix ignored, delay logged): plain 20-step chunks, the
-               client's pipelined loop keeps one request in flight (what the Aug 9/10 baseline did)
-      later    guided RTC (prefix-conditioned denoising) only if VLASH's sampler exposes its denoising
-               loop cleanly; VLASH's own "inference_overlap_steps" blend is a client-side alternative
+A2  Client mode — DEFINITIONS LOCKED 2026-10-20 (operator):
+      NON-PIPELINED (stop-and-wait): execute the whole chunk, stop, send the observation, wait for the
+               reply, execute. No overlap, no guessing at the join. Latency costs TIME (duty = chunk /
+               (chunk + round trip)), not correctness, on a STATIC bench; it also makes the arm stop-start.
+      PIPELINED: send the next request while actions remain, timed to arrive before the current chunk
+               runs out; the arm never stops, but the new chunk was planned from an earlier observation
+               and without knowing what the arm did since → the join is a GUESS unless the model is told
+               the committed actions. That is what RTC (guided or trained) does.
+      RULE: pipelined only WITH RTC; without RTC we run non-pipelined. R3 default = NON-PIPELINED.
+      The word "pipelined" is reserved for the definition above and not used loosely elsewhere.
+      RTC inside the adapter: guided RTC (LeRobot's prefix-conditioned denoising) only if VLASH's sampler
+      exposes its loop cleanly — a later step, not R3's first run.
 A3  env: the draft runs LeRobot 0.5.2; VLASH pins 0.4.1 → run the adapter in /home/kiran/sim/vlash-venv
     and have the draft's server import only its codec/transport from there, OR run two processes
     (draft server ↔ local VLASH policy over a unix socket). Decide at build from what imports cleanly.
@@ -48,9 +55,10 @@ G2  open-loop replay  replay a WHOLE recorded real episode of ours (so101_orange
                       arm joints, gripper open/close in step) = the model understands our rig; a drift or
                       flat output = mapping/normalisation bug. This is a sanity floor, NOT a success rate.
 G3  remote replay     the same probe run FROM THE ACER in Pune over ZeroTier (needs AI90's key on the Acer or
-                      the operator to run one command) → true end-to-end latency per call, jitter, and the
-                      client's pipelined duty cycle at that latency; compare with the 300-500 ms figure and
-                      L6's cliff (plain chunking dies at 500 ms; 20 steps @30 fps = 667 ms chunk here).
+                      the operator to run one command) → true end-to-end latency per call and jitter; for the
+                      NON-PIPELINED client this gives the duty cycle = 667 ms / (667 + RTT) and the wall time per
+                      attempt — a speed cost, not a correctness cliff (L6's cliff applies to clients that keep
+                      moving during the wait, i.e. pipelined without RTC).
 G2b closed loop, sim  the same policy wrapper drives the LeIsaac orange task for 50+50 seeded episodes
                       (R2 in the R plan): compounding error, grasp timing, release — the step the replay
                       cannot test; the corpus holds ~200 LeIsaac orange episodes, so this is in-distribution

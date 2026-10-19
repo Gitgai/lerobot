@@ -139,8 +139,10 @@ waits for (a) the operator at the bench and (b) a serving path the bench client 
             (the operator's draft pi05-rtc-remote-draft-20261007 = a ZENOH policy server on LeRobot 0.5.2, with
             timing captures) → a thin adapter: VLASH policy.predict_action_chunk inside LeRobot's
             policy_server, chunk 50 → n_action_steps 20, RTC on at the client. ~1 day, operator's call.
-  The 300-500 ms figure the operator quoted is this path; L6 showed plain chunking dies at 500 ms,
-  so the bench client's RTC/pipelining is not optional for R3.
+  The 300-500 ms figure the operator quoted is this path. R3 runs the client NON-PIPELINED (stop-and-wait):
+  on a static bench the pause costs time (~57% duty at 500 ms) and stop-start dynamics, not stale
+  observations. Pipelining is used only together with RTC (definitions locked in the R3a plan, 2026-10-20).
+  The August claim that the sequential loop 'crippled' the grasp is a hypothesis, not a measured A/B.
 Protocol as the September arm trials (RTC on, ~95% duty): 20 placements of the orange on a grid,
 success = orange in the bowl, no contact with anything else; filmed; the pipeline flag checked
 (--rtc) before blaming latency. Reading: ≥ 10/20 → start Stage 3 from this checkpoint;
