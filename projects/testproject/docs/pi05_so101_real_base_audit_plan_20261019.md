@@ -144,7 +144,9 @@ same policy and task, before the 100 headless episodes; (2) frames recorded by t
 every Nth call) for every headless episode, for review and montages. Both adopted.
 LIVE RUN 2026-10-20 03:12-03:16Z (Isaac Sim window on the desktop, seeds 7, 8): 2/2 SUCCESS — the public
 checkpoint picked an orange and placed it on the plate zero-shot, 1,515 and 1,470 sim steps (~50 s each),
-76 and 74 policy calls, 132-180 ms/call. results_live.jsonl; 61 frame pairs in frames_live/.
+76 and 74 policy calls, 132-180 ms/call. results_live.jsonl; 61 frame pairs in frames_live/; contact sheets montage_live_ep{1,2}.jpg CONFIRM the full
+task: the success predicate needs ALL THREE oranges inside the plate's 10 cm box AND the arm back at rest — the
+sheets show three sequential pick-and-places and the return. This is the complete LeIsaac task, zero-shot.
 Scored run launched 03:16Z: 50 episodes with the corpus instruction (seeds 100..149) then 50 with ours
 ("pick up the orange and move it to another place", seeds 200..249), headless, frames every 10th call.
 Note: the 8.8 GB process on GPU 0 port 18916 is the operator's own LIBERO LoRA server from 10-16 (no client
