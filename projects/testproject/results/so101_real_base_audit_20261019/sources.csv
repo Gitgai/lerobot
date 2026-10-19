@@ -1,0 +1,157 @@
+source,license,provenance,n_ep,med_len,min_len,fps,base,lw,rw,sim_by_name,n_tasks,top_task,orange,low_motion_eps,med_motion
+CoRL2026-CSI/IsaacLab-SO101-PullCube-100epi-10fps-appendix,apache-2.0,huggingface-hub,100,322,319,,0.0,0.0,0.0,True,1,Pull the cube to the target marker.,False,0,101.5
+CoRL2026-CSI/SO101-teleop_stack_RGBblock_on_bluedish_150epi_10fps,apache-2.0,huggingface-hub,150,217,175,,0.0,0.0,0.0,False,1,"Stack red, green, and blue blocks on the blue dish from bottom to top.",False,0,146.5
+Damin3927/so101_pickplace,apache-2.0,huggingface-hub,50,547,335,,0.0,0.0,0.0,False,9,Put all the beads in the brown case into the white box,False,0,103.5
+ankithreddy/so101_pickplace_tools,apache-2.0,huggingface-hub,90,614,402,,0.0,0.0,0.0,False,1,pick up screwdriver and put it in box,False,0,152.8
+ankithreddy/so101_pickplace_uno,apache-2.0,huggingface-hub,50,877,587,,0.0,0.0,0.0,False,1,Pick up Phillips Screwdriver and put it in box,False,0,147.9
+anvilbot-patrickhhh/SO101_PickAndPlace_3cams,apache-2.0,huggingface-hub,50,150,150,,0.0,0.0,0.0,False,1,Pick the green cube and then place it in the region with the black tape,False,0,167.6
+azaracla/so101_pick_3dprint,apache-2.0,huggingface-hub,50,480,362,,0.0,0.0,0.0,False,1,Place the 3d print in the transparent box,False,0,160.3
+brcg3/so101_test,apache-2.0,huggingface-hub,53,278,94,,0.0,0.0,0.0,False,1,Grab the tan cube,False,1,138.0
+gimarchetti/so101-winnie-us5,apache-2.0,huggingface-hub,53,965,804,,0.0,0.0,0.0,False,1,rub the plush toy with the bottle,False,0,144.0
+gimarchetti/so101-winnie-us7,apache-2.0,huggingface-hub,121,1150,829,,0.0,0.0,0.0,False,1,"first grab the green bottle, second slide it across the belly of the toy from foot to red shirt, third put the bottle down on the green circle.",False,0,156.3
+joadv/so101-test,apache-2.0,huggingface-hub,50,360,256,,0.0,0.0,0.0,False,1,Pick the yellow block and put it in the black box,False,0,166.0
+jrkhf/so101_wrist_top_cameras_set_1,apache-2.0,huggingface-hub,50,810,589,,0.0,0.0,0.0,False,1,Pick and drop lego block,False,0,150.0
+jrkhf/so101_wrist_top_cameras_set_2,apache-2.0,huggingface-hub,103,588,377,,0.0,0.0,0.0,False,1,Pick and drop lego block,False,0,139.7
+k1000dai/so101_put_on_conveyor_mix_training-smolvla,apache-2.0,huggingface-hub,200,618,215,,0.0,0.0,0.0,False,1,Put the yellow block on the cross mark,False,0,201.7
+littledragon/so101_sock_stowing2,apache-2.0,huggingface-hub,59,539,313,,0.0,0.0,0.0,False,1,Put the sock in the container,False,0,152.1
+observabot/so101_die_mat4,apache-2.0,huggingface-hub,217,508,322,,0.0,0.0,0.0,False,1,Grasp the die and put it on the mat.,False,0,146.8
+piuslim373/so101-transfer-capsule,apache-2.0,huggingface-hub,101,473,310,,0.0,0.0,0.0,False,1,Transfer the capsule into the container,False,0,152.9
+piuslim373/so101-transfer-capsule3,apache-2.0,huggingface-hub,50,219,181,,0.0,0.0,0.0,False,1,Transfer the capsule to container,False,0,134.2
+piuslim373/so101-transfer-capsule4,apache-2.0,huggingface-hub,50,206,166,,0.0,0.0,0.0,False,1,Transfer the capsule to container,False,0,135.2
+piuslim373/so101-transfer-capsule5,apache-2.0,huggingface-hub,80,200,158,,0.0,0.0,0.0,False,1,Transfer the capsule to container,False,0,132.7
+r2owb0/so101-DS1,apache-2.0,huggingface-hub,51,599,421,,0.0,0.0,0.0,False,1,pick up the cube and drop it into the bowl,False,1,156.6
+un1c0rnio/so101_eraser_mat1,apache-2.0,huggingface-hub,50,347,231,,0.0,0.0,0.0,False,1,Grasp the eraser and move it to the mat.,False,0,94.7
+zacapa/SO101_AVE_07,apache-2.0,huggingface-hub,226,621,158,,0.0,0.0,0.0,False,1,Grasp a plug and place it in an empty tray slot,False,0,115.1
+zacapa/SO101_chess_test2_6,apache-2.0,huggingface-hub,274,676,350,,0.0,0.0,0.0,False,1,Move the Brown Queen to the Blue Square.,False,0,144.5
+zacapa/SO101_chess_test7,apache-2.0,huggingface-hub,83,392,355,,0.0,0.0,0.0,False,1,start chess game with move the E pawn to E4,False,0,126.6
+zacapa/SO101_cube_test2,apache-2.0,huggingface-hub,103,660,658,,0.0,0.0,0.0,False,2,Grasp the brown cube then place it in the white bin.,False,0,150.2
+zaringleb/pick_colored_cube_so101,apache-2.0,huggingface-hub,60,156,100,,0.0,0.0,0.0,False,3,Pick red cube,True,0,89.7
+zaringleb/pick_single_cube_so101,apache-2.0,huggingface-hub,185,297,155,,0.0,0.0,0.0,False,1,Pick red cube,False,1,149.4
+5hadytru/so101_IF_1,apache-2.0,huggingface-hub,82,453,341,,0.0,0.0,0.0,False,28,Move the white pen backwards,False,0,135.7
+5hadytru/so101_IF_2,apache-2.0,huggingface-hub,78,376,287,,0.0,0.0,0.0,False,27,Move the blue pliers right,False,0,141.2
+5hadytru/so101_IF_3,apache-2.0,huggingface-hub,67,327,253,,0.0,0.0,0.0,False,24,Place the pink eraser in the plastic bin,False,0,132.1
+5hadytru/so101_grasp_1,apache-2.0,huggingface-hub,210,458,218,,0.0,0.0,0.0,False,1,Place each object in the plastic bin,False,1,156.2
+5hadytru/so101_grasp_2,apache-2.0,huggingface-hub,780,654,265,,0.0,0.0,0.0,False,1,Place each object in the plastic bin,False,0,152.6
+5hadytru/so101_grasp_3,apache-2.0,huggingface-hub,370,684,258,,0.0,0.0,0.0,False,1,Place each object in the plastic bin,False,0,144.0
+Benxiaogu/SO101-full,apache-2.0,huggingface-hub,100,877,869,,0.0,0.0,0.0,False,1,Grasp a pen and put it into the cup,False,0,155.6
+CrawlAiHuggingFace/multiplied_so101-table-cleanup,apache-2.0,huggingface-hub,79,611,3,,0.0,0.0,0.0,False,4,Grab pens and place into pen holder,False,2,155.8
+DeanSu948/so101_test_0815,apache-2.0,huggingface-hub,50,804,441,,0.0,0.0,0.0,False,1,Grab the black ball into the box,False,1,170.9
+EverNorif/so101-table-cleanup,apache-2.0,huggingface-hub,82,1060,805,,0.0,0.0,0.0,False,1,Grab pens and place into pen holder.,False,0,159.8
+EverNorif/so101_place_orange_isaaclab,apache-2.0,huggingface-hub,83,232,151,,0.0,0.0,0.0,True,1,Grab orange and place into plate,True,1,146.6
+Jaehooni/smolvla_so101_pick_and_place,apache-2.0,huggingface-hub,80,533,395,,0.0,0.0,0.0,False,1,pick up the red cube and place it in the box,False,0,118.8
+JiabinQ/so101_pick_place,apache-2.0,huggingface-hub,50,242,204,,0.0,0.0,0.0,False,1,Put the chopsticks on the tray,False,0,165.0
+Kazu1232/record-so101-A_warp50,apache-2.0,huggingface-hub,50,419,317,,0.0,0.0,0.0,False,1,Grab a cube and put it in the A-area.,False,0,153.0
+Kazu1232/record-so101-B_warp50,apache-2.0,huggingface-hub,50,438,313,,0.0,0.0,0.0,False,1,Grab a cube and put it in the B-area.,False,0,141.0
+Kazu1232/record-so101-C_warp50,apache-2.0,huggingface-hub,50,374,276,,0.0,0.0,0.0,False,1,Grab a cube and put it in the C-area.,False,0,130.7
+Kazu1232/record-so101-warp-ABC-reverse_A50,apache-2.0,huggingface-hub,50,380,265,,0.0,0.0,0.0,False,1,"Grab the cubes in areas A, B, and C vertically and put on the plate. If there are multiple cubes in A, B, and C, grab them in order of priority from the top. (Priority: A > B > C)",False,0,152.4
+Kazu1232/record-so101-warp-ABC-reverse_B50,apache-2.0,huggingface-hub,50,369,271,,0.0,0.0,0.0,False,1,"Grab the cubes in areas A, B, and C vertically and put on the plate. If there are multiple cubes in A, B, and C, grab them in order of priority from the top. (Priority: A > B > C)",False,0,128.2
+Kazu1232/record-so101-warp-ABC-reverse_C50,apache-2.0,huggingface-hub,50,365,256,,0.0,0.0,0.0,False,1,"Grab the cubes in areas A, B, and C vertically and put on the plate. If there are multiple cubes in A, B, and C, grab them in order of priority from the top. (Priority: A > B > C)",False,0,121.1
+LeRobot-worldwide-hackathon/241-Sushi_Shinkansen_So101-pick_sushi,apache-2.0,huggingface-hub,147,408,4,,0.0,0.0,0.0,False,1,Pick up the sushi from the Shinkansen and put it on the blue dish,False,6,147.2
+LightwheelAI/so101-pick-pen,apache-2.0,huggingface-hub,61,643,465,,0.0,0.0,0.0,False,1,Grab pens and place into pen holder.,False,0,161.9
+LightwheelAI/so101-place-orange,apache-2.0,huggingface-hub,61,677,571,,0.0,0.0,0.0,False,1,Grab oranges and place into plate.,True,0,162.8
+LittleFire99/so101_test_1,apache-2.0,huggingface-hub,90,664,528,,0.0,0.0,0.0,False,1,Grab the blue cube,False,0,139.2
+SurajChess/so101-left-arm-pick-green-gear,apache-2.0,huggingface-hub,50,446,355,,0.0,0.0,0.0,False,1,Pick and show the green gear,False,0,162.4
+SurajChess/so101-left-arm-pick-grey-gear,apache-2.0,huggingface-hub,50,499,447,,0.0,0.0,0.0,False,1,Pick and show the grey gear,False,0,164.7
+SurajChess/so101-left-arm-pick-red-gear,apache-2.0,huggingface-hub,50,520,456,,0.0,0.0,0.0,False,1,Pick and show the red gear,False,0,129.0
+SurajChess/so101-left-arm-pick-white-object,apache-2.0,huggingface-hub,50,490,389,,0.0,0.0,0.0,False,1,Pick and show the white object,False,0,119.3
+SurajChess/so101-leftarm-red-gear-pickshowplace_brownsmallyellow,apache-2.0,huggingface-hub,50,478,424,,0.0,0.0,0.0,False,1,Pick and show the red gear,False,0,151.6
+SurajChess/so101-leftarm-red-gear-pickshowplace_greyyellow,apache-2.0,huggingface-hub,50,455,405,,0.0,0.0,0.0,False,1,Pick and show the red gear,False,0,157.8
+SurajChess/so101-leftarm-red-gear-pickshowplace_greyyellowbrownsmallyellow,apache-2.0,huggingface-hub,50,463,402,,0.0,0.0,0.0,False,1,Pick and show the red gear,False,0,144.8
+SurajChess/so101-leftarm-yellow-gear-pickshowplace_brownsmallyellow,apache-2.0,huggingface-hub,50,439,390,,0.0,0.0,0.0,False,1,Pick and show the yellow gear,False,0,134.6
+SurajChess/so101-leftarm-yellow-gear-pickshowplace_redgreen,apache-2.0,huggingface-hub,50,490,387,,0.0,0.0,0.0,False,1,Pick and show the yellow gear,False,0,139.6
+SurajChess/so101-leftarm-yellow-gear-pickshowplace_redgreenbrownsmallyellow,apache-2.0,huggingface-hub,50,394,351,,0.0,0.0,0.0,False,1,Pick and show the yellow gear,False,0,130.3
+SurajChess/so101_dataset3,apache-2.0,huggingface-hub,50,413,274,,0.0,0.0,0.0,False,1,Grab the tape and put it in the box,False,0,181.7
+SurajChess/so101_dataset_marker_tape_1,apache-2.0,huggingface-hub,160,290,182,,0.0,0.0,0.0,False,1,Grab the marker and put it in the box,False,0,160.6
+SurajChess/so101_dataset_tape,apache-2.0,huggingface-hub,51,323,240,,0.0,0.0,0.0,False,1,Grab the tape and put it in the box,False,0,160.0
+Temmp1e/so101_cleanup,apache-2.0,huggingface-hub,75,316,106,,0.0,0.0,0.0,False,3,Grab pens and place into pen holder,False,0,156.0
+TzuShian/so101_grabchess_250924,apache-2.0,huggingface-hub,120,846,645,,0.0,0.0,0.0,False,1,Grab black chess and put it in the blue box,False,0,213.1
+TzuShian/so101_white_chess_20251021,apache-2.0,huggingface-hub,274,866,740,,0.0,0.0,0.0,False,1,Grab white chess and put them in the box,False,0,228.3
+YSanYi/so101_push_green_block_into_box,apache-2.0,huggingface-hub,60,290,195,,0.0,0.0,0.0,False,1,push the green block off the conveyor belt into the storage box.,False,0,107.7
+ZhangHuTony/so101_pickplace,apache-2.0,huggingface-hub,50,617,511,,0.0,0.0,0.0,False,1,Pick cube and place in goal square,False,0,138.0
+aaron-ser/so101-dice-pickup-dataset,apache-2.0,huggingface-hub,70,498,249,,0.0,0.0,0.0,False,1,Pick up the white dice and place it inside a box.,False,0,147.7
+aaronsu11/so101_fruit,apache-2.0,huggingface-hub,200,190,72,,0.0,0.0,0.0,False,4,Grab a banana and put it on the plate,True,0,123.3
+aaronsu11/so101_fruit_leisaac,apache-2.0,huggingface-hub,57,139,116,,0.0,0.0,0.0,True,1,Pick up an orange and place it on the plate,True,0,121.4
+aiden-li/so101-close-lower-drawer,apache-2.0,huggingface-hub,59,436,238,,0.0,0.0,0.0,False,1,Close the lower drawer,False,0,168.5
+aiden-li/so101-close-upper-drawer,apache-2.0,huggingface-hub,150,243,111,,0.0,0.0,0.0,False,1,Close the upper drawer,False,0,145.9
+aiden-li/so101-grabtissue,apache-2.0,huggingface-hub,144,117,81,,0.0,0.0,0.0,False,1,Grab a piece of tissue.,False,0,170.1
+aiden-li/so101-open-lower-drawer,apache-2.0,huggingface-hub,144,280,13,,0.0,0.0,0.0,False,1,Open the lower drawer,False,2,125.9
+aiden-li/so101-open-upper-drawer,apache-2.0,huggingface-hub,154,235,165,,0.0,0.0,0.0,False,1,Open the upper drawer,False,0,156.9
+anvilbot-patrickhhh/SO101_PickAndPlace_front_wrist,apache-2.0,huggingface-hub,50,150,150,,0.0,0.0,0.0,False,1,Put the green cube in the area with the black tape,False,0,224.4
+anvilbot-patrickhhh/SO101_relocate_cube_2cams_record_2,apache-2.0,huggingface-hub,100,150,150,,0.0,0.0,0.0,False,1,Put the green cube in the area with the black tape,False,0,205.1
+c299m/so101-pen-in-box-v2,apache-2.0,huggingface-hub,130,450,448,,0.0,0.0,0.0,False,1,Pick up the pen and place it in the box.,False,0,121.7
+ceva-automation-sg/smolVLA_so101,apache-2.0,huggingface-hub,90,548,397,,0.0,0.0,0.0,False,1,Pick up the rectangular box and place it at vertical position,False,0,190.6
+dleon23/record-so101_2,apache-2.0,huggingface-hub,101,195,89,,0.0,0.0,0.0,False,1,pick up the black and white box,False,0,97.1
+fbeltrao/so101_multi_task_v2,apache-2.0,huggingface-hub,106,346,290,,0.0,0.0,0.0,False,2,Unplug the cable.,False,0,112.9
+funXedu/so101_lego_brick,apache-2.0,huggingface-hub,86,1001,463,,0.0,0.0,0.0,False,1,Put lego brick into the circle,False,0,136.2
+geekscape/lerobot_so101_test_00,apache-2.0,huggingface-hub,50,227,174,,0.0,0.0,0.0,False,1,Grab the orange cube,True,0,126.6
+jrkhf/so101_set_2,apache-2.0,huggingface-hub,50,933,449,,0.0,0.0,0.0,False,1,Grab lego block,False,0,173.0
+leesangoh/so101-pick-and-place-red-bus,apache-2.0,huggingface-hub,50,274,255,,0.0,0.0,0.0,False,1,put red bus into the plastic bowl,False,0,154.6
+lipsop/so101-block-in-bin-100ep,apache-2.0,huggingface-hub,100,871,739,,0.0,0.0,0.0,False,1,Grasp a lego block and put it in the bin.,False,0,155.5
+nbirukov/so101_pick_stack_ring_pole,apache-2.0,huggingface-hub,100,602,440,,0.0,0.0,0.0,False,1,Pick up a ring and put it on the stacking pole,False,0,137.2
+nbirukov/so101_pick_up_3c_zone_2,apache-2.0,huggingface-hub,130,189,133,,0.0,0.0,0.0,False,8,Pick up the brown lego duplo block,True,0,132.1
+ndelgado/so101_dataset,apache-2.0,huggingface-hub,50,1200,1198,,0.0,0.0,0.0,False,1,"Pick up lego, put in box",False,0,181.8
+nikodembartnik/so101-task1,apache-2.0,huggingface-hub,50,426,295,,0.0,0.0,0.0,False,1,Put red cube in a black bowl,False,0,150.0
+omkarmayekar555/sim_so101_follower_14_OCT_1_6_loc_one_orange,apache-2.0,huggingface-hub,64,449,289,,0.0,0.0,0.0,True,1,Grab orange and pit it into plate,True,0,135.1
+peterrolfes/so101_grab_the_screw_big,apache-2.0,huggingface-hub,126,399,20,,0.0,0.0,0.0,False,1,Grab the Screw,False,1,163.5
+piuslim373/so101-transfer-bottle,apache-2.0,huggingface-hub,50,222,182,,0.0,0.0,0.0,False,1,Transfer the bottle to container,False,0,147.3
+piuslim373/so101-transfer-bottle1,apache-2.0,huggingface-hub,50,242,214,,0.0,0.0,0.0,False,1,Transfer the bottle to container,False,0,181.3
+puneetpanwar/so101-table_cleanup,apache-2.0,huggingface-hub,50,602,340,,0.0,0.0,0.0,False,1,Put the pens into pen holder,False,0,147.1
+puneetpanwar/so101_cube_pickup,apache-2.0,huggingface-hub,100,279,88,,0.0,0.0,0.0,False,1,Put the black cube into pen holder,False,0,145.5
+r-oi/so101_pickplace_cube_100ep_rand-pos,apache-2.0,huggingface-hub,100,332,265,,0.0,0.0,0.0,False,1,Pick up the white cube and place it in the box,False,0,141.1
+r-oi/so101_pickplace_cube_1020_same_place,apache-2.0,huggingface-hub,50,414,331,,0.0,0.0,0.0,False,1,Pick up the white cube and place it in the box,False,0,115.9
+r-oi/so101_pickplace_cube_80ep,apache-2.0,huggingface-hub,80,494,398,,0.0,0.0,0.0,False,1,Pick up the white cube and place it in the box,False,0,141.9
+ricky0526/so101_move_block,apache-2.0,huggingface-hub,120,290,226,,0.0,0.0,0.0,False,4,Put the brown block into the plate on the right.,False,0,141.6
+ricky0526/so101_pick_mouse_to_box_v1,apache-2.0,huggingface-hub,60,409,279,,0.0,0.0,0.0,False,1,Pick up the toy mouse and place it in the box.,False,0,122.8
+ricky0526/so101_pick_toy_to_plate_v1,apache-2.0,huggingface-hub,50,521,453,,0.0,0.0,0.0,False,1,Pick up the toy and place it on the plate,False,0,152.4
+ricky0526/so101_pick_toy_to_plate_v2,apache-2.0,huggingface-hub,50,471,381,,0.0,0.0,0.0,False,1,Pick up the toy and place it on the plate,False,0,156.6
+rowb1/so101_pick_cup1,apache-2.0,huggingface-hub,50,115,114,,0.0,0.0,0.0,False,1,put the cube into the bowl,False,0,131.8
+rowb1/so101_pick_cup2,apache-2.0,huggingface-hub,50,115,114,,0.0,0.0,0.0,False,1,put the cube into the bowl,False,0,176.2
+tinkhireeva/so101_pick_place_yellow_objects,apache-2.0,huggingface-hub,60,421,292,,0.0,0.0,0.0,False,6,Grab yellow cube,False,0,123.7
+tinkhireeva/so101_pick_place_yellow_objects_10_locations_dima,apache-2.0,huggingface-hub,50,530,393,,0.0,0.0,0.0,False,1,Grab yellow cube and put it in grey container on the left,False,0,163.9
+wantobcm/so101_box2bowl,apache-2.0,huggingface-hub,162,452,314,,0.0,0.0,0.0,False,1,Grab the box and place into bowl.,False,1,180.6
+y1y2y3/so101_test8,apache-2.0,huggingface-hub,250,450,383,,0.0,0.0,0.0,False,1,"pick up small white cube, place it into big brown box",False,0,165.2
+yuk6ra/so101-onetape-cleanup,apache-2.0,huggingface-hub,50,444,444,,0.0,0.0,0.0,False,1,Grab the tape and place it in the box.,False,0,124.9
+yuk6ra/so101-pen-cleanup,mit,huggingface-hub,50,592,591,,0.0,0.0,0.0,False,1,Grab pens and place into box,False,0,120.2
+yuk6ra/so101-tapes-cleanup,apache-2.0,huggingface-hub,50,444,444,,0.0,0.0,0.0,False,1,Grab tapes and place into box,False,0,138.5
+yutaro-kimura-acs/so101_pp_blue_box,apache-2.0,huggingface-hub,50,543,396,,0.0,0.0,0.0,False,1,Pick and place the blue box,False,0,109.6
+CnLori/so101_grab_cube,apache-2.0,huggingface-hub,50,429,363,,0.0,0.0,0.0,False,1,Grab the blue cube,False,0,155.2
+CnLori/so101_pickup_cube,apache-2.0,huggingface-hub,56,501,409,,0.0,0.0,0.0,False,1,Pick up the blue cube to the box.,False,0,138.8
+brcg3/so101_test_2,apache-2.0,huggingface-hub,52,484,151,,0.0,0.0,0.0,False,1,Grab the pink cube and put it in the clear box,False,1,130.0
+lucasfv/so101_finetuning,apache-2.0,huggingface-hub,60,840,831,,0.0,0.0,0.0,False,6,pick the red screwdriver and hold it in the air,False,0,106.0
+sabinMlminator/so101_pickplace_cubes_test2,apache-2.0,huggingface-hub,120,967,781,,0.0,0.0,0.0,False,4,Put the blue cube in the bin.,False,0,149.7
+Grigorij/so-101-duck,apache-2.0,huggingface-hub,70,599,598,,0.0,0.0,0.0,False,1,Place the duck on the black mark.,False,0,140.2
+Grigorij/so-101-test,apache-2.0,huggingface-hub,50,1048,1048,,0.0,0.0,0.0,False,1,Grab the green jelly and place it on black plate.,False,0,159.2
+JulienStocker/so101-cup_pnp_50ep_ver01,apache-2.0,huggingface-hub,50,323,232,,0.0,0.0,0.0,False,1,place the white cup on the plate,False,0,103.8
+MCeut/so101_lab_openBin_putCube,apache-2.0,huggingface-hub,103,1028,447,,0.0,0.0,0.0,False,1,Open bin and put cube,False,0,131.8
+Seungyoun/so101-pick-and-place,apache-2.0,huggingface-hub,121,508,260,,0.0,0.0,0.0,False,1,Put the vitamin bottle in the box,False,1,122.2
+Teddy14/so101_test,apache-2.0,huggingface-hub,90,599,599,,0.0,0.0,0.0,False,1,Grasp a lego block and put it in the bin.,False,0,133.9
+Teddy14/so101_two_cam,apache-2.0,huggingface-hub,90,599,599,,0.0,0.0,0.0,False,1,Grasp a lego block and put it in the bin.,False,1,137.2
+Thytu/so101-object-in-box_v0.4-fixed,apache-2.0,huggingface-hub,101,204,156,,0.0,0.0,0.0,False,1,Drop the red octogon into the yellow box,False,1,139.0
+YDY0427/so101_test_20250708_195723,apache-2.0,huggingface-hub,50,510,382,,0.0,0.0,0.0,False,1,Pick my cheese to black panel.,False,0,136.8
+aiden-li/so101-picklego,apache-2.0,huggingface-hub,113,419,238,,0.0,0.0,0.0,False,1,Pick up the lego hotdog and place it on the blue mark,False,0,115.0
+aiden-li/so101-picktape,apache-2.0,huggingface-hub,159,333,177,,0.0,0.0,0.0,False,1,Pick up the pink tape and place it in the blue box.,False,0,124.3
+anvilbot-patrickhhh/SO101_record_test,apache-2.0,huggingface-hub,100,302,299,,0.0,0.0,0.0,False,1,Put the green cube in the area with the black tape,False,0,234.7
+baluatbfl/my-so101arm-dataset,apache-2.0,huggingface-hub,50,749,748,,0.0,0.0,0.0,False,1,pick the battery and place it in the cup.,False,0,108.4
+fuemocheng/record_so101_mahjong_test01,apache-2.0,huggingface-hub,60,1460,1287,,0.0,0.0,0.0,False,1,Draw a tile,False,0,204.2
+guanfengliu/so101_main_bin_3cameras_1depth,apache-2.0,huggingface-hub,62,211,159,,0.0,0.0,0.0,False,1,Put brush into bin using 3 cameras 3,False,0,134.9
+guanfengliu/so101_main_bin_3cameras_3,apache-2.0,huggingface-hub,55,229,119,,0.0,0.0,0.0,False,1,Put brush into bin using 3 cameras 3,False,0,135.5
+guanfengliu/so101_main_bin_yellow4,apache-2.0,huggingface-hub,100,407,365,,0.0,0.0,0.0,False,1,Put brush into bin yellow,False,0,96.1
+kagyvro48/so101_dataset1_arracher_la_mauvaise_herbe,apache-2.0,huggingface-hub,61,443,437,,0.0,0.0,0.0,False,1,Pull out the weed.,False,0,157.1
+mr-dee/dylan-so101-train1,apache-2.0,huggingface-hub,50,447,437,,0.0,0.0,0.0,False,1,Pick sweet and put it in container,False,0,89.6
+omkarmayekar555/so101_test_dataset2,apache-2.0,huggingface-hub,50,150,129,,0.0,0.0,0.0,False,1,take the brain and put it in box,False,0,149.4
+oretti/so101_dice_5,apache-2.0,huggingface-hub,60,484,435,,0.0,0.0,0.0,False,3,play roll dice,False,0,122.6
+qm30631122/so101_grab_pen_blocked_20sec_50ep_102425,apache-2.0,huggingface-hub,50,480,480,,0.0,0.0,0.0,False,1,Grab pen and put in to cylinder.,False,0,150.7
+ranegray/so101-drawing-dataset,apache-2.0,huggingface-hub,51,380,345,,0.0,0.0,0.0,False,5,Draw a circle,False,0,102.1
+ricky0526/so101_pick_toy_to_plate_v3,apache-2.0,huggingface-hub,80,267,153,,0.0,0.0,0.0,False,1,Pick up the toy and place it on the plate,False,0,160.1
+ricky0526/so101_pick_toy_to_plate_v4,apache-2.0,huggingface-hub,80,229,189,,0.0,0.0,0.0,False,1,Pick up the toy and place it on the plate,False,0,133.8
+rl26-world-models/so101-task2-720p-whole-arm-v4-fresh,apache-2.0,huggingface-hub,50,782,453,,0.0,0.0,0.0,False,1,"push the white object from the start position to the target position gently, while avoiding the red obstacle",False,0,167.8
+sabinMlminator/so101_pickplace_cubes_test1,apache-2.0,huggingface-hub,200,988,365,,0.0,0.0,0.0,False,157,Put the light brown cube in the bin.,False,0,142.4
+shimazukosen/so101_record_2,apache-2.0,huggingface-hub,80,440,430,,0.0,0.0,0.0,False,1,Pick the block and place it in the gray area,False,0,153.6
+yutaro-kimura-acs/so101_pp_blue_and_red,apache-2.0,huggingface-hub,100,404,294,,0.0,0.0,0.0,False,2,Pick and place the blue box,False,0,108.3
+zz4321/so101_grasp_rubic,apache-2.0,huggingface-hub,101,299,191,,0.0,0.0,0.0,False,1,Place the cube in the tape,False,0,236.3
+self/pick_place_blue_pen_v1,apache-2.0,author-recorded,18,462,319,,0.0,0.0,0.0,False,1,Pick up the blue pen and put it in the pen holder.,False,0,153.2
+self/pickandplace_bluecube_whitecup,apache-2.0,author-recorded,11,413,309,,0.0,0.0,0.0,False,1, Pick up the blue cube block and put it inside the white cup.,False,0,150.2
+self/pickandplace_greencube_whitecup,apache-2.0,author-recorded,14,377,325,,0.0,0.0,0.0,False,1,Pick up the green cube block and put it inside the white cup.,False,0,156.3
+self/skill_earser_move_v3_followercal,apache-2.0,author-recorded,50,490,341,,0.0,0.0,0.0,False,1,place the white eraser on the green square,False,0,139.8
+self/skill_eraser_move_v2,apache-2.0,author-recorded,90,522,227,,0.0,0.0,0.0,False,1,Place the white eraser on the red square,False,1,135.1
+self/stack_cube_normalized,apache-2.0,author-recorded,149,976,309,,0.0,0.0,0.0,False,1,stack the black cubes,False,0,

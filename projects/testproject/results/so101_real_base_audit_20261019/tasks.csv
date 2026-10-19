@@ -1,0 +1,407 @@
+task,n_episodes,n_sources
+Place each object in the plastic bin,1360,3
+Grasp a lego block and put it in the bin.,280,3
+Move the Brown Queen to the Blue Square.,274,1
+Grab white chess and put them in the box,274,1
+Pick up the toy and place it on the plate,260,4
+Put the green cube in the area with the black tape,250,3
+"pick up small white cube, place it into big brown box",250,1
+Pick up the white cube and place it in the box,230,3
+Grasp a plug and place it in an empty tray slot,226,1
+Grasp the die and put it on the mat.,217,1
+Pick red cube,213,2
+Put the yellow block on the cross mark,200,1
+Pick and show the red gear,200,4
+Transfer the capsule to container,180,3
+Grab the box and place into bowl.,162,1
+Grab the marker and put it in the box,160,1
+Pick up the pink tape and place it in the blue box.,159,1
+Open the upper drawer,154,1
+Pick and drop lego block,153,2
+"Stack red, green, and blue blocks on the blue dish from bottom to top.",150,1
+"Grab the cubes in areas A, B, and C vertically and put on the plate. If there are multiple cubes in A, B, and C, grab them in order of priority from the top. (Priority: A > B > C)",150,3
+Pick and show the yellow gear,150,3
+Close the upper drawer,150,1
+stack the black cubes,149,1
+Pick up the sushi from the Shinkansen and put it on the blue dish,147,1
+Grab a piece of tissue.,144,1
+Open the lower drawer,144,1
+Grab pens and place into pen holder.,143,2
+Grab the blue cube,140,2
+Grab a banana and put it on the plate,135,1
+Pick up the pen and place it in the box.,130,1
+Grab the Screw,126,1
+"first grab the green bottle, second slide it across the belly of the toy from foot to red shirt, third put the bottle down on the green circle.",121,1
+Put the vitamin bottle in the box,121,1
+Grab black chess and put it in the blue box,120,1
+Put brush into bin using 3 cameras 3,117,2
+Pick up the lego hotdog and place it on the blue mark,113,1
+Open bin and put cube,103,1
+Transfer the capsule into the container,101,1
+Grab the tape and put it in the box,101,2
+pick up the black and white box,101,1
+Drop the red octogon into the yellow box,101,1
+Place the cube in the tape,101,1
+Pull the cube to the target marker.,100,1
+Grasp the brown cube then place it in the white bin.,100,1
+Grasp a pen and put it into the cup,100,1
+Pick up a ring and put it on the stacking pole,100,1
+Transfer the bottle to container,100,2
+Put the black cube into pen holder,100,1
+put the cube into the bowl,100,2
+Pick and place the blue box,100,2
+Put brush into bin yellow,100,1
+pick up screwdriver and put it in box,90,1
+Pick up the rectangular box and place it at vertical position,90,1
+Place the white eraser on the red square,90,1
+Put lego brick into the circle,86,1
+start chess game with move the E pawn to E4,83,1
+Grab orange and place into plate,83,1
+pick up the red cube and place it in the box,80,1
+Pick the block and place it in the gray area,80,1
+Pick up the white dice and place it inside a box.,70,1
+Place the duck on the black mark.,70,1
+Grab orange and pit it into plate,64,1
+Grab oranges and place into plate.,61,1
+Pull out the weed.,61,1
+push the green block off the conveyor belt into the storage box.,60,1
+Pick up the toy mouse and place it in the box.,60,1
+Draw a tile,60,1
+Put the sock in the container,59,1
+Close the lower drawer,59,1
+Pick up an orange and place it on the plate,57,1
+Pick up the blue cube to the box.,56,1
+Put the blue cube in the bin.,55,2
+Unplug the cable.,54,1
+Grab the tan cube,53,1
+rub the plush toy with the bottle,53,1
+Pick up the lego brick.,52,1
+Grab the pink cube and put it in the clear box,52,1
+pick up the cube and drop it into the bowl,51,1
+Pick up Phillips Screwdriver and put it in box,50,1
+Pick the green cube and then place it in the region with the black tape,50,1
+Place the 3d print in the transparent box,50,1
+Pick the yellow block and put it in the black box,50,1
+Grasp the eraser and move it to the mat.,50,1
+Grab the black ball into the box,50,1
+Put the chopsticks on the tray,50,1
+Grab a cube and put it in the A-area.,50,1
+Grab a cube and put it in the B-area.,50,1
+Grab a cube and put it in the C-area.,50,1
+Pick and show the green gear,50,1
+Pick and show the grey gear,50,1
+Pick and show the white object,50,1
+Pick cube and place in goal square,50,1
+Grab the orange cube,50,1
+Grab lego block,50,1
+put red bus into the plastic bowl,50,1
+"Pick up lego, put in box",50,1
+Put red cube in a black bowl,50,1
+Put the pens into pen holder,50,1
+Grab yellow cube and put it in grey container on the left,50,1
+Grab the tape and place it in the box.,50,1
+Grab pens and place into box,50,1
+Grab tapes and place into box,50,1
+Grab the green jelly and place it on black plate.,50,1
+place the white cup on the plate,50,1
+Pick my cheese to black panel.,50,1
+pick the battery and place it in the cup.,50,1
+Pick sweet and put it in container,50,1
+take the brain and put it in box,50,1
+Grab pen and put in to cylinder.,50,1
+"push the white object from the start position to the target position gently, while avoiding the red obstacle",50,1
+Pick and place the red box,50,1
+place the white eraser on the green square,50,1
+Grab pens and place into pen holder,45,2
+play roll dice,40,1
+Put the yellow cube in the bin.,38,2
+Put the brown cube in the bin.,35,1
+Grab an apple and put it on the plate,30,1
+Grab an orange and put it on the plate,30,1
+Put the brown block into the plate on the right.,30,1
+Put the brown block into the plate on the left.,30,1
+Put the green block into the plate on the right.,30,1
+Put the green block into the plate on the left.,30,1
+Pick orange cube,28,1
+Grab screwdrivers and place into pen holder,25,1
+Grab bottles and place into pen holder,25,1
+Grab tapes and place into pen holder,20,1
+Grab scissor and place into pen holder,20,1
+Pick up the brown lego duplo block,20,1
+Pick up the gray lego duplo block,20,1
+Pick up the green lego duplo block,20,1
+Pick up the blue lego duplo block,20,1
+Pick up the white lego duplo block,20,1
+Grab markers and place into pen holder,19,1
+Pick up the blue pen and put it in the pen holder.,18,1
+Pick up the green cube block and put it inside the white cup.,14,1
+Put all the beads in the brown case into the white box,11,1
+Draw a circle,11,1
+ Pick up the blue cube block and put it inside the white cup.,11,1
+Grasp the two black cubes and put them into the white box,10,1
+Put all the cubes into the white box and the Lego blocks into the brown case,10,1
+Flip the hourglass,10,1
+Pick up the orange lego duplo block,10,1
+Pick up the yellow lego duplo block,10,1
+Pick up the red lego duplo block,10,1
+Grab yellow cube,10,1
+put yellow cube in gray container on the left,10,1
+Grab round yellow object,10,1
+Grab yellow donut,10,1
+put yellow round object in gray container on the right,10,1
+put yellow donut in gray container on the right,10,1
+pick the red screwdriver and hold it in the air,10,1
+pick the blue screwdriver and hold it in the air,10,1
+pick the yellow screwdriver and hold it in the air,10,1
+"put aside the red screwdriver in the second rectangle, and go to standby position",10,1
+"put aside the yellow screwdriver in the second rectangle, and go to standby position",10,1
+"put aside the blue screwdriver in the fourth rectangle, and go to standby position",10,1
+reset the environments,10,1
+Finish and clean up afterwards,10,1
+Draw a line,10,1
+Draw a square,10,1
+Draw a triangle,10,1
+Draw a star,10,1
+Put the light brown cube in the bin.,8,1
+Move the white pen backwards,6,1
+Move the altoids container right,6,1
+Move the blue pliers right,6,1
+Place the pink eraser in the plastic bin,6,1
+Move the pink eraser backwards,6,1
+Put the light brown cube in the center right bin.,6,1
+Move the black glasses left,5,1
+Move the black glasses backwards,5,1
+Move the white pen left,5,1
+Move the altoids container left,5,1
+Move the altoids container backwards,5,1
+Move the black block right,5,1
+Place the blue pliers in the plastic bin,5,1
+Move the blue pliers backwards,5,1
+Move the green clip left,5,1
+Move the green clip backwards,5,1
+Move the pink eraser forwards,5,1
+Grab a orange and put it on the plate,5,1
+Pick yellow cube,4,1
+Place the black glasses in the plastic bin,4,1
+Move the black glasses right,4,1
+Move the black glasses forwards,4,1
+Place the white pen in the bin,4,1
+Move the white pen right,4,1
+Move the white pen forwards,4,1
+Place the altoids container in the plastic bin,4,1
+Move the altoids container forwards,4,1
+Place the brown stuffed animal in the plastic bin,4,1
+Move the brown stuffed animal left,4,1
+Move the brown stuffed animal right,4,1
+Move the brown stuffed animal forwards,4,1
+Move the brown stuffed animal backwards,4,1
+Place the black block in the plastic bin,4,1
+Move the black block left,4,1
+Move the black block forwards,4,1
+Move the black block backwards,4,1
+Move the blue pliers left,4,1
+Move the blue pliers forwards,4,1
+Place the green chapstick in the plastic bin,4,1
+Move the green chapstick left,4,1
+Place the green clip in the plastic bin,4,1
+Move the green clip right,4,1
+Move the green clip forwards,4,1
+Move the pink eraser left,4,1
+Move the pink eraser right,4,1
+Put the light brown cube in the lower right bin.,4,1
+"Place the cubes on the bench from left to right in the following order: black, brown and black",3,1
+Grasp the brown cube then place it in the white box.,3,1
+Put the light brown and blue cube in the upper center bin.,3,1
+Put the blue cube in the center right bin.,3,1
+Put the blue cube in the center bin.,3,1
+Place the blue cube in the central bin,3,1
+"Place the cubes on the bench from left to right in the following order: white, white and black",2,1
+Place the cubes on the bench from left to right in the following order: black and brown,2,1
+Place the black block next to the black glasses,2,1
+Put the blue and light brown cube in the center right bin.,2,1
+"Put the blue cube in the center bin, located to the left of the other bin.",2,1
+Put the blue and light brown cube in the lower left bin.,2,1
+"Put the light brown cube in the center bin, located to the left of the other bin.",2,1
+Put the light brown and blue cube in the center right bin.,2,1
+Put the blue and light brown cube in the bin.,2,1
+Put the blue cube in the lower right bin.,2,1
+"Put the light brown cube in the upper center bin, located above the other bin.",2,1
+Place the yellow cube in the lower left bin,2,1
+Put the blue cube in the top right bin,2,1
+Put the blue cube in the lower right bin,2,1
+Put the yellow cube in the lower right bin,2,1
+Put the yellow cube in the upper left bin.,2,1
+"Place the cubes on the bench from left to right in the following order: black, white and brown",1,1
+"Place the cubes on the bench from left to right in the following order: white, white and white",1,1
+Place the black glasses next to the white pen,1,1
+Place the black glasses next to the black block,1,1
+Place the black glasses next to the altoids container,1,1
+Place the black glasses next to the blue pliers,1,1
+Place the white pen next to the brown stuffed animal,1,1
+Place the white pen next to the altoids container,1,1
+Place the white pen next to the pink eraser,1,1
+Place the white pen next to the black block,1,1
+Place the altoids container next to the black block,1,1
+Place the altoids container next to the blue pliers,1,1
+Place the altoids container next to the green clip,1,1
+Place the altoids container next to the green chapstick,1,1
+Place the altoids container next to the pink eraser,1,1
+Place the brown stuffed animal next to the black glasses,1,1
+Place the brown stuffed animal next to the green clip,1,1
+Place the brown stuffed animal next to the blue pliers,1,1
+Place the brown stuffed animal next to the white pen,1,1
+Place the black block next to the green chapstick,1,1
+Place the black block next to the green clip,1,1
+Place the black block next to the pink eraser,1,1
+Place the blue pliers next to the brown stuffed animal,1,1
+Place the blue pliers next to the pink eraser,1,1
+Place the blue pliers next to the altoids container,1,1
+Place the blue pliers next to the black glasses,1,1
+Place the green chapstick next to the black glasses,1,1
+Place the green chapstick next to the pink eraser,1,1
+Place the green chapstick next to the altoids container,1,1
+Place the green chapstick next to the green clip,1,1
+Place the green clip next to the black box,1,1
+Place the green clip next to the altoids container,1,1
+Place the green clip next to the pink eraser,1,1
+Place the green clip next to the white pen,1,1
+Place the pink eraser next to the brown stuffed animal,1,1
+Place the pink eraser next to the black glasses,1,1
+Place the pink eraser next to the green chapstick,1,1
+Place the pink eraser next to the white pen,1,1
+Put the blue cube in in the bin.,1,1
+"Put the light brown and blue cube in the center bin, located to the left of the other bin.",1,1
+"Put the light brown cube in the center bin, located below the other bin.",1,1
+Put the blue and light brown cube in the right bin.,1,1
+"Put the blue cube in the center right bin, located below the other bin, and put the light brown cube in upper right bin, located above the other bin.",1,1
+"Put the light brown cube in the lower right bin, and put the blue cube in the upper center bin.",1,1
+"Put the light brown and blue cube in the upper center bin, located above the other bin.",1,1
+Put the light brown cube in the upper center bin.,1,1
+Put the blue cube in the upper center bin.,1,1
+"Put the light brown and blue cube in the center left bin, located below the other bin.",1,1
+"Put the blue cube in the upper center bin, and put the light brown cube in the lower right cube.",1,1
+"Put the blue cube in the center right bin, located to the right of the other bin.",1,1
+Put the light brown cube and blue cube in the lower left bin.,1,1
+Put the light brown cube in the lower left bin,1,1
+"Put the blue cube in the lower right bin and the light brown cube in the center bin, located above the other bin.",1,1
+"put the light brown cube in the center bin, located to the left of the other bin, and the blue cube in the upper right bin, located to the right of the other bin.",1,1
+"Put the light brown cube in the bin to the left, put the blue cube in the in to the right.",1,1
+Put the blue cube in the lower center bin.,1,1
+Put the light brown and blue cube in the bin.,1,1
+Put the blue cube in the upper right bin.,1,1
+"Put the blue cube in the center bin, located to the right of the other bin.",1,1
+Put the blue and light brown cube in the upper center bin.,1,1
+"Put the light brown cube in the center right bin, located to the right of the other bin, and put the blue cube in the center bin, located to the left o the other bin.",1,1
+"Put the light brown cube in the center bin, located to the left of the other bin, and put the blue cube in the upper right bin.",1,1
+Put the light brown and blue cube in the lower center bin.,1,1
+Put the blue cube and light brown cube in the center right bin.,1,1
+Put the light brown cube in the upper right bin.,1,1
+Put the blue and light brown cube in the upper left bin.,1,1
+Place the blue cube in the upper right bin,1,1
+place the blue cube in the upper right bin and the light brown cube in the upper left bin,1,1
+put the blue and light brown cubes in the upper left bin.,1,1
+Put the blue cube in the upper right bin,1,1
+put the blue and light brown cubes in the right bin,1,1
+place the light brown cube in the low left bin.,1,1
+Place both cubes in the lower left bin // Place the blue and light brown cubes in the lower left bin,1,1
+Put the light brown cube in the lower right bin and the blue cube in the lower right bin.,1,1
+Put the yellow cube in the right bin,1,1
+Put the yellow cube in the lower (left) bin,1,1
+Place the yellow cube in the central bin,1,1
+Place the light brown and blue cubes in the upper bin,1,1
+Put light brown and blue cubes in the upper bin,1,1
+"Place the blue, light brown and yellow cubes in the right bin. // Place all cubes in the right bin",1,1
+Put the blue cube in the central bin,1,1
+Put the light brown cube in the central bin,1,1
+Put the blue cube in the right bin,1,1
+Put the light brown cube in the right bin,1,1
+Place the blue and yellow cubes into the lower right bin,1,1
+Place the blue and light brown cubes in the right bin and the yellow cube in the top right bin,1,1
+"Put the yellow, blue and light brown cubes in the central bin. // Put all cubes in the central bin",1,1
+Put the blue and light brown cubes in the right bin,1,1
+Place the yellow and light brown cubes in the right bin and the blue cube in the top bin,1,1
+Put the blue cube in the right bin and the yellow cube in the top bin,1,1
+Put the blue cube in the lower right bin and the light brown cube in the central bin,1,1
+place the light brown cube in the lower bin and the yellow cube in the top bin,1,1
+Place the yellow cube in the lower bin and the light brown cube in the top bin,1,1
+Put the blue cube in the lower right bin and the yellow cube in the top bin,1,1
+Place the blue and light brown cubes in the top left bin and the yellow cube in the lower right bin,1,1
+Place the yellow cube in the right bin and the blue cube in the left bin,1,1
+Put the light brown cube in the lower left bin and the blue cube in the right bin,1,1
+Put the light brown and blue cubes in the right bin,1,1
+Place the yellow and blue cubes in the top bin,1,1
+Put the yellow and light brown cubes in the top left bin,1,1
+Place the yellow and blue cubes in the left bin,1,1
+Put the light brown cube in the top bin,1,1
+Place the yellow cube in the left bin,1,1
+"Place the blue, yellow and light brown cubes in the top bin // Place all cubes in the top bin",1,1
+Place the light brown cube in the left bin and the yellow cube in the right bin,1,1
+Put the blue cube in the lower left bin and the yellow and light brown cubes in the top bin,1,1
+Place the light brown and blue cubes in the right bin,1,1
+Put the light brown cube in the left bin and the blue cube in the right bin,1,1
+Put the blue cube in the right bin and the yellow cube in the left bin,1,1
+"Place the blue, light brown and yellow cubes in the top bin. // Put all cubes in the top bin",1,1
+Put the light brown cube in the lower right bin,1,1
+Put the blue and light brown cubes in the top left bin. //Put both cubes in the top left bin,1,1
+Place the light brown cube in the top left bin and the blue cube in the top right bin,1,1
+Put the blue and yellow cubes in the top right bin,1,1
+Put the yellow cube in the lower left bin and the light brown cube in the top bin,1,1
+Place the blue cube in the lower bin and the yellow and light brown cube in the top bin,1,1
+"Put the yellow cube in upper left bin, put the blue cube in the lower right bin",1,1
+"Put the yellow cube and the blue cube in the upper right bin, put the brown cube in the lower left cube.",1,1
+"Put the yellow and brown cube in the upper left bin, left of the other bin, but the blue cube in the center bin, right of the other bin.",1,1
+Put the yellow cube in the center left bin.,1,1
+Put the brown cube in the lower left bin.,1,1
+Put the blue cube in the upper left bin.,1,1
+"Put the yellow, blue and brown cube in the upper left bin.",1,1
+"Put the brown cube in the lower right cube, put the yellow cube in the upper left cube.",1,1
+Put the blue and brown cube in the lower right bin.,1,1
+"Put the blue cube in the lower right bin, put the yellow cube in the lower left bin.",1,1
+Put the yellow cube in in the lower left bin.,1,1
+Put the light brown and the yellow cube in the lower right bin.,1,1
+Put the yellow and light brown cubes in the lower right bin.,1,1
+Put the blue cube in the upper center cube.,1,1
+Put the yellow cube in the lower right bin and the light brown cube in the upper center cube.,1,1
+Put the yellow cube in cube bin at the center.,1,1
+Put the light brown cube in the upper bin.,1,1
+Put the light brown and the blue cube in the upper bin.,1,1
+Put the light brown and yellow cube in the lower left bin.,1,1
+"Put the light brown cube in the lower left bin, put the yellow cube in the upper right bin.",1,1
+"Put the yellow cube in the upper right bin, put the light brown cube in the lower lift bin.",1,1
+"Put the light brown cube in the left center bin, put the blue cube in the right bin.",1,1
+"Put the blue cube in the lower center bin, located below the other bin.",1,1
+"Put the blue cube in center left bin, located left of the other bin.",1,1
+"Put the light brown yellow cube in the lower left bin, located below the other bin, and the yellow cube on the center left bin, located above the other bin.",1,1
+"Put the yellow and light brown cube in the lower left bin, put the blue cube in the lower right bin.",1,1
+"Put the light brown, blue and yellow bin in the lower right bin.",1,1
+Put the blue cube in center right bin.,1,1
+Put the yellow and blue cube in the bin.,1,1
+Put the light brown cube in the lower left bin.,1,1
+Put the yellow and light brown cube in the center bin.,1,1
+"Put the light brown, yellow and blue cube in the center right bin.",1,1
+"Put the yellow cube in the center right bin, located to the right of the other bin.",1,1
+"Put the blue cube in the center left bin, located to the left of the other bin.",1,1
+Put the yellow cube in the lower right bin.,1,1
+Put the yellow cube in the upper right bin.,1,1
+"Put the blue cube in upper right bin, located to the right of the other bin, and the light brown and yellow cube in the center left bin, located to the left of the other bin.",1,1
+"Put the yellow cube in the lower right bin, located below the other bin.",1,1
+"Put the blue cube in the upper right bin, located above the other bin, and the yellow and light brown cube in the lower right bin, located below the other bin.",1,1
+Put the blue cube in the right bin.,1,1
+"Put the light brown cube in the center left bin, located to the left of the other bin.",1,1
+"Put the yellow cube in the lower right bin, put the blue and light brown cube in the lower left bin.",1,1
+"Put the blue cube in the lower right bin, put light brown cube in the upper left bin.",1,1
+"Put the blue cube in the lower right bin, located below the other bin.",1,1
+"Put the yellow cube in the upper right bin, located above the other bin.",1,1
+"Put the blue cube in the lower left bin, put the yellow cube in the upper right bin.",1,1
+"Put the blue cube in the center left bin, located left of the other bin, put the light brown cube in the lower right bin located right of the other bin.",1,1
+"Put the yellow cube in the center right bin, put the blue and light brown cube in the lower left bin.",1,1
+"Put the light brown cube in the center right bin, located to the right of the other bin.",1,1
+"Put the light brown, blue and yellow cube in the lower left bin, located to the left of the other bin.",1,1
+"Put the yellow cube in the center bin, located below the other bin, and the blue cube in the upper center bin, located above the other bin.",1,1
+"Put the blue and light brown cube in the lower right bin, located below the other bin, put the yellow cube in the upper center bin, located above the other bin.",1,1
+"Put the blue and yellow cube in the center left bin, put the light brown cube in the center right bin.",1,1
+"Put the light brown cube in the lower right bin, put the blue cube in the lower left bin.",1,1
+Put the light brown and yellow cube in the upper left bin.,1,1
+Put the light brown cube in the center left bin.,1,1
+"Put the yellow cube in the center left bin, put the light brown cube in the upper right bin, located to the right of the other bin.",1,1
+Put the blue and yellow cube in the bin.,1,1
