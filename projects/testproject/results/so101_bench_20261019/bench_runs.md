@@ -105,6 +105,24 @@ Reading: lateral alignment can be right; the miss here is HEIGHT at the close (f
 the wrist camera shows plainly. Same family as trials 1–4: grasp pose, not object identity or size.
 Frames c09_call*, log bench_ep5_onion.jsonl, montages ep5onion_front_every4 / ep5onion_wrist_key.
 
+## Trial 6 — 2026-10-20 — COUNTED (orange, fits the jaws) — FAIL (aligned, closed above it, then over-reached)
+First counted trial with a real orange (a mandarin-sized orange, fits the open jaws with room). Placed ~15 cm
+straight in front of the base. **Rig change noticed in the first frame: the overhead C270's view differs from
+trials 1–5** (base now top-centre, tray right, table edge visible top-left — the camera was moved or bumped
+between trials 5 and 6; operator asked). 45 chunks, 87.6 s, median RTT 1.135 s; both cameras warmed up.
+- calls 1–10: rest → table in 9 chunks (slower start: 3 chunks of small wrist motion first), gripper 40–48
+- calls 11–14: **orange between the jaws (wrist 11–13), gripper closed to 2** — fingers shut above the fruit;
+  the orange did not move
+- calls 15–45: the arm extended PAST the orange (shoulder_lift 44 → 68, elbow −43 → −73: the furthest reach
+  of any trial) and worked the gripper there (floors 10, 16, 19–22), orange behind/below the jaws in the
+  wrist view the whole time; one short lift at 42 (shoulder 55 → 38) with gripper 22, empty; ended at
+  [21, 52, −44, 87, −33, 35]; returned to start
+Reading: as trial 5 — correct lateral alignment, close too high — followed by a new failure: an over-reach
+beyond the object, consistent with the moved overhead camera (the front view is the policy's main depth cue;
+a shifted camera shifts where it thinks the object is). Counted as FAIL; the camera move is a CONFOUND for
+this trial and must be fixed (restore the view of trials 1–5 or re-fix the mount and keep it) before trial 7.
+Frames c10_call*, log bench_ep6_orange.jsonl, montages ep6orange_front_every4 / ep6orange_wrist_key / ep6orange_front_end.
+
 ## Running tally
 | trial | utc | result | chunks | wall s | median RTT s | note |
 |---|---|---|---|---|---|---|
@@ -114,6 +132,8 @@ Frames c09_call*, log bench_ep5_onion.jsonl, montages ep5onion_front_every4 / ep
 | 4 (onion, off-protocol) | 2026-10-20 | FAIL | 45 | 95.6 | 1.325 | reached, seven closes beside it (floor 4; 13 once = glancing squeeze), empty lift at the end |
 | 5 (onion, off-protocol) | 2026-10-20 | FAIL | 45 | 147.5 | 1.618 | aligned between the jaws at calls 8–14 but closed ABOVE it (floor 4–6), pushed out; ZeroTier stall 7–14 s/call on 24–30 |
 
-Counted toward the 20: trials 1–2 (pending the object-fit decision). Off-protocol: trials 3–5 (onion).
-Pattern over 5: reach 5/5 · object between the jaws at some point 3/5 (2, 3, 5) · a close that held the object 0/5 ·
-lift motions 2 (both empty) · placement on the tray 0.
+| 6 (orange, counted) | 2026-10-20 | FAIL | 45 | 87.6 | 1.135 | aligned at calls 11–14 but closed above it (floor 2), then over-reached past the orange; overhead camera had moved (confound) |
+
+Counted toward the 20: trials 1–2 (pending the object-fit decision) and 6 → 0/3. Off-protocol: trials 3–5 (onion).
+Pattern over 6: reach 6/6 · object between the jaws at some point 4/6 (2, 3, 5, 6) · a close that held the object 0/6 ·
+lift motions 3 (all empty) · placement on the tray 0. Close-too-high seen twice (5, 6); close-beside seen in 1, 3, 4.
