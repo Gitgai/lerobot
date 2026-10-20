@@ -85,11 +85,35 @@ grasp pose/timing, not object size alone.
 
 Montages: montages/ep3onion_front_every4.jpg, ep3onion_front_lift.jpg (calls 22–38), ep3onion_wrist_key.jpg.
 
+## Trial 4 — 2026-10-20 — OFF-PROTOCOL (onion, larger reddish one) — FAIL (jaws beside it, one empty lift)
+Operator re-placed a larger red onion (orange-ish colour, fits the jaws) front-left. 45 chunks, 95.6 s, median
+RTT 1.325 s. Rest → table in 4 chunks. Seven close cycles; gripper floor 4 (calls 9, 23–24, 32: empty) and
+13 (calls 40–42: a glancing squeeze on the onion's side, wrist 41–42). Calls 42–43: lift (shoulder_lift 53 → 36)
+with the gripper at 13–17 — empty; onion still on the table in front 43. Onion nudged a few cm. Returned to start.
+Frames c08_call*, log bench_ep4_onion.jsonl, montages ep4onion_front_every4 / ep4onion_wrist_key / ep4onion_front_end.
+
+## Trial 5 — 2026-10-20 — OFF-PROTOCOL (same onion, placed closer to the base) — FAIL (aligned, closed ABOVE it)
+Onion placed ~8 cm in front of the base, slightly left. 45 chunks, 147.5 s, median RTT 1.618 s with a ZeroTier
+stall on calls 24–30 (10.7 s, 6.6 s, 8.2 s, 6.6 s, 9.6 s, 14.0 s per call; server compute stayed 141–145 ms,
+so the stall was the network). Non-pipelined client → the arm simply waited; no motion during the stall.
+- calls 5–9: arm over the onion, **onion squarely between the jaws in the wrist view (calls 8, 9, 13, 14)** —
+  the first correctly aligned approach on the bench — yet the gripper closed to 6 (call 9) and 4 (call 15):
+  the fingers shut above the onion (approach not low enough) and the close pushed it out (wrist 15)
+- calls 16–45: re-approach with pan −4 to −7, three more closes (17, 11, 18) beside it, then hovering with the
+  gripper open through the stall; ended at [−1, 19, 11, 70, −43, 17]; returned to start
+Reading: lateral alignment can be right; the miss here is HEIGHT at the close (fingers above the object), which
+the wrist camera shows plainly. Same family as trials 1–4: grasp pose, not object identity or size.
+Frames c09_call*, log bench_ep5_onion.jsonl, montages ep5onion_front_every4 / ep5onion_wrist_key.
+
 ## Running tally
 | trial | utc | result | chunks | wall s | median RTT s | note |
 |---|---|---|---|---|---|---|
 | 1 | 2026-10-19T19:58:52Z | FAIL | 45 | 74.1 | 0.917 | reached, 10 grasp attempts beside the fruit, black front frames on calls 1–2 |
 | 2 | 2026-10-19T20:12:03Z | FAIL | 45 | 72.8 | 0.918 | reached, jaws on the fruit (gripper floor 10–17), no enclosure, no lift, fruit nudged |
 | 3 (onion, off-protocol) | 2026-10-20 | FAIL | 45 | 89.1 | 1.285 | reached, onion between the jaws once but closed beside it, one empty-handed lift+release, nudged |
+| 4 (onion, off-protocol) | 2026-10-20 | FAIL | 45 | 95.6 | 1.325 | reached, seven closes beside it (floor 4; 13 once = glancing squeeze), empty lift at the end |
+| 5 (onion, off-protocol) | 2026-10-20 | FAIL | 45 | 147.5 | 1.618 | aligned between the jaws at calls 8–14 but closed ABOVE it (floor 4–6), pushed out; ZeroTier stall 7–14 s/call on 24–30 |
 
-Counted toward the 20: trials 1–2 (pending the object-fit decision). Off-protocol: trial 3 (onion).
+Counted toward the 20: trials 1–2 (pending the object-fit decision). Off-protocol: trials 3–5 (onion).
+Pattern over 5: reach 5/5 · object between the jaws at some point 3/5 (2, 3, 5) · a close that held the object 0/5 ·
+lift motions 2 (both empty) · placement on the tray 0.
