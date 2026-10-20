@@ -188,9 +188,16 @@ trial 1     FAIL — scene "as is" (yellow citrus, grey tray). Rest → table in
 trial 2     FAIL — fruit re-placed closer, front-left. Reached in 8 chunks; from call 13 the fruit sat between
             the jaws and the gripper bottomed at 10–17 on eight closes (2 on air in trial 1) → squeezing the
             fruit's equator, no enclosure, no lift; fruit nudged a few cm. Supports the size hypothesis.
-trials 3–20 pending — operator re-places the fruit per placement; the client returns the arm to its start
-            pose itself (--return-start). Still open: jaw opening vs fruit diameter (measure; a corpus-sized
-            orange or a mandarin is the fair test — the citrus fills the fully-open jaws in the wrist frames).
+trials 3–5  off-protocol (onion; operator's object): 3 FAILs — reach OK, closes beside/above, two empty lifts.
+trials 6–10 COUNTED, a real orange that fits the jaws: 5 FAILs → **0/7 counted so far** (2026-10-20). In 8 of
+            10 trials the object was between the jaws at some point; every close landed 1–3 cm too high or to
+            one side and the policy retried the same close instead of adjusting. Overhead camera moved before
+            trial 6 (not restored; consistent 6–10; over-reach past the object seen in 6 and 10). Trials 7–8
+            idled at rest for ~20 s before reaching. Full table in bench_runs.md.
+trials 11–20 pending (13 more if trials 1–2 are excluded under the object-fit rule, 10 if counted). The
+            reading rule (< 5/20 → our own data) cannot flip any more: even 10/10 from here would be 10/20 at
+            best, and 0/7 already makes ≥ 10/20 need 10 straight successes. Decision point for the operator:
+            finish the 20 for the record, or stop here and start R5 (LoRA on top) with 0/7 as the base row.
 ```
 Protocol amendment PROPOSED 2026-10-19 (operator to confirm): **object-fit rule.** A trial run with a fruit
 that does not fit between the fully open jaws is an object failure, not a policy result. Such trials are

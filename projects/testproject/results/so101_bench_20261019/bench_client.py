@@ -92,6 +92,7 @@ def main():
     ap.add_argument("--auto", action="store_true", help="no prompts: start the episode immediately, record the result as 'unscored' (operator scores it afterwards)")
     ap.add_argument("--home-to", default="", help="six comma-separated joint targets (LeRobot units): move there slowly (1.5 deg/step, 3 grip/step at --fps) and exit; no cameras, no policy")
     ap.add_argument("--return-start", action="store_true", help="after each episode move slowly back to the pose the episode started from")
+    ap.add_argument("--pause-between", type=float, default=5.0, help="--auto only: seconds to wait before each episode (time for the operator to re-place the object)")
     a = ap.parse_args()
     if a.no_robot: a.dry_run = True
 
@@ -148,7 +149,9 @@ def main():
             if not a.dry_run and not a.auto:
                 print(f"\n=== episode {ep+1}: place the orange, then press Enter (q/ESC stops) ===", flush=True); input()
             elif not a.dry_run:
-                print(f"\n=== episode {ep+1}: starting in 5 s (auto) ===", flush=True); time.sleep(5)
+                print(f"\n=== episode {ep+1}: starting in {a.pause_between:.0f} s (auto) — place the object now ===", flush=True)
+                for left in range(int(a.pause_between), 0, -5):
+                    print(f"    {left} s", flush=True); time.sleep(min(5, left))
             t_ep = time.time(); n_chunks = 0; lat = []; q_start = joints_now()
             for ci in range(a.max_chunks):
                 if stop["flag"]: break

@@ -123,6 +123,31 @@ a shifted camera shifts where it thinks the object is). Counted as FAIL; the cam
 this trial and must be fixed (restore the view of trials 1–5 or re-fix the mount and keep it) before trial 7.
 Frames c10_call*, log bench_ep6_orange.jsonl, montages ep6orange_front_every4 / ep6orange_wrist_key / ep6orange_front_end.
 
+## Trials 7–10 — 2026-10-20 — COUNTED (orange), four back-to-back — all FAIL
+Run as one client process (`--episodes 4 --return-start --pause-between 30`; operator re-placed the orange in the
+30 s countdown; one gRPC connection → frames c11_call000001–000180, 45 per trial). Overhead camera in the
+trial-6 position throughout (not restored; consistent for 6–10). Log bench_ep7_10_orange.jsonl + .run.log.
+Median RTT 0.98 / 1.20 / 1.20 / 1.21 s; 78–87 s per trial. Composites: montages/ep{7,8,9,10}orange_composite.jpg.
+```text
+trial  placement                 off-rest at  closes (gripper floor)          what the wrist camera shows
+7      ~15 cm in front, centre   chunk 15     21–22 (4), 28–30 (24), 41 (7)   c21: shut beside; c40→41: orange between the
+                                                                              jaws, close ended at 7 with the fruit still
+                                                                              visible between the fingertips → closed above it
+8      ~15 cm front-left         chunk 16     22–26 (11–13), 30–31 (3),       c22–26: orange between the jaws, floor 11–13 =
+                                              37–38 (4), 42 (21)               squeezing its side, no hold; c30–31 beside;
+                                                                              c36–38 above it; orange pushed ~10 cm toward base
+9      ~8 cm, close to the base  chunk 7      21 (7), 28 (2), 31–32 (3),      c17–22 between the jaws, closes above (7, 13);
+                                              33 (14), 38–39 (16)              c27–28 beside; c30–33 above again; nudged
+10     left of the base          chunk 7      12–13 (2), 20 (3), 26–27 (18–20) c11–14 beside; c19–20 orange between the jaws,
+                                              33–34 (24)                       shut to 3 above it; then the arm reached far
+                                                                              past it (shoulder 68, elbow −74) and hovered
+                                                                              with half-closed gripper over nothing
+```
+New in this batch: two trials (7, 8) sat motionless at rest for 14–15 chunks (≈20 s) before starting the reach —
+the policy output "hold" at the start pose; trials 9 and 10 started within 6 chunks. Not seen in trials 1–6.
+Reading: identical failure family across all four — the arm finds the orange and gets it between the jaws,
+and the close is 1–3 cm too high or to one side; it never re-adjusts downward, it retries the same close.
+
 ## Running tally
 | trial | utc | result | chunks | wall s | median RTT s | note |
 |---|---|---|---|---|---|---|
@@ -134,6 +159,12 @@ Frames c10_call*, log bench_ep6_orange.jsonl, montages ep6orange_front_every4 / 
 
 | 6 (orange, counted) | 2026-10-20 | FAIL | 45 | 87.6 | 1.135 | aligned at calls 11–14 but closed above it (floor 2), then over-reached past the orange; overhead camera had moved (confound) |
 
-Counted toward the 20: trials 1–2 (pending the object-fit decision) and 6 → 0/3. Off-protocol: trials 3–5 (onion).
-Pattern over 6: reach 6/6 · object between the jaws at some point 4/6 (2, 3, 5, 6) · a close that held the object 0/6 ·
-lift motions 3 (all empty) · placement on the tray 0. Close-too-high seen twice (5, 6); close-beside seen in 1, 3, 4.
+| 7 (orange, counted) | 2026-10-20 | FAIL | 45 | 78.1 | 0.975 | 15 chunks idle at rest, then closes beside / above the orange |
+| 8 (orange, counted) | 2026-10-20 | FAIL | 45 | 84.7 | 1.202 | 16 chunks idle, side-squeeze (floor 11–13) then above; orange pushed ~10 cm |
+| 9 (orange, counted) | 2026-10-20 | FAIL | 45 | 87.2 | 1.199 | prompt start; between the jaws repeatedly, closes above/beside |
+| 10 (orange, counted) | 2026-10-20 | FAIL | 45 | 85.0 | 1.205 | closed above it at c20, then over-reached far past it and hovered |
+
+Counted toward the 20: trials 1, 2 (pending the object-fit decision), 6, 7, 8, 9, 10 → **0/7**. Off-protocol: trials 3–5 (onion).
+Pattern over 10: reach 10/10 · object between the jaws at some point 8/10 (all but 1, 4) · a close that held the object 0/10 ·
+lift motions 3 (all empty, trials 3, 4, 6) · placement on the tray 0. Close-too-high: 5, 6, 7, 8, 9, 10; close-beside: 1, 3, 4, 8, 9, 10;
+over-reach past the object: 6, 10 (both with the moved overhead camera); idle-at-rest start ≥ 14 chunks: 7, 8.
