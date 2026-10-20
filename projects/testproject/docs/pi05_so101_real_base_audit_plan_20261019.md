@@ -194,10 +194,13 @@ trials 6–10 COUNTED, a real orange that fits the jaws: 5 FAILs → **0/7 count
             one side and the policy retried the same close instead of adjusting. Overhead camera moved before
             trial 6 (not restored; consistent 6–10; over-reach past the object seen in 6 and 10). Trials 7–8
             idled at rest for ~20 s before reaching. Full table in bench_runs.md.
-trials 11–20 pending (13 more if trials 1–2 are excluded under the object-fit rule, 10 if counted). The
-            reading rule (< 5/20 → our own data) cannot flip any more: even 10/10 from here would be 10/20 at
-            best, and 0/7 already makes ≥ 10/20 need 10 straight successes. Decision point for the operator:
-            finish the 20 for the record, or stop here and start R5 (LoRA on top) with 0/7 as the base row.
+trials 11–16 COUNTED, orange placed close-in beside the base: 6 FAILs → **0/13 counted** (2026-10-20). Third
+            placement region, same behaviour: reaches the region, closes beside/above, never holds. Two trials
+            ended in a raised "finished" posture with nothing held.
+trials 17–20 pending (4 more counted, or 7 if trials 1–2 are excluded). The reading is already settled:
+            < 5/20 is guaranteed (0/13 leaves at most 7/20), so the rule's outcome is "our own data is needed
+            and R0 tells us what kind" → R5 (LoRA on top of this checkpoint with our 188 real episodes).
+            Remaining trials are for the record only.
 ```
 Protocol amendment PROPOSED 2026-10-19 (operator to confirm): **object-fit rule.** A trial run with a fruit
 that does not fit between the fully open jaws is an object failure, not a policy result. Such trials are
