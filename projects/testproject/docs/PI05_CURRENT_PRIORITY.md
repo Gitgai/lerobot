@@ -120,10 +120,10 @@ R5   "LoRA on top": freeze the public checkpoint, add rank-16  next     plan: pi
      LoRA trained on our 188 real orange episodes; Isaac gate            (split out 2026-10-19); ½ day build + hours
      vs the base's 76% ("did not break it"), then 20 bench               of training on a free 5090; awaiting go;
      trials on the same grid as the base's 20                            bench 0/2 is NOT yet evidence for it
-R3   "bench trials": 20 real attempts in Pune, NON-PIPELINED  running  2026-10-19: 0/2 — trial 1 jaws beside the
-     client, frames recorded server-side                                 fruit; trial 2 jaws ON the fruit, no enclosure,
-     record: results/so101_bench_20261019/bench_runs.md                  no lift (0.92 s RTT, 42% duty). Fruit looks too
-                                                                        big for the jaws — measure before trial 3
+R3   "bench trials": 20 real attempts in Pune, NON-PIPELINED  running  0/2 counted (citrus, 2026-10-19) + 1 off-protocol
+     client, frames recorded server-side                                 onion FAIL (2026-10-20): reaches every time, closes
+     record: results/so101_bench_20261019/bench_runs.md                  beside the object, one empty-handed lift+release
+                                                                        → grasp pose/timing, not object size alone
      ≥10/20 → Stage 3 starts from this checkpoint; <5/20 → record ours
 ```
 

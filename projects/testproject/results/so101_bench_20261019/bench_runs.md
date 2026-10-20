@@ -59,8 +59,37 @@ a lift would have followed with a graspable orange is not answerable from this t
 
 Montages: montages/ep2_front_every4.jpg, montages/ep2_wrist_key.jpg.
 
+## Trial 3 — 2026-10-20 ~04:2x UTC — OFF-PROTOCOL object (onion) — FAIL (reach OK, jaws beside it, one empty lift)
+Operator's object: a small brown onion (fits the jaws easily; not an orange, so this is a generalisation probe
+and NOT one of the 20). Placed ~12 cm front-left of the base, tray unchanged. Start = rest (wrist_flex 65
+instead of 79 — the return move after trial 2 had stopped short; harmless). 45 chunks, 89 s, median RTT
+1.285 s (slower network than yesterday's 0.92 s; server compute unchanged). Both cameras warmed up (129 / 176).
+
+What the arm did (frames c07_call*, bench_ep3_onion.jsonl):
+- calls 1–7: rest → table in 6 chunks, gripper open (48)
+- calls 8–22: hovered over the onion, three partial closes (30, 19, 11), pan drifting 18 → 25
+- calls 23–24: onion BETWEEN the jaws in the wrist view, gripper closed to 3–4 — but the close landed on the
+  onion's side, not around it; by call 25 the onion is beside the jaw again (nudged)
+- calls 32–35: second full close (3) beside the onion
+- calls 35–37: **lift with the gripper closed** (shoulder_lift 34 → 14, elbow −35 → −8) — the first lift motion
+  seen on the bench — but the jaws were empty (wrist 35/36: onion to the right of the closed jaws); gripper
+  opened to 37 at the top (a "release" with nothing in hand)
+- calls 38–45: back down, two more closes (6, 18), ended extended at [24, 40, −22, 90, −39, 16]; returned
+  to start by the client (reached [1, −104, 97, 65, −2, 48])
+
+Reading: the policy treats the onion as the target (goes to it, no hesitation) — object identity did not
+stop it. The failure is the same grasp-placement error as trials 1–2, now on an object that fits, plus one
+grasp→lift→release sequence executed on an empty gripper: the model believed it had grasped. That is the
+"fragile grasper" of the simulator ladder on real hardware, and the first bench evidence that the gap is
+grasp pose/timing, not object size alone.
+
+Montages: montages/ep3onion_front_every4.jpg, ep3onion_front_lift.jpg (calls 22–38), ep3onion_wrist_key.jpg.
+
 ## Running tally
 | trial | utc | result | chunks | wall s | median RTT s | note |
 |---|---|---|---|---|---|---|
 | 1 | 2026-10-19T19:58:52Z | FAIL | 45 | 74.1 | 0.917 | reached, 10 grasp attempts beside the fruit, black front frames on calls 1–2 |
 | 2 | 2026-10-19T20:12:03Z | FAIL | 45 | 72.8 | 0.918 | reached, jaws on the fruit (gripper floor 10–17), no enclosure, no lift, fruit nudged |
+| 3 (onion, off-protocol) | 2026-10-20 | FAIL | 45 | 89.1 | 1.285 | reached, onion between the jaws once but closed beside it, one empty-handed lift+release, nudged |
+
+Counted toward the 20: trials 1–2 (pending the object-fit decision). Off-protocol: trial 3 (onion).
