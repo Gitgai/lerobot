@@ -18,10 +18,12 @@ dataset:
   use_imagenet_stats: false   # our v2.1 stats carry no image entries (KeyError in the smoke, 2026-10-21); the policy's
                               # VISUAL normalisation is IDENTITY (config.json), so ImageNet stats are never used — no change in the maths
 
-output_dir: /mnt/data4tb/so101-lora-on-top-20261021/row1_author_lora
-job_name: r5_row1_author_lora
-batch_size: 1
-grad_accum_steps: 8          # effective 8, as published
+output_dir: /mnt/data4tb/so101-lora-on-top-20261021/row1_author_lora_b8
+job_name: r5_row1_author_lora_b8
+batch_size: 8                # MICRO-BATCH CHANGE 2026-10-21 (operator go): the published 1 x 8 was written for a 12 GB
+grad_accum_steps: 1          # card and used 13 of 72 GB at 76% util (1.18 s/step). 8 x 1 = the same effective batch 8, same
+                             # lr/schedule/everything; no batch-dependent layers in the model → same maths up to fp ordering.
+                             # The 1 x 8 run (row1_author_lora/, stopped at step ~2.6k, one 8.6 GB ckpt at 2500) is kept for the record.
 steps: 25000                 # 55,660 frames / 8 = 6,958 steps per pass → 25k ≈ 3.6 passes (LIBERO LoRA ran ~3.5)
 num_workers: 4
 seed: 1000

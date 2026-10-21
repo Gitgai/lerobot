@@ -104,9 +104,14 @@ smoke       PASSED 14:46Z. unit r5-smoke, GPU 1, 60 steps, save every 30: loader
             state. Normalisation buffers in the checkpoint == the corpus stats (checked tensor-equal). Resume
             test: unit r5-smoke-resume auto-resumed from step 60 (adapters reloaded), ran to 90, saved. Host
             memory peak 30.7 GB + 5.4 GB swap during the save. Smoke outputs deleted (ledger §4).
-run         ROW 1 STARTED 2026-10-21 14:47Z: unit r5-row1, 25,000 steps, save every 2,500 (10 checkpoints ≈ 86 GB),
-            output /mnt/data4tb/so101-lora-on-top-20261021/row1_author_lora. ETA ≈ 00:00Z 2026-10-22 at 1.2 s/step.
-            Monitor: every 500th step, checkpoints, errors, a HEALTH line (swap, RAM, dir size, GPU) every 30 min.
+run         ROW 1 first launch 2026-10-21 18:47Z (14:47 local; journal stamps are LOCAL = UTC−4): batch 1 × accum 8 as
+            published → 13 of 72 GB, 76% util, 1.18 s/step, loss 0.016 @500, 0.012 @2k, ckpt at 2,500 (19:35Z).
+            STOPPED at ~2.6k on the operator's go (micro-batch change, 19:38Z); that run's dir row1_author_lora/
+            (one 8.6 GB ckpt) is kept for the record (ledger §10).
+            RELAUNCHED 19:40Z as batch 8 × accum 1 (same effective batch, same recipe otherwise), output
+            row1_author_lora_b8/: 34 of 72 GB, 70% util, 0.62 s/step (1.9× faster) → 25k steps ≈ 4.3 h,
+            ETA ≈ 00:00Z 2026-10-22. Loss at step 100: 0.035 (warm-up, lr still 2.6e-6).
+            Monitor: checkpoints, errors, a HEALTH line (latest step/loss/speed, swap, RAM, dir size, GPU) every 30 min.
 config      results/so101_lora_on_top_20261019/row1_author_lora.yaml; launcher run_r5.sh (systemd user units
             r5-smoke / r5-row1; CUDA_VISIBLE_DEVICES=1, HF_HOME on data4tb, TMPDIR on /home).
 ```
