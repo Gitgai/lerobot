@@ -198,6 +198,10 @@ Composites: montages/ep{11..16}orange_composite.jpg.
 | 16 (orange, counted) | 2026-10-20 | FAIL | 45 | 84.6 | 1.210 | orange never in the wrist view; closes on air |
 
 Counted toward the 20: trials 1, 2 (pending the object-fit decision), 6–16 → **0/13**. Off-protocol: trials 3–5 (onion).
+CAMERA CAVEAT (2026-10-21): all 16 trials ran with the C270 as a straight-down OVERHEAD front camera (two
+positions: trials 1–5 and 6–16). Our own real recordings (so101_orange_89_v21, orange79_plus_plate20) used a LOW
+FRONT camera at table height looking toward the base. So 0/13 is the zero-shot number "with an overhead front
+camera", not on the training view; the control row for R5 is to be taken with the C270 in the low front position.
 Pattern over 16: reach 16/16 · object between or touching the jaws at some point 12/16 · a close that held the object 0/16 ·
 lift motions 3 (all empty, trials 3, 4, 6) · placement on the tray 0. Close-too-high: 5, 6, 7, 8, 9, 10, 14; close-beside:
 1, 3, 4, 8, 9, 10, 11, 12, 13, 14, 16; over-reach past the object: 6, 10; idle-at-rest start ≥ 12 chunks: 7, 8, 13, 14, 16;

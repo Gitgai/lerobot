@@ -160,11 +160,12 @@ in our scene; 3,300-ep 11-task Isaac Lab corpus (other scene, train-only);
 3  openpi mirror push (needs operator: create Gitgai/openpi, 3 commands)
 4  ✔ R0 + R4 audit CLOSED 2026-10-20 (95% usable; 13% slot-swap; 96 real orange) · ✔ R1
 5  AWAITING GO (independent, can all start the same day):
-   a  ✔ W0 wrapper → ✔ R2 sim gate → ✔ R3a (no adapter needed) → R3 bench RUNNING: 0/2 on 2026-10-19;
-      trials 3–20 run whenever the operator is at the bench (measure jaw vs fruit first — object-fit rule
-      proposed; one ssh command per trial from AI90; the client returns the arm to start itself)
-      → R5 LoRA on top (plan split out 2026-10-19): can START beside the bench on a free 5090, its Isaac
-      gate needs no arm; its bench row waits for the base's 20 as the control
+   a  ✔ W0 wrapper → ✔ R2 sim gate → ✔ R3a (no adapter needed) → R3 bench: 0/13 counted + 3 onion
+      (2026-10-19/20), reading settled (< 5/20). Caveat: overhead front camera, not the training view.
+      NEXT AT THE BENCH: C270 to the low front position of our recordings, fixed mount, frame check,
+      then 5 zero-shot trials = the R5 control row
+      → R5 LoRA on top (plan split out 2026-10-19): can START NOW on a free 5090 (operator: which GPU);
+      its Isaac gate needs no arm; its bench row runs on the low-front camera against the control row
    b  L7 full FT with EMA in host RAM, GPU 1, ~54 h (plan 2026-10-18)
    c  O0 + O1a orange recorder, GPU 0, days (plan 2026-10-10)
    d  ledger §7 optimizer-state strip (209 GB, RED) · empty Gitgai/openpi repo for the mirror

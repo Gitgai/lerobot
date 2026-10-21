@@ -201,6 +201,11 @@ trials 17–20 pending (4 more counted, or 7 if trials 1–2 are excluded). The 
             < 5/20 is guaranteed (0/13 leaves at most 7/20), so the rule's outcome is "our own data is needed
             and R0 tells us what kind" → R5 (LoRA on top of this checkpoint with our 188 real episodes).
             Remaining trials are for the record only.
+CAMERA       (2026-10-21) all 16 trials used the C270 straight-down OVERHEAD; our 188 training episodes used a
+             LOW FRONT camera at table height (frame check 2026-10-21). Next bench step: move + fix the C270 to
+             the low front position, verify against a recorded frame, then 5 pre-registered zero-shot trials
+             = the R5 control row (0/5 → stop; any success → noted, R5 unchanged). Wrist camera unchanged.
+             The simulator-pose experiment is NOT done (matches 200 sim episodes only; would split the evidence).
 ```
 Protocol amendment PROPOSED 2026-10-19 (operator to confirm): **object-fit rule.** A trial run with a fruit
 that does not fit between the fully open jaws is an object failure, not a policy result. Such trials are
