@@ -199,9 +199,9 @@ trials 11–16 COUNTED, orange placed close-in beside the base: 6 FAILs → **0/
             ended in a raised "finished" posture with nothing held.
 trials 17–20 pending (4 more counted, or 7 if trials 1–2 are excluded). The reading is already settled:
             < 5/20 is guaranteed (0/13 leaves at most 7/20), so the rule's outcome is "our own data is needed
-            and R0 tells us what kind" → R5 (LoRA on top of this checkpoint with our 188 real episodes).
+            and R0 tells us what kind" → R5 (LoRA on top of this checkpoint with our 109 unique real episodes (89 + 20 plate demos; the 99-episode set repeats 79 of the 89)).
             Remaining trials are for the record only.
-CAMERA       (2026-10-21) all 16 trials used the C270 straight-down OVERHEAD; our 188 training episodes used a
+CAMERA       (2026-10-21) all 16 trials used the C270 straight-down OVERHEAD; our 109 training episodes used a
              LOW FRONT camera at table height (frame check 2026-10-21). Next bench step: move + fix the C270 to
              the low front position, verify against a recorded frame, then 5 pre-registered zero-shot trials
              = the R5 control row (0/5 → stop; any success → noted, R5 unchanged). Wrist camera unchanged.
@@ -239,7 +239,7 @@ data is otherwise sound, the next move is "LoRA on top with our real orange epis
 the third option and a multi-day 8-GPU job; it is not scheduled.
 
 ## R5 — LoRA on top of the public checkpoint with our real orange data (proposed 2026-10-19; SPLIT OUT)
-Own plan: **pi05_so101_lora_on_top_plan_20261019.md** (what it means in plain words, the 188-episode data
+Own plan: **pi05_so101_lora_on_top_plan_20261019.md** (what it means in plain words, the 109-episode data
 table, the author's LoRA recipe read from VLASH's async_lora.yaml, the Isaac "did not break it" gate with
 readings, the bench comparison against the base's 20 trials). Summary: freeze dongyoonkim/so101-pi05-base,
 add rank-16 LoRA trained on so101_orange_89_v21 (89) + orange79_plus_plate20 (99), serve through the same

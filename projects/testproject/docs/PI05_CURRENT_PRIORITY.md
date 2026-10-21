@@ -116,10 +116,10 @@ R3a  "bench serving adapter": the wrapper behind the bench   done     2026-10-19
      client + ARM-LESS verification                                      wrapper speaks LeRobot gRPC and the bench
      (remote dry run from the Acer done; replay ladder                   client (bench_client.py) talks to it from
      G1/G2/G4 not run — superseded by the live trial)                     Pune at 0.67–0.92 s per call
-R5   "LoRA on top": freeze the public checkpoint, add rank-16  next     plan: pi05_so101_lora_on_top_plan_20261019.md
-     LoRA trained on our 188 real orange episodes; Isaac gate            (split out 2026-10-19); ½ day build + hours
-     vs the base's 76% ("did not break it"), then 20 bench               of training on a free 5090; awaiting go;
-     trials on the same grid as the base's 20                            bench 0/2 is NOT yet evidence for it
+R5   "LoRA on top": freeze the public checkpoint, add rank-16  running  GO 2026-10-21; GPU 1 (72 GB, free); outputs on
+     LoRA trained on our 109 unique real orange episodes; Isaac gate            /mnt/data4tb/so101-lora-on-top-20261021 (ledger
+     vs the base's 76% ("did not break it"), then bench trials           §10); row 1 = author's VLASH recipe as published;
+     on the low-front camera vs the control row                          build → smoke → train → Isaac gate → bench
 R3   "bench trials": 20 real attempts in Pune, NON-PIPELINED  running  **0/13 counted** (citrus ×2, orange ×11) + 3 off-protocol
      client, frames recorded server-side                                 onion FAILs (2026-10-19/20): reach 16/16, object at
      record: results/so101_bench_20261019/bench_runs.md                  the jaws 12/16, a close that held it 0/16, 3 empty

@@ -67,7 +67,7 @@ variety vs   for the controlled comparison, variety in placements is what matter
 matching     random placements). For the real arm it is the reverse: a pixel policy breaks when the camera
              moves, so matching our rig matters more than variety, and useful variety there is variety
              INSIDE real data (placements, fruit, lighting on our own setup).
-two data     simulated data → the clean method comparison (O1); our 188 real episodes → the arm (R5 / O3).
+two data     simulated data → the clean method comparison (O1); our 109 unique real episodes (89 + 20 plate demos; the 99-episode set repeats 79 of the 89) → the arm (R5 / O3).
 stories      Mixing them in one run is ruled out (standing decision below: real sets for the arm, sim sets
              for the comparison).
 ```

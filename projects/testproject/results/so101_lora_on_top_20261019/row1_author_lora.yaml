@@ -1,0 +1,82 @@
+# R5 row 1 — the checkpoint author's LoRA recipe AS PUBLISHED (vlash/examples/train/pi05/async_lora.yaml @22cbabfe),
+# with only the fields that name OUR inputs/outputs changed: pretrained_path (their SO-101 checkpoint, not pi05_base),
+# dataset (our 109-episode merge), output_dir, steps/save cadence, wandb off, video backend (torchcodec does not load
+# in vlash-venv; pyav does). Plan: docs/pi05_so101_lora_on_top_plan_20261019.md. 2026-10-21.
+
+policy:
+  type: pi05
+  pretrained_path: /mnt/data4tb/huggingface-cache/models--dongyoonkim--so101-pi05-base/snapshots/56325bafcca9ec3155b8bfdf655be7df17e7f09f
+  push_to_hub: false
+  dtype: bfloat16
+  device: cuda
+  state_cond: true
+
+dataset:
+  repo_id: orange89_plus_plate20
+  root: /home/kiran/lerobot_assets/datasets/orange89_plus_plate20
+  video_backend: pyav
+  use_imagenet_stats: false   # our v2.1 stats carry no image entries (KeyError in the smoke, 2026-10-21); the policy's
+                              # VISUAL normalisation is IDENTITY (config.json), so ImageNet stats are never used — no change in the maths
+
+output_dir: /mnt/data4tb/so101-lora-on-top-20261021/row1_author_lora
+job_name: r5_row1_author_lora
+batch_size: 1
+grad_accum_steps: 8          # effective 8, as published
+steps: 25000                 # 55,660 frames / 8 = 6,958 steps per pass → 25k ≈ 3.6 passes (LIBERO LoRA ran ~3.5)
+num_workers: 4
+seed: 1000
+
+use_policy_training_preset: false
+optimizer:
+  type: adamw
+  lr: 5.0e-5
+  betas: [0.9, 0.95]
+  weight_decay: 1.0e-10
+
+scheduler:
+  type: cosine_decay_with_warmup
+  num_warmup_steps: 1000
+  peak_lr: 5.0e-5
+  decay_lr: 2.5e-6
+  num_decay_steps: 25000
+
+save_checkpoint: true
+save_freq: 2500              # standing rule: every 2.5k steps
+
+log_freq: 100
+wandb:
+  enable: false
+  project: vlash
+  entity: null
+  disable_artifact: true
+
+max_delay_steps: 8           # author's async recipe kept (plan: option b); harmless for a non-pipelined client
+
+lora:
+  enable: true
+  backend: peft
+  extra_trainable_modules:
+    - action_in_proj
+    - action_out_proj
+    - time_mlp_in
+    - time_mlp_out
+    - state_proj
+    - state_mlp_in
+    - state_mlp_out
+    - embeddings
+    - input_layernorm
+    - post_attention_layernorm
+  r: 16
+  alpha: 16
+  dropout: 0
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+    - out_proj
+    - fc1
+    - fc2

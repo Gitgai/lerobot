@@ -159,6 +159,16 @@ still present; §7 proposal still open). /tmp (tmpfs 30 GB, user quota shared wi
 is back to 22 GB of DYNUS working trees — the condition that killed the Bash tool on 2026-10-10
 recurs at ~30 GB.
 
+## 10. NEW ALLOCATION 2026-10-21 — R5 LoRA on top (operator: "choose whichever GPU, SSD you like")
+Path: /mnt/data4tb/so101-lora-on-top-20261021/ (data4tb: 772 GB used of 3.6 TB, 2.9 TB free at 04:4xZ).
+Contents: VLASH training outputs every 2.5k steps. CORRECTED 2026-10-21 14:43Z from the smoke: VLASH saves the
+FULL merged model.safetensors (7.5 GB) + lora_adapters/ + 1.2 GB optimizer state = 8.6 GB per checkpoint, not
+MBs → 10 checkpoints ≈ 86 GB for the 25k-step run (+ smoke, deleted after it passes, rule §4). Budget: ~100 GB;
+alert at 150 GB. Stripping model.safetensors from non-final checkpoints afterwards (adapters + base rebuild it)
+is a deletion → RED, ask first. Train logs and the Isaac gate's frames are small. Nothing on
+root except the repo's small JSON/config under results/so101_lora_on_top_20261019/. GPU 1 (72 GB) for training
+and the Isaac gate; GPU 0 untouched (operator's LoRA server pid 2840093, bench wrapper pid 1569398).
+
 ## 9. INCIDENT 2026-10-20 ~02:00Z — /tmp user quota exhausted again (second time; first 2026-10-10)
 Measured from the kernel (quotactl_fd on /tmp): uid 1000 hard = soft limit 23.68 GiB, used 23.68 GiB; the
 tmpfs itself is 30 GB with 6 GB free. Content: DYNUS working trees (dynus_a2b2_git, dynus-l2-original,
