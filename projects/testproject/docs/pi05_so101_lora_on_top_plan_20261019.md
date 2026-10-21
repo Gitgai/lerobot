@@ -41,6 +41,16 @@ base              pretrained_path = dongyoonkim/so101-pi05-base (their yaml says
 LoRA              peft, r 16, alpha 16, dropout 0; targets q/k/v/o_proj, gate/up/down_proj, out_proj, fc1, fc2;
                   extra trainable: action_in/out_proj, time_mlp_in/out, state_proj, state_mlp_in/out,
                   embeddings, input/post_attention layernorm
+what trains       NOT the same trainable set as the LIBERO LoRA (operator's point, 2026-10-21). openpi's LoRA
+                  freeze filter (pi0_config.get_freeze_filter) freezes only the ".*llm.*" transformer weights;
+                  the SigLIP vision encoder trained FULLY there (415M of 467M trainable, RESULTS doc §open items).
+                  VLASH's config puts LoRA on the vision tower too (fc1/fc2/out_proj are SigLIP module names) and
+                  fully trains only the small projections, embeddings and layernorms → far fewer trainable
+                  parameters. Our rig gap is visual (cameras), so the vision-encoder choice is the knob most
+                  likely to matter. Row 1 = the author's recipe as published (rule: never bend a published
+                  recipe on the first run). Row 2, only if row 1 is partial = LIBERO-style: vision encoder fully
+                  trainable + LoRA in the transformers. With 188 episodes (92k frames vs LIBERO's ~270k) row 2
+                  carries a real overfitting/forgetting risk — the Isaac gate is what catches it.
 optimiser         adamw lr 5e-5, betas (0.9, 0.95), wd 1e-10; cosine with 1k warm-up → 2.5e-6
 batch             1 × grad_accum 8 = 8 (their consumer-GPU setting); steps 50,000 in the template
 dtype             bfloat16 (their recipe; the openpi "no half precision" rule is openpi's recipe, not VLASH's —
