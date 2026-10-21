@@ -97,9 +97,16 @@ normalise   the checkpoint's model.safetensors carries its own MEAN_STD buffers 
             dataset's stats.json is therefore not on the maths path. (Verify once on the smoke checkpoint: the
             saved buffers must equal the values above.)
 video       torchcodec fails to load in vlash-venv → video_backend pyav (15.1.0).
-smoke       unit r5-smoke, GPU 1, 60 steps, save every 30: loader OK (v2.1 compat), 154M learnable of 3.77B
-            (LoRA + the listed extra modules), loss 0.037 at step 10, 1.32 s per optimizer step (batch 1 × accum 8)
-            → 25k steps ≈ 9.2 h. Resume test after the smoke.
+smoke       PASSED 14:46Z. unit r5-smoke, GPU 1, 60 steps, save every 30: loader OK (v2.1 compat), 154M learnable
+            of 3.77B (LoRA + the listed extra modules), loss 0.037 → 0.023, 1.1–1.3 s per optimizer step (batch 1
+            × accum 8). Checkpoint = 8.6 GB: model.safetensors is the MERGED model (824 tensors, no LoRA keys —
+            directly servable by the bench wrapper) + lora_adapters/ (571 MB, 1,332 tensors) + 1.2 GB optimizer
+            state. Normalisation buffers in the checkpoint == the corpus stats (checked tensor-equal). Resume
+            test: unit r5-smoke-resume auto-resumed from step 60 (adapters reloaded), ran to 90, saved. Host
+            memory peak 30.7 GB + 5.4 GB swap during the save. Smoke outputs deleted (ledger §4).
+run         ROW 1 STARTED 2026-10-21 14:47Z: unit r5-row1, 25,000 steps, save every 2,500 (10 checkpoints ≈ 86 GB),
+            output /mnt/data4tb/so101-lora-on-top-20261021/row1_author_lora. ETA ≈ 00:00Z 2026-10-22 at 1.2 s/step.
+            Monitor: every 500th step, checkpoints, errors, a HEALTH line (swap, RAM, dir size, GPU) every 30 min.
 config      results/so101_lora_on_top_20261019/row1_author_lora.yaml; launcher run_r5.sh (systemd user units
             r5-smoke / r5-row1; CUDA_VISIBLE_DEVICES=1, HF_HOME on data4tb, TMPDIR on /home).
 ```
