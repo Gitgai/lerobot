@@ -112,6 +112,12 @@ run         ROW 1 first launch 2026-10-21 18:47Z (14:47 local; journal stamps ar
             row1_author_lora_b8/: 34 of 72 GB, 70% util, 0.62 s/step (1.9× faster) → 25k steps ≈ 4.3 h,
             ETA ≈ 00:00Z 2026-10-22. Loss at step 100: 0.035 (warm-up, lr still 2.6e-6).
             Monitor: checkpoints, errors, a HEALTH line (latest step/loss/speed, swap, RAM, dir size, GPU) every 30 min.
+serving     BUG FOUND AND FIXED before the gate (21:30Z): LoRA checkpoints save image features as observation.images.
+            front/.wrist (our dataset's names); the wrapper hard-coded base_0_rgb/left_wrist_0_rgb → both slots would
+            have been "missing" and the model blind. Wrapper now reads slot names from the checkpoint config in order.
+            Served the 010000 checkpoint on :8082 beside the training: slots mapped front→front, wrist→wrist; one real
+            frame pair + state from episode 0 → a0 within 1.8 units of the state and 1.7 of the recorded next action;
+            300 ms per call uncompiled on the busy GPU. The bench wrapper (base) is unaffected (same names as before).
 config      results/so101_lora_on_top_20261019/row1_author_lora.yaml; launcher run_r5.sh (systemd user units
             r5-smoke / r5-row1; CUDA_VISIBLE_DEVICES=1, HF_HOME on data4tb, TMPDIR on /home).
 ```
