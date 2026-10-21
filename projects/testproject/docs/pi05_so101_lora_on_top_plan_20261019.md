@@ -131,6 +131,16 @@ readings  ≥ ~65% (within the 95% CI of 76 at n=100)   → base intact; go to t
           < 40%                                       → broken; do not bench; check the slot map and the instruction first
 also      open-loop MAE on the 10 held-out real episodes vs the base's MAE on the same (sanity floor, not success)
 ```
+Pre-registered rows (2026-10-21, launcher results/so101_lora_on_top_20261019/run_isaac_gate.sh, everything on GPU 1,
+LoRA server :8081, Isaac headless, 50 seeded episodes per row, the SAME seeds as the base's control rows):
+```text
+row      instruction                                        seeds     control (base)   what it tests
+corpusA  "Grab oranges and place into plate."               100–149   38/50 = 76%      forgetting (the gate proper)
+plateC   "pick up the orange and place it on the plate"     300–349   none scored      our own plate wording on the Isaac task
+oursB    "pick up the orange and move it to another place"  200–249   16/50 = 32%      optional (WITH_OURSB=1): our other wording
+which ckpt  the final one (025000) first; a second checkpoint (012500) only if the final fails the gate
+reading     corpusA ≥ ~65% → go to the bench; 40–65% → partial forgetting, see recipe row 2 / fewer steps; < 40% → broken
+```
 
 ## Bench after the gate
 Same R3 protocol, same client, same 20-placement grid, same fruit as the base's trials (so the two 20-trial

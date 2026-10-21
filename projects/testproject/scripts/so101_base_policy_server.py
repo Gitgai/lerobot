@@ -85,12 +85,20 @@ def main():
                 cfg = PreTrainedConfig.from_pretrained(a.ckpt)
                 cfg.empty_cameras = 2; cfg.device = "cuda"; cfg.compile_model = bool(a.compile)   # fill up to 2 missing slots (1- or 2-camera clients)
                 cfg.n_action_steps = min(self.actions_per_chunk, cfg.chunk_size); cfg.num_inference_steps = a.num_inference_steps
+                # slot names come from the CHECKPOINT's config, in order: external first, wrist second. The public base
+                # names them base_0_rgb / left_wrist_0_rgb / right_wrist_0_rgb; our LoRA checkpoints (trained on our
+                # dataset) name them observation.images.front / .wrist (found 2026-10-21) — hard-coded names would have
+                # left both slots "missing" and the model blind.
+                img_feats = list(cfg.image_features.keys()) if getattr(cfg, "image_features", None) else list(SLOTS.values())
+                self.slot_ext = img_feats[0] if img_feats else SLOTS["front"]
+                self.slot_wrist = img_feats[1] if len(img_feats) > 1 else SLOTS["wrist"]
+                log.info("checkpoint image slots %s → external=%s wrist=%s", img_feats, self.slot_ext, self.slot_wrist)
                 t0 = time.perf_counter()
                 self.policy = get_policy_class(cfg.type).from_pretrained(a.ckpt, config=cfg); self.policy.eval()
                 log.info("VLASH pi05 loaded in %.1fs: chunk %d, n_action_steps %d, infer steps %d, compile %s",
                          time.perf_counter() - t0, cfg.chunk_size, cfg.n_action_steps, cfg.num_inference_steps, a.compile)
                 # warm-up (compile) on a dummy observation so the first real call is not minutes long
-                dummy = {v: torch.zeros(1, 3, 480, 640, device="cuda") for v in SLOTS.values()}
+                dummy = {v: torch.zeros(1, 3, 480, 640, device="cuda") for v in (self.slot_ext, self.slot_wrist)}
                 dummy["observation.state"] = torch.zeros(1, 6, device="cuda"); dummy["task"] = "warm up"
                 with torch.inference_mode():
                     for _ in range(3): self.policy.predict_action_chunk(dummy)
@@ -119,9 +127,10 @@ def main():
             is_wrist = lambda k: any(t in k.lower() for t in ("wrist", "handeye", "gripper", "endeff", "hand", "ego"))
             wrist_keys = [k for k in img_keys if is_wrist(k)]; ext_keys = [k for k in img_keys if not is_wrist(k)]
             mapping = {}
-            if ext_keys: mapping[ext_keys[0]] = "observation.images.base_0_rgb"
-            if wrist_keys: mapping[wrist_keys[0]] = "observation.images.left_wrist_0_rgb"
-            elif len(ext_keys) > 1: mapping[ext_keys[1]] = "observation.images.left_wrist_0_rgb"   # second external view in the wrist slot (as the corpus did)
+            slot_ext = getattr(self, "slot_ext", SLOTS["front"]); slot_wrist = getattr(self, "slot_wrist", SLOTS["wrist"])
+            if ext_keys: mapping[ext_keys[0]] = slot_ext
+            if wrist_keys: mapping[wrist_keys[0]] = slot_wrist
+            elif len(ext_keys) > 1: mapping[ext_keys[1]] = slot_wrist   # second external view in the wrist slot (as the corpus did)
             if not hasattr(self, "_mapping_logged") or self._mapping_logged != mapping:
                 log.info("camera mapping for this client: %s (image keys seen: %s)", mapping, img_keys); self._mapping_logged = mapping
             for k, slot in mapping.items():
