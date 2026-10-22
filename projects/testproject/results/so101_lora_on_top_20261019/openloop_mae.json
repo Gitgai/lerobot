@@ -1,0 +1,82 @@
+{
+ "episodes": [
+  2,
+  8,
+  13,
+  14,
+  16,
+  54,
+  56,
+  60,
+  75,
+  80
+ ],
+ "stride": 15,
+ "results": {
+  "base": {
+   "path": "/mnt/data4tb/huggingface-cache/models--dongyoonkim--so101-pi05-base/snapshots/56325bafcca9ec3155b8bfdf655be7df17e7f09f",
+   "n_probes": 302,
+   "mae_per_joint": {
+    "shoulder_pan": 7.090000152587891,
+    "shoulder_lift": 5.980000019073486,
+    "elbow_flex": 8.369999885559082,
+    "wrist_flex": 5.46999979019165,
+    "wrist_roll": 2.930000066757202,
+    "gripper": 8.34000015258789
+   },
+   "mae_arm_joints_mean": 5.96999979019165,
+   "mae_gripper": 8.34000015258789,
+   "gripper_open_close_agreement_at_step10": 0.725,
+   "secs": 42.5
+  },
+  "lora05k": {
+   "path": "/mnt/data4tb/so101-lora-on-top-20261021/row1_author_lora_b8/checkpoints/005000/pretrained_model",
+   "n_probes": 302,
+   "mae_per_joint": {
+    "shoulder_pan": 2.690000057220459,
+    "shoulder_lift": 4.03000020980835,
+    "elbow_flex": 4.989999771118164,
+    "wrist_flex": 4.679999828338623,
+    "wrist_roll": 2.450000047683716,
+    "gripper": 3.450000047683716
+   },
+   "mae_arm_joints_mean": 3.7699999809265137,
+   "mae_gripper": 3.450000047683716,
+   "gripper_open_close_agreement_at_step10": 0.818,
+   "secs": 45.4
+  },
+  "lora12k": {
+   "path": "/mnt/data4tb/so101-lora-on-top-20261021/row1_author_lora_b8/checkpoints/012500/pretrained_model",
+   "n_probes": 302,
+   "mae_per_joint": {
+    "shoulder_pan": 2.0799999237060547,
+    "shoulder_lift": 3.880000114440918,
+    "elbow_flex": 4.130000114440918,
+    "wrist_flex": 3.5,
+    "wrist_roll": 2.059999942779541,
+    "gripper": 2.559999942779541
+   },
+   "mae_arm_joints_mean": 3.130000114440918,
+   "mae_gripper": 2.559999942779541,
+   "gripper_open_close_agreement_at_step10": 0.871,
+   "secs": 44.7
+  },
+  "lora25k": {
+   "path": "/mnt/data4tb/so101-lora-on-top-20261021/row1_author_lora_b8/checkpoints/025000/pretrained_model",
+   "n_probes": 302,
+   "mae_per_joint": {
+    "shoulder_pan": 1.690000057220459,
+    "shoulder_lift": 3.0999999046325684,
+    "elbow_flex": 3.7799999713897705,
+    "wrist_flex": 3.0799999237060547,
+    "wrist_roll": 1.6399999856948853,
+    "gripper": 2.0899999141693115
+   },
+   "mae_arm_joints_mean": 2.6600000858306885,
+   "mae_gripper": 2.0899999141693115,
+   "gripper_open_close_agreement_at_step10": 0.877,
+   "secs": 42.7
+  }
+ },
+ "utc": "2026-10-22T01:47:44Z"
+}

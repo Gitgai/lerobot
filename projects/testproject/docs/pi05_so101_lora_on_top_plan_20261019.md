@@ -173,6 +173,18 @@ ckpt 012500  corpusA  running (01:32Z, 20 episodes, recorder on). Episode 1 time
              the scene renders correctly in both cameras (plate, three oranges, arm), so cause (c) serving is ruled
              out. Behaviour: the arm goes to the oranges, hovers with the gripper pointing down, nudges them, never
              closes on one — the bench behaviour reproduced in the scene where the base scored 76%.
+open-loop    (02:0xZ, openloop_mae.py, 302 probe frames from the 10 August hold-out episodes of orange_89, every 15th
+             frame; next-10 actions vs the recorded ones; LeRobot units) — did the fine-tune move the model toward OUR
+             demonstrations? Yes, monotonically with steps. NOTE these 10 episodes are inside the R5 training set, so
+             for the LoRA rows this is a seen-data floor; for the base they are unseen.
+               model     arm-joint MAE (°)   gripper MAE   gripper open/close agreement at step 10
+               base            5.97              8.34               0.725
+               lora 5k         3.77              3.45               0.818
+               lora 12.5k      3.13              2.56               0.871
+               lora 25k        2.66              2.09               0.877
+             Reading: the adapters learned our rig's motions (the gripper timing above all: 8.3 → 2.1) while the
+             Isaac skill was lost. Whether "learned our motions" turns into grasps on the bench is exactly what the
+             bench row will measure — the Isaac gate cannot answer that for a model trained only on our table.
 reading      the final checkpoint FORGOT the Isaac scene. Candidate causes, to be separated by the next rows:
              (a) too many steps for 109 episodes of one rig (25k = 3.6 passes; the base's own skill drifted away) →
                  earlier checkpoints 012500 and 005000 on corpusA, 20 episodes each;
