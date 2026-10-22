@@ -169,7 +169,7 @@ ckpt 025000  corpusA  0/5, all five timed out at the 100 s cap (base: 4/5 on the
              DEVIATION from the 50-episode pre-registration, recorded here; the 5 episodes are the result.
 ckpt 025000  plateC   0/5, all timed out (seeds 300–304; our own trained wording). Stopped at 5 (01:32Z), same rule.
              → cause (b), the instruction, is ruled out: a wording it was trained on fails identically.
-ckpt 012500  corpusA  running (01:32Z, 20 episodes, recorder on). Episode 1 timed out. FRAMES (montage_012500_ep1.jpg):
+ckpt 012500  corpusA  0/5, all timed out (seeds 100–104; base 4/5). Stopped at 5 (02:10Z). FRAMES (montage_012500_ep1.jpg):
              the scene renders correctly in both cameras (plate, three oranges, arm), so cause (c) serving is ruled
              out. Behaviour: the arm goes to the oranges, hovers with the gripper pointing down, nudges them, never
              closes on one — the bench behaviour reproduced in the scene where the base scored 76%.
