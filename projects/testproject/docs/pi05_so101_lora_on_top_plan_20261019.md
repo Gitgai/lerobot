@@ -197,7 +197,7 @@ PARTIAL      (04:5xZ) The binary gate hides how far each model gets. From the re
 PROGRESS     each 100 s episode (montage_episode_ends_by_row.jpg; success needs all 3 oranges on the plate + rest pose):
                row-1 12.5k   oranges on plate at timeout: 0, 1, 2, 1, 0   (4 of 15)
                row-1 5k                                    0, 0, 0, 0, 0   (0 of 15)
-               row-2 7k      ep1–3 so far:                 2, 1, 2         (5 of 9)
+               row-2 7k      binary 0/5 (04:55Z);          2, 1, 2, 1, 2   (8 of 15)  — montage_row2_007000_ends.jpg
                base          38/50 full successes in a mean 119 s wall (all 3 oranges + rest)
              Reading: the fine-tuned models are not blind and not "broken" — they pick and place oranges in the Isaac
              scene, but SLOWER and less reliably than the base, and the 100 s cap turns "2 of 3 placed" into a 0.
