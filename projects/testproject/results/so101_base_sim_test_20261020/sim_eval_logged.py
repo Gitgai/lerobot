@@ -132,6 +132,26 @@ def preprocess_obs_dict(obs_dict: dict, model_type: str, language_instruction: s
         raise ValueError(f"Model type {model_type} not supported")
 
 
+
+def _oranges_on_plate(env):
+    """Our harness (2026-10-22): how many oranges sit inside the plate box of the task's own success predicate
+    (x/y within ±0.10 m of the plate, height within ±0.07 m), plus whether the arm is at rest. None on any error."""
+    try:
+        import torch as _t
+        from leisaac.utils.robot_utils import is_so101_at_rest_pose
+        sc = env.unwrapped.scene; org = sc.env_origins[0]
+        pl = sc["Plate"].data.root_pos_w[0] - org
+        n = 0
+        for name in ("Orange001", "Orange002", "Orange003"):
+            o = sc[name].data.root_pos_w[0] - org
+            if abs(float(o[0] - pl[0])) < 0.10 and abs(float(o[1] - pl[1])) < 0.10 and abs(float(o[2] - pl[2])) < 0.07:
+                n += 1
+        rb = sc["robot"].data
+        rest = bool(is_so101_at_rest_pose(rb.joint_pos, rb.joint_names)[0])
+        return n, rest
+    except Exception as e:  # noqa: BLE001
+        print(f"[harness] oranges_on_plate failed: {e}", flush=True); return None, None
+
 def main():
     """Running lerobot teleoperation with leisaac manipulation environment."""
 
@@ -260,7 +280,8 @@ def main():
                     if rate_limiter:
                         rate_limiter.sleep(env)
             if success or time_out:
-                _rec = {"episode": episode_count, "success": bool(success), "time_out": bool(time_out), "steps": _steps, "policy_calls": _calls, "wall_s": round(time.time() - _t_ep, 1), "seed": int(env_cfg.seed), "task": args_cli.task, "instruction": args_cli.policy_language_instruction, "utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}
+                _n_plate, _rest = _oranges_on_plate(env)
+                _rec = {"episode": episode_count, "success": bool(success), "time_out": bool(time_out), "oranges_on_plate": _n_plate, "at_rest": _rest, "steps": _steps, "policy_calls": _calls, "wall_s": round(time.time() - _t_ep, 1), "seed": int(env_cfg.seed), "task": args_cli.task, "instruction": args_cli.policy_language_instruction, "utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}
                 print("[RESULT] " + _json.dumps(_rec), flush=True); _sys.stderr.write("[RESULT] " + _json.dumps(_rec) + "\n"); _sys.stderr.flush()
                 if _res: _res.write(_json.dumps(_rec) + "\n"); _res.flush()
                 _t_ep = time.time(); _steps = 0; _calls = 0
