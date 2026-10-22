@@ -167,7 +167,10 @@ MBs → 10 checkpoints ≈ 86 GB for the 25k-step run (+ smoke, deleted after it
 alert at 150 GB. Stripping model.safetensors from non-final checkpoints afterwards (adapters + base rebuild it)
 is a deletion → RED, ask first. Train logs and the Isaac gate's frames are small. 2026-10-21 19:38Z: the first
 launch (batch 1 × 8) was stopped after one checkpoint; row1_author_lora/ (8.6 GB) stays until the operator says
-otherwise; the live run writes to row1_author_lora_b8/. Nothing on
+otherwise; the live run writes to row1_author_lora_b8/. 2026-10-22 07:50Z: directory = 145 GB (row1 first launch
+8.6 + row1_b8 86 + row2_conservative_lora 51, seven 7.3 GB ckpts); data4tb 917 GB used, 2.7 TB free. Under the
+150 GB alert; a further training row needs either a higher budget here or the operator's OK to strip the
+non-final checkpoints' model.safetensors (adapters + base rebuild them). Nothing on
 root except the repo's small JSON/config under results/so101_lora_on_top_20261019/. GPU 1 (72 GB) for training
 and the Isaac gate; GPU 0 untouched (operator's LoRA server pid 2840093, bench wrapper pid 1569398).
 

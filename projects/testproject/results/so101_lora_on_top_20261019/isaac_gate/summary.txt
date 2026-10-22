@@ -1,0 +1,15 @@
+results_lora_012500_corpusA.jsonl: 0/5
+=== GATE DONE lora_012500 2026-10-22T02:11:58Z
+results_lora_005000_corpusA.jsonl: 0/5
+=== GATE DONE lora_005000 2026-10-22T02:50:39Z
+=== QUEUE DONE 2026-10-22T02:50:39Z
+results_row2_007000_corpusA.jsonl: 0/5
+=== GATE DONE row2_007000 2026-10-22T04:54:56Z
+results_row2_003000_corpusA.jsonl: 0/5
+=== GATE DONE row2_003000 2026-10-22T05:32:23Z
+=== ROW2 QUEUE DONE 2026-10-22T05:32:23Z
+results_row2_007000_cap200_corpusA.jsonl: 2/5
+=== GATE DONE row2_007000_cap200 2026-10-22T06:33:47Z
+results_lora_025000_cap200_corpusA.jsonl: 0/5
+=== GATE DONE lora_025000_cap200 2026-10-22T07:48:22Z
+=== LONGCAP QUEUE DONE 2026-10-22T07:48:22Z

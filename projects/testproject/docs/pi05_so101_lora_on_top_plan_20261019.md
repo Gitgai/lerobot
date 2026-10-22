@@ -246,6 +246,29 @@ reading      the final checkpoint FORGOT the Isaac scene. Candidate causes, to b
                  recorder will be on for the next rows (RECORD_EVERY=25) to see the frames.
 ```
 
+### Simulator stage CLOSED 2026-10-22 07:48Z — summary table and decision
+```text
+                         open-loop on OUR frames        Isaac PickOrange, seeds 100–104, corpus wording
+model                    arm MAE °  grip MAE  agree    100 s cap: success / oranges placed   200 s cap: success / oranges
+base (public ckpt)         5.75      8.84     0.69     4/5 (38/50 overall)                   —
+row 1 (author recipe) 5k   3.77      3.45     0.82     0/5 · 0 of 15 (frames)               —
+row 1 12.5k                3.13      2.56     0.87     0/5 · 4 of 15 (frames)               —
+row 1 25k (final)          2.62      2.08     0.89     0/5 (corpus) · 0/5 (plate wording)   0/5 · 2 of 15 (logged)
+row 2 (conservative) 3k    4.19      4.68     0.84     0/5 · 9 of 15 (frames)               —
+row 2 7k (final)           4.00      4.22     0.85     0/5 · 8 of 15 (frames)               2/5 FULL · (31 s and 183 s)
+```
+Reading. Both recipes learned our rig's motions (open-loop). The author's recipe learned them best and lost most
+of the base's Isaac competence; the conservative recipe learned about half as much and kept most of it, completing
+the whole three-orange task in 2 of 5 under a 200 s cap. Neither is "broken". The pre-registered gate (≥ ~65% at
+100 s) was the wrong instrument for a model trained on one rig: it measured pace and forgetting together.
+Decision: BOTH finals go to the bench, with the public base as the control row, on the low-front camera:
+  bench order   control (base) → row-2 7k (primary candidate: competence kept) → row-1 25k (best fit to our data)
+  per model     5 placements first (same grid for all three), extend to 10 if any model scores ≥ 2/5
+  instruction   "pick up the orange and place it on the plate" for the fine-tuned rows (their training string);
+                the base gets the corpus wording as before; serving = the same wrapper, port 8080, GPU 1 free now
+Disk: /mnt/data4tb/so101-lora-on-top-20261021 = 145 GB (row 1 94 incl. the stopped first launch, row 2 51); under the
+150 GB alert; nothing to delete without the operator (RED).
+
 ## Bench after the gate
 Same R3 protocol, same client, same 20-placement grid, same fruit as the base's trials (so the two 20-trial
 sets compare), instruction = the dataset's own string. The base's 20 are the control row. Reading: the
