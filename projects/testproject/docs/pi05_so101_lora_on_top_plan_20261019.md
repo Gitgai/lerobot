@@ -193,6 +193,18 @@ ROW 2 DONE   04:07Z: 7,000 steps in 77 min (0.61 s/step), loss 0.038 → 0.010, 
                open/close   .808  .808  .838  .851  .838  .841  .851  | .689  | .887
              Reading: the conservative recipe moves the model about HALF-way toward our demonstrations and then
              plateaus from step 3k on (lr already decaying). Isaac rows for 7k and 3k follow (5 episodes each).
+PARTIAL      (04:5xZ) The binary gate hides how far each model gets. From the recorded overhead frame at the END of
+PROGRESS     each 100 s episode (montage_episode_ends_by_row.jpg; success needs all 3 oranges on the plate + rest pose):
+               row-1 12.5k   oranges on plate at timeout: 0, 1, 2, 1, 0   (4 of 15)
+               row-1 5k                                    0, 0, 0, 0, 0   (0 of 15)
+               row-2 7k      ep1–3 so far:                 2, 1, 2         (5 of 9)
+               base          38/50 full successes in a mean 119 s wall (all 3 oranges + rest)
+             Reading: the fine-tuned models are not blind and not "broken" — they pick and place oranges in the Isaac
+             scene, but SLOWER and less reliably than the base, and the 100 s cap turns "2 of 3 placed" into a 0.
+             Our 109 demonstrations are single-orange, 25 s each; the model may have inherited that pace. Row 2 keeps
+             more of the base's competence than row 1 (5/9 vs 4/15 oranges), consistent with less drift.
+             Next diagnostics: (i) log oranges-on-plate in the eval JSON instead of reading frames; (ii) re-run row-2
+             7k and row-1 25k with a 200 s cap, 5 episodes, to separate "slower" from "cannot".
 open-loop    (02:0xZ, openloop_mae.py, 302 probe frames from the 10 August hold-out episodes of orange_89, every 15th
              frame; next-10 actions vs the recorded ones; LeRobot units) — did the fine-tune move the model toward OUR
              demonstrations? Yes, monotonically with steps. NOTE these 10 episodes are inside the R5 training set, so
