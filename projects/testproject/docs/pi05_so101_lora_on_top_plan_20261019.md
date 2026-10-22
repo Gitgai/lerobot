@@ -216,6 +216,10 @@ PROGRESS     each 100 s episode (montage_episode_ends_by_row.jpg; success needs 
              (its frames must be read instead); the 200 s row-2 run logged 0 for ep1 while its frames show one orange
              on the plate from call 226 to the end. Fixed: the count is taken before each step and the last pre-step
              value is reported. In force from the row-1 25k 200 s row onward.
+200 s CAP    row-2 7k, seeds 100–104 (06:34Z): **2/5 FULL SUCCESSES** (seed 101 in 183 s sim; seed 102 in 31 s — faster
+             than the base's 52 s on that seed), 3 timeouts. Base: 4/5 on these seeds under the 100 s cap.
+             → "slower, not cannot": the gentle fine-tune completes the whole Isaac task (3 oranges + rest) in 2 of 5,
+             at a pace that the 100 s gate hid. Row-1 25k at 200 s runs next (counter fixed for that row).
              200 s cap, row-2 7k, ep1 (frames): one orange placed by call ~200, then 400 calls hovering over the other
              two without a grasp — the same seed placed two under the 100 s cap: the policy's sampling is stochastic,
              so 5-episode rows carry ±1-orange noise per episode.
