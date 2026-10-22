@@ -160,6 +160,25 @@ which ckpt  the final one (025000) first; a second checkpoint (012500) only if t
 reading     corpusA ≥ ~65% → go to the bench; 40–65% → partial forgetting, see recipe row 2 / fewer steps; < 40% → broken
 ```
 
+### Gate results (2026-10-22)
+```text
+ckpt 025000  corpusA  0/5, all five timed out at the 100 s cap (base: 4/5 on the same seeds 100–104; 38/50 overall).
+             Server log: the arm reaches out over the oranges and cycles the gripper for the whole episode — the
+             bench behaviour, now in the scene where the base scored 76%. Row STOPPED at 5 by me (00:53Z): each
+             timeout costs 7 min and 0/5 against 4/5 is already far below the pre-registered < 40% "broken" line.
+             DEVIATION from the 50-episode pre-registration, recorded here; the 5 episodes are the result.
+             plateC (our own plate wording, seeds 300+) running next with 20 episodes (diagnostic size), 00:55Z.
+reading      the final checkpoint FORGOT the Isaac scene. Candidate causes, to be separated by the next rows:
+             (a) too many steps for 109 episodes of one rig (25k = 3.6 passes; the base's own skill drifted away) →
+                 earlier checkpoints 012500 and 005000 on corpusA, 20 episodes each;
+             (b) the instruction: "Grab oranges…" never appeared in our 109 episodes and the recipe trains the
+                 token EMBEDDINGS (extra_trainable_modules) → plateC (a trained wording) tells us if the language
+                 channel still works at all;
+             (c) nothing wrong with the model, only with serving → the slot/layout checks passed and the server
+                 answers every call; the same wrapper scores the base at 76%, so (c) is unlikely but the
+                 recorder will be on for the next rows (RECORD_EVERY=25) to see the frames.
+```
+
 ## Bench after the gate
 Same R3 protocol, same client, same 20-placement grid, same fruit as the base's trials (so the two 20-trial
 sets compare), instruction = the dataset's own string. The base's 20 are the control row. Reading: the

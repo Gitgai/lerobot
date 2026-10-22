@@ -9,6 +9,7 @@
 # Everything on GPU 1 (policy server + Isaac Sim); GPU 0 keeps the operator's server and the bench wrapper.
 set -euo pipefail
 STEP=${1:?checkpoint step dir name, e.g. 025000}; TAG=${2:-lora_${STEP}}
+ROWS=${ROWS:-corpusA,plateC}; EPISODES=${EPISODES:-50}   # 2026-10-22: ROWS/EPISODES overrides for diagnostic rows (timeouts cost 7 min each)
 RUN=/mnt/data4tb/so101-lora-on-top-20261021/row1_author_lora_b8
 CK=$RUN/checkpoints/$STEP/pretrained_model
 OUT=/home/kiran/projects/git/nvidia/lerobot/projects/testproject/results/so101_lora_on_top_20261019
@@ -25,9 +26,9 @@ systemd-run --user --unit=so101-lora-server --collect \
 echo "so101-lora-server started on :8081 (GPU 1) with $CK"
 # 2) the three rows, Isaac on GPU 1 too; results_<tag>_<row>.jsonl in $OUT/isaac_gate
 export OUTDIR=$OUT/isaac_gate PORT=8081 SIM_GPU=1 CKPT_LABEL=$CK HEADLESS=1
-bash $SIM/run_sim_test.sh 50 "${TAG}_corpusA" "Grab oranges and place into plate." 100
-bash $SIM/run_sim_test.sh 50 "${TAG}_plateC"  "pick up the orange and place it on the plate" 300
-if [ "${WITH_OURSB:-0}" = "1" ]; then bash $SIM/run_sim_test.sh 50 "${TAG}_oursB" "pick up the orange and move it to another place" 200; fi
+case ",$ROWS," in *,corpusA,*) bash $SIM/run_sim_test.sh $EPISODES "${TAG}_corpusA" "Grab oranges and place into plate." 100;; esac
+case ",$ROWS," in *,plateC,*)  bash $SIM/run_sim_test.sh $EPISODES "${TAG}_plateC"  "pick up the orange and place it on the plate" 300;; esac
+case ",$ROWS," in *,oursB,*)   bash $SIM/run_sim_test.sh $EPISODES "${TAG}_oursB"   "pick up the orange and move it to another place" 200;; esac
 systemctl --user stop so101-lora-server
 for f in "$OUT"/isaac_gate/results_${TAG}_*.jsonl; do echo "$(basename $f): $(grep -c '"success": true' $f)/$(wc -l < $f)"; done | tee -a "$OUT/isaac_gate/summary.txt"
 echo "=== GATE DONE $TAG $(date -u +%FT%TZ)" >> "$OUT/isaac_gate/summary.txt"
