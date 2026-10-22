@@ -29,5 +29,10 @@ case "${1:-}" in
     systemd-run --user --unit=r5-row1 --collect "${ENV[@]}" --working-directory=/home/kiran/sim/vlash \
       "$VENV/bin/vlash" train "$CFG"
     echo "unit r5-row1 started/resumed; log: journalctl --user -u r5-row1 -f" ;;
-  *) echo "usage: $0 smoke|smoke-resume|train|resume"; exit 2 ;;
+  train2|resume2)
+    # row 2 (conservative recipe, 2026-10-22): row2_conservative_lora.yaml, unit r5-row2
+    systemd-run --user --unit=r5-row2 --collect "${ENV[@]}" --working-directory=/home/kiran/sim/vlash \
+      "$VENV/bin/vlash" train "$HERE/row2_conservative_lora.yaml"
+    echo "unit r5-row2 started/resumed; log: journalctl --user -u r5-row2 -f" ;;
+  *) echo "usage: $0 smoke|smoke-resume|train|resume|train2|resume2"; exit 2 ;;
 esac
