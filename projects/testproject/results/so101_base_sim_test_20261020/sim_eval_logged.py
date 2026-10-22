@@ -254,7 +254,7 @@ def main():
     # simulate environment
     while max_episode_count <= 0 or episode_count <= max_episode_count:
         print(f"[Evaluation] Evaluating episode {episode_count}...")
-        success, time_out = False, False
+        success, time_out = False, False; _pre = (None, None)
         while simulation_app.is_running():
             # run everything in inference mode
             with torch.inference_mode():
@@ -270,6 +270,7 @@ def main():
                     action = actions[i, :, :]
                     if env.cfg.dynamic_reset_gripper_effort_limit:
                         dynamic_reset_gripper_effort_limit_sim(env, task_type)
+                    _pre = _oranges_on_plate(env)   # BEFORE the step: Isaac Lab resets a done env inside step(), so counting after sees the fresh scene (found 2026-10-22)
                     obs_dict, _, reset_terminated, reset_time_outs, _ = env.step(action); _steps += 1
                     if reset_terminated[0]:
                         success = True
@@ -280,7 +281,7 @@ def main():
                     if rate_limiter:
                         rate_limiter.sleep(env)
             if success or time_out:
-                _n_plate, _rest = _oranges_on_plate(env)
+                _n_plate, _rest = _pre
                 _rec = {"episode": episode_count, "success": bool(success), "time_out": bool(time_out), "oranges_on_plate": _n_plate, "at_rest": _rest, "steps": _steps, "policy_calls": _calls, "wall_s": round(time.time() - _t_ep, 1), "seed": int(env_cfg.seed), "task": args_cli.task, "instruction": args_cli.policy_language_instruction, "utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}
                 print("[RESULT] " + _json.dumps(_rec), flush=True); _sys.stderr.write("[RESULT] " + _json.dumps(_rec) + "\n"); _sys.stderr.flush()
                 if _res: _res.write(_json.dumps(_rec) + "\n"); _res.flush()

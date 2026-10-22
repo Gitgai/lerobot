@@ -210,6 +210,14 @@ PROGRESS     each 100 s episode (montage_episode_ends_by_row.jpg; success needs 
              more of the base's competence than row 1 (5/9 vs 4/15 oranges), consistent with less drift.
              Next diagnostics: (i) log oranges-on-plate in the eval JSON instead of reading frames; (ii) re-run row-2
              7k and row-1 25k with a 200 s cap, 5 episodes, to separate "slower" from "cannot".
+             (i) FIRST VERSION WAS WRONG (05:50Z): it counted AFTER env.step(), and Isaac Lab resets a done env inside
+             step(), so a timed-out episode always read 0 — row-2 3k's "0 of 15" from the log is therefore NOT trusted
+             (its frames must be read instead); the 200 s row-2 run logged 0 for ep1 while its frames show one orange
+             on the plate from call 226 to the end. Fixed: the count is taken before each step and the last pre-step
+             value is reported. In force from the row-1 25k 200 s row onward.
+             200 s cap, row-2 7k, ep1 (frames): one orange placed by call ~200, then 400 calls hovering over the other
+             two without a grasp — the same seed placed two under the 100 s cap: the policy's sampling is stochastic,
+             so 5-episode rows carry ±1-orange noise per episode.
 open-loop    (02:0xZ, openloop_mae.py, 302 probe frames from the 10 August hold-out episodes of orange_89, every 15th
              frame; next-10 actions vs the recorded ones; LeRobot units) — did the fine-tune move the model toward OUR
              demonstrations? Yes, monotonically with steps. NOTE these 10 episodes are inside the R5 training set, so
