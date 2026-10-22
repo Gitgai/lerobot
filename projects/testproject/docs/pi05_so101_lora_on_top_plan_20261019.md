@@ -180,6 +180,11 @@ CURVE        (0.7 of a pass, lr still in warm-up/peak). Cause (a) "too many step
              ONE rig moves the model off the Isaac scene almost immediately. Next: row 2 (conservative — frozen
              embeddings/norms, lr 2e-5, 1 pass, ckpt every 1k) to see whether a gentler recipe keeps Isaac while still
              learning our rig (open-loop MAE), AND the bench row of the 025000 checkpoint, which is the real question.
+ROW 2        LAUNCHED 02:50Z (unit r5-row2, GPU 1): row2_conservative_lora.yaml — same base/data/LoRA targets, but NO
+             trainable embeddings or layer norms, lr 2e-5 → 1e-6, 7,000 steps (≈1 pass), ckpt every 1k. ETA ≈ 04:05Z.
+             Armed behind it (unit r5-row2-eval): open-loop MAE for base + row-1 25k + every row-2 checkpoint, then
+             Isaac corpusA 5 episodes for 007000 and 003000 with frames. Decision rule: a row-2 checkpoint that keeps
+             ≥ 3/5 on Isaac AND beats the base on the open-loop MAE is the bench candidate alongside row-1 25k.
 open-loop    (02:0xZ, openloop_mae.py, 302 probe frames from the 10 August hold-out episodes of orange_89, every 15th
              frame; next-10 actions vs the recorded ones; LeRobot units) — did the fine-tune move the model toward OUR
              demonstrations? Yes, monotonically with steps. NOTE these 10 episodes are inside the R5 training set, so

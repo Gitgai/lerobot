@@ -10,7 +10,7 @@
 set -euo pipefail
 STEP=${1:?checkpoint step dir name, e.g. 025000}; TAG=${2:-lora_${STEP}}
 ROWS=${ROWS:-corpusA,plateC}; EPISODES=${EPISODES:-50}   # 2026-10-22: ROWS/EPISODES overrides for diagnostic rows (timeouts cost 7 min each)
-RUN=/mnt/data4tb/so101-lora-on-top-20261021/row1_author_lora_b8
+RUN=${RUN:-/mnt/data4tb/so101-lora-on-top-20261021/row1_author_lora_b8}   # RUN override for other rows (row2_conservative_lora)
 CK=$RUN/checkpoints/$STEP/pretrained_model
 OUT=/home/kiran/projects/git/nvidia/lerobot/projects/testproject/results/so101_lora_on_top_20261019
 SIM=/home/kiran/projects/git/nvidia/lerobot/projects/testproject/results/so101_base_sim_test_20261020
