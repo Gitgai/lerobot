@@ -18,7 +18,7 @@ What it changes relative to the stock server (everything else is the stock 0.4.1
         <joint>.pos x6 (LeIsaac/LeRobot order)  -> observation.state (1,6)      task -> task (str)
   * per-call timing and the first action vs. the state are logged, so a mapping bug shows up immediately.
 """
-import argparse, logging, pickle, sys, time, types
+import argparse, io, logging, pickle, sys, time, types
 import numpy as np, torch
 
 import os
@@ -70,12 +70,21 @@ def main():
 
     class Server(PS.PolicyServer):
         def SendPolicyInstructions(self, request, context):  # noqa: N802
-            specs = pickle.loads(request.data)  # nosec - trusted client on our own network
+            # Reply pickles must use the module layout THIS client has: LeIsaac pins lerobot.scripts.server.helpers
+            # (0.4.2 layout); a stock LeRobot 0.4.x bench client expects lerobot.async_inference.helpers. Read the
+            # layout from the CLIENT'S OWN PICKLE BYTES (the module it asked for), not from type(specs).__module__ —
+            # that always names the server's real module, which LeIsaac cannot import (its lerobot 0.4.2 venv dies on
+            # transformers/huggingface_hub). Found 2026-10-22 on the first LeIsaac run through this code path (R5 gate).
+            seen = []
+
+            class _Rec(pickle.Unpickler):
+                def find_class(self, module, name):
+                    seen.append((module, name)); return super().find_class(module, name)
+
+            specs = _Rec(io.BytesIO(request.data)).load()  # nosec - trusted client on our own network
             log.info("client policy request: type=%s path=%s actions_per_chunk=%s device=%s (path IGNORED, serving %s)",
                      specs.policy_type, specs.pretrained_name_or_path, specs.actions_per_chunk, specs.device, a.ckpt)
-            # Reply pickles must use the module layout THIS client has: LeIsaac pins lerobot.scripts.server.helpers
-            # (0.4.2 layout); a stock LeRobot 0.4.x bench client expects lerobot.async_inference.helpers.
-            client_layout = type(specs).__module__
+            client_layout = next((m for m, n in seen if n == "RemotePolicyConfig"), type(specs).__module__)
             for name in ("TimedAction", "TimedData"):
                 getattr(H, name).__module__ = client_layout
             log.info("reply pickle layout set to %s", client_layout)

@@ -117,6 +117,13 @@ DONE        ROW 1 TRAINING FINISHED 2026-10-22 00:07Z: 25,000 steps in 4 h 27 mi
             stopped first launch). No errors, no resume needed; swap peaked ~35 GB (file-cache driven), RAM never short.
             Isaac gate launched 00:09Z on checkpoint 025000 (unit r5-gate → so101-lora-server :8081 on GPU 1 + Isaac
             headless on GPU 1; rows corpusA then plateC, 50 episodes each).
+gate bugs   (1) 00:08Z launcher used a relative script path under systemd → exit 127; (2) 00:08Z the Isaac runner
+            looked for sim_eval_logged.py in OUTDIR → rc=2; (3) 00:10Z the LeIsaac client crashed decoding the first
+            reply: since the 2026-10-19 bench change the wrapper tagged reply pickles with the SERVER's module name
+            (lerobot.async_inference.helpers), which LeIsaac's venv cannot import (lerobot 0.4.2 + transformers 5.14
+            + huggingface_hub 0.35 clash on import). The R2 runs never hit it because they were served by the older
+            wrapper process that was never restarted. Fix: the wrapper reads the module path from the client's own
+            pickle bytes (custom Unpickler.find_class) and tags replies with that. Gate relaunched 00:16Z.
 serving     BUG FOUND AND FIXED before the gate (21:30Z): LoRA checkpoints save image features as observation.images.
             front/.wrist (our dataset's names); the wrapper hard-coded base_0_rgb/left_wrist_0_rgb → both slots would
             have been "missing" and the model blind. Wrapper now reads slot names from the checkpoint config in order.
