@@ -21,7 +21,7 @@ mkdir -p "$OUT/isaac_gate"
 systemctl --user stop so101-lora-server 2>/dev/null || true
 systemd-run --user --unit=so101-lora-server --collect \
   --setenv=CUDA_VISIBLE_DEVICES=1 --setenv=HF_HOME=/mnt/data4tb/huggingface-cache --setenv=TMPDIR=/home/kiran/tmp \
-  --setenv=HOME=/home/kiran --setenv=PYTHONUNBUFFERED=1 \
+  --setenv=HOME=/home/kiran --setenv=PYTHONUNBUFFERED=1 --setenv=RECORD_DIR="${RECORD_DIR:-}" --setenv=RECORD_EVERY="${RECORD_EVERY:-25}" \
   /home/kiran/sim/vlash-venv/bin/python "$WRAP" --host 127.0.0.1 --port 8081 --ckpt "$CK/"
 echo "so101-lora-server started on :8081 (GPU 1) with $CK"
 # 2) the three rows, Isaac on GPU 1 too; results_<tag>_<row>.jsonl in $OUT/isaac_gate
