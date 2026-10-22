@@ -198,6 +198,11 @@ PROGRESS     each 100 s episode (montage_episode_ends_by_row.jpg; success needs 
                row-1 12.5k   oranges on plate at timeout: 0, 1, 2, 1, 0   (4 of 15)
                row-1 5k                                    0, 0, 0, 0, 0   (0 of 15)
                row-2 7k      binary 0/5 (04:55Z);          2, 1, 2, 1, 2   (8 of 15)  — montage_row2_007000_ends.jpg
+               row-2 3k      binary 0/5 (05:32Z);          0, 0, 0, 0, 0   (0 of 15, logged by the eval)
+             Pattern: in BOTH rows the mid-training checkpoint is the worst (row-1 5k 0/15, row-2 3k 0/15) and the
+             later checkpoint recovers part of the skill (row-1 12.5k 4/15, row-2 7k 8/15) — a transient disruption
+             while the adapters move, then re-stabilisation. So "stop early" is wrong here; the end of the schedule
+             is the better checkpoint in both recipes, and the gentler recipe ends higher.
                base          38/50 full successes in a mean 119 s wall (all 3 oranges + rest)
              Reading: the fine-tuned models are not blind and not "broken" — they pick and place oranges in the Isaac
              scene, but SLOWER and less reliably than the base, and the 100 s cap turns "2 of 3 placed" into a 0.
