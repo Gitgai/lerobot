@@ -173,6 +173,13 @@ ckpt 012500  corpusA  0/5, all timed out (seeds 100–104; base 4/5). Stopped at
              the scene renders correctly in both cameras (plate, three oranges, arm), so cause (c) serving is ruled
              out. Behaviour: the arm goes to the oranges, hovers with the gripper pointing down, nudges them, never
              closes on one — the bench behaviour reproduced in the scene where the base scored 76%.
+ckpt 005000  corpusA  0/5, all timed out (seeds 100–104; base 4/5). Stopped at 5 (02:49Z).
+FORGETTING   025000 0/5 · 012500 0/5 · 005000 0/5 · base 4/5 (same seeds). The Isaac skill is gone already at 5k steps
+CURVE        (0.7 of a pass, lr still in warm-up/peak). Cause (a) "too many steps" is NOT the explanation on its own:
+             the author's recipe as published (LoRA + trainable embeddings + layer norms, lr 5e-5) on 109 episodes of
+             ONE rig moves the model off the Isaac scene almost immediately. Next: row 2 (conservative — frozen
+             embeddings/norms, lr 2e-5, 1 pass, ckpt every 1k) to see whether a gentler recipe keeps Isaac while still
+             learning our rig (open-loop MAE), AND the bench row of the 025000 checkpoint, which is the real question.
 open-loop    (02:0xZ, openloop_mae.py, 302 probe frames from the 10 August hold-out episodes of orange_89, every 15th
              frame; next-10 actions vs the recorded ones; LeRobot units) — did the fine-tune move the model toward OUR
              demonstrations? Yes, monotonically with steps. NOTE these 10 episodes are inside the R5 training set, so
