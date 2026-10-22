@@ -185,6 +185,14 @@ ROW 2        LAUNCHED 02:50Z (unit r5-row2, GPU 1): row2_conservative_lora.yaml 
              Armed behind it (unit r5-row2-eval): open-loop MAE for base + row-1 25k + every row-2 checkpoint, then
              Isaac corpusA 5 episodes for 007000 and 003000 with frames. Decision rule: a row-2 checkpoint that keeps
              ≥ 3/5 on Isaac AND beats the base on the open-loop MAE is the bench candidate alongside row-1 25k.
+ROW 2 DONE   04:07Z: 7,000 steps in 77 min (0.61 s/step), loss 0.038 → 0.010, 7 checkpoints. Open-loop (same 302 probes,
+             04:1xZ; base re-measured 5.75/8.84 → the sampler noise on this measure is ≈ ±0.3):
+               row 2 step   1k    2k    3k    4k    5k    6k    7k    | base  | row-1 25k
+               arm MAE (°)  5.08  4.51  4.19  4.20  4.12  4.00  4.00  | 5.75  | 2.62
+               gripper MAE  5.15  4.73  4.68  4.00  4.19  4.20  4.22  | 8.84  | 2.08
+               open/close   .808  .808  .838  .851  .838  .841  .851  | .689  | .887
+             Reading: the conservative recipe moves the model about HALF-way toward our demonstrations and then
+             plateaus from step 3k on (lr already decaying). Isaac rows for 7k and 3k follow (5 episodes each).
 open-loop    (02:0xZ, openloop_mae.py, 302 probe frames from the 10 August hold-out episodes of orange_89, every 15th
              frame; next-10 actions vs the recorded ones; LeRobot units) — did the fine-tune move the model toward OUR
              demonstrations? Yes, monotonically with steps. NOTE these 10 episodes are inside the R5 training set, so
