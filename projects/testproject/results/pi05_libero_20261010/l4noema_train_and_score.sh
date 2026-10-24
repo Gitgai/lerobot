@@ -53,7 +53,7 @@ step "THREE-ROW TABLE"
 import json,glob,os,sys
 res=sys.argv[1]
 def row(f):
-    s=json.load(open(f)); 
+    s=json.load(open(f));
     if s.get("rate") is None: return None
     lo,hi=s["ci95"]; return (s["row"],s["k"],s["n"],100*s["rate"],100*lo,100*hi)
 print(f"{'row':48s} {'k/n':>8s} {'rate':>6s}  CI95")

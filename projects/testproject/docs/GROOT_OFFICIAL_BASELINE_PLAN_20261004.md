@@ -34,18 +34,18 @@ Read the actual NVIDIA N1.6 release source matching this checkpoint and the inst
 
 Inventory and compare:
 
-| Area | Baseline requirement / evidence to collect |
-|---|---|
-| Model | Recovery checkpoint6000, exact path, configuration, weight identity and startup log; no retraining/checkpoint change |
-| Task/data | Tomato task exactly `pick up the tomato and place it on the plate`; verified recovery dataset metadata includes10 tomato and50 orange episodes |
-| Action interpretation | Official embodiment adapter, joint order, normalization, state-relative arm action conversion and absolute gripper conversion; calibration/units checked |
-| Execution | Official chunk/execution horizon and rate for this release; distinguish prediction horizon from how many actions execute |
-| Scheduling | Remove custom asynchronous workers, age-based skip-ahead and three-tick target blending from this baseline; identify official synchronous/non-RTC path rather than merely changing a flag |
-| Transport | Audit project JPEG encoding and network wrapper against official server/client support. Use the official supported choice; if JPEG is custom, do not retain it silently under an “as-is” label |
-| Device integration | Verify SO-101 compatibility with official SO100/embodiment interfaces and LeRobot versions; keep necessary adaptation explicit |
-| Motor setup | Record actual configure() values and startup readback where supported. Do not import pi05's increased register values or silently change GR00T values |
-| Diagnostics | Save observations, actual dispatched targets and motor feedback without target rewriting; measure/report diagnostic timing overhead |
-| Stop/cleanup | Preserve exact-process stop and verified torque release; document local lifecycle integration separately |
+| Area                  | Baseline requirement / evidence to collect                                                                                                                                                     |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Model                 | Recovery checkpoint6000, exact path, configuration, weight identity and startup log; no retraining/checkpoint change                                                                           |
+| Task/data             | Tomato task exactly `pick up the tomato and place it on the plate`; verified recovery dataset metadata includes10 tomato and50 orange episodes                                                 |
+| Action interpretation | Official embodiment adapter, joint order, normalization, state-relative arm action conversion and absolute gripper conversion; calibration/units checked                                       |
+| Execution             | Official chunk/execution horizon and rate for this release; distinguish prediction horizon from how many actions execute                                                                       |
+| Scheduling            | Remove custom asynchronous workers, age-based skip-ahead and three-tick target blending from this baseline; identify official synchronous/non-RTC path rather than merely changing a flag      |
+| Transport             | Audit project JPEG encoding and network wrapper against official server/client support. Use the official supported choice; if JPEG is custom, do not retain it silently under an “as-is” label |
+| Device integration    | Verify SO-101 compatibility with official SO100/embodiment interfaces and LeRobot versions; keep necessary adaptation explicit                                                                 |
+| Motor setup           | Record actual configure() values and startup readback where supported. Do not import pi05's increased register values or silently change GR00T values                                          |
+| Diagnostics           | Save observations, actual dispatched targets and motor feedback without target rewriting; measure/report diagnostic timing overhead                                                            |
+| Stop/cleanup          | Preserve exact-process stop and verified torque release; document local lifecycle integration separately                                                                                       |
 
 Current project reference: `/home/gaikwad-prakash/n16_realarm_client.py`. Current numbered launcher still selects custom RTC; it must not be used unchanged for the new baseline. GR00T server reference: `/home/kiran/srv_wrap_recov.py`; GR00T venv: `/home/kiran/sim/Isaac-GR00T-n16/.venv` on AI90. Acer GR00T venv: `/home/gaikwad-prakash/PrakashProjects/lerobot/lerobot/.venv`.
 

@@ -7,6 +7,7 @@ burned into the controllers and never change.
 
 Usage:  eval $(python arm_ports.py)   ->  exports FOLLOWER_PORT / LEADER_PORT
 """
+
 import glob
 import subprocess
 
@@ -15,8 +16,9 @@ LEADER_SERIAL = "5B14029688"
 
 
 def serial_of(dev: str) -> str:
-    out = subprocess.run(["udevadm", "info", "-q", "property", "-n", dev],
-                         capture_output=True, text=True).stdout
+    out = subprocess.run(
+        ["udevadm", "info", "-q", "property", "-n", dev], capture_output=True, text=True
+    ).stdout
     for line in out.splitlines():
         if line.startswith("ID_SERIAL_SHORT="):
             return line.split("=", 1)[1]

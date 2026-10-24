@@ -1,5 +1,17 @@
 # Robot Arm Learning Project
 
+> **Start here — repository organization, 24 October 2026**
+>
+> This folder is part of **Gitgai/lerobot**, not a separate repository.
+> Read the [one-repository consolidation plan](docs/REPOSITORY_CONSOLIDATION_PLAN_20261024.md)
+> for the canonical paths, completed preservation/update work and remaining migration steps.
+> Newer Acer session work still exists in `/home/gaikwad-prakash/Documents/ChatGPT/Lerobot`;
+> only a selected code/documentation batch has been migrated. Do not delete that workspace or assume the commands below are current.
+> The older entry points and status below are retained as history, not current trial instructions.
+
+**Acer fruit OpenPI work:** [current navigation and migration status](docs/ACER_FRUIT_OPENPI_STATUS.md).
+The first source-code candidate is now in this repository; active launch paths and external environments remain unchanged.
+
 This project is for building a leader/follower robot arm setup and using LeRobot to evaluate, collect, and train robot manipulation policies.
 
 > **Entry points (2026-08-03):**

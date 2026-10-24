@@ -1,0 +1,83 @@
+{
+  "date": "2026-10-24",
+  "scope": "11 historical documents; banners, links, timezone spelling, Markdown formatting; no raw evidence or live status verification",
+  "files": [
+    {
+      "source": "/home/gaikwad-prakash/Documents/ChatGPT/Lerobot/PI05_ORANGE_TOMATO_LORA_PLAN_20261017.md",
+      "destination": "/home/gaikwad-prakash/PrakashProjects/lerobot/lerobot/projects/testproject/docs/fruit_openpi_history/PI05_ORANGE_TOMATO_LORA_PLAN_20261017.md",
+      "source_sha256": "21f9c09ef1b0611367b8fa7b8e27c86a97ce4150f3d29b2d06a0cbd6f408a53f",
+      "externalized_links": 22,
+      "destination_sha256": "7694fbdf9319e4095a35638405e00689c7016b1e52a94ba3de87e61e32b618be"
+    },
+    {
+      "source": "/home/gaikwad-prakash/Documents/ChatGPT/Lerobot/fruit_review_20261017/OPENPI_FRUIT_CONFIGURATION_PROPOSAL_20261020.md",
+      "destination": "/home/gaikwad-prakash/PrakashProjects/lerobot/lerobot/projects/testproject/docs/fruit_openpi_history/fruit_review_20261017/OPENPI_FRUIT_CONFIGURATION_PROPOSAL_20261020.md",
+      "source_sha256": "9529cba869ff19633aeb575340e8c3e26a440ea6df74d472969f29f4db79ecc1",
+      "externalized_links": 0,
+      "destination_sha256": "22d8aedf9a1d15454e809ea123aa462ad517b417191d5bbef5671a54f4862e99"
+    },
+    {
+      "source": "/home/gaikwad-prakash/Documents/ChatGPT/Lerobot/fruit_review_20261017/OPENPI_BASELINE_AND_MAIN_COMMAND_20261020.md",
+      "destination": "/home/gaikwad-prakash/PrakashProjects/lerobot/lerobot/projects/testproject/docs/fruit_openpi_history/fruit_review_20261017/OPENPI_BASELINE_AND_MAIN_COMMAND_20261020.md",
+      "source_sha256": "2c54faa90e8a987a21875cc247046ba8b3a170baf1282534217038fc3751fa96",
+      "externalized_links": 0,
+      "destination_sha256": "88396fc77c6f1f426a015f28ef1d48ea14466d6157e8143cbd45a0cbb2cc6895"
+    },
+    {
+      "source": "/home/gaikwad-prakash/Documents/ChatGPT/Lerobot/fruit_review_20261017/OPENPI_FRUIT_CHECKPOINT_SELECTION_20261020.md",
+      "destination": "/home/gaikwad-prakash/PrakashProjects/lerobot/lerobot/projects/testproject/docs/fruit_openpi_history/fruit_review_20261017/OPENPI_FRUIT_CHECKPOINT_SELECTION_20261020.md",
+      "source_sha256": "85355c7b5f9209b2a30719ad9f913cd35ef5d28944b20dda8435741e727ef7ec",
+      "externalized_links": 2,
+      "destination_sha256": "5672206479d64e93d754de6d105c50211949406862e06a4560f6d9538e0ae0a5"
+    },
+    {
+      "source": "/home/gaikwad-prakash/Documents/ChatGPT/Lerobot/fruit_review_20261017/SAVED_4K_SERVING_CHECK_20261020.md",
+      "destination": "/home/gaikwad-prakash/PrakashProjects/lerobot/lerobot/projects/testproject/docs/fruit_openpi_history/fruit_review_20261017/SAVED_4K_SERVING_CHECK_20261020.md",
+      "source_sha256": "2eb5b74d3ebbe04135f47553b2a302bc7713bf2c59a2ccaf4086b1fff87a8a69",
+      "externalized_links": 3,
+      "destination_sha256": "c11f24f5bacba91d0995d683788cd9516d6281d6ee6b3aec95c888a24fcebc02"
+    },
+    {
+      "source": "/home/gaikwad-prakash/Documents/ChatGPT/Lerobot/fruit_openpi_client/README.md",
+      "destination": "/home/gaikwad-prakash/PrakashProjects/lerobot/lerobot/projects/testproject/docs/fruit_openpi_history/fruit_openpi_client/README.md",
+      "source_sha256": "cb777df84ef380e71eda88b9e656882fb2c1e7fbed67b66db5e3eb15e9de080d",
+      "externalized_links": 0,
+      "destination_sha256": "41d623939dbda967a4f739f235cee789e26ccae7485932b3a9e2661da328300f"
+    },
+    {
+      "source": "/home/gaikwad-prakash/Documents/ChatGPT/Lerobot/fruit_openpi_client/orange_trial_01_20261022/REVIEW.md",
+      "destination": "/home/gaikwad-prakash/PrakashProjects/lerobot/lerobot/projects/testproject/docs/fruit_openpi_history/fruit_openpi_client/orange_trial_01_20261022/REVIEW.md",
+      "source_sha256": "b7fb6f41e8482739e522ebf773bc67eff15028ef17726150e4a99b0eafc0f327",
+      "externalized_links": 0,
+      "destination_sha256": "863bc751240c9c238cf33c168993f97925267a6f2e71441446616cfc8a25038e"
+    },
+    {
+      "source": "/home/gaikwad-prakash/Documents/ChatGPT/Lerobot/fruit_openpi_client/storage_investigation_20261022/REPORT.md",
+      "destination": "/home/gaikwad-prakash/PrakashProjects/lerobot/lerobot/projects/testproject/docs/fruit_openpi_history/fruit_openpi_client/storage_investigation_20261022/REPORT.md",
+      "source_sha256": "b6583fef813766e07e47b332cc82df99ff232211d97b4d6f6a984f7b762f3ed3",
+      "externalized_links": 0,
+      "destination_sha256": "b27b7bc80bfc81cd7cb50cc3719f0a3462cb3e8bc10e62bd224e8de1c359ed20"
+    },
+    {
+      "source": "/home/gaikwad-prakash/Documents/ChatGPT/Lerobot/fruit_openpi_client/storage_investigation_20261022/RECOVERY_PROGRESS.md",
+      "destination": "/home/gaikwad-prakash/PrakashProjects/lerobot/lerobot/projects/testproject/docs/fruit_openpi_history/fruit_openpi_client/storage_investigation_20261022/RECOVERY_PROGRESS.md",
+      "source_sha256": "90c8b793b238174f7a20713e053df336232b31ea262d895132f6130e57655a67",
+      "externalized_links": 1,
+      "destination_sha256": "de5b4e662f88045a7e872def753e9cfe6336761b5bcd13545994914e7ec368f8"
+    },
+    {
+      "source": "/home/gaikwad-prakash/Documents/ChatGPT/Lerobot/fruit_openpi_client/storage_investigation_20261022/INVESTIGATION_PLAN.md",
+      "destination": "/home/gaikwad-prakash/PrakashProjects/lerobot/lerobot/projects/testproject/docs/fruit_openpi_history/fruit_openpi_client/storage_investigation_20261022/INVESTIGATION_PLAN.md",
+      "source_sha256": "6d0ca87d435aba4f9c5d24704eb5a221535374ae4491561c445060415aa72f47",
+      "externalized_links": 2,
+      "destination_sha256": "fad15a525bfd605c867f7eadd316f5670c50d81ec8e5ad4b91124cfdcb422a93"
+    },
+    {
+      "source": "/home/gaikwad-prakash/Documents/ChatGPT/Lerobot/fruit_openpi_client/storage_investigation_20261022/EXTERNAL_BACKUP_20261023.md",
+      "destination": "/home/gaikwad-prakash/PrakashProjects/lerobot/lerobot/projects/testproject/docs/fruit_openpi_history/fruit_openpi_client/storage_investigation_20261022/EXTERNAL_BACKUP_20261023.md",
+      "source_sha256": "4236004dc153084164d088a86fcddd8fb2efa121ac1e4bb7d558976cf15c6c96",
+      "externalized_links": 0,
+      "destination_sha256": "35b5c91a8d40e4f484bce61bec8fa91bd1344ffd081e091225c7439843d75945"
+    }
+  ]
+}

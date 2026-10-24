@@ -6,6 +6,7 @@ v2.1's videos/chunk-NNN/<key>/. The old glob therefore always returned 0, which
 made rec_esp.sh take its "empty stub" branch and rm -rf a dataset that had real
 episodes in it. Read the metadata instead - it is the only honest source.
 """
+
 import json
 import sys
 from pathlib import Path

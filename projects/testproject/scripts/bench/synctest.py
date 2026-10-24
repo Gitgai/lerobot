@@ -24,15 +24,18 @@ import numpy as np
 from lerobot.robots.so_follower import SOFollower, SOFollowerRobotConfig
 from lerobot.teleoperators.so_leader import SOLeader, SOLeaderTeleopConfig
 
+
 def resolve_ports():
     """Ask arm_ports.py, the same resolver rec_esp.sh uses."""
     import subprocess
-    out = subprocess.run(["python3", os.path.expanduser("~/arm_ports.py")],
-                         capture_output=True, text=True).stdout
+
+    out = subprocess.run(
+        ["python3", os.path.expanduser("~/arm_ports.py")], capture_output=True, text=True
+    ).stdout
     got = {}
     for line in out.splitlines():
         if line.startswith("export "):
-            k, _, v = line[len("export "):].partition("=")
+            k, _, v = line[len("export ") :].partition("=")
             got[k] = v.strip()
     f, l = got.get("FOLLOWER_PORT"), got.get("LEADER_PORT")
     if not f or not l:
@@ -48,7 +51,7 @@ JOINTS = ["shoulder_pan", "shoulder_lift", "elbow_flex", "wrist_flex", "wrist_ro
 # have renumbered three times today, and the follower has just moved to another
 # physical port, so a hardcoded /dev/ttyACM0 would silently address the leader.
 FOLLOWER_PORT, LEADER_PORT = resolve_ports()
-print("  follower %s   leader %s" % (FOLLOWER_PORT, LEADER_PORT), flush=True)
+print(f"  follower {FOLLOWER_PORT}   leader {LEADER_PORT}", flush=True)
 
 robot = SOFollower(SOFollowerRobotConfig(port=FOLLOWER_PORT, id="my_so101_follower"))
 teleop = SOLeader(SOLeaderTeleopConfig(port=LEADER_PORT, id="my_so101_leader"))
@@ -88,30 +91,37 @@ except Exception as exc:
     # A USB dropout raises here and, worse, makes the tidy disconnect below fail
     # too - which is how the follower was left holding torque last time. Report
     # it in one line rather than a wall of traceback, and still try to release.
-    print("  ABORTED after %.1fs: %s: %s" % (time.perf_counter() - t0,
-                                             type(exc).__name__, str(exc)[:80]), flush=True)
+    print(
+        f"  ABORTED after {time.perf_counter() - t0:.1f}s: {type(exc).__name__}: {str(exc)[:80]}",
+        flush=True,
+    )
 finally:
     for name, dev in (("follower", robot), ("leader", teleop)):
         try:
             dev.disconnect()
             print("  %s disconnected, torque off" % name, flush=True)
         except Exception as exc:
-            print("  %s would NOT release: %s - retrying on a fresh handle"
-                  % (name, type(exc).__name__), flush=True)
+            print(
+                f"  {name} would NOT release: {type(exc).__name__} - retrying on a fresh handle",
+                flush=True,
+            )
             try:
-                from lerobot.motors.feetech import FeetechMotorsBus
                 from lerobot.motors import Motor, MotorNormMode
+                from lerobot.motors.feetech import FeetechMotorsBus
+
                 port = "/dev/ttyACM0" if name == "follower" else "/dev/ttyACM1"
-                ms = {j: Motor(i + 1, "sts3215", MotorNormMode.RANGE_M100_100)
-                      for i, j in enumerate(JOINTS)}
+                ms = {j: Motor(i + 1, "sts3215", MotorNormMode.RANGE_M100_100) for i, j in enumerate(JOINTS)}
                 b = FeetechMotorsBus(port=port, motors=ms)
                 b.connect(handshake=False)
                 b.disable_torque()
                 b.disconnect()
                 print("  %s torque released on the second attempt" % name, flush=True)
             except Exception as exc2:
-                print("  %s STILL HOLDING TORQUE - power it down by hand (%s)"
-                      % (name.upper(), type(exc2).__name__), flush=True)
+                print(
+                    "  %s STILL HOLDING TORQUE - power it down by hand (%s)"
+                    % (name.upper(), type(exc2).__name__),
+                    flush=True,
+                )
 
 if len(lead) < 30:
     print("\n  only %d cycles captured - too few to judge tracking." % len(lead))
@@ -130,12 +140,12 @@ for i, j in enumerate(JOINTS):
 big = max(range(6), key=lambda i: L[:, i].max() - L[:, i].min())
 best, lag = -2, 0
 for s in range(0, 16):
-    a = L[:len(L) - s, big]
+    a = L[: len(L) - s, big]
     b = F[s:, big]
     if a.std() < 1e-6 or b.std() < 1e-6:
         continue
     c = np.corrcoef(a, b)[0, 1]
     if c > best:
         best, lag = c, s
-print("\n  most-moved joint: %s (%.0f deg of travel)" % (JOINTS[big], L[:, big].max() - L[:, big].min()))
+print(f"\n  most-moved joint: {JOINTS[big]} ({L[:, big].max() - L[:, big].min():.0f} deg of travel)")
 print("  follower lags leader by %d cycles (%.0f ms), match %.3f" % (lag, lag * 1000.0 / HZ, best))

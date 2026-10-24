@@ -4,6 +4,7 @@ Source of truth: meta/{info,sources,episodes,tasks,episodes_stats} + ATTRIBUTION
 /mnt/data4tb/huggingface-cache. Per-source table: sources.csv · task table: tasks.csv (this dir).
 
 ## From metadata alone (R0.2, R0.3, part of R0.5)
+
 ```text
 sources            156 (150 Hub + 6 author-recorded); licences 155 apache-2.0, 1 MIT
 episodes           13,969; frames 7,272,752; length min 3 / median 450 / max 2,960 frames
@@ -27,12 +28,15 @@ survey overlap     inside the merge already: LightwheelAI/so101-place-orange, Li
                    NOT inside: armnet (2,499), hungho77 (455), wsagi real orange (99), lerobot/svla —
                    these remain additive for Stage 3.
 ```
+
 ## Needs the parquet files (R0.4, R0.5 — pending download)
+
 camera occupancy per source (mask columns) · fps per source (timestamp) — the 450 ten-fps episodes ·
 exact duplicates (hash of action stream) · near duplicates across sources (length, mean action) ·
 degenerate episodes (motion from the stream, not stats) · then R0.6 verdicts and R0.7 video samples.
 
 ## The author's own pipeline records (github jinnymo/so101-pi05-base, pipeline/artifacts/, copied to author_artifacts/)
+
 ```text
 dedup (23_dedup_result)   210 candidate sets → 182 kept, 28 dropped as identical / strict-subset /
                           "leakage" (train+val splits of one recording). Examples dropped: six
@@ -45,6 +49,7 @@ manifest (27)             211 → 181 kept (then 156 after the licence filter); 
 camera map (21)           211 sources; 68 have a NON-wrist camera in a wrist slot (card says 42 of the
                           final 156); 2 ambiguous; 6 streams dropped.
 ```
+
 Reading so far: the author did real work — fingerprint dedup across authors, length-mismatch drops,
 licence filter — and documented it. What the card UNDER-states: simulation data is inside (≥4 sources,
 304 ep) and real orange-fruit demonstrations are ~61 (+ part of 200 mixed-fruit). Our own checks still
@@ -52,6 +57,7 @@ to run on the parquet: exact duplicate EPISODES across sources (the author dedup
 fps/occupancy from the streams, degenerate episodes.
 
 ## From the parquet sample, 3 episodes per source (R0.4, 2026-10-19)
+
 ```text
 fps per source     151 sources at 30 fps · 5 sources at 10 fps = 450 episodes (the card's number confirmed):
                    CoRL2026-CSI IsaacLab PullCube 100 · CoRL2026-CSI teleop stack RGB block 150 ·
@@ -66,7 +72,9 @@ orange sources     all 30 fps; 7 of 8 are base+left_wrist (our layout); nbirukov
 ```
 
 ## Visual pass (R0.7, 2026-10-19): 2 episodes × 22 sources (20 largest + all orange) — montages/ (54 PNG, not in git)
+
 Top row of each sheet = base_0_rgb slot, bottom = left_wrist_0_rgb slot, 6 frames across the episode.
+
 ```text
 SLOTS SWAPPED (wrist view sits in base_0_rgb, external view in the wrist slot):
   5hadytru/so101_grasp_1, _2, _3     1,360 ep   uploader's "front" IS the wrist camera, "overhead" the external;
@@ -83,6 +91,7 @@ SIM (rendered, obvious): EverNorif orange · aaronsu11 leisaac · omkarmayekar o
 QUALITY NOTES: 5hadytru wrist stream is very dark (black table, underexposed) and partly occluded by a
   person's hand in frame 1 of ep 3196; y1y2y3 and zacapa AVE_07 are dim; sushi set shows a hand in frame.
 ```
+
 Why it matters: the author's slot semantics ("base = external, left_wrist = wrist") is what the policy
 learned on 87% of the data; 13% taught it the opposite pairing. For a policy that reads both views this
 is label noise on the camera channel, not fatal, but it is the single largest defect found and it is
@@ -91,6 +100,7 @@ five sources (a manifest edit, no re-encoding). The 1,314 single-camera episodes
 episodes are weaker signal, not wrong.
 
 ## R0.5 + R4 — duplicates, degenerate episodes, and the cleaned manifest (2026-10-20 02:16Z, all 13,969 parquet files)
+
 ```text
 exact duplicate episodes   1 (inside one source); cross-source near-duplicates 0  → the author's dataset-level
                            dedup holds at the episode level; the "14k" is real, not repeats
@@ -103,7 +113,9 @@ manifest_clean.csv         KEEP 13,292 of 13,969 = 95.2%  (real, 30 fps, not dup
   real orange-fruit kept   96 (LightwheelAI 61 + aaronsu11 fruit, orange tasks, 35)
   sources kept             148 of 156
 ```
+
 ## Verdict
+
 The corpus is sound as data: no hidden repetition, almost no junk, 95% usable at 30 fps on real arms, and
 82% in exactly our two-camera layout. Its two real weaknesses are (1) 13% of episodes with the camera slots
 swapped — a labelling error of the merge, fixable by a manifest swap, and the one thing the pictures caught
@@ -114,6 +126,7 @@ episodes) carries the slot noise; whether that matters is what R2 (sim, closed l
 (R3a G2, in-corpus vs held-out vs ours, as-shipped vs swapped) will measure.
 
 ## What the tasks are (grouped from the 406 strings; episodes, share of 13,969)
+
 ```text
 pick-and-place into a bin/box/cup/bowl/tray    6,264  44.8%   "Place each object in the plastic bin" (1,360), lego into bin …
 pick / grasp with no stated target             2,346  16.8%   "Grasp the die and put it on the mat", "Pick red cube"
@@ -128,6 +141,7 @@ push/pull/button · conveyor · clean-up           131   0.9%
 objects (overlapping): cube/block/lego 4,709 · pen/marker/eraser 1,710 · tool/plug/bottle/cup 1,209 ·
 toy/figure/die 918 · chess piece 851 · tape roll 781 · fruit 553
 ```
+
 Reading: ~90% is single-object pick-and-place of a small rigid object into or onto a target — the same
 motor skill as our orange-on-plate task, with the plate variant at 5.6% (777 ep) and fruit at 3.3%. What
 is thin: deformables, two-handed, long-horizon, and precise insertion. For a base model this is the right

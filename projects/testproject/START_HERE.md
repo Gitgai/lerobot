@@ -5,7 +5,10 @@
 > **If you are an AI agent opening this folder, read these instead:**
 >
 > 1. `NEW_MACHINE_SETUP.md` — only if the machine is not set up yet
-> 2. `docs/agent_handoff_pi05_20260803.md` — **the current project handoff**
+> 2. **The project `README.md` and its task-specific status links.**
+>    A newer date alone does not supersede a different model or experiment.
+>    `docs/agent_handoff_pi05_20260803.md` was the handoff as of 2026-08-03 and is
+>    itself now superseded.
 >
 > This file is from the **ACT era (2026-07-10)** and is wrong in its most
 > important claim: the project moved from **ACT to Pi05** (a
@@ -28,8 +31,8 @@
 ## 1. What this project is
 
 - **Robot:** SO-101 leader + follower arms (Feetech STS3215 servos, 6 DoF incl. gripper). The **leader** is moved by hand to teleoperate the **follower** for recording demos; at eval time the **policy** drives the follower.
-- **Cameras (3):** `front`, `top`, `wrist` — the ACT model consumes all three (`observation.images.{front,top,wrist}`).
-- **Task string (must match exactly):** `"pick up the orange and move it to another place"`.
+- **Camera contract:** depends on the target model. The current physical rig is documented in `docs/CAMERA_RECORDING_STATUS.md`; do not assume the legacy `front/top/wrist` labels match the physical mounts.
+- **Task string (must match exactly):** `"pick up the tomato and put it on the plate"`.
 - **Policy:** ACT (Action Chunking Transformer), ~52 M params, from the `lerobot` library.
 - **Workflow:** record demos (local) → train (RunPod GPU, ~20k steps) → eval on the real arm (local).
 
@@ -102,10 +105,10 @@ Restore these to the same absolute paths on the new machine.
 - **Follower arm:** serial `5B14114209`, id `my_so101_follower`, port `/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114209-if00`.
 - **Leader arm:** serial `5B14029688`, id `my_so101_leader` (only needed for _recording_, not eval).
 - **Cameras:**
-  - `front` = the **laptop's built-in webcam** (`Integrated_Webcam_FHD`). ⚠️ **This changes on a new laptop** — different camera/position → the model's front view drifts. Reproduce the framing closely, or expect degradation.
-  - `top` = **Logitech C270** USB (`usb-046d_C270_HD_WEBCAM_FC7A6780`), needs `fourcc=MJPG` + ~3 s warmup (returns black on a cold single grab).
-  - `wrist` = **Raspberry Pi camera** at `raspi@192.168.1.5`, streamed to `http://127.0.0.1:8092/frame` via `tools/pi_wrist_proxy.py`. New laptop must be on the **same network** + have the Pi SSH key.
-- **Safety guard:** always run the arm with `--max-relative-target 5`. **`15` overloaded a motor** (bus timeout → power-cycle the follower to recover).
+  - **Current intended `front`:** Logitech C270 USB (`usb-046d_C270_HD_WEBCAM_FC7A6780`), stable path `/dev/v4l/by-id/usb-046d_C270_HD_WEBCAM_FC7A6780-video-index0`; use `fourcc=MJPG` and ~3 s warmup.
+  - **Current intended `wrist`:** OV4689, shown by Linux as `AK-Camera`, stable path `/dev/v4l/by-id/usb-SunplusIT_Inc_AK-Camera_JV-video-index0`.
+  - The laptop's built-in Acer webcam is also present, but it was accidentally used by the recent simplified recorder. See `docs/CAMERA_RECORDING_STATUS.md` before recording.
+- **LeRobot default:** leave `max_relative_target` unset unless a run explicitly needs a relative target limit. **`15` overloaded a motor** (bus timeout → power-cycle the follower to recover).
 
 ---
 
@@ -130,7 +133,7 @@ Restore these to the same absolute paths on the new machine.
 cd ~/PrakashProjects/testproject/scripts
 python act_eval_3cam.py \
   --policy-path /data/act_orange49_checkpoints/020000/pretrained_model \
-  --task "pick up the orange and move it to another place" \
+  --task "pick up the tomato and put it on the plate" \
   --duration 25 --max-relative-target 5 --record --run-name eval_x \
   --i-understand-this-moves-robot
 ```
@@ -157,7 +160,7 @@ python act_eval_3cam.py \
 
 ## 9. Gotchas (accumulated — save yourself the pain)
 
-- **Safety:** always `--max-relative-target 5`. `15` overloads a motor (→ power-cycle follower).
+- **Safety:** LeRobot's default is no relative target clamp. Add `--max-relative-target 5` only for an explicitly guarded test. `15` overloads a motor (→ power-cycle follower).
 - **Front camera held by Chrome:** if a browser tab is using the webcam, the eval can't open `front`. Close it.
 - **Wrist camera / Pi:** the Pi runs a `timelapse.service` that grabs the camera. Stop it: `sudo systemctl stop timelapse.service` on the Pi. Restart the proxy with `python tools/pi_wrist_proxy.py`. If `rpicam-vid` streaming crashes (SIGPIPE), reboot the Pi.
 - **Never `rm -rf ~/.cache/huggingface`** — it wipes the arm calibration (happened; had to recalibrate). Calibration is backed up in `/data/so101_calibration_backup/`.

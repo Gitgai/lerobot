@@ -22,8 +22,8 @@ frames of a working run and a failing one:
 The model learned "a big orange under my fingers means descend and close". No
 substitute camera produced that picture, so the descent was never commanded.
 
->>> DECISION (operator, 2026-09-10): stop matching new cameras to old pictures.
->>> Record fresh demonstrations through the camera we intend to keep.
+> > > DECISION (operator, 2026-09-10): stop matching new cameras to old pictures.
+> > > Record fresh demonstrations through the camera we intend to keep.
 
 That is this plan.
 

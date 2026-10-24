@@ -35,14 +35,26 @@ CAMS = ["observation.images.front", "observation.images.wrist"]
 
 def frame_count(mp4: Path) -> int:
     out = subprocess.run(
-        ["ffprobe", "-v", "error", "-count_frames", "-select_streams", "v:0",
-         "-show_entries", "stream=nb_read_frames", "-of", "csv=p=0", str(mp4)],
-        capture_output=True, text=True).stdout.strip()
+        [
+            "ffprobe",
+            "-v",
+            "error",
+            "-count_frames",
+            "-select_streams",
+            "v:0",
+            "-show_entries",
+            "stream=nb_read_frames",
+            "-of",
+            "csv=p=0",
+            str(mp4),
+        ],
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
     return int(out) if out.isdigit() else -1
 
 
-meta = pd.concat([pd.read_parquet(p)
-                  for p in sorted((SRC / "meta/episodes").rglob("*.parquet"))])
+meta = pd.concat([pd.read_parquet(p) for p in sorted((SRC / "meta/episodes").rglob("*.parquet"))])
 keep = [e for e in sorted(meta["episode_index"].unique()) if int(e) not in REJECT]
 print(f"source episodes {len(meta)}, rejected {sorted(REJECT)}, converting {len(keep)}")
 
@@ -74,9 +86,13 @@ for new_i, old_i in enumerate(keep):
         if n != len(df):
             failures.append(f"ep {new_i} ({c}): {n} video frames vs {len(df)} rows")
 
-    rows.append({"episode_index": new_i,
-                 "tasks": [r["tasks"][0] if isinstance(r["tasks"], (list, np.ndarray)) else r["tasks"]],
-                 "length": int(len(df))})
+    rows.append(
+        {
+            "episode_index": new_i,
+            "tasks": [r["tasks"][0] if isinstance(r["tasks"], (list, np.ndarray)) else r["tasks"]],
+            "length": int(len(df)),
+        }
+    )
     print(f"  ep {old_i:>3} -> {new_i:>3}  {len(df)} frames")
 
 (DST / "meta/episodes.jsonl").write_text("".join(json.dumps(x) + "\n" for x in rows))

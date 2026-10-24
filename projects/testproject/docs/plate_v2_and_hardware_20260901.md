@@ -23,9 +23,9 @@ WHAT THIS RUN CANNOT ANSWER: whether the PLATE skill improved. All 20 plate
 demos are in training, so nothing is held back to score them against. Only the
 arm can judge that.
 
->>> ACTION FOR THE NEXT DATASET: hold 5-10 plate demos OUT of training. <<<
-Without a held-out set, "should we train longer?" is unanswerable offline and
-every future round repeats this same blind spot.
+> > > ACTION FOR THE NEXT DATASET: hold 5-10 plate demos OUT of training. <<<
+> > > Without a held-out set, "should we train longer?" is unanswerable offline and
+> > > every future round repeats this same blind spot.
 
 ## 2. The machine is shared - and it bit us three times
 
@@ -98,9 +98,9 @@ policy's tolerance for image change is near zero: four tape markers took it from
 90% to 0%. Swapping the camera would very likely require re-recording all 99
 demonstrations.
 
->>> ADOPT THE ESP32 AT THE MOMENT WE RE-RECORD, NOT BEFORE. <<<
-Expanding to 60-80 plate demos already requires recording. Doing both at once
-costs nothing extra and permanently retires the ribbon failure.
+> > > ADOPT THE ESP32 AT THE MOMENT WE RE-RECORD, NOT BEFORE. <<<
+> > > Expanding to 60-80 plate demos already requires recording. Doing both at once
+> > > costs nothing extra and permanently retires the ribbon failure.
 
 Until then the OV5647 stays, and it needs a REPLACEMENT RIBBON to be trusted.
 
@@ -189,9 +189,9 @@ camera. Same lesson as the simulator renders: the policy only understands the
 kind of pictures it was raised on. The ESP32's wider field of view and
 different colour rendering are enough to break recognition.
 
->>> CONFIRMED: the ESP32 is good hardware and a bad substitute. Adopting it
->>> REQUIRES re-recording the demonstrations. Do it at the 60-80 demo session,
->>> never as an emergency swap mid-experiment.
+> > > CONFIRMED: the ESP32 is good hardware and a bad substitute. Adopting it
+> > > REQUIRES re-recording the demonstrations. Do it at the 60-80 demo session,
+> > > never as an emergency swap mid-experiment.
 
 ### Two scoring bugs found the same day - both mine
 
@@ -211,8 +211,8 @@ ctrl1         26.3         207                7     <- no grasp
 t1            19.4         196                4     <- no grasp
 ```
 
-   A real hold is SUSTAINED. 207 cycles of scattered servo chatter outscored a
-   genuine 20-cycle hold. FIX: require the longest UNBROKEN block >= 10 cycles.
+A real hold is SUSTAINED. 207 cycles of scattered servo chatter outscored a
+genuine 20-cycle hold. FIX: require the longest UNBROKEN block >= 10 cycles.
 
 Both were caught because the operator asked "where did it grasp?" - a proxy
 measurement was being reported without checking the thing it stood for.
@@ -239,8 +239,8 @@ For scale: showing the model a WRONG image costs +3.3. A 40 px shift costs
 +0.13, about 4% of that. The brightness control came out at +0.01 exactly as
 predicted, which shows the probe is sensitive enough to detect real damage.
 
->>> HYPOTHESIS REJECTED. The model tolerates moderate viewpoint change fine.
->>> Geometric augmentation would fix a weakness it does not have. Do not run it.
+> > > HYPOTHESIS REJECTED. The model tolerates moderate viewpoint change fine.
+> > > Geometric augmentation would fix a weakness it does not have. Do not run it.
 
 Cost of finding out: 15 minutes. Cost had we skipped straight to the retrain:
 ~2 h GPU and a wrong conclusion in the record.
@@ -280,9 +280,9 @@ C  WRONG OV5647 frame, other episode   4.34     +2.13   known catastrophe
 the ESP32 swap costs 73% of what a completely wrong image costs
 ```
 
->>> The camera swap ALONE is sufficient to break the model. Feeding it an ESP32
->>> wrist view is nearly as damaging as feeding it a picture from a different
->>> episode.
+> > > The camera swap ALONE is sufficient to break the model. Feeding it an ESP32
+> > > wrist view is nearly as damaging as feeding it a picture from a different
+> > > episode.
 
 ### This resolves the apparent contradiction with section 7
 

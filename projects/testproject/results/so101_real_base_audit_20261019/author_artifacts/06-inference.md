@@ -23,13 +23,13 @@ Contents:
 
 ## 1. Prerequisites
 
-| Item | What was used |
-|---|---|
-| Robot | SO-101 follower arm, 6 DoF, Feetech STS3215 servos, USB serial (`/dev/ttyACM0`) |
-| Cameras | 2 USB UVC cameras: one overhead view of the workspace, one wrist view |
-| GPU | NVIDIA RTX 3090 Ti, 24 GB, driver 590.48.01 |
-| OS | Linux (kernel 6.x), V4L2 |
-| Checkpoint | step 40000, `model.safetensors` 7,481,485,688 bytes |
+| Item       | What was used                                                                   |
+| ---------- | ------------------------------------------------------------------------------- |
+| Robot      | SO-101 follower arm, 6 DoF, Feetech STS3215 servos, USB serial (`/dev/ttyACM0`) |
+| Cameras    | 2 USB UVC cameras: one overhead view of the workspace, one wrist view           |
+| GPU        | NVIDIA RTX 3090 Ti, 24 GB, driver 590.48.01                                     |
+| OS         | Linux (kernel 6.x), V4L2                                                        |
+| Checkpoint | step 40000, `model.safetensors` 7,481,485,688 bytes                             |
 
 The policy is about 3.62B parameters in bfloat16, so the weights alone occupy roughly 7 GiB of
 VRAM. Peak VRAM during inference was not recorded; a 24 GB card had ample headroom with
@@ -37,14 +37,14 @@ VRAM. Peak VRAM during inference was not recorded; a 24 GB card had ample headro
 
 Time budget for a first run, from a clean machine:
 
-| Step | Time |
-|---|---|
-| Create the environment, install VLASH | 15-30 min (dominated by the torch download) |
-| Download the checkpoint (7.0 GiB) | depends on link speed |
-| Identify camera device nodes, write the config | 10-20 min |
-| Dry run | ~1 min per attempt after startup |
-| Startup, no `compile_model` | about 25 s |
-| Startup, `compile_model: true` | about 2-3 min (torch.compile warmup) |
+| Step                                           | Time                                        |
+| ---------------------------------------------- | ------------------------------------------- |
+| Create the environment, install VLASH          | 15-30 min (dominated by the torch download) |
+| Download the checkpoint (7.0 GiB)              | depends on link speed                       |
+| Identify camera device nodes, write the config | 10-20 min                                   |
+| Dry run                                        | ~1 min per attempt after startup            |
+| Startup, no `compile_model`                    | about 25 s                                  |
+| Startup, `compile_model: true`                 | about 2-3 min (torch.compile warmup)        |
 
 The two startup figures were measured on this machine with pi0.5 checkpoints of the same size; they
 were not timed separately for this checkpoint.
@@ -81,19 +81,19 @@ unrelated changes or fail against a shifted API.
 
 Resolved versions in the environment that produced the results in section 9:
 
-| Package | Version |
-|---|---|
-| python | 3.10.20 |
-| torch | 2.7.1+cu126 |
-| torchvision | 0.22.1 |
-| torchcodec | 0.5 |
-| lerobot | 0.4.1 |
-| transformers | 4.53.3 |
-| peft | 0.18.0 |
-| numpy | 2.2.6 |
-| opencv-python | 4.13.0.92 |
-| draccus | 0.10.0 |
-| ffmpeg | 7.1.1 (conda-forge) |
+| Package       | Version             |
+| ------------- | ------------------- |
+| python        | 3.10.20             |
+| torch         | 2.7.1+cu126         |
+| torchvision   | 0.22.1              |
+| torchcodec    | 0.5                 |
+| lerobot       | 0.4.1               |
+| transformers  | 4.53.3              |
+| peft          | 0.18.0              |
+| numpy         | 2.2.6               |
+| opencv-python | 4.13.0.92           |
+| draccus       | 0.10.0              |
+| ffmpeg        | 7.1.1 (conda-forge) |
 
 VLASH's `pyproject.toml` pins `transformers` to a git commit rather than a release tag; 4.53.3 is
 what that commit resolved to here. If a later resolution breaks, pin `transformers==4.53.3`.
@@ -132,13 +132,13 @@ tokenizer.
 
 ### 2.4 Environment variables
 
-| Variable | Purpose | If unset |
-|---|---|---|
-| `VLASH_PALIGEMMA_PATH` | local tokenizer directory (only exists with the patch in 3.4) | the patched build falls back to a hardcoded container path; if that path does not exist, `transformers` treats the string as a repo id and raises `HFValidationError` |
-| `HF_HUB_OFFLINE=1` | forbid all Hub lookups | the Hub is contacted on every load; on a machine without credentials for the gated tokenizer repo this fails at load time |
-| `TRANSFORMERS_OFFLINE=1` | same, for the `transformers` cache path | as above |
-| `VLASH_DRY_RUN=1` | compute and print actions without commanding the motors (patch 3.2) | actions are sent to the arm |
-| `VLASH_SAFE_DEG` | abort threshold on action magnitude (patch 3.2), default 180 | 180 |
+| Variable                 | Purpose                                                             | If unset                                                                                                                                                              |
+| ------------------------ | ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `VLASH_PALIGEMMA_PATH`   | local tokenizer directory (only exists with the patch in 3.4)       | the patched build falls back to a hardcoded container path; if that path does not exist, `transformers` treats the string as a repo id and raises `HFValidationError` |
+| `HF_HUB_OFFLINE=1`       | forbid all Hub lookups                                              | the Hub is contacted on every load; on a machine without credentials for the gated tokenizer repo this fails at load time                                             |
+| `TRANSFORMERS_OFFLINE=1` | same, for the `transformers` cache path                             | as above                                                                                                                                                              |
+| `VLASH_DRY_RUN=1`        | compute and print actions without commanding the motors (patch 3.2) | actions are sent to the arm                                                                                                                                           |
+| `VLASH_SAFE_DEG`         | abort threshold on action magnitude (patch 3.2), default 180        | 180                                                                                                                                                                   |
 
 Setting `HF_HUB_OFFLINE=1` with an incomplete cache does not fall back to a download; the load
 fails with an offline-mode error. Populate the cache first, then go offline.
@@ -206,7 +206,7 @@ level).
 +++ b/vlash/run.py
 @@ def run_loop(...):
          action = async_manager.get_action(observation_frame)
- 
+
 +        import os as _os
 +        _dry_run = _os.environ.get("VLASH_DRY_RUN", "0") == "1"
 +        _safe_range = float(_os.environ.get("VLASH_SAFE_DEG", "180"))
@@ -358,11 +358,11 @@ different depths: an extracted `model.tar.gz` typically puts the files under
 
 Failure signatures:
 
-| Symptom | Cause |
-|---|---|
-| `config.json not found`, or a draccus `ParsingError ... got {}` | `policy.path` is not the directory holding `config.json` |
+| Symptom                                                                                                         | Cause                                                                        |
+| --------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `config.json not found`, or a draccus `ParsingError ... got {}`                                                 | `policy.path` is not the directory holding `config.json`                     |
 | Runs, but the motion has nothing to do with the trained behavior; log shows the adapter directory was not found | one directory level off on an adapter-style checkpoint; only the base loaded |
-| Actions are NaN or inf | normalization buffers missing or uninitialized |
+| Actions are NaN or inf                                                                                          | normalization buffers missing or uninitialized                               |
 
 ---
 
@@ -376,32 +376,32 @@ The `<...>` placeholders have to be filled in before the first run.
 ```yaml
 robot:
   type: so101_follower
-  port: <serial_port>                   # follower arm, e.g. /dev/ttyACM0; `ls /dev/ttyACM*`
-  id: <robot_id>                        # selects <calibration_dir>/<robot_id>.json
+  port: <serial_port> # follower arm, e.g. /dev/ttyACM0; `ls /dev/ttyACM*`
+  id: <robot_id> # selects <calibration_dir>/<robot_id>.json
   calibration_dir: <path/to/calibration>
   cameras:
-    base_0_rgb:                         # overhead / external view
+    base_0_rgb: # overhead / external view
       type: opencv
-      index_or_path: <overhead_node>    # e.g. /dev/video0; identify by capturing a frame (5.4)
+      index_or_path: <overhead_node> # e.g. /dev/video0; identify by capturing a frame (5.4)
       fourcc: MJPG
       width: 640
       height: 480
       fps: 30
-    left_wrist_0_rgb:                   # wrist view
+    left_wrist_0_rgb: # wrist view
       type: opencv
-      index_or_path: <wrist_node>       # e.g. /dev/video2; swapping the two raises nothing
+      index_or_path: <wrist_node> # e.g. /dev/video2; swapping the two raises nothing
       fourcc: MJPG
       width: 640
       height: 480
       fps: 30
 
 policy:
-  path: <CKPT_ROOT>/40000               # directory holding config.json + model.safetensors
-  empty_cameras: 1                      # fills the missing right_wrist_0_rgb slot
+  path: <CKPT_ROOT>/40000 # directory holding config.json + model.safetensors
+  empty_cameras: 1 # fills the missing right_wrist_0_rgb slot
   device: cuda
-  compile_model: true                   # required by inference_overlap_steps > 0
-  n_action_steps: 20                    # re-plan every 20 actions; checkpoint stores 50
-  num_inference_steps: 15               # checkpoint stores 10
+  compile_model: true # required by inference_overlap_steps > 0
+  n_action_steps: 20 # re-plan every 20 actions; checkpoint stores 50
+  num_inference_steps: 15 # checkpoint stores 10
 
 single_task: "Pick up the green cube block and put it inside the white cup."
 
@@ -441,11 +441,11 @@ mapped: external view to `base_0_rgb`, a wrist view to `left_wrist_0_rgb`.
 `empty_cameras` is the number of slots the policy should fill itself. Set it to the number of policy
 slots you are not providing:
 
-| Physical cameras | Slots provided | `empty_cameras` |
-|---|---|---|
-| 3 | base + left wrist + right wrist | 0 |
-| 2 | base + left wrist | 1 |
-| 1 | base | 2 |
+| Physical cameras | Slots provided                  | `empty_cameras` |
+| ---------------- | ------------------------------- | --------------- |
+| 3                | base + left wrist + right wrist | 0               |
+| 2                | base + left wrist               | 1               |
+| 1                | base                            | 2               |
 
 For each missing slot the policy appends a black image (all -1 after the SigLIP range shift) with
 its attention mask set to `False`, so the placeholder contributes no attention keys and the language
@@ -470,12 +470,48 @@ LeRobot resolves the calibration file as `<calibration_dir>/<id>.json` and decod
 
 ```json
 {
-  "shoulder_pan":   {"id": 1, "drive_mode": 0, "homing_offset": -1594, "range_min": 1045, "range_max": 3418},
-  "shoulder_lift":  {"id": 2, "drive_mode": 0, "homing_offset": -1657, "range_min":  845, "range_max": 3214},
-  "elbow_flex":     {"id": 3, "drive_mode": 0, "homing_offset":  1566, "range_min":  904, "range_max": 3121},
-  "wrist_flex":     {"id": 4, "drive_mode": 0, "homing_offset": -1462, "range_min":  875, "range_max": 3220},
-  "wrist_roll":     {"id": 5, "drive_mode": 0, "homing_offset": -1488, "range_min":    0, "range_max": 4095},
-  "gripper":        {"id": 6, "drive_mode": 0, "homing_offset":  1548, "range_min": 2027, "range_max": 3496}
+  "shoulder_pan": {
+    "id": 1,
+    "drive_mode": 0,
+    "homing_offset": -1594,
+    "range_min": 1045,
+    "range_max": 3418
+  },
+  "shoulder_lift": {
+    "id": 2,
+    "drive_mode": 0,
+    "homing_offset": -1657,
+    "range_min": 845,
+    "range_max": 3214
+  },
+  "elbow_flex": {
+    "id": 3,
+    "drive_mode": 0,
+    "homing_offset": 1566,
+    "range_min": 904,
+    "range_max": 3121
+  },
+  "wrist_flex": {
+    "id": 4,
+    "drive_mode": 0,
+    "homing_offset": -1462,
+    "range_min": 875,
+    "range_max": 3220
+  },
+  "wrist_roll": {
+    "id": 5,
+    "drive_mode": 0,
+    "homing_offset": -1488,
+    "range_min": 0,
+    "range_max": 4095
+  },
+  "gripper": {
+    "id": 6,
+    "drive_mode": 0,
+    "homing_offset": 1548,
+    "range_min": 2027,
+    "range_max": 3496
+  }
 }
 ```
 
@@ -488,7 +524,7 @@ Two practical points:
   so on) raises a decoding error naming that key. Strip anything that is not a joint before use.
 - **First connect prompts.** If the values stored in the motors differ from the file, LeRobot prints
   `Press ENTER to use provided calibration file associated with the id ..., or type 'c' and press
-  ENTER to run calibration:`. Pressing ENTER writes the file's calibration into the motors, which is
+ENTER to run calibration:`. Pressing ENTER writes the file's calibration into the motors, which is
   what you want. Typing `c` starts a full re-calibration and overwrites the file.
 
 If the arm's calibration does not match the arm the data was recorded on, joint zero points shift
@@ -561,26 +597,26 @@ remaining `N` steps of execution and the transfer and synchronization happen at 
 inference call is issued from the control loop, so its CPU-side launch cost lands on that one step;
 that is why VLASH refuses `inference_overlap_steps > 0` unless `compile_model` is true.
 
-The chunk that is launched early is conditioned on the *last action of the current chunk* rather
+The chunk that is launched early is conditioned on the _last action of the current chunk_ rather
 than the live joint state - the state the arm is predicted to be in when the new chunk starts. This
 is VLASH's future-state-aware trick and it is what makes overlap stable instead of jittery.
 
 ### 6.2 Option reference
 
-| Option | Where | Meaning | Tradeoff |
-|---|---|---|---|
-| `policy.n_action_steps` | policy | actions executed per chunk before re-planning; must be <= `chunk_size` (50) | this is the re-planning period. At 30 fps, 20 means a fresh plan every 667 ms. Lower = more reactive to changes in the scene, more compute; higher = smoother but sluggish to react |
-| `inference_overlap_steps` | run | steps before the chunk ends at which the next inference starts; 0 = synchronous | larger = more compute window and a longer blend ramp, but the new chunk is conditioned on an older observation. A quarter to a half of `n_action_steps` is a reasonable band. Must be <= `n_action_steps`, and requires `compile_model: true`. Scaled internally by `action_quant_ratio` |
-| `policy.compile_model` | policy | `torch.compile` the policy | adds 2-3 min of warmup at startup, then faster inference. Mandatory when overlap > 0 |
-| `policy.num_inference_steps` | policy | flow matching denoising steps per chunk | more = more precise integration, slower; fewer = faster, coarser. The checkpoint stores 10; the evaluation used 15 |
-| `fps` | run | control loop target rate | should match the rate the training data was collected at (30). A different loop rate changes what one action step means in time and stretches or compresses every trajectory |
-| `policy.device` | policy | `cuda` | - |
-| `action_quant_ratio` | run | send every Nth action | 2 makes the arm traverse a chunk twice as fast at the cost of resolution. The evaluation used 1 |
-| `control_time_s` | run | wall-clock runtime, then the loop exits | 15-30 s for a dry run, 60-600 s for a live task |
-| `display_data` | run | stream observations to Rerun | useful for debugging, costs loop time |
-| `play_sounds` | run | spoken start/stop cues | off for evaluation |
-| `VLASH_SAFE_DEG` | env (patch 3.2) | abort if any action exceeds this magnitude | 180 is loose, 100 is tight in normalized joint units |
-| `VLASH_DRY_RUN` | env (patch 3.2) | compute actions, do not command motors | see section 8 |
+| Option                       | Where           | Meaning                                                                         | Tradeoff                                                                                                                                                                                                                                                                                 |
+| ---------------------------- | --------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `policy.n_action_steps`      | policy          | actions executed per chunk before re-planning; must be <= `chunk_size` (50)     | this is the re-planning period. At 30 fps, 20 means a fresh plan every 667 ms. Lower = more reactive to changes in the scene, more compute; higher = smoother but sluggish to react                                                                                                      |
+| `inference_overlap_steps`    | run             | steps before the chunk ends at which the next inference starts; 0 = synchronous | larger = more compute window and a longer blend ramp, but the new chunk is conditioned on an older observation. A quarter to a half of `n_action_steps` is a reasonable band. Must be <= `n_action_steps`, and requires `compile_model: true`. Scaled internally by `action_quant_ratio` |
+| `policy.compile_model`       | policy          | `torch.compile` the policy                                                      | adds 2-3 min of warmup at startup, then faster inference. Mandatory when overlap > 0                                                                                                                                                                                                     |
+| `policy.num_inference_steps` | policy          | flow matching denoising steps per chunk                                         | more = more precise integration, slower; fewer = faster, coarser. The checkpoint stores 10; the evaluation used 15                                                                                                                                                                       |
+| `fps`                        | run             | control loop target rate                                                        | should match the rate the training data was collected at (30). A different loop rate changes what one action step means in time and stretches or compresses every trajectory                                                                                                             |
+| `policy.device`              | policy          | `cuda`                                                                          | -                                                                                                                                                                                                                                                                                        |
+| `action_quant_ratio`         | run             | send every Nth action                                                           | 2 makes the arm traverse a chunk twice as fast at the cost of resolution. The evaluation used 1                                                                                                                                                                                          |
+| `control_time_s`             | run             | wall-clock runtime, then the loop exits                                         | 15-30 s for a dry run, 60-600 s for a live task                                                                                                                                                                                                                                          |
+| `display_data`               | run             | stream observations to Rerun                                                    | useful for debugging, costs loop time                                                                                                                                                                                                                                                    |
+| `play_sounds`                | run             | spoken start/stop cues                                                          | off for evaluation                                                                                                                                                                                                                                                                       |
+| `VLASH_SAFE_DEG`             | env (patch 3.2) | abort if any action exceeds this magnitude                                      | 180 is loose, 100 is tight in normalized joint units                                                                                                                                                                                                                                     |
+| `VLASH_DRY_RUN`              | env (patch 3.2) | compute actions, do not command motors                                          | see section 8                                                                                                                                                                                                                                                                            |
 
 `n_action_steps` and `num_inference_steps` are stored in the checkpoint's `config.json` as 50 and 10.
 To reproduce the evaluation they must be overridden explicitly, in YAML or on the command line.
@@ -606,17 +642,17 @@ chunk.
 These are the settings under which the hardware result in section 9 was obtained. They are one
 working point, not a tuned optimum.
 
-| Setting | Value |
-|---|---|
-| Checkpoint | step 40000 |
-| `inference_overlap_steps` | 8 |
-| `policy.compile_model` | true |
-| `policy.n_action_steps` | 20 |
-| `policy.num_inference_steps` | 15 |
-| `fps` | 30 |
-| `action_quant_ratio` | 1 |
-| `VLASH_SAFE_DEG` | 180 |
-| Cameras | 2 physical, `empty_cameras: 1` |
+| Setting                      | Value                          |
+| ---------------------------- | ------------------------------ |
+| Checkpoint                   | step 40000                     |
+| `inference_overlap_steps`    | 8                              |
+| `policy.compile_model`       | true                           |
+| `policy.n_action_steps`      | 20                             |
+| `policy.num_inference_steps` | 15                             |
+| `fps`                        | 30                             |
+| `action_quant_ratio`         | 1                              |
+| `VLASH_SAFE_DEG`             | 180                            |
+| Cameras                      | 2 physical, `empty_cameras: 1` |
 
 At 30 fps that is a re-plan every 667 ms with a 267 ms overlap window and a blend ramp over the
 first 8 actions of each chunk. The reading is a balance against what the checkpoint stores:
@@ -759,14 +795,14 @@ motion quality for turnaround.
 
 Closed-loop evaluation on the physical arm, single session.
 
-| Item | Value |
-|---|---|
-| Checkpoint | step 40000 |
-| Prompt | "Pick up the green cube block and put it inside the white cup." |
-| Demonstrations of this task in the training data | 14 |
-| Observed success rate | about 90% |
-| Number of trials behind that rate | not recorded |
-| Settings | section 7 |
+| Item                                             | Value                                                           |
+| ------------------------------------------------ | --------------------------------------------------------------- |
+| Checkpoint                                       | step 40000                                                      |
+| Prompt                                           | "Pick up the green cube block and put it inside the white cup." |
+| Demonstrations of this task in the training data | 14                                                              |
+| Observed success rate                            | about 90%                                                       |
+| Number of trials behind that rate                | not recorded                                                    |
+| Settings                                         | section 7                                                       |
 
 The task was run repeatedly, with the cube moved between trials and under varying lighting, and
 succeeded across those variations. **The number of trials was not recorded**, so 90% is an observed
@@ -859,22 +895,22 @@ Hardware faults seen on this rig, in case they surface as apparent policy failur
 
 ## 11. Troubleshooting
 
-| Symptom | Cause | Fix |
-|---|---|---|
-| `HFValidationError` on tokenizer load | tokenizer path unset and the default path does not exist | set `VLASH_PALIGEMMA_PATH` to a local tokenizer directory, or authenticate to the gated Hub repo |
-| Offline-mode error on load | `HF_HUB_OFFLINE=1` with an incomplete cache | populate the cache online once, then go offline |
-| `Robot camera names must exactly match policy image feature names!` | fewer cameras than policy slots on unpatched VLASH | apply patch 3.1 and set `empty_cameras` |
-| `Robot has cameras the policy does not expect` | camera key is not a policy slot name | rename the key to `base_0_rgb` / `left_wrist_0_rgb` / `right_wrist_0_rgb` |
-| `When inference_overlap_steps > 0, policy.compile_model must be True` | async without compile | set `--policy.compile_model=true` |
-| `n_action_steps must be greater than or equal to overlap_steps` | overlap too large | lower `inference_overlap_steps` below `n_action_steps` |
-| `n_action_steps (N) cannot be greater than chunk_size (50)` | `n_action_steps` over 50 | lower it |
-| `config.json not found`, draccus `ParsingError ... got {}` | `policy.path` one level off | `ls` the directory, point at the level holding `config.json` |
-| Actions are NaN or inf | normalization buffers missing or uninitialized | verify with the snippet in 4.1 |
-| Runs but the behavior is unrelated to training | wrong checkpoint level loaded, or `single_task` does not match the trained instruction | check the directory level (4.2), check `train_config.json` for the training task string |
-| `set(fourcc/width)` returns false, then `VIDIOC_QBUF Bad file descriptor` | OpenCV resolved to `CAP_ANY` | force `cv2.CAP_V4L2` (5.4) |
-| Camera opens but frames stall at 30 fps | raw pixel format over USB | set `fourcc: MJPG` |
-| `Not a video capture device` | wrong `/dev/videoN` | enumerate capture devices, verify by capturing a frame |
-| Decoding error naming an unknown key while loading calibration | non-joint metadata in the calibration JSON | strip every top-level key that is not a joint |
-| `Mismatch between calibration values in the motor and the calibration file` prompt | motors and file disagree, or `id` points at the wrong file | press ENTER to write the file into the motors; check `robot.id` |
-| Headless warning about keyboard input | no display attached | stop with `Ctrl-C`; `ESC` is unavailable |
-| Process left running after a crash | - | `pkill -f "vlash run"`; the `finally` block disconnects the robot and releases the cameras |
+| Symptom                                                                            | Cause                                                                                  | Fix                                                                                              |
+| ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `HFValidationError` on tokenizer load                                              | tokenizer path unset and the default path does not exist                               | set `VLASH_PALIGEMMA_PATH` to a local tokenizer directory, or authenticate to the gated Hub repo |
+| Offline-mode error on load                                                         | `HF_HUB_OFFLINE=1` with an incomplete cache                                            | populate the cache online once, then go offline                                                  |
+| `Robot camera names must exactly match policy image feature names!`                | fewer cameras than policy slots on unpatched VLASH                                     | apply patch 3.1 and set `empty_cameras`                                                          |
+| `Robot has cameras the policy does not expect`                                     | camera key is not a policy slot name                                                   | rename the key to `base_0_rgb` / `left_wrist_0_rgb` / `right_wrist_0_rgb`                        |
+| `When inference_overlap_steps > 0, policy.compile_model must be True`              | async without compile                                                                  | set `--policy.compile_model=true`                                                                |
+| `n_action_steps must be greater than or equal to overlap_steps`                    | overlap too large                                                                      | lower `inference_overlap_steps` below `n_action_steps`                                           |
+| `n_action_steps (N) cannot be greater than chunk_size (50)`                        | `n_action_steps` over 50                                                               | lower it                                                                                         |
+| `config.json not found`, draccus `ParsingError ... got {}`                         | `policy.path` one level off                                                            | `ls` the directory, point at the level holding `config.json`                                     |
+| Actions are NaN or inf                                                             | normalization buffers missing or uninitialized                                         | verify with the snippet in 4.1                                                                   |
+| Runs but the behavior is unrelated to training                                     | wrong checkpoint level loaded, or `single_task` does not match the trained instruction | check the directory level (4.2), check `train_config.json` for the training task string          |
+| `set(fourcc/width)` returns false, then `VIDIOC_QBUF Bad file descriptor`          | OpenCV resolved to `CAP_ANY`                                                           | force `cv2.CAP_V4L2` (5.4)                                                                       |
+| Camera opens but frames stall at 30 fps                                            | raw pixel format over USB                                                              | set `fourcc: MJPG`                                                                               |
+| `Not a video capture device`                                                       | wrong `/dev/videoN`                                                                    | enumerate capture devices, verify by capturing a frame                                           |
+| Decoding error naming an unknown key while loading calibration                     | non-joint metadata in the calibration JSON                                             | strip every top-level key that is not a joint                                                    |
+| `Mismatch between calibration values in the motor and the calibration file` prompt | motors and file disagree, or `id` points at the wrong file                             | press ENTER to write the file into the motors; check `robot.id`                                  |
+| Headless warning about keyboard input                                              | no display attached                                                                    | stop with `Ctrl-C`; `ESC` is unavailable                                                         |
+| Process left running after a crash                                                 | -                                                                                      | `pkill -f "vlash run"`; the `finally` block disconnects the robot and releases the cameras       |

@@ -40,14 +40,14 @@ This is stronger than matching dimensions alone, but it remains a saved-input te
 
 ## Timing results
 
-| Measurement | Ordinary SSH | Losslessly compressed SSH |
-|---|---:|---:|
-| Requests | 16 | 16 |
-| Median end-to-end | 2.743 s | 1.737 s |
-| p95 end-to-end | 4.069 s | 2.187 s |
-| Maximum end-to-end | 5.888 s | 2.195 s |
-| Median upload/acknowledgement | 1.840 s | 1.379 s |
-| Replies slower than 50/30 seconds | 15/16 | 9/16 |
+| Measurement                       | Ordinary SSH | Losslessly compressed SSH |
+| --------------------------------- | -----------: | ------------------------: |
+| Requests                          |           16 |                        16 |
+| Median end-to-end                 |      2.743 s |                   1.737 s |
+| p95 end-to-end                    |      4.069 s |                   2.187 s |
+| Maximum end-to-end                |      5.888 s |                   2.195 s |
+| Median upload/acknowledgement     |      1.840 s |                   1.379 s |
+| Replies slower than 50/30 seconds |        15/16 |                      9/16 |
 
 Compression reduced the median by approximately **36.7%** in this paired experiment. It did not eliminate the delay or establish a worst-case bound.
 

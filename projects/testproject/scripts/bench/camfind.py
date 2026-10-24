@@ -10,6 +10,7 @@ Prints shell assignments:
     WRIST_CAM=/dev/videoN
     FRONT_CAM=/dev/videoN
 """
+
 import glob
 import re
 import subprocess
@@ -20,8 +21,9 @@ WANT = {"wrist": "AK-Camera", "front": "C270"}
 
 def card_name(dev):
     try:
-        out = subprocess.run(["v4l2-ctl", "-d", dev, "--info"],
-                             capture_output=True, text=True, timeout=5).stdout
+        out = subprocess.run(
+            ["v4l2-ctl", "-d", dev, "--info"], capture_output=True, text=True, timeout=5
+        ).stdout
     except Exception:
         return None
     m = re.search(r"Card type\s*:\s*(.+)", out)
@@ -30,8 +32,9 @@ def card_name(dev):
 
 def can_capture(dev):
     try:
-        out = subprocess.run(["v4l2-ctl", "-d", dev, "--list-formats"],
-                             capture_output=True, text=True, timeout=5).stdout
+        out = subprocess.run(
+            ["v4l2-ctl", "-d", dev, "--list-formats"], capture_output=True, text=True, timeout=5
+        ).stdout
     except Exception:
         return False
     return "MJPG" in out

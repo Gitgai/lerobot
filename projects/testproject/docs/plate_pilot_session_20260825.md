@@ -22,7 +22,7 @@ operator-LEFT   (camera-x 369-500)   4   target 4   done
    before draccus parses the command line.
 4. `--resume` requires an explicit `--dataset.root`; without it each run
    creates a NEW timestamped dataset. Demo 1 was orphaned this way.
-5. PORTS ARE NOT STABLE. A dropout renumbers /dev/ttyACM*, so a hard-coded
+5. PORTS ARE NOT STABLE. A dropout renumbers /dev/ttyACM\*, so a hard-coded
    port either fails or SILENTLY ADDRESSES THE WRONG ARM. `arm_ports.py`
    resolves both by serial (follower 5B14114209, leader 5B14029688).
 6. Auto-retry-on-failure REMOVED. It re-recorded while the operator was still

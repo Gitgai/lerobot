@@ -55,6 +55,7 @@ mixing   against the LeIsaac rig (a moved camera breaks a pixel policy on
 ```
 
 What varies and what does not (clarified 2026-10-19, operator's question):
+
 ```text
 varies       object placements — LeIsaac's scripted generator respawns the three oranges and the plate
              each episode (utils/domain_randomization.py: object pose; camera-pose jitter is available in

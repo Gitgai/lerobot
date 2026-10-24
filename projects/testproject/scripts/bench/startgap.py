@@ -22,6 +22,7 @@ def load(kind, folder, dev_id, port):
     with open(path) as fh:
         raw = json.load(fh)
     from lerobot.motors import MotorCalibration
+
     calib = {k: MotorCalibration(**v) for k, v in raw.items()}
     norm = MotorNormMode.DEGREES
     motors = {j: Motor(i + 1, "sts3215", norm) for i, j in enumerate(JOINTS)}
@@ -33,12 +34,12 @@ def load(kind, folder, dev_id, port):
 
 
 import subprocess
-out = subprocess.run(["python3", os.path.expanduser("~/arm_ports.py")],
-                     capture_output=True, text=True).stdout
+
+out = subprocess.run(["python3", os.path.expanduser("~/arm_ports.py")], capture_output=True, text=True).stdout
 ports = {}
 for line in out.splitlines():
     if line.startswith("export "):
-        k, _, v = line[len("export "):].partition("=")
+        k, _, v = line[len("export ") :].partition("=")
         ports[k] = v.strip()
 
 foll = load("so_follower", ROBOTS, "my_so101_follower", ports["FOLLOWER_PORT"])

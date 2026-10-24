@@ -4,8 +4,10 @@ import pandas as pd
 df = pd.read_parquet("/home/gaikwad-prakash/esp_orange/data/chunk-000/file-000.parquet")
 st = np.stack(df["observation.state"].values)
 grip, lift = st[:, 5], st[:, 1]
-print("  %d rows.  gripper %.1f..%.1f   shoulder_lift %.1f..%.1f"
-      % (len(df), grip.min(), grip.max(), lift.min(), lift.max()))
+print(
+    "  %d rows.  gripper %.1f..%.1f   shoulder_lift %.1f..%.1f"
+    % (len(df), grip.min(), grip.max(), lift.min(), lift.max())
+)
 
 rng = grip.max() - grip.min()
 ci = np.where(grip < grip.min() + 0.25 * rng)[0]

@@ -1,0 +1,262 @@
+#!/usr/bin/env python3
+"""Real-arm client for the GR00T N1.6 policy server - SINGLE FILE, no gr00t install.
+
+WHY THIS EXISTS
+---------------
+The arm lives on the OLD machine (gaikwad-prakash@192.168.194.228) whose venv
+is the rig's own era (lerobot 0.5.2, so_follower drivers - the environment
+that drove this arm before). Installing the Isaac-GR00T stack there for two
+small classes is absurd; this file VENDORS them faithfully instead:
+
+    MsgSerializer, PolicyClient   <- gr00t/policy/server_client.py (n1.6-release)
+    So100Adapter, eval loop       <- gr00t/eval/real_robot/SO100/eval_so100.py
+
+Vendoring notes (deviations, all deliberate):
+  - PolicyClient.get_action == _get_action (BasePolicy validation skipped;
+    default strict=False made it non-blocking anyway - wire bytes identical,
+    and Stage A's live handshake verified exactly this payload).
+  - ModalityConfig decode returns the raw dict (we never call that endpoint).
+  - --dry_run: no robot; sends a synthetic observation and prints the action
+    chunk - proves network + serialization + server end to end from the arm
+    machine before any hardware moves.
+
+USAGE (on the arm machine)
+--------------------------
+dry run (no robot):
+  ~/PrakashProjects/lerobot/lerobot/.venv/bin/python n16_realarm_client.py \
+      --policy_host=192.168.194.158 --policy_port=5556 --dry_run=true
+
+real (cameras must be named front/wrist, 640x480; WB LOCKED first):
+  ... n16_realarm_client.py \
+      --robot.type=so101_follower --robot.port=/dev/ttyACM0 \
+      --robot.id=my_so101_follower \
+      --robot.cameras="{front: {type: opencv, index_or_path: /dev/videoX, width: 640, height: 480, fps: 30}, wrist: {type: opencv, index_or_path: /dev/videoY, width: 640, height: 480, fps: 30}}" \
+      --policy_host=192.168.194.158 --policy_port=5556 \
+      --lang_instruction="Grab orange and place into plate"
+
+Rig spec (measured, priority order): (0) layout match - plate LEFT, oranges
+clustered 10-15 cm right; (1) clean table, nothing orange-ish; (2) LOCK white
+balance+exposure (v4l2-ctl); (3) ~2 cm mounting slack. Ctrl+C stops.
+"""
+
+from dataclasses import dataclass, field
+import io
+import logging
+import time
+from typing import Any
+
+import draccus
+import msgpack
+import numpy as np
+import zmq
+
+# ---------------------------------------------------------------- wire format
+class MsgSerializer:
+    @staticmethod
+    def to_bytes(data: Any) -> bytes:
+        return msgpack.packb(data, default=MsgSerializer.encode_custom_classes)
+
+    @staticmethod
+    def from_bytes(data: bytes) -> Any:
+        return msgpack.unpackb(data, object_hook=MsgSerializer.decode_custom_classes)
+
+    @staticmethod
+    def decode_custom_classes(obj):
+        if not isinstance(obj, dict):
+            return obj
+        if "__ModalityConfig_class__" in obj:
+            return obj["as_json"]  # vendored: raw dict; endpoint unused here
+        if "__ndarray_class__" in obj:
+            return np.load(io.BytesIO(obj["as_npy"]), allow_pickle=False)
+        return obj
+
+    @staticmethod
+    def encode_custom_classes(obj):
+        if isinstance(obj, np.ndarray):
+            output = io.BytesIO()
+            np.save(output, obj, allow_pickle=False)
+            return {"__ndarray_class__": True, "as_npy": output.getvalue()}
+        return obj
+
+
+class PolicyClient:
+    def __init__(self, host="localhost", port=5555, timeout_ms=15000, api_token=None):
+        self.context = zmq.Context()
+        self.host = host
+        self.port = port
+        self.timeout_ms = timeout_ms
+        self.api_token = api_token
+        self._init_socket()
+
+    def _init_socket(self):
+        self.socket = self.context.socket(zmq.REQ)
+        self.socket.setsockopt(zmq.RCVTIMEO, self.timeout_ms)
+        self.socket.connect(f"tcp://{self.host}:{self.port}")
+
+    def ping(self) -> bool:
+        try:
+            self.call_endpoint("ping", requires_input=False)
+            return True
+        except zmq.error.ZMQError:
+            self._init_socket()
+            return False
+
+    def call_endpoint(self, endpoint: str, data: dict | None = None, requires_input: bool = True) -> Any:
+        request: dict = {"endpoint": endpoint}
+        if requires_input:
+            request["data"] = data
+        if self.api_token:
+            request["api_token"] = self.api_token
+        self.socket.send(MsgSerializer.to_bytes(request))
+        message = self.socket.recv()
+        if message == b"ERROR":
+            raise RuntimeError("Server error. Make sure we are running the correct policy server.")
+        response = MsgSerializer.from_bytes(message)
+        if isinstance(response, dict) and "error" in response:
+            raise RuntimeError(f"Server error: {response['error']}")
+        return response
+
+    def get_action(self, observation: dict, options: dict | None = None):
+        response = self.call_endpoint("get_action", {"observation": observation, "options": options})
+        return tuple(response)  # (action, info)
+
+
+# ------------------------------------------------------------------- adapter
+def recursive_add_extra_dim(obs: dict) -> dict:
+    out = {}
+    for k, v in obs.items():
+        if isinstance(v, dict):
+            out[k] = recursive_add_extra_dim(v)
+        elif isinstance(v, np.ndarray):
+            out[k] = v[None, ...]
+        elif isinstance(v, (int, float, np.floating, np.integer)):
+            out[k] = np.array([v])
+        elif isinstance(v, str):
+            out[k] = [v]
+        else:
+            out[k] = [v]
+    return out
+
+
+class So100Adapter:
+    def __init__(self, policy_client: PolicyClient):
+        self.policy = policy_client
+        self.robot_state_keys = [
+            "shoulder_pan.pos",
+            "shoulder_lift.pos",
+            "elbow_flex.pos",
+            "wrist_flex.pos",
+            "wrist_roll.pos",
+            "gripper.pos",
+        ]
+        self.camera_keys = ["front", "wrist"]
+
+    def obs_to_policy_inputs(self, obs: dict) -> dict:
+        model_obs = {}
+        model_obs["video"] = {k: obs[k] for k in self.camera_keys}
+        state = np.array([obs[k] for k in self.robot_state_keys], dtype=np.float32)
+        model_obs["state"] = {"single_arm": state[:5], "gripper": state[5:6]}
+        model_obs["language"] = {"annotation.human.task_description": obs["lang"]}
+        model_obs = recursive_add_extra_dim(model_obs)
+        model_obs = recursive_add_extra_dim(model_obs)
+        return model_obs
+
+    def decode_action_chunk(self, chunk: dict, t: int) -> dict:
+        single_arm = chunk["single_arm"][0][t]
+        gripper = chunk["gripper"][0][t]
+        full = np.concatenate([single_arm, gripper], axis=0)
+        return {name: float(full[i]) for i, name in enumerate(self.robot_state_keys)}
+
+    def get_action(self, obs: dict) -> list:
+        model_input = self.obs_to_policy_inputs(obs)
+        action_chunk, info = self.policy.get_action(model_input)
+        any_key = next(iter(action_chunk.keys()))
+        horizon = action_chunk[any_key].shape[1]
+        return [self.decode_action_chunk(action_chunk, t) for t in range(horizon)]
+
+
+# ---------------------------------------------------------------------- main
+@dataclass
+class EvalConfig:
+    policy_host: str = "192.168.194.158"
+    policy_port: int = 5556
+    action_horizon: int = 8
+    lang_instruction: str = "Grab orange and place into plate"
+    dry_run: bool = False
+    robot: dict = field(default_factory=dict)  # replaced below when not dry_run
+
+
+def run_dry(cfg) -> None:
+    client = PolicyClient(host=cfg.policy_host, port=cfg.policy_port)
+    print(f"[dry] ping {cfg.policy_host}:{cfg.policy_port} ->", client.ping())
+    adapter = So100Adapter(client)
+    obs = {
+        "front": np.zeros((480, 640, 3), np.uint8),
+        "wrist": np.zeros((480, 640, 3), np.uint8),
+        "lang": cfg.lang_instruction,
+        **{k: 0.0 for k in adapter.robot_state_keys},
+    }
+    t0 = time.time()
+    actions = adapter.get_action(obs)
+    dt = time.time() - t0
+    print(f"[dry] got {len(actions)} action steps in {dt:.2f}s")
+    print("[dry] step0:", {k: round(v, 2) for k, v in actions[0].items()})
+    print("[dry] last :", {k: round(v, 2) for k, v in actions[-1].items()})
+    print("[dry] NETWORK + WIRE + SERVER: OK")
+
+
+def main() -> None:
+    import sys
+
+    if any(a.startswith("--dry_run") for a in sys.argv[1:]):
+        # light-weight path: no lerobot imports at all
+        @draccus.wrap()
+        def _dry(cfg: EvalConfig):
+            run_dry(cfg)
+
+        _dry()
+        return
+
+    # real path - lerobot imports only here so dry_run works anywhere
+    from lerobot.robots import RobotConfig, make_robot_from_config, so_follower  # noqa: F401
+
+    @dataclass
+    class RealConfig:
+        robot: RobotConfig = None
+        policy_host: str = "192.168.194.158"
+        policy_port: int = 5556
+        action_horizon: int = 8
+        lang_instruction: str = "Grab orange and place into plate"
+
+    @draccus.wrap()
+    def _real(cfg: RealConfig):
+        logging.basicConfig(level=logging.INFO)
+        robot = make_robot_from_config(cfg.robot)
+        robot.connect()
+        print("[real] robot connected")
+        client = PolicyClient(host=cfg.policy_host, port=cfg.policy_port)
+        assert client.ping(), "policy server unreachable"
+        policy = So100Adapter(client)
+        print(f'[real] running with instruction: "{cfg.lang_instruction}"  (Ctrl+C stops)')
+        try:
+            while True:
+                obs = robot.get_observation()
+                obs["lang"] = cfg.lang_instruction
+                actions = policy.get_action(obs)
+                for action_dict in actions[: cfg.action_horizon]:
+                    tic = time.time()
+                    robot.send_action(action_dict)
+                    toc = time.time()
+                    if toc - tic < 1.0 / 30:
+                        time.sleep(1.0 / 30 - (toc - tic))
+        except KeyboardInterrupt:
+            print("\n[real] stopping")
+        finally:
+            robot.disconnect()
+            print("[real] robot disconnected")
+
+    _real()
+
+
+if __name__ == "__main__":
+    main()

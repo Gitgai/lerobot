@@ -17,6 +17,7 @@ rate. **This session proved the control loop and the network are NOT the ceiling
 the ceiling is grasp-and-release precision, plus a marginal 5.4 V follower supply.**
 
 **Do next, in order:**
+
 1. **Fix the follower power to ~7.4 V** (measured 5.4 V; physical fix). Cheapest
    lever, likely cause of the "clamp-stall" failures.
 2. **Re-run a scored set** of checkpoint-6000 WITH `--rtc` at 7.4 V = the true rate.
@@ -70,6 +71,7 @@ GR00T trains on LeRobot v2.1 (per-episode files), not v3.0.
 ## What this session established (2026-09-20)
 
 ### 1. RTC works and is ~5x faster (demo tempo) — but doesn't fix placement
+
 `--rtc` (depth-2 pipelined client: 2 sockets + staleness guard) was OFF in every
 eval this month; it is the loop the 9/10 baseline used. Re-tested this session:
 
@@ -78,11 +80,13 @@ eval this month; it is the loop the 9/10 baseline used. Re-tested this session:
 RTC (702)     68.7 s     337       133 deg/s        4.8 deg/s     348 ms
 SEQ (604)    294.2 s     322        27 deg/s        0.2 deg/s     632 ms
 ```
+
 RTC finishes in 69 s vs 294 s, peak joint speed ~5x higher = demo tempo restored.
 Gates passed: G0 dry 95.4% duty, G1 motion 85-86% duty. **But the scored rate did
 not move (3/7).** The loop was necessary, not sufficient.
 
 ### 2. The grip trace is the outcome oracle — release, not grasp, is the tell
+
 ```text
 trial  grip-min @ frac   final   outcome    read
 702 v   15.6 @ 0.38       70.4    PLACE      closed EARLY, then RELEASED (final high)
@@ -93,21 +97,25 @@ trial  grip-min @ frac   final   outcome    read
 706 x   16.7 @ 0.97       16.9    STALL      closed LATE, stayed CLAMPED (never released)
 708 x   15.2 @ 0.93       15.2    STALL      closed late, clamped, orange pinned at table
 ```
+
 Every SUCCESS ends with the gripper reopened over the plate (final 54-70). Every
 FAILURE either never closes (703/704, min ~60) or closes and stays clamped
 (706/708, final 15-17). grip-min ~22 = orange secured; ~13-14 = closed on air;
 68+ = never closed.
 
 ### 3. Two failure modes, both grasp-execution
+
 ```text
 no-grasp     (703, 704)  gripper never closes
 clamp-stall  (706, 708)  closes but never lifts/releases; orange pinned at table
 ```
+
 708 was re-run with a 120 s window (708b): the arm closed at frac 0.65 but stayed
 clamped (final 17.7) and never lifted — a TRUE stall, not a timeout. More time did
 not help.
 
 ### 4. Undervoltage: follower at 5.4 V (nominal 7.4 V)
+
 Measured 2026-09-20 with `~/voltrace.py`. LIFTING the grasped orange is the
 highest-torque moment; the clamp-stalls (grasped, could not lift) fit an
 undervolted-servo signature. NOT a hard block — 702/705/707 lifted+placed at 5.4 V
@@ -125,6 +133,7 @@ diffusion steps   already at the minimum of 4 (num_inference_timesteps).
 image payload     256 px / 640x480 is a minor knob, not the ceiling.
 orange position   same positions gave both outcomes -> execution inconsistency, not OOD.
 ```
+
 The only remaining levers are POWER (physical) and GRASP-PRECISION DATA.
 
 ---
@@ -132,38 +141,46 @@ The only remaining levers are POWER (physical) and GRASP-PRECISION DATA.
 ## How to run everything
 
 ### Policy server (AI90 — usually already up)
+
 ```bash
 # check it's listening
 ss -ltnp | grep 5555
 # (re)start on a chosen recovery checkpoint (3000|6000):
 RECOV_CKPT=6000 python3 ~/srv_wrap_recov.py
 ```
+
 Serving now: pid on 5555, RECOV_CKPT=6000, up since 2026-09-19. It's a ZMQ REQ/REP
 service binding 0.0.0.0:5555; transport is msgpack (safe, no pickle) + JPEG q92.
 
 ### One scored trial (Acer)
+
 ```bash
 ssh gaikwad-prakash@192.168.194.228 '~/home_and_trial.sh <N>'
 ```
+
 `home_and_trial.sh` homes with retry (calls `clear_overload.py` + `home_arm.py` up
 to 3-4x to clear latched Feetech errors) then runs `run_trial.sh <N>`, which calls
 `n16_realarm_client.py --policy_host=192.168.194.220 --policy_port=5555
 --jpeg_quality=92 --rtc=true` under `timeout 300`. Output per trial:
+
 ```text
 "chunks <N>  grip min <g>@c<chunk>(frac <f>)  final <g>"   <- the outcome oracle
 ~/trial_<N>_frames/     per-chunk front+wrist JPEGs
 ~/trial_<N>_trace.jsonl per-chunk state/action/rtt/grip
 ~/trial_<N>_sheet.jpg   front(top)+wrist(bottom) contact sheet (trial_sheet.py)
 ```
+
 Score by eye from the sheet + wrist cam (NOT the auto detector). A place = the
 wrist cam shows the orange over the plate AND the gripper reopens (final grip 54-70).
 
 ### Check follower voltage (Acer)
+
 ```bash
 ssh gaikwad-prakash@192.168.194.228 'python3 ~/voltrace.py'
 ```
 
 ### Re-analyze traces for grip + speed (either box; script in scratchpad + Acer ~/)
+
 ```bash
 python3 ~/rtc_analyze.py   # on the Acer, prints the table in section 2 above
 ```
@@ -173,6 +190,7 @@ python3 ~/rtc_analyze.py   # on the Acer, prints the table in section 2 above
 ## Key files
 
 ### AI90 (this box)
+
 ```text
 ~/srv_wrap_recov.py                  policy server launcher (RECOV_CKPT env, ignores SIGSTKFLT)
 ~/rtc_analyze.py                     trace -> grip/speed/rtt table (verified this session)
@@ -183,6 +201,7 @@ python3 ~/rtc_analyze.py   # on the Acer, prints the table in section 2 above
 ```
 
 ### Acer (arm side, all in ~)
+
 ```text
 home_and_trial.sh   home-with-retry then run_trial.sh
 run_trial.sh        the trial (now passes --rtc=true)

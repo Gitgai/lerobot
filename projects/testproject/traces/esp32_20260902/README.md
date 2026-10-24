@@ -25,7 +25,7 @@ moved 1 px.
 CAVEAT ON ctrl1: the scene was meant to have no plate and did. The confound was
 found by the operator and ctrl2 is the clean rerun.
 
-Frames: *_start.jpg are the first front-camera frames (used for the
+Frames: \*\_start.jpg are the first front-camera frames (used for the
 orange-moved test). ctrl1_front_grid / ctrl1_wrist_grid show the run that
 produced a FALSE grasp reading before the scorer was fixed.
 wrist_camera_compare.jpg is the OV5647 view the model trained on, beside the

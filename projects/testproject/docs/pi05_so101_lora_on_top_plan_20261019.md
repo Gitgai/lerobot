@@ -9,6 +9,7 @@ C270 move to the low-front position (R3 record).
 Parent: pi05_so101_real_base_audit_plan_20261019.md (R5 row). Tracker: PI05_CURRENT_PRIORITY.md.
 
 ## What "LoRA on top" means (plain)
+
 dongyoonkim/so101-pi05-base was trained on ~14,000 public SO-101 episodes, orange picking among them. We do
 NOT retrain it. We freeze it and add small LoRA adapter weights (rank 16 in the author's own recipe) trained
 only on our 109 unique real episodes, recorded on OUR arm, OUR two cameras, OUR tray, with OUR instruction. The bet:
@@ -23,6 +24,7 @@ an object-size problem (the citrus looks wider than the jaws; unmeasured). R5 is
 FEEDS; it is not justified by the bench result yet.
 
 ## Data (what we train on)
+
 ```text
 set                        episodes  frames   fps  cameras        instruction(s)
 so101_orange_89_v21           89     40,712   30   front, wrist   "pick up the orange and move it to another place"
@@ -34,7 +36,9 @@ split (checked), so counting both sets double-counts 79 episodes. Training set =
 orange89_plus_plate20 (89 + 20 = 109; scripts/merge_orange89_plus_plate20.py, videos symlinked, no re-encode).
 front camera in ALL 109: the LOW FRONT view at table height (frame check 2026-10-21) — the bench must match it.
 ```
+
 Decisions to take at build (each is a knob, not a guess — record the choice):
+
 - instruction: keep the recorded strings (two of them) — the model sees our wording as the dataset wrote it;
   the bench client then sends the SAME string ("pick up the orange and place it on the plate" for the tray
   task). Do not train on one wording and test with another.
@@ -45,6 +49,7 @@ Decisions to take at build (each is a knob, not a guess — record the choice):
   for an open-loop sanity check (action MAE on unseen episodes); everything else trains.
 
 ## Recipe (the author's own LoRA config, read from /home/kiran/sim/vlash/examples/train/pi05/async_lora.yaml)
+
 ```text
 base              pretrained_path = dongyoonkim/so101-pi05-base (their yaml says lerobot/pi05_base; we start
                   from the SO-101 checkpoint — that is the whole point)
@@ -84,6 +89,7 @@ serving           the same wrapper loads the base + adapter (VLASH apply.py / ch
 ```
 
 ## Build record (2026-10-21)
+
 ```text
 data        orange89_plus_plate20 built (109 ep, 55,660 frames, 2 tasks; videos symlinked; 89 per-episode stats
             carried, plate_demos_v21 has none). scripts/merge_orange89_plus_plate20.py.
@@ -135,8 +141,10 @@ config      results/so101_lora_on_top_20261019/row1_author_lora.yaml; launcher r
 ```
 
 ## Gate (before any bench time): Isaac orange task, R2 harness
+
 Score the adapted model on the LeIsaac pick-orange task with the same harness that scored the base
 (results/so101_base_sim_test_20261020/, 100 seeded episodes, non-pipelined, chunk 20).
+
 ```text
 control   the base itself: 76% with the corpus wording, 32% with ours (R2, 2026-10-19)
 what the gate IS      a "did not break it" check: Isaac is in the base's training distribution, so a large
@@ -149,8 +157,10 @@ readings  ≥ ~65% (within the 95% CI of 76 at n=100)   → base intact; go to t
           < 40%                                       → broken; do not bench; check the slot map and the instruction first
 also      open-loop MAE on the 10 held-out real episodes vs the base's MAE on the same (sanity floor, not success)
 ```
+
 Pre-registered rows (2026-10-21, launcher results/so101_lora_on_top_20261019/run_isaac_gate.sh, everything on GPU 1,
 LoRA server :8081, Isaac headless, 50 seeded episodes per row, the SAME seeds as the base's control rows):
+
 ```text
 row      instruction                                        seeds     control (base)   what it tests
 corpusA  "Grab oranges and place into plate."               100–149   38/50 = 76%      forgetting (the gate proper)
@@ -161,6 +171,7 @@ reading     corpusA ≥ ~65% → go to the bench; 40–65% → partial forgettin
 ```
 
 ### Gate results (2026-10-22)
+
 ```text
 ckpt 025000  corpusA  0/5, all five timed out at the 100 s cap (base: 4/5 on the same seeds 100–104; 38/50 overall).
              Server log: the arm reaches out over the oranges and cycles the gripper for the whole episode — the
@@ -247,6 +258,7 @@ reading      the final checkpoint FORGOT the Isaac scene. Candidate causes, to b
 ```
 
 ### Simulator stage CLOSED 2026-10-22 07:48Z — summary table and decision
+
 ```text
                          open-loop on OUR frames        Isaac PickOrange, seeds 100–104, corpus wording
 model                    arm MAE °  grip MAE  agree    100 s cap: success / oranges placed   200 s cap: success / oranges
@@ -257,30 +269,34 @@ row 1 25k (final)          2.62      2.08     0.89     0/5 (corpus) · 0/5 (plat
 row 2 (conservative) 3k    4.19      4.68     0.84     0/5 · 9 of 15 (frames)               —
 row 2 7k (final)           4.00      4.22     0.85     0/5 · 8 of 15 (frames)               2/5 FULL · (31 s and 183 s)
 ```
+
 Reading. Both recipes learned our rig's motions (open-loop). The author's recipe learned them best and lost most
 of the base's Isaac competence; the conservative recipe learned about half as much and kept most of it, completing
 the whole three-orange task in 2 of 5 under a 200 s cap. Neither is "broken". The pre-registered gate (≥ ~65% at
 100 s) was the wrong instrument for a model trained on one rig: it measured pace and forgetting together.
 Decision: BOTH finals go to the bench, with the public base as the control row, on the low-front camera:
-  bench order   control (base) → row-2 7k (primary candidate: competence kept) → row-1 25k (best fit to our data)
-  per model     5 placements first (same grid for all three), extend to 10 if any model scores ≥ 2/5
-  instruction   "pick up the orange and place it on the plate" for the fine-tuned rows (their training string);
-                the base gets the corpus wording as before; serving = the same wrapper, port 8080, GPU 1 free now
+bench order control (base) → row-2 7k (primary candidate: competence kept) → row-1 25k (best fit to our data)
+per model 5 placements first (same grid for all three), extend to 10 if any model scores ≥ 2/5
+instruction "pick up the orange and place it on the plate" for the fine-tuned rows (their training string);
+the base gets the corpus wording as before; serving = the same wrapper, port 8080, GPU 1 free now
 Disk: /mnt/data4tb/so101-lora-on-top-20261021 = 145 GB (row 1 94 incl. the stopped first launch, row 2 51); under the
 150 GB alert; nothing to delete without the operator (RED).
 
 ## Bench after the gate
+
 Same R3 protocol, same client, same 20-placement grid, same fruit as the base's trials (so the two 20-trial
 sets compare), instruction = the dataset's own string. The base's 20 are the control row. Reading: the
 difference in successes out of 20, with its CI — two rows, one table, contacts/knock-overs counted.
 
 ## What it will and will not tell us
-WILL  whether our 109 episodes close the rig gap on top of a competent base — the cheapest path to a working
-      bench policy, and the first real number for "public base + our data"
+
+WILL whether our 109 episodes close the rig gap on top of a competent base — the cheapest path to a working
+bench policy, and the first real number for "public base + our data"
 WON'T whether full fine-tuning would do better (that is the LIBERO/LeIsaac comparison's job, in sim); whether
-      more of our data helps (a second row later, if R5 is partial)
+more of our data helps (a second row later, if R5 is partial)
 
 ## Outputs
+
 results/so101_lora_on_top_20261019/{config.yaml, train.log, smoke/, isaac_gate.jsonl, holdout_mae.json,
 bench_runs.md (row 2 beside the base's)}; adapter weights on /mnt/data4tb (ledger entry before the run).
 Cost: ½ day build (loader + slot map + instruction check + smoke), hours of training, 2 h Isaac gate.

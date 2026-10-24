@@ -5,7 +5,7 @@ forensics with a **live view (cameras + joint/grip plots + fault flags)** viewab
 remotely from the GPU box or a browser, during trials/replays/teleop.
 
 Motivation: this session's whole diagnosis chain — the grip-min trace, the voltage
-sag, the exact tick a gripper fault fired — was reconstructed *after* each run from
+sag, the exact tick a gripper fault fired — was reconstructed _after_ each run from
 `trace.jsonl` + still frames. A live grip plot + camera + Status flag would have
 shown all of it as it happened. Live view = faster iteration and faults caught in
 the act, not autopsied.
@@ -30,6 +30,7 @@ our GR00T client        n16_realarm_client.py has NO rerun at all -> no live vie
 ```
 
 ## The one real constraint: the Acer is headless (SSH)
+
 `rr.spawn()` opens a viewer window **on the Acer's screen**, which we can't see over
 SSH. So every path below must either (a) `connect_grpc` to a viewer running where a
 human/agent can see it, or (b) `serve_web` so it's viewable in a **browser** over
@@ -45,6 +46,7 @@ hosts (ZeroTier)   AI90 192.168.194.220   |   Acer 192.168.194.228
 ## Plan (phased, smallest useful first)
 
 ### Phase 0 — prerequisites
+
 - rerun 0.26.2 installed on the Acer venv. DONE.
 - Cameras ON (the "camera drop" on 2026-09-26 was the front cam simply not powered
   on, not flaky hardware). DONE.
@@ -52,7 +54,9 @@ hosts (ZeroTier)   AI90 192.168.194.220   |   Acer 192.168.194.228
   live-viz work regardless; it will make the power test easier to watch.
 
 ### Phase 1 — Quick win: live view for lerobot-native commands (NO code change)
+
 Prove the remote pipeline end to end using a command that already supports it.
+
 ```text
 1. Start a viewer we can see:
      option A (browser):  on the Acer, a tiny script: rr.init("live"); rr.serve_web()
@@ -67,8 +71,10 @@ Success: live cameras + state scalars appear in the browser/viewer from the Acer
 ```
 
 ### Phase 2 — Add rerun to the GR00T client (the main deliverable)
+
 `n16_realarm_client.py` is the policy-trial path and has no rerun. Add it, mirroring
 lerobot's own pattern so it behaves identically and stays OFF by default.
+
 ```text
 - new CLI fields:  display_data: bool = False, display_ip: str|None, display_port: int|None
 - on start (if display_data):  init_rerun(session_name="n16_trial",
@@ -85,6 +91,7 @@ lerobot's own pattern so it behaves identically and stays OFF by default.
 ```
 
 ### Phase 3 — Wire into the trial runner + auto-open
+
 ```text
 - so101_trial_runner.py: pass through --display_data/--display_ip/--display_port to the
   client command (execute(), ~line 193-205 where the client argv is built).
@@ -95,6 +102,7 @@ lerobot's own pattern so it behaves identically and stays OFF by default.
 ---
 
 ## What to log (so the view answers the questions we actually ask)
+
 ```text
 cameras     front + wrist            see approach/grasp/place live
 grip.pos    the grip trace, live     the single best predictor of outcome this whole project
@@ -102,9 +110,11 @@ joints x6   state vs action0         spot undershoot / tracking error (undertorq
 rtt/age     starved_ticks            RTC pipeline health (duty) live
 Status      per-motor fault byte     a voltage(1)/overload(32) fault shows the moment it trips
 ```
+
 That set turns every lesson from this session into a real-time readout.
 
 ## Guardrails
+
 ```text
 - display_data OFF for SCORED trials: perf + reproducibility. A scored number must come
   from the un-instrumented path.
@@ -117,11 +127,13 @@ That set turns every lesson from this session into a real-time readout.
 ```
 
 ## Success criteria
+
 Watch a **live GR00T trial** — front+wrist cameras, a live grip-position plot, joint
 tracking, RTC duty, and motor fault flags — in a **browser on the GPU box**, in real
 time, while the scored-run path stays untouched when `--display_data` is off.
 
 ## Effort estimate
+
 ```text
 Phase 1  ~30 min   config only, proves remote pipeline
 Phase 2  ~1-2 hr   client edit + test (the real deliverable)
@@ -129,6 +141,7 @@ Phase 3  ~30 min   runner passthrough + auto-open
 ```
 
 ## Open items to confirm at implementation
+
 - Exact rerun 0.26 serve call for the browser path (`serve_web` vs
   `serve_grpc` + `serve_web_viewer`) — pick whichever gives a single URL to open.
 - Whether `lerobot-replay` exposes `--display_data` in this version (record/rollout/

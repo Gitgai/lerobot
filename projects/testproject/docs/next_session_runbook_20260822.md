@@ -92,6 +92,7 @@ trials measure whether the target was learned. Never report a single blended
 success number for this checkpoint - it would be uninterpretable.
 
 ```text
+
 ```
 
 ## 2b. Early arm check of plate-v1 (added 2026-08-26, operator chose this)
@@ -116,6 +117,7 @@ TWO SEPARATE SCORES, never blended:
 ```
 
 Decision after 10 runs:
+
 - grasps improve on the right AND some plate-seeking -> record the full 60-80
 - grasps improve, no plate-seeking -> plate needs more/better demos; consider
   whether the plate is visible enough at release (section 1b found it is)
@@ -139,11 +141,12 @@ READY     arm on USB 3-2 (never 3-1, which is faulty)
 ```
 
 WHEN RECORDING THE FULL 60-80 SET, TWO CHANGES:
-  1. HOLD 5-10 PLATE DEMOS OUT of training. Without a held-out plate set,
-     "did the plate skill improve?" cannot be answered offline at all - which
-     is exactly the wall plate_v2 hit.
-  2. Switch to the ESP32 wrist camera at that session, not before. The demos
-     and the camera then match, and the ribbon problem retires permanently.
+
+1. HOLD 5-10 PLATE DEMOS OUT of training. Without a held-out plate set,
+   "did the plate skill improve?" cannot be answered offline at all - which
+   is exactly the wall plate_v2 hit.
+2. Switch to the ESP32 wrist camera at that session, not before. The demos
+   and the camera then match, and the ribbon problem retires permanently.
 
 ## 3. What happens after (no operator needed)
 

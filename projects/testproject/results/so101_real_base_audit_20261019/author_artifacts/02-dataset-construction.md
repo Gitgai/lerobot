@@ -13,14 +13,14 @@ time. Read that section before running the merge.
 
 ## Result
 
-| | |
-|---|---|
-| Merged corpus | 17,137 episodes / 8,690,531 frames / 430 tasks / 51,411 videos |
-| Format | LeRobot codebase version v2.1, single repository |
-| Cameras | 3 fixed slots plus one validity mask column per slot |
-| Action space | 6 DoF, follower frame, degrees |
+|                                  |                                                                                                    |
+| -------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Merged corpus                    | 17,137 episodes / 8,690,531 frames / 430 tasks / 51,411 videos                                     |
+| Format                           | LeRobot codebase version v2.1, single repository                                                   |
+| Cameras                          | 3 fixed slots plus one validity mask column per slot                                               |
+| Action space                     | 6 DoF, follower frame, degrees                                                                     |
 | Fed to the released training run | 16,687 episodes / 8,595,621 frames (450 episodes from five 10 fps sources excluded, see pitfall 2) |
-| Published subset | 156 source datasets / 13,969 episodes / 7,272,752 frames |
+| Published subset                 | 156 source datasets / 13,969 episodes / 7,272,752 frames                                           |
 
 ### Funnel
 
@@ -52,12 +52,12 @@ and target, v3.0 input for the converter) are.
 
 **Disk.** Roughly 1 TB free if every intermediate is kept:
 
-| Artifact | Size |
-|---|---|
-| Raw downloads, video included | 303 GB |
-| Curated pool copied into a flat layout | 246 GB |
-| Merged repository | 198 GB apparent, mostly hardlinks into the pool |
-| Published subset | about 171 GB apparent, also hardlinked |
+| Artifact                               | Size                                            |
+| -------------------------------------- | ----------------------------------------------- |
+| Raw downloads, video included          | 303 GB                                          |
+| Curated pool copied into a flat layout | 246 GB                                          |
+| Merged repository                      | 198 GB apparent, mostly hardlinks into the pool |
+| Published subset                       | about 171 GB apparent, also hardlinked          |
 
 The merge hardlinks source video instead of copying it, so the merged repository
 costs its parquet files plus the black placeholder videos on top of the pool, not
@@ -93,12 +93,12 @@ $REF                        reference recording, follower frame
 are referenced below (`01_hf_so101_crawler.py` onward). Paths are always command-line
 arguments, never constants inside the files, but they are not all the same argument:
 
-| Group | Scripts | Where paths come from |
-|---|---|---|
+| Group               | Scripts                                                                | Where paths come from                                                                                                                                                        |
+| ------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Dataset-tree stages | 04, 05, 06, 07, 08, 09, 10, 13, 14, 20, 22, 24, 28, 29, 30, 31, 32, 33 | `--root` (default `$ROOT`, then `.`), from which each derives `external_hf/`, `base_train/` or `base_unified/`. `--src`, `--dst` and `--dest` override the derived directory |
-| Catalog stages | 01, 03 | no `--root`. They only touch spreadsheets, named by `--csv` and `--xlsx`, relative to the current directory |
-| Report stages | 11, 12 | no `--root`. They edit the analysis workbook in place, named by `--report`, relative to the current directory |
-| Manifest assembly | 26 | no `--root`. `--artifacts` is the directory it reads the three JSON inputs from, `--out` the manifest it writes |
+| Catalog stages      | 01, 03                                                                 | no `--root`. They only touch spreadsheets, named by `--csv` and `--xlsx`, relative to the current directory                                                                  |
+| Report stages       | 11, 12                                                                 | no `--root`. They edit the analysis workbook in place, named by `--report`, relative to the current directory                                                                |
+| Manifest assembly   | 26                                                                     | no `--root`. `--artifacts` is the directory it reads the three JSON inputs from, `--out` the manifest it writes                                                              |
 
 Output locations differ in the same way. Stages 20, 22, 24 and 26 default to writing
 their JSON instruction sheets into `pipeline/artifacts/`, which also holds the ones this
@@ -140,17 +140,17 @@ recordings are usable as SO-101 prior.
 `meta/tasks.jsonl`, over plain HTTP with a 404-aware retry (404 is final, 429/500/503
 back off and retry). From those plus the index entry:
 
-| Field | Source | Used for |
-|---|---|---|
-| `id`, `url`, `downloads`, `likes`, `last_modified`, `tags` | Hub index | provenance, license tag, ranking |
-| `codebase_version` | info.json | v2.1 vs v3.0 routing (stage 5) |
-| `robot_type` | info.json | recorded, not used as a filter |
-| `action_dim`, action `names` | info.json `features.action` | single vs bimanual, stage 3 input |
-| `n_cam`, `cam_keys`, `has_depth` | info.json keys under `observation.images` | stage 2 blacklist, stage 6 mapping |
-| `episodes`, `frames`, `fps` | info.json totals | size screening |
-| `tasks` | tasks.jsonl, first 8 unique | language instruction survey |
-| `is_variant` | id matches `merged\|multiplied\|trimmed\|converted\|_copy\|backup\|eval_` | duplicate hint |
-| `score` | `min(ep,300) + whitelist_cams*20 + min(downloads,400)/4`, minus penalties | sheet ordering only |
+| Field                                                      | Source                                                                    | Used for                           |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------- |
+| `id`, `url`, `downloads`, `likes`, `last_modified`, `tags` | Hub index                                                                 | provenance, license tag, ranking   |
+| `codebase_version`                                         | info.json                                                                 | v2.1 vs v3.0 routing (stage 5)     |
+| `robot_type`                                               | info.json                                                                 | recorded, not used as a filter     |
+| `action_dim`, action `names`                               | info.json `features.action`                                               | single vs bimanual, stage 3 input  |
+| `n_cam`, `cam_keys`, `has_depth`                           | info.json keys under `observation.images`                                 | stage 2 blacklist, stage 6 mapping |
+| `episodes`, `frames`, `fps`                                | info.json totals                                                          | size screening                     |
+| `tasks`                                                    | tasks.jsonl, first 8 unique                                               | language instruction survey        |
+| `is_variant`                                               | id matches `merged\|multiplied\|trimmed\|converted\|_copy\|backup\|eval_` | duplicate hint                     |
+| `score`                                                    | `min(ep,300) + whitelist_cams*20 + min(downloads,400)/4`, minus penalties | sheet ordering only                |
 
 **Pass criterion.** A repository enters the catalog if `meta/info.json` parses and
 identifies a LeRobot recording. Everything else is a `parse_fail` row.
@@ -218,13 +218,13 @@ this stage are the camera blacklist and the 50-episode floor.
 
 **Result.**
 
-| Category | Rows |
-|---|---|
-| clean | 390 |
-| sim | 49 |
-| small | 822 |
-| blacklist_cam | 327 |
-| parse_fail | 136 |
+| Category                                     | Rows                         |
+| -------------------------------------------- | ---------------------------- |
+| clean                                        | 390                          |
+| sim                                          | 49                           |
+| small                                        | 822                          |
+| blacklist_cam                                | 327                          |
+| parse_fail                                   | 136                          |
 | **Selected** (`clean`+`sim`, >= 50 episodes) | **408** (390 clean + 18 sim) |
 
 31 of the 49 sim rows fell below the episode floor. 6 of the 408 selected datasets
@@ -268,11 +268,11 @@ datasets this pipeline itself flags green are by construction exactly that. Thre
 were measured during this build, all Apache-2.0, with an action-to-state offset well
 inside the green threshold:
 
-| Repository | Episodes | Cameras | Measured action-state offset |
-|---|---|---|---|
-| `zaringleb/pick_single_cube_so101` | 185 | top + wrist | 1.1 deg |
-| `zacapa/SO101_chess_test2_6` | 274 | overhead + wrist | 0.6 deg |
-| `lipsop/so101-block-in-bin-100ep` | 100 | front + wrist | 0.8 deg |
+| Repository                         | Episodes | Cameras          | Measured action-state offset |
+| ---------------------------------- | -------- | ---------------- | ---------------------------- |
+| `zaringleb/pick_single_cube_so101` | 185      | top + wrist      | 1.1 deg                      |
+| `zacapa/SO101_chess_test2_6`       | 274      | overhead + wrist | 0.6 deg                      |
+| `lipsop/so101-block-in-bin-100ep`  | 100      | front + wrist    | 0.8 deg                      |
 
 ```bash
 python -c "from huggingface_hub import snapshot_download; \
@@ -289,7 +289,7 @@ candidate comes back green against itself. `03_action_match.py` accepts either
 downloaded v2.1 dataset works as-is.
 
 Borrowing a reference costs two things. The range-overlap column becomes overlap with
-*that* robot's workspace rather than yours, and any systematic calibration offset in the
+_that_ robot's workspace rather than yours, and any systematic calibration offset in the
 reference is inherited by the whole screen. Prefer a reference with many episodes and
 wide joint coverage, and read the `unit` distribution the stage prints as a sanity check.
 
@@ -358,11 +358,11 @@ between the two means is the frame test.
 
 **Pass criteria.**
 
-| Flag | Condition |
-|---|---|
-| red | `dim != 6`, or joint names differ as a set, or offset > 15 degrees (strong leader suspicion), or metadata could not be fetched |
+| Flag   | Condition                                                                                                                                                                                                       |
+| ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| red    | `dim != 6`, or joint names differ as a set, or offset > 15 degrees (strong leader suspicion), or metadata could not be fetched                                                                                  |
 | yellow | unit differs from the reference (conversion needed), or joint order differs (reorder needed), or offset in 6 to 15 degrees (weak leader suspicion), or `observation.state` absent so the offset is unverifiable |
-| green | dimension 6, names and order match, unit is degrees, offset <= 6 degrees |
+| green  | dimension 6, names and order match, unit is degrees, offset <= 6 degrees                                                                                                                                        |
 
 Only green datasets proceed. Yellow is recoverable in principle and was not
 recovered: with 307 clean candidates available, converting units or reordering joints
@@ -370,11 +370,11 @@ for three more datasets was not worth the risk of getting the frame wrong.
 
 **Result over the 408 candidates.**
 
-| Flag | Count | Breakdown |
-|---|---|---|
-| green | 307 | 297 real, 10 simulation |
-| yellow | 3 | 2 in radians, 1 with a 13.6 degree offset |
-| red | 98 | 97 dimension or name mismatch, 1 metadata fetch failure |
+| Flag   | Count | Breakdown                                               |
+| ------ | ----- | ------------------------------------------------------- |
+| green  | 307   | 297 real, 10 simulation                                 |
+| yellow | 3     | 2 in radians, 1 with a 13.6 degree offset               |
+| red    | 98    | 97 dimension or name mismatch, 1 metadata fetch failure |
 
 Unit distribution across all 408: degree 373, raw 23, radian 11, unknown 1. Format
 split within the green set: 223 already v2.1, 84 v3.0. Camera count within the green
@@ -386,7 +386,7 @@ positions by default.
 **Failure modes.**
 
 - **This test cannot see your own arm's zero point.** It compares action against
-  state *within* each dataset, so a consistent calibration offset in the uploader's
+  state _within_ each dataset, so a consistent calibration offset in the uploader's
   own robot cancels out. It proves the dataset is internally follower-framed; it does
   not prove the dataset's zero agrees with yours. Correcting that requires replaying
   trajectories on your hardware, which was not done. The residual is left for the
@@ -434,7 +434,8 @@ and `videos/`.
 through `snapshot_download`; the remaining 2 failed with a brotli decode error from the
 transfer layer and were recovered with a plain `git lfs clone` of the repository.
 
-[^dl]: Both counts appear in the record and mean different things, which is why every
+[^dl]:
+    Both counts appear in the record and mean different things, which is why every
     stage downstream of this one starts from 307. 305 is what the automated downloader
     reported; 307 is what was on disk when the stage finished, and is the number the
     quality-inspection stage read.
@@ -535,12 +536,12 @@ where the pool actually gets its shape.
 spreadsheet row per dataset: size, camera keys, resolution, codec, action dimension
 and unit, per-joint global range, and four quality counters.
 
-| Counter | Rule | Meaning |
-|---|---|---|
-| `traj_max_jump`, `n_anomaly_ep` | max per-frame action delta > 50 degrees | discontinuity, teleoperation glitch, or bad splice |
-| `n_static_ep` | every joint's range within the episode < 5 degrees | empty or frozen episode |
-| `n_desync_ep` | mean per-episode `\|action - state\|` > 10 degrees | action and state out of sync |
-| `range_warn` | joint span > 320 degrees, or < 1 degree on a non-gripper joint | implausible range, or a stuck joint |
+| Counter                         | Rule                                                           | Meaning                                            |
+| ------------------------------- | -------------------------------------------------------------- | -------------------------------------------------- |
+| `traj_max_jump`, `n_anomaly_ep` | max per-frame action delta > 50 degrees                        | discontinuity, teleoperation glitch, or bad splice |
+| `n_static_ep`                   | every joint's range within the episode < 5 degrees             | empty or frozen episode                            |
+| `n_desync_ep`                   | mean per-episode `\|action - state\|` > 10 degrees             | action and state out of sync                       |
+| `range_warn`                    | joint span > 320 degrees, or < 1 degree on a non-gripper joint | implausible range, or a stuck joint                |
 
 Plus a video check that decodes the first ten frames of a representative camera and
 flags an all-black opening. Ten frames rather than one, because many recordings open
@@ -646,11 +647,11 @@ present slot, and no depth stream reaches a slot.
 **Result at dataset level** (211 datasets): 17 fill one slot, 165 fill two, 29 fill
 all three. Audit of what actually landed where:
 
-| Slot | Real external | Real wrist | Placeholder |
-|---|---|---|---|
-| `base_0_rgb` | 208 | 0 | 3 |
-| `left_wrist_0_rgb` | 41 | 156 | 14 |
-| `right_wrist_0_rgb` | 29 | 0 | 182 |
+| Slot                | Real external | Real wrist | Placeholder |
+| ------------------- | ------------- | ---------- | ----------- |
+| `base_0_rgb`        | 208           | 0          | 3           |
+| `left_wrist_0_rgb`  | 41            | 156        | 14          |
+| `right_wrist_0_rgb` | 29            | 0          | 182         |
 
 `base_0_rgb` is 99% clean. `left_wrist_0_rgb` is 74% real wrist views, with 20%
 external views spilled into it by rule 4. That spill is the price of rule 4 and was
@@ -727,21 +728,21 @@ set, the dropped set, and the relation and episode counts behind every drop.
 
 **Decision rules.**
 
-| Relation | Action |
-|---|---|
-| fingerprints exactly equal | keep one (lexicographically first name), drop the rest |
-| `fp(x)` is a proper subset of `fp(y)` | drop `x`, keep the largest superset |
+| Relation                              | Action                                                 |
+| ------------------------------------- | ------------------------------------------------------ |
+| fingerprints exactly equal            | keep one (lexicographically first name), drop the rest |
+| `fp(x)` is a proper subset of `fp(y)` | drop `x`, keep the largest superset                    |
 
 Comparison is all-pairs across every dataset, ignoring the author, which is what
 catches cross-author re-uploads.
 
 **Result.** 211 datasets in, 181 kept, 30 dropped:
 
-| Reason | Count |
-|---|---|
-| proper subset of a larger dataset (cumulative uploads, splits) | 18 |
-| identical fingerprint (re-uploads, evaluation copies) | 10 |
-| manual: train/validation leakage the fingerprint missed | 2 |
+| Reason                                                         | Count |
+| -------------------------------------------------------------- | ----- |
+| proper subset of a larger dataset (cumulative uploads, splits) | 18    |
+| identical fingerprint (re-uploads, evaluation copies)          | 10    |
+| manual: train/validation leakage the fingerprint missed        | 2     |
 
 The two manual drops are a train/final and validation/final pair from one uploader
 whose metadata was inconsistent enough that the fingerprints did not line up, but
@@ -777,12 +778,12 @@ applies the policy that decides which candidates actually get dropped.
 
 **Detection rules** (`24_ep_drop.py`, per episode, per camera):
 
-| Rule | Action |
-|---|---|
-| fewer than 2 rows | drop, empty episode |
-| `timestamp[-1] - timestamp[0] <= 0` | drop |
-| video file missing | drop; LeRobot will try to decode it and crash |
-| `abs(video_duration - action_duration) / action_duration > 0.05` | flag as a duration mismatch |
+| Rule                                                             | Action                                        |
+| ---------------------------------------------------------------- | --------------------------------------------- |
+| fewer than 2 rows                                                | drop, empty episode                           |
+| `timestamp[-1] - timestamp[0] <= 0`                              | drop                                          |
+| video file missing                                               | drop; LeRobot will try to decode it and crash |
+| `abs(video_duration - action_duration) / action_duration > 0.05` | flag as a duration mismatch                   |
 
 **Compare durations in seconds, never frame counts.** A 10 fps video paired with a
 30 fps parquet legitimately has one third of the rows as frames, and LeRobot indexes
@@ -791,7 +792,7 @@ dataset as broken. Video duration is read from container metadata, which is fast
 a decode-and-count fallback.
 
 **Policy** (`26_build_manifest.py`): of the duration mismatches, only the ones where
-the **video is shorter than the motion** are dropped. A video that runs *longer* than
+the **video is shorter than the motion** are dropped. A video that runs _longer_ than
 the recorded motion is harmless, because LeRobot only decodes within the episode's
 timestamp range and never touches the tail.
 
@@ -829,12 +830,12 @@ string that is not an instruction is a training defect even when the trajectory 
 good. Eight datasets were rewritten, by hand, in the manifest as a
 `{task_index: new_string}` map applied at merge time:
 
-| Problem | Example | Rewritten to |
-|---|---|---|
-| integer placeholder | `tasks.jsonl` task field is `0` | "Stack red, green, and blue blocks on the blue dish from bottom to top." |
-| Python dict repr leaked into the label | `{'color': 'black', ...}` | "Place the cubes on the bench from left to right in the following order: black, white and brown" |
-| non-English label | French verb phrase | "Pull out the weed." |
-| snake_case identifier | `pick_and_place_random` | "Pick up the object and place it at a random target location." |
+| Problem                                | Example                         | Rewritten to                                                                                     |
+| -------------------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------ |
+| integer placeholder                    | `tasks.jsonl` task field is `0` | "Stack red, green, and blue blocks on the blue dish from bottom to top."                         |
+| Python dict repr leaked into the label | `{'color': 'black', ...}`       | "Place the cubes on the bench from left to right in the following order: black, white and brown" |
+| non-English label                      | French verb phrase              | "Pull out the weed."                                                                             |
+| snake_case identifier                  | `pick_and_place_random`         | "Pick up the object and place it at a random target location."                                   |
 
 Source files are never edited; the mapping lives in the manifest and is applied while
 writing the merged repository, so the rewrite is auditable and reversible.
@@ -934,11 +935,11 @@ than in the data, and all of them from the same cause: the feature template is c
 from whichever dataset comes first in traversal order and is never reconciled against
 the rest.
 
-| Field | What it says | What is true |
-|---|---|---|
-| top-level `fps` | 30 | 16,687 episodes are 30 fps and 450 from five sources are 10 fps. Per-episode timestamps are correct; this one field is not. See pitfall 2 |
-| `video.fps` inside each of the three video feature blocks | 10 | The majority of the corpus is 30 fps, so this is wrong for 16,687 of 17,137 episodes — and it disagrees with the top-level `fps: 30` sitting a few lines above it in the same file |
-| `shape` and `video.height` / `video.width` in the same three blocks | `[480, 640, 3]`, 480 x 640 | Source resolutions run from 480x640 to 1920x1080. One resolution is declared for all three slots and every episode |
+| Field                                                               | What it says               | What is true                                                                                                                                                                       |
+| ------------------------------------------------------------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| top-level `fps`                                                     | 30                         | 16,687 episodes are 30 fps and 450 from five sources are 10 fps. Per-episode timestamps are correct; this one field is not. See pitfall 2                                          |
+| `video.fps` inside each of the three video feature blocks           | 10                         | The majority of the corpus is 30 fps, so this is wrong for 16,687 of 17,137 episodes — and it disagrees with the top-level `fps: 30` sitting a few lines above it in the same file |
+| `shape` and `video.height` / `video.width` in the same three blocks | `[480, 640, 3]`, 480 x 640 | Source resolutions run from 480x640 to 1920x1080. One resolution is declared for all three slots and every episode                                                                 |
 
 None of the three affected the training run, because the loader reads frames by
 timestamp and gets the real rate and the real resolution from the video stream, and
@@ -1024,8 +1025,8 @@ exist on disk for every episode. Then metadata agreement: `info.total_episodes` 
 `total_frames` against the measurement, line counts of `episodes.jsonl` and
 `tasks.jsonl` against `info`.
 
-*Result: 0 issues over 17,137 episodes. Present-slot distribution 1,314 / 14,098 /
-1,725 for one, two and three real cameras.*
+_Result: 0 issues over 17,137 episodes. Present-slot distribution 1,314 / 14,098 /
+1,725 for one, two and three real cameras._
 
 **`30_smoke.py` — loader and collation.** Loads the repository through the training
 stack's v2.1 compatibility layer, applies the same 224 resize-with-pad transform the
@@ -1034,16 +1035,16 @@ batch. Asserts that mask values arrive in the batch as clean 0/1 (this is the ch
 that catches normalization pollution) and that the number of masked slots varies
 across the batch, which proves per-episode masking is really per-episode.
 
-*Result: pass. Heterogeneous resolutions collate to 224; masking varies within a
-batch; 10 fps episodes decode.*
+_Result: pass. Heterogeneous resolutions collate to 224; masking varies within a
+batch; 10 fps episodes decode._
 
 **`32_forward_smoke.py` — model forward.** Builds the patched pi0.5 policy from the
 merged repository's metadata, checks that no `_mask` key survived into
 `config.input_features`, assembles a batch that deliberately mixes a three-camera
 episode with a one-camera episode, and runs a forward pass under `no_grad` and bf16.
 
-*Result: 3.62B parameters, no `_mask` keys in `input_features`, loss 0.019 and
-finite, on a single 24 GB consumer GPU at batch size 2.*
+_Result: 3.62B parameters, no `_mask` keys in `input_features`, loss 0.019 and
+finite, on a single 24 GB consumer GPU at batch size 2._
 
 **`33_train_smoke.py` — one training step.** Opens the merged repository through the same
 letterbox transform the trainer uses, builds the policy in train mode at bf16 with gradient
@@ -1056,8 +1057,8 @@ The script does not read the weights back, so a reported step means `optimizer.s
 returned, not that a before/after comparison was made. 03 §8.4 runs the equivalent check
 inside the built image, against the training environment rather than the dataset build.
 
-*Result: loss 0.057, gradient norm 4.11, both finite, optimizer step included, 21 GB peak. A
-full fine-tune of this model runs on a single consumer GPU, slowly.*
+_Result: loss 0.057, gradient norm 4.11, both finite, optimizer step included, 21 GB peak. A
+full fine-tune of this model runs on a single consumer GPU, slowly._
 
 **Pre-merge checks** (`13_precheck.py`, `14_video_sync.py`, described in the
 interlude) must be run before the merge, because they report per-source episode
@@ -1068,7 +1069,7 @@ still died twice in its first 150 steps. A 20-step smoke test does not accumulat
 descriptors, and random sampling of 20 batches has a small chance of touching the 2.6%
 of episodes that carry the timestamp defect. Add a targeted, exhaustive check for
 anything that affects a small subset of episodes — for example, verify the first
-timestamp against the first video PTS for *every* episode, not for a sample.
+timestamp against the first video PTS for _every_ episode, not for a sample.
 
 ---
 
@@ -1104,13 +1105,13 @@ lacks one.
 
 **Result.**
 
-| License | Datasets | Episodes |
-|---|---|---|
-| apache-2.0 | 149 | 13,587 |
-| mit | 1 | 50 |
-| recorded by the author | 6 | 332 |
-| **Published** | **156** | **13,969** |
-| Withheld, no declared license | 25 | 3,168 |
+| License                       | Datasets | Episodes   |
+| ----------------------------- | -------- | ---------- |
+| apache-2.0                    | 149      | 13,587     |
+| mit                           | 1        | 50         |
+| recorded by the author        | 6        | 332        |
+| **Published**                 | **156**  | **13,969** |
+| Withheld, no declared license | 25       | 3,168      |
 
 The withheld portion is 18.5% of the corpus and is spread across tasks and camera
 configurations rather than concentrated in one category.
@@ -1131,7 +1132,7 @@ and warns if the count differs from the plan.
 
 **Consequence to state plainly.** The published checkpoint cannot be reproduced from
 the published data. 3,168 episodes that the model trained on are not in the release,
-and the 450 10 fps episodes that *are* in the release were excluded from the training
+and the 450 10 fps episodes that _are_ in the release were excluded from the training
 run. 13,519 of the 13,969 published episodes were part of the run.
 
 **Failure modes.**
@@ -1241,21 +1242,21 @@ The merge writes `fps: 30` because that is the majority. Five of the 181 sources
 recorded at 10 fps: 450 episodes, 2.6% of the corpus.
 
 | Source rate | Datasets | Episodes |
-|---|---|---|
-| 30 fps | 176 | 16,687 |
-| 10 fps | 5 | 450 |
+| ----------- | -------- | -------- |
+| 30 fps      | 176      | 16,687   |
+| 10 fps      | 5        | 450      |
 
 The five are worth naming, because they are the ones a reproduction has to decide
 about:
 
-| Source repository | Episodes | Frames |
-|---|---|---|
-| `CoRL2026-CSI/SO101-teleop_stack_RGBblock_on_bluedish_150epi_10fps` | 150 | 32,702 |
-| `CoRL2026-CSI/IsaacLab-SO101-PullCube-100epi-10fps-appendix` | 100 | 32,208 |
-| `anvilbot-patrickhhh/SO101_relocate_cube_2cams_record_2` | 100 | 15,000 |
-| `anvilbot-patrickhhh/SO101_PickAndPlace_front_wrist` | 50 | 7,500 |
-| `anvilbot-patrickhhh/SO101_PickAndPlace_3cams` | 50 | 7,500 |
-| **total** | **450** | **94,910** |
+| Source repository                                                   | Episodes | Frames     |
+| ------------------------------------------------------------------- | -------- | ---------- |
+| `CoRL2026-CSI/SO101-teleop_stack_RGBblock_on_bluedish_150epi_10fps` | 150      | 32,702     |
+| `CoRL2026-CSI/IsaacLab-SO101-PullCube-100epi-10fps-appendix`        | 100      | 32,208     |
+| `anvilbot-patrickhhh/SO101_relocate_cube_2cams_record_2`            | 100      | 15,000     |
+| `anvilbot-patrickhhh/SO101_PickAndPlace_front_wrist`                | 50       | 7,500      |
+| `anvilbot-patrickhhh/SO101_PickAndPlace_3cams`                      | 50       | 7,500      |
+| **total**                                                           | **450**  | **94,910** |
 
 Two of them declare the rate in the repository name, which is the only reason the
 group was identifiable after the merge erased per-source identity.
@@ -1271,7 +1272,7 @@ the wrong declared rate arrived together, from the same five sources.
 subset with low probability, and the per-episode consistency check that would have
 caught it deterministically (`13_precheck.py`, measured `dt` versus declared `fps`)
 was run against the pool before the merge, where every source's `fps` was still
-correct for its own episodes. The defect is created *by* the merge and only exists
+correct for its own episodes. The defect is created _by_ the merge and only exists
 afterwards.
 
 **Detection.** After merging, verify per episode rather than per repository:
@@ -1450,14 +1451,14 @@ python gen_attribution.py --src "$ROOT/base_train"   # -> dataset/ATTRIBUTION.md
 
 Checkpoints worth stopping at:
 
-| After | Expect |
-|---|---|
-| stage 3 | green count in the low hundreds; zero strong-leader-suspicion rows |
-| stage 4 | downloaded repository count within 1-2 of the green count |
-| stage 7 | deduplication drops 10-20% of datasets; inspect the cluster report by hand |
-| stage 9 | episode and frame totals equal the sum of sources minus drops |
+| After    | Expect                                                                               |
+| -------- | ------------------------------------------------------------------------------------ |
+| stage 3  | green count in the low hundreds; zero strong-leader-suspicion rows                   |
+| stage 4  | downloaded repository count within 1-2 of the green count                            |
+| stage 7  | deduplication drops 10-20% of datasets; inspect the cluster report by hand           |
+| stage 9  | episode and frame totals equal the sum of sources minus drops                        |
 | stage 11 | `31_verify_full.py` reports zero issues, and the exhaustive timestamp check is clean |
-| stage 12 | dry-run episode count equals the plan |
+| stage 12 | dry-run episode count equals the plan                                                |
 
 ## Related documents
 

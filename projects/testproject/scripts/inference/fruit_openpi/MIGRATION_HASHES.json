@@ -1,0 +1,69 @@
+{
+  "date": "2026-10-24",
+  "scope": "nine selected sources; path migration plus repository-required formatting/lint cleanup; originals retained; no environment/data migration",
+  "files": [
+    {
+      "source": "/home/gaikwad-prakash/Documents/ChatGPT/Lerobot/fruit_openpi_client/client.py",
+      "destination": "/home/gaikwad-prakash/PrakashProjects/lerobot/lerobot/projects/testproject/scripts/inference/fruit_openpi/client.py",
+      "source_sha256": "faa99272014461f113ba970236a61ae67eb3148d7e55376b498cc7abb6b482f6",
+      "destination_sha256": "37dc75dd6e66b275cd1724f6aae7e286cafc41a27301d71f7194116e33f0e8f7",
+      "identical": false
+    },
+    {
+      "source": "/home/gaikwad-prakash/Documents/ChatGPT/Lerobot/fruit_openpi_client/transport.py",
+      "destination": "/home/gaikwad-prakash/PrakashProjects/lerobot/lerobot/projects/testproject/scripts/inference/fruit_openpi/transport.py",
+      "source_sha256": "d6e661cdb3c82fcaa4b8c5a21d021dd37c1bec66cf59a46a6672695785f32359",
+      "destination_sha256": "c614762ac438e84d3e40fd2dcc6a6d676a4effe0cff120d02a5f7e863b820c9a",
+      "identical": false
+    },
+    {
+      "source": "/home/gaikwad-prakash/Documents/ChatGPT/Lerobot/fruit_openpi_client/server.py",
+      "destination": "/home/gaikwad-prakash/PrakashProjects/lerobot/lerobot/projects/testproject/scripts/inference/fruit_openpi/server.py",
+      "source_sha256": "672ace52408626a491ed95f64b3881f230dfad40ff2b58c48080a461c7d594bb",
+      "destination_sha256": "80d5734fe760b5ae18e73627ecd1e1b91634953329af41714f0a79a1b1ee85d3",
+      "identical": false
+    },
+    {
+      "source": "/home/gaikwad-prakash/Documents/ChatGPT/Lerobot/fruit_openpi_client/contract.py",
+      "destination": "/home/gaikwad-prakash/PrakashProjects/lerobot/lerobot/projects/testproject/scripts/inference/fruit_openpi/contract.py",
+      "source_sha256": "3e4acc52480f7b49c793e232d92de84d544e229af71a2156f3ebb52a5c981141",
+      "destination_sha256": "661d55a7d70cd0c39a02643af8504d2ea6f815a94ea7bad053b557eed2b870d0",
+      "identical": false
+    },
+    {
+      "source": "/home/gaikwad-prakash/Documents/ChatGPT/Lerobot/fruit_openpi_client/freshness.py",
+      "destination": "/home/gaikwad-prakash/PrakashProjects/lerobot/lerobot/projects/testproject/scripts/inference/fruit_openpi/freshness.py",
+      "source_sha256": "11b602543b510be5e0c53dcb4fc81d86b41c1e8d0630fe27fdf7a1f21b0afae2",
+      "destination_sha256": "f75ed123a23a925df7bc4bb349ccef685f3475f75de09da65db7acab319454a7",
+      "identical": false
+    },
+    {
+      "source": "/home/gaikwad-prakash/Documents/ChatGPT/Lerobot/fruit_openpi_client/test_contract.py",
+      "destination": "/home/gaikwad-prakash/PrakashProjects/lerobot/lerobot/projects/testproject/scripts/inference/fruit_openpi/test_contract.py",
+      "source_sha256": "75f77934c6e74b71fffa0bc5b6f87c53651d2ce2ef0501a9e03e28c1404e813d",
+      "destination_sha256": "8cd7d7e7858d39ac70e0a70c8db7fdd04ed29c74c6db1dc8e642b7f334ea61fa",
+      "identical": false
+    },
+    {
+      "source": "/home/gaikwad-prakash/Documents/ChatGPT/Lerobot/fruit_openpi_client/test_freshness.py",
+      "destination": "/home/gaikwad-prakash/PrakashProjects/lerobot/lerobot/projects/testproject/scripts/inference/fruit_openpi/test_freshness.py",
+      "source_sha256": "cc86229f42a1f56f3e033dbb440660f153d26f0a3108ff45eb7ba2149ed66c95",
+      "destination_sha256": "33b58526e42a8c2e7f0740ab265a92aff4a96067cb8a8b692cd7355a4ed351b0",
+      "identical": false
+    },
+    {
+      "source": "/home/gaikwad-prakash/Documents/ChatGPT/Lerobot/jpeg_trial_20260930/frame_recorder.py",
+      "destination": "/home/gaikwad-prakash/PrakashProjects/lerobot/lerobot/projects/testproject/scripts/inference/fruit_openpi/frame_recorder.py",
+      "source_sha256": "d7a5687b6d47e55f382cc9917cf55ee353250145c5dd25659f3f5706c69435df",
+      "destination_sha256": "fb4d3e50ef7712e3d09c37e5e183de4e3d32af4d03ca3bf7ce73f049625a1895",
+      "identical": false
+    },
+    {
+      "source": "/home/gaikwad-prakash/so101_trial_safety.py",
+      "destination": "/home/gaikwad-prakash/PrakashProjects/lerobot/lerobot/projects/testproject/scripts/inference/fruit_openpi/so101_trial_safety.py",
+      "source_sha256": "dad9143afe72548bba5318b47643396ecca088389823138a9f2252bf79476573",
+      "destination_sha256": "f3248712f4af198c81151e5e062ed770dcc52bf6c3e7cc646d97d0209414fe89",
+      "identical": false
+    }
+  ]
+}

@@ -9,7 +9,7 @@ Outcome: trained in 12 h 9 min; checkpoints 5k/10k/15k all passed structural and
 fresh-process inference checks; 10k had the best offline full-sequence action
 agreement and was the deployment candidate; 32 network predictions matched the
 offline reference exactly; no physical trial; LoRA comparison excluded by the
-operator at the time. Read the PI05_*.md files in date order; `records/` holds
+operator at the time. Read the PI05\_\*.md files in date order; `records/` holds
 the JSON reports and configs they cite (no checkpoints, no .npz).
 
 The weights of the three checkpoints stay on disk at

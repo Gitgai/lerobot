@@ -35,9 +35,9 @@ DST = ROOT / "new30_merged"
 MODALITY_FROM = ROOT / "orange79_plus_plate20/meta/modality.json"
 
 SOURCES = [
-    (NEW / "orange_final10_v21",    0, "pick up the orange and place it on the plate"),
+    (NEW / "orange_final10_v21", 0, "pick up the orange and place it on the plate"),
     (NEW / "orange_adjusted10_v21", 0, "pick up the orange and place it on the plate"),
-    (NEW / "tomato10_v21",          1, "pick up the tomato and place it on the plate"),
+    (NEW / "tomato10_v21", 1, "pick up the tomato and place it on the plate"),
 ]
 CAMS = ["observation.images.front", "observation.images.wrist"]
 
@@ -69,7 +69,8 @@ for src, task_idx, task_str in SOURCES:
 seen, tasks = set(), []
 for _, t, s in SOURCES:
     if t not in seen:
-        seen.add(t); tasks.append({"task_index": t, "task": s})
+        seen.add(t)
+        tasks.append({"task_index": t, "task": s})
 (DST / "meta/tasks.jsonl").write_text("".join(json.dumps(t) + "\n" for t in tasks))
 
 info = json.loads((SOURCES[0][0] / "meta/info.json").read_text())
@@ -90,4 +91,7 @@ for t in tasks:
 
 broken = [p for p in (DST / "videos").rglob("*.mp4") if not p.resolve().exists()]
 print("  broken video links: %d" % len(broken) if broken else "  all 60 video links resolve")
-print("\n  NEXT: generate stats -> python -m gr00t.data.stats --dataset-path %s --embodiment-tag new_embodiment" % DST)
+print(
+    "\n  NEXT: generate stats -> python -m gr00t.data.stats --dataset-path %s --embodiment-tag new_embodiment"
+    % DST
+)

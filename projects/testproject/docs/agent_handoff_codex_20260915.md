@@ -167,14 +167,14 @@ ports, under four different programs.
 
 Each line is a measurement taken on 2026-09-14, not an inference.
 
-| Suspect | Test | Result |
-|---|---|---|
-| Our test script | Ran LeRobot's own `lerobot-teleoperate` | **Died the same way** |
-| A bad laptop port | Moved follower from port 3-2 to 3-1 | **Died on both** |
-| Torque / motor current | Same 30 s read loop with torque never enabled | **Died at 18 s anyway** |
-| Servo supply sagging | Logged `Present_Voltage` every 50 ms until death | **Steady 5.9 V throughout** |
-| Cable signal integrity | Counted kernel `-71 / -32 / -110` errors | **Zero.** Every drop is a clean power-cycle |
-| The laptop's USB stack | Identical CH340 board (the leader) hammered 30 s | **Survived, 564 read cycles, no drop** |
+| Suspect                | Test                                             | Result                                      |
+| ---------------------- | ------------------------------------------------ | ------------------------------------------- |
+| Our test script        | Ran LeRobot's own `lerobot-teleoperate`          | **Died the same way**                       |
+| A bad laptop port      | Moved follower from port 3-2 to 3-1              | **Died on both**                            |
+| Torque / motor current | Same 30 s read loop with torque never enabled    | **Died at 18 s anyway**                     |
+| Servo supply sagging   | Logged `Present_Voltage` every 50 ms until death | **Steady 5.9 V throughout**                 |
+| Cable signal integrity | Counted kernel `-71 / -32 / -110` errors         | **Zero.** Every drop is a clean power-cycle |
+| The laptop's USB stack | Identical CH340 board (the leader) hammered 30 s | **Survived, 564 read cycles, no drop**      |
 
 The leader control (last row) is the decisive one. Same board model, same
 laptop, same driver, same read pattern, same moment — the leader is fine and the
@@ -184,7 +184,7 @@ path: its cable, its connector, or its board.**
 ### Do not re-derive these
 
 The supply voltage is a red herring and cost an hour. It reads 6.0–6.1 V idle
-and 5.6–5.9 V under load, which *is* under the STS3215's 6.0–8.4 V spec and is
+and 5.6–5.9 V under load, which _is_ under the STS3215's 6.0–8.4 V spec and is
 worth improving eventually — but it is **not** the cause of the dropouts,
 because the voltage trace is flat across the instant the board disappears, and
 because the board dies just as readily with torque off and the servos idle.
@@ -198,8 +198,8 @@ Easy to read backwards.)
 ## The timeline matters
 
 ```text
-2026-09-14 ~18:50 IST   a full 30-second recording SUCCEEDED, torque on throughout
-2026-09-14  19:13 IST   first dropout
+2026-09-14 ~18:50 UTC+05:30   a full 30-second recording SUCCEEDED, torque on throughout
+2026-09-14  19:13 UTC+05:30   first dropout
                         ... and five more within twenty minutes
 ```
 
@@ -305,7 +305,7 @@ wrist_roll         8.4        8.4     0.0 deg
 gripper           53.7       -7.4    61.1 deg
 ```
 
-Five joints within half a degree — and they reached that agreement by *tracking*
+Five joints within half a degree — and they reached that agreement by _tracking_
 during the seconds each test survived, so the follower genuinely follows.
 Calibration is sound. Close this question; do not re-open it.
 
@@ -341,7 +341,7 @@ video file, so the file count is not the episode count.
 Fixed by reading the dataset's own metadata. New file `~/epcount.py` prints
 `meta/info.json`'s `total_episodes`, or 0 if absent/unreadable; `rec_esp.sh` now
 uses it for both the resume decision and the closing count, and only clears a
-directory when epcount says 0 *and* the path exists.
+directory when epcount says 0 _and_ the path exists.
 
 ---
 
@@ -405,20 +405,20 @@ patched this session to use `arm_ports.py` after it was found hardcoding
 
 ### Scripts on the laptop
 
-| File | Moves the arm? | Purpose |
-|---|---|---|
-| `~/arm_ports.py` | no | resolve arm ports by serial |
-| `~/camfind.py` | no | resolve cameras by name |
-| `~/epcount.py` | no | episodes in a dataset, from its metadata |
-| `~/probe_ports.py` | no | which ports have responding motors |
-| `~/startgap.py` | no | leader vs follower pose, calibrated |
-| `~/notorque.py` | no | 30 s bus hammer, follower, torque off |
-| `~/notorque_leader.py` | no | same, leader — the control |
-| `~/gripcheck.py` | no | per-joint load, voltage, temperature |
-| `~/safe.py` | releases | report torque state, then disable |
-| `~/voltrace.py` | **enables torque** | voltage trace to the moment of death |
-| `~/synctest.py` | **moves the arm** | 60 s teleop, measures tracking error |
-| `~/rec_esp.sh` | **moves the arm** | record demonstrations |
+| File                   | Moves the arm?     | Purpose                                  |
+| ---------------------- | ------------------ | ---------------------------------------- |
+| `~/arm_ports.py`       | no                 | resolve arm ports by serial              |
+| `~/camfind.py`         | no                 | resolve cameras by name                  |
+| `~/epcount.py`         | no                 | episodes in a dataset, from its metadata |
+| `~/probe_ports.py`     | no                 | which ports have responding motors       |
+| `~/startgap.py`        | no                 | leader vs follower pose, calibrated      |
+| `~/notorque.py`        | no                 | 30 s bus hammer, follower, torque off    |
+| `~/notorque_leader.py` | no                 | same, leader — the control               |
+| `~/gripcheck.py`       | no                 | per-joint load, voltage, temperature     |
+| `~/safe.py`            | releases           | report torque state, then disable        |
+| `~/voltrace.py`        | **enables torque** | voltage trace to the moment of death     |
+| `~/synctest.py`        | **moves the arm**  | 60 s teleop, measures tracking error     |
+| `~/rec_esp.sh`         | **moves the arm**  | record demonstrations                    |
 
 Local copies of the ones written this session are in this session's scratchpad;
 they are not yet committed to the repo. **Consider committing them** — they have

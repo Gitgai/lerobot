@@ -36,8 +36,8 @@ seconds.
 
 ## Scope — WHICH episodes get trimmed
 
->>> DECISION (operator, 2026-09-15): trim the 20 orange episodes only.
->>> Leave the 10 tomato episodes exactly as recorded.
+> > > DECISION (operator, 2026-09-15): trim the 20 orange episodes only.
+> > > Leave the 10 tomato episodes exactly as recorded.
 
 The tomato episodes are already tight and there is nothing worth taking:
 
@@ -69,7 +69,7 @@ down to 34.8s against tomato's 29.9s, which is close enough.
 ```
 
 **Step 2's "at the end" is load-bearing, not decoration.** The arm is at rest at
-the *start* of every episode too. An earlier draft read "find the moment the arm
+the _start_ of every episode too. An earlier draft read "find the moment the arm
 reaches its rest posture and stays there", which — scanned forward — matches
 **frame zero** and deletes the entire episode. Always search backward from the
 last frame.
@@ -195,7 +195,7 @@ TEST    is the fruit's centroid inside the plate hull, and by how far.
 ### Three ways this detector failed first — do not repeat them
 
 **1. Picking the plate by size.** The robot arm's white-and-grey plastic falls in
-the same colour range and is *sometimes the larger blob*. Four episodes were
+the same colour range and is _sometimes the larger blob_. Four episodes were
 reported OFF PLATE because the fruit was being measured against the arm.
 
 **2. Picking the plate by shape.** Requiring a smooth oval (solidity ≥ 0.88)
