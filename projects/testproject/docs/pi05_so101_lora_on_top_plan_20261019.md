@@ -34,6 +34,23 @@ split (checked), so counting both sets double-counts 79 episodes. Training set =
 orange89_plus_plate20 (89 + 20 = 109; scripts/merge_orange89_plus_plate20.py, videos symlinked, no re-encode).
 front camera in ALL 109: the LOW FRONT view at table height (frame check 2026-10-21) — the bench must match it.
 ```
+DATA INVENTORY CORRECTION (2026-10-24, operator's question "do we have the latest episodes?"): rows 1 and 2 MISSED
+60 September episodes that were on AI90 all along (used in September for the GR00T recovery work, never listed in
+the R5 plan):
+```text
+set                 episodes  frames   instruction(s)                                        front camera   recorded
+new30_merged           30     28,945   20 × "pick up the orange and place it on the plate"   OVERHEAD       2026-09-15
+                                        10 × "pick up the tomato and place it on the plate"   (oblique, tray at right)
+recovery30_v21         30     26,913   30 × orange→plate, each starting OFF-TARGET then       OVERHEAD       2026-09-18
+                                        correcting (recovery demos, 30 s)
+(new30_plus_recov30 = the two above merged, 60)
+```
+So the real data is 169 unique episodes in TWO camera placements: 109 LOW-FRONT (August) + 60 OVERHEAD (September).
+The September overhead view is the view the bench has had in every trial so far (and today, 2026-10-24) — i.e. rows
+1–2 were trained on the view the bench does NOT have, and the data that matches the bench's actual camera was left
+out. Row 3 = all 169 (both views; the base corpus itself spans many external placements, and the policy conditions on
+the image) → tested on the OVERHEAD bench camera, no camera move needed; the 10 tomato episodes make the operator's
+tomato in-distribution. Merge: scripts/merge_real_sets_v21.py → all169_aug_low_sep_overhead.
 Decisions to take at build (each is a knob, not a guess — record the choice):
 - instruction: keep the recorded strings (two of them) — the model sees our wording as the dataset wrote it;
   the bench client then sends the SAME string ("pick up the orange and place it on the plate" for the tray
