@@ -2,6 +2,27 @@
 
 Updated: 24 October 2026. Scope: organize and preserve project work, not run a robot trial.
 
+## Current Git status and what merging means
+
+The selected migration and all nine earlier local files are committed and pushed on `codex/consolidate-fruit-openpi-20261024`, through `ff0b0b36`. The repository working tree was clean after that push. The main branch remains at `aff7b4c7`; these are two branches of **one repository**, not separate projects. Merging would add the branch's changes to the main project version. Pushing has already saved them remotely; merging is a separate step.
+
+The older Documents/ChatGPT workspace is still retained and only selected contents have migrated. A clean repository does not establish complete workspace consolidation, data backup or hardware readiness. The earlier pending-commit statements below are historical and superseded for these completed batches.
+
+### Merge-readiness review — 24 October
+
+Ran `pre-commit run --all-files` on an isolated checkout of **origin/main itself** (`aff7b4c7`). It failed the same check categories as the preservation branch: EOF/whitespace, Ruff formatting/lint, spelling, Python modernization, Markdown formatting and Bandit. Both first passes reported `274 errors (82 fixed, 192 remaining)` from Ruff. These counts are after preceding format hooks and must not be confused with a raw Ruff scan. Secret/large-file, YAML/TOML, workflow security and type checks passed. The temporary baseline checkout was disposable; its formatter changes were not applied to the working repository.
+
+All 19 targeted tests and scoped checks passed for the selected branch changes. This distinguishes existing check debt from the consolidation changes; it does not prove all behavior correct. No simulator, server or physical robot run was performed for this Git review.
+
+**Decision:** prepare a draft pull request, do not claim CI is green, and do not silently force a merge or disable checks. Quality runs on pull requests targeting main or pushes to main; ordinary pushes to this feature branch do not trigger that workflow, explaining the previously empty run list. Review the actual PR check state separately from local results.
+
+### Remaining merge phases
+
+1. Preserve the scoped branch and open a draft PR with explicit baseline-versus-branch results.
+2. Triage existing failures separately: distinguish mechanical formatting from changes that can affect closure capture, action scheduling, loop semantics, loading or network exposure. No blanket unsafe auto-fix or global exclusions.
+3. Review and test any necessary remediation in a separate scoped change; do not change motor defaults or bypass protections to satisfy static checks.
+4. Re-run repository-wide checks and review the PR. Then merge through the normal reviewed workflow and verify GitHub main and the local checkout agree. Do not force-push, delete the old workspace, or describe this step as completed before verifying it.
+
 ## The simple rule
 
 Use **Gitgai/lerobot** as the single source-controlled project. On Acer its root is `/home/gaikwad-prakash/PrakashProjects/lerobot/lerobot`; robot-project work belongs under `projects/testproject/`. AI90's checkout is another copy of that same repository, not a different project.
@@ -20,7 +41,7 @@ Use **Gitgai/lerobot** as the single source-controlled project. On Acer its root
 - [ ] Inventory newer session-workspace code/docs against the now-current repository; identify exact duplicates, conflicts, machine-specific paths and dependencies.
 - [ ] Copy selected active code/tests/docs into agreed locations, without deleting the originals. Record source/destination hashes and provenance. Exclude secrets and generated bulk data.
 - [ ] Check imports, relative links and absolute runtime paths; run relevant non-moving tests before changing launch paths. Existing launch commands remain at their existing locations meanwhile.
-- [ ] Review the exact staged diff and secret/large-file exclusions; run applicable checks; commit and push scoped code/docs. Do not bulk-stage the workspace or unrelated user edits.
+- [x] Review the selected batches' staged diffs and secret/large-file exclusions; run scoped checks and commit/push those batches. This does not cover every old workspace file or a merge into main.
 - [ ] Only after verification, label superseded instructions as historical and give the old workspace a redirect. No deletion is required to complete consolidation.
 
 ## Preservation record
