@@ -19,10 +19,8 @@ from lerobot.motors.feetech import FeetechMotorsBus
 
 JOINTS = ["shoulder_pan", "shoulder_lift", "elbow_flex", "wrist_flex", "wrist_roll", "gripper"]
 
-out = subprocess.run(["python3", os.path.expanduser("~/arm_ports.py")],
-                     capture_output=True, text=True).stdout
-port = [l.split("=", 1)[1].strip() for l in out.splitlines()
-        if l.startswith("export FOLLOWER_PORT")][0]
+out = subprocess.run(["python3", os.path.expanduser("~/arm_ports.py")], capture_output=True, text=True).stdout
+port = [l.split("=", 1)[1].strip() for l in out.splitlines() if l.startswith("export FOLLOWER_PORT")][0]
 print("  follower on %s" % port, flush=True)
 
 motors = {j: Motor(i + 1, "sts3215", MotorNormMode.RANGE_M100_100) for i, j in enumerate(JOINTS)}
@@ -45,8 +43,10 @@ try:
         log.append((t, min(v.values()) / 10.0, max(x & 0x3FF for x in ld.values())))
         time.sleep(0.05)
 except Exception as exc:
-    print("  DIED at %.2fs: %s: %s" % (time.perf_counter() - t0,
-                                       type(exc).__name__, str(exc)[:70]), flush=True)
+    print(
+        f"  DIED at {time.perf_counter() - t0:.2f}s: {type(exc).__name__}: {str(exc)[:70]}",
+        flush=True,
+    )
 finally:
     try:
         bus.disable_torque()
@@ -61,5 +61,7 @@ for t, v, l in log[-20:]:
     print("    %5.2fs %6.1fV %8d" % (t, v, l))
 if log:
     vs = [v for _, v, _ in log]
-    print("\n  voltage: started %.1fV, lowest %.1fV, ended %.1fV over %d samples"
-          % (vs[0], min(vs), vs[-1], len(vs)))
+    print(
+        "\n  voltage: started %.1fV, lowest %.1fV, ended %.1fV over %d samples"
+        % (vs[0], min(vs), vs[-1], len(vs))
+    )

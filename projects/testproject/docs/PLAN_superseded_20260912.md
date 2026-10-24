@@ -79,6 +79,7 @@ stealing the camera mid-trial at random.
 ```
 
 **Decision:**
+
 - grasps -> the rig is healthy. Proceed to step 2.
 - does not grasp -> something other than the camera broke since 2026-08-20.
   Stop and diagnose. Do NOT run model comparisons on a rig that cannot grasp.

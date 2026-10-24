@@ -1,8 +1,8 @@
 # Visualizing eval trials, and the recovery-data plan
 
 Written 2026-09-18. Two things settled this session: how to replay a policy eval
-trial in LeRobot's viewer, and why the fix for the hover failure is *recovery
-data* — plus a hard finding that constrains how we can collect it.
+trial in LeRobot's viewer, and why the fix for the hover failure is _recovery
+data_ — plus a hard finding that constrains how we can collect it.
 
 ---
 
@@ -47,6 +47,7 @@ HF_HUB_OFFLINE=1 .venv/bin/lerobot-dataset-viz \
 ```
 
 Gotchas, each hit this session:
+
 - `HF_HUB_OFFLINE=1` is required, or `local/...` tries HuggingFace and 401s.
 - The web app (9090) and the DATA server (gRPC 9876) are SEPARATE ports. Opening
   `:9090` bare shows an EMPTY viewer because it can't reach the data. Open with
@@ -58,7 +59,7 @@ Gotchas, each hit this session:
   with the VENV rerun (`~/PrakashProjects/.../.venv/bin/rerun file.rrd`) — NOT the
   snap/apt `rerun` (wrong version, rejects the file). Native needs a display
   (the Acer's Wayland session; over SSH set `WAYLAND_DISPLAY=wayland-0
-  XDG_RUNTIME_DIR=/run/user/1000`).
+XDG_RUNTIME_DIR=/run/user/1000`).
 
 ### Reading the plots
 
@@ -226,26 +227,31 @@ run policy, score placement from the FRONT camera, gripper trace kept.
 Same rate as the pre-recovery model (5/10) BUT a completely different failure mode.
 
 ### The hover is gone
+
 All 10 trials the arm set out and descended onto the orange. Zero hovers. The
 covariate-shift failure the recovery data targeted is eliminated. The rate is
 flat only because a new bottleneck surfaced: the GRASP.
 
 ### Grasp timing perfectly separates outcome (the key finding)
+
 ```text
 success grasp at chunk:  59  67 127 148 171   (first ~55% of the trial)
 failure grasp at chunk: 201 207 233 285 317   (last ~65%) - clean gap, no overlap
 ```
 
 ### grip-min is a physical grasp gauge (jaws stop on the orange's diameter)
+
 ```text
 grip-min 22-25  orange in the jaws          all 5 successes
 grip-min 13-14  closed on EMPTY AIR (miss)  609, 610
 grip-min 18-20  partial/fumble              603, 611
 grip-min 68     never closed                607
 ```
+
 Release confirms: successes reopen 63-71; three failures stay clamped 18-20.
 
 ### Position does NOT drive outcome (hypothesis refuted, by eye not the detector)
+
 Same orange positions gave both outcomes: far-left 601 ✓ vs 607 ✗; centre 604 ✓
 vs 609/610 ✗; far-right 608 ✓ vs 611 ✗. The failure is execution inconsistency,
 not a hard/OOD position. (The automated orange detector was UNRELIABLE here - it
@@ -253,6 +259,7 @@ mislocated 607's far-left orange to centre on a wood-grain false positive - so
 positions were read by eye. See the blind-spot lesson, section 6.)
 
 ### Two earlier claims corrected by the data
+
 - "The correction meanders/dithers" - WRONG. Failures UNDER-move: 603/607/611
   had arm joint travel 262-487 deg, below every success (960-1769). They STALLED
   (arm stuck, didn't complete); 609/610 moved a normal amount but the grasp
@@ -261,6 +268,7 @@ positions were read by eye. See the blind-spot lesson, section 6.)
   far-left spot. Position is not the cause.
 
 ### Mechanism
+
 Recovery data made the APPROACH reliable but the GRASP is not. Per stochastic
 rollout the model either locks on and grasps cleanly in the first half (success)
 or it doesn't get the grasp geometry early and then stalls (603, 611), never
@@ -270,6 +278,7 @@ coverage problem. Likely cause: the recovery demos taught "come down and try"
 but not enough PRECISE, DECISIVE grasps.
 
 ### Confound not resolved
+
 **BIGGER confound found later — see section 8: ALL these trials ran with the RTC
 pipeline OFF (~31% duty), so the arm stalled ~650 ms between chunks. The 5/10 was
 measured CRIPPLED; the true rate is unknown until re-tested with --rtc.**
@@ -282,6 +291,7 @@ against gross drift. A controlled re-test (rest arm, repeat positions) would
 settle it.
 
 ### Next
+
 1. Test checkpoint-3000 (recovery).
 2. Next data need is PRECISE grasp demos (clean early closes at grip~22), NOT
    more descent demos.
@@ -300,6 +310,7 @@ Surfaced by the operator's question: "how did the old model get 9/10 over this
 same transatlantic link?" The answer corrects section 7's implied cause.
 
 ### The old 9/10 used RTC (real-time chunking); this session's evals did not
+
 `orange_pick_baseline_v1` (9/10 on the arm, 2026-08-20) ran the client with RTC
 ENABLED — a PIPELINED loop that keeps one request always in flight, so the arm
 moves continuously while the next chunk's inference happens in the background.
@@ -315,11 +326,13 @@ THIS SESSION (601-611, 301-305, 621):  --rtc OFF (sequential)
                           measured chunk interval 919 ms, duty ~29%
                           == the client's own "sequential baseline 31%" (line 336)
 ```
+
 Sequential = move 267 ms -> FREEZE ~650 ms waiting for the round-trip -> move ->
 freeze. During the freezes the arm is blind/open-loop — exactly the imprecise
 final-approach behaviour section 7 diagnosed.
 
 ### Correction to the latency conclusion
+
 An earlier read this session concluded the ~1.1 Hz loop was an unavoidable
 consequence of the transatlantic link and that the fix was serving on a local /
 Mumbai cloud GPU. **That was wrong.** The latency was already solved in August by
@@ -333,15 +346,18 @@ fewer-diffusion-steps ideas are also minor; diffusion steps are already at the
 minimum of 4. The whole local/Mumbai-GPU line of thought was a wrong turn.)
 
 ### Implication
+
 The recovery model's 5/10 and checkpoint-3000's 0/5 were measured CRIPPLED
 (RTC off). Their true rates are unknown until re-tested with --rtc. The whole
 "new camera -> 5/10" narrative may itself be partly confounded by RTC being off
 in those evals — to be measured, not assumed.
 
 ### The fix (free, no GPU, no retrain, proven)
+
 ```text
 add  --rtc  to run_trial.sh  ->  re-enable the ~95% duty pipeline  ->  re-test 6000
 ```
+
 `_rtc_loop()` (client line 474, "one request always in flight") is the real arm
 path, gated at line 694 by `if cfg.rtc`. It passed gates G0-G2 and drove the 9/10
 run, so it is proven — but verify it still runs cleanly before trusting a number.
@@ -351,11 +367,11 @@ Evidence: git 9e7203b7, 65eaa3ad ("skip-ahead + micro-blend + depth-2 pipeline")
 measured duty 29% ~= sequential baseline 31%.
 
 ### Lesson
+
 Before attributing a slow control loop to network latency, CHECK WHETHER THE
 PIPELINE (RTC) IS ENABLED. A measured 1.1 Hz was read as "the link is too slow /
 needs a local GPU" when the real cause was a client flag defaulting to off. The
 operator's "but the old model worked 9/10" caught it.
-
 
 ---
 
@@ -368,6 +384,7 @@ rate within noise. The bottleneck is the grasp-and-release execution, not the
 control loop. The loop was necessary (it is the 9/10 loop) but is not sufficient.
 
 ### Gates — all passed
+
 ```text
 G0  --rtc --dry_run        95.4% duty, no deadlocks
 G1  --rtc, motion only      duty 85-86%, smooth continuous motion
@@ -376,17 +393,20 @@ network  DIRECT             rtt ~345 ms every RTC trial (ZeroTier AI90->Acer)
 ```
 
 ### RTC IS ~5x faster than sequential — demo tempo, verified from the traces
+
 ```text
              run time   chunks   peak arm speed   median speed   rtt
 RTC (702)     68.7 s     337       133 deg/s        4.8 deg/s     348 ms
 SEQ (604)    294.2 s     322        27 deg/s        0.2 deg/s     632 ms
 ```
+
 Same ~330 chunks, but RTC finishes in 69 s vs 294 s and peak joint speed is ~5x
 higher. This settles the earlier flip-flop: RTC is NOT "just smoother at the same
 speed" — it restores continuous demo-tempo motion by hiding the ~345 ms round-trip
 behind the arm's motion (depth-2, ~85-95% duty), not by commanding faster targets.
 
 ### Scored set 3/7 (~43%) — the grip trace tells the whole story
+
 ```text
 trial  grip-min @ frac   final   outcome    read
 702 v   15.6 @ 0.38       70.4    PLACE      closed EARLY, then RELEASED (final high)
@@ -397,12 +417,14 @@ trial  grip-min @ frac   final   outcome    read
 706 x   16.7 @ 0.97       16.9    STALL      closed LATE, stayed CLAMPED (never released)
 708 x   15.2 @ 0.93       15.2    STALL      closed late, clamped, orange pinned at table
 ```
+
 **The discriminator is RELEASE, not just the grasp:** every success ends with the
 gripper reopened over the plate (final 54-70). Every failure either never closes
 (703/704, min ~60) or closes and stays clamped (706/708, final 15-17) — the orange
 is pinned but never lifted/released.
 
 ### 708 re-run (708b) — a TRUE stall, not a timeout
+
 Re-ran 708 with a 120 s window (double). The arm reached the orange, closed at
 frac 0.65 (grip-min 10.1) but STAYED clamped (final 17.7) and never lifted — the
 orange sat in the jaws at table level start to finish. More time did not rescue
@@ -410,15 +432,18 @@ it. So the clamp-stall is a genuine inability to complete the lift, not a window
 that was too short.
 
 ### Two failure modes, both grasp-execution, neither the loop
+
 ```text
 1. no-grasp    (703, 704)  gripper never closes
 2. clamp-stall (706, 708)  closes but never releases/lifts -> orange pinned at table
 successes      (702,705,707) close early-ish AND release over the plate
 ```
+
 RTC removed the ~650 ms open-loop freezes, but the model still cannot reliably
 (a) close on the orange and (b) lift+release it.
 
 ### Undervoltage — a real, testable contributor to the clamp-stalls
+
 Follower bus measured **5.4 V (nominal 7.4 V)** on 2026-09-20 (read with
 `~/voltrace.py` on the Acer). LIFTING the grasped orange (arm + payload against
 gravity) is the highest-torque moment in the task — exactly where an undervolted
@@ -431,6 +456,7 @@ blocker and the operator correctly pushed back "it was working till now" — the
 honest read is: marginal, a candidate for the LIFT specifically, not a wall.)
 
 ### Verdict — where the levers actually are
+
 RTC is proven and stays ON (it is the 9/10 loop). The placement ceiling is
 GRASP-AND-RELEASE precision, which is a DATA problem: precise, decisive grasp demos
 with a clean early close AND a clear release over the plate — NOT the loop, NOT a

@@ -1,19 +1,21 @@
 # SO-101 bench runs — public checkpoint dongyoonkim/so101-pi05-base, non-pipelined client
 
-Protocol: R3 in docs/pi05_so101_real_base_audit_plan_20261019.md (20 placements, success = fruit on the plate,
+Protocol: R3 in docs/pi05\*so101_real_base_audit_plan_20261019.md (20 placements, success = fruit on the plate,
 no contact with anything else). Client: bench_client.py (this directory) on the Acer (192.168.194.228), policy
 wrapper scripts/so101_base_policy_server.py on AI90 GPU 0, port 8080, over ZeroTier (Pune ↔ NJ).
 Rig: front = Logitech C270 overhead (/dev/video6), wrist = AK-Camera (/dev/video4), arm /dev/ttyACM0
 (calibration id my_so101_follower). Instruction: "Grab oranges and place into plate." Chunk 20 at 30 Hz,
-per-step clamp 8° (15 gripper units). Frames recorded server-side: frames/c05_call*_{front,wrist}.jpg (every call).
+per-step clamp 8° (15 gripper units). Frames recorded server-side: frames/c05_call\*\*{front,wrist}.jpg (every call).
 
 ## Trial 1 — 2026-10-19 19:57–19:58 UTC — FAIL (reach OK, grasp missed)
+
 Scene as the operator left it ("try as is"): one yellow citrus (not an orange) ~15 cm in front-left of the base,
 grey oval tray to its right. Arm started at rest [0, -105, 97, 79, -1, 49] (pan, lift, elbow, wrist_flex,
 wrist_roll, gripper; LeRobot units). 45 chunks, 74 s wall, median round trip 917 ms per call (server 142 ms,
 the rest is JPEG transport over ZeroTier) → duty ≈ 667 / (667 + 917) = 42%.
 
 What the arm did (frames + joint log, Acer ~/bench_ep1.jsonl):
+
 - calls 1–5: gripper closed from 49 → 2 at rest, wrist_flex dipped; **front frames of calls 1 and 2 were
   fully black** (C270 warm-up after open; wrist camera was fine) — the first two chunks were planned without
   the front view
@@ -33,17 +35,20 @@ corpus's oranges (jaw opening vs fruit diameter not measured — measure before 
 Montages: montages/ep1_front_every4.jpg, montages/ep1_wrist_key.jpg.
 
 Fixes made after trial 1 (bench_client.py, copied to the Acer, md5 88d872a8…):
+
 - camera warm-up: read until a frame has signal (≤ 3 s), abort if still black
 - `--home-to a,b,c,d,e,f`: slow clamped move to a pose and exit; `--return-start`: after each episode move
   back to the pose it started from
 - episode record now carries start_state / end_state
 
 ## Trial 2 — 2026-10-19 20:10–20:12 UTC — FAIL (jaws on the fruit, could not close around it, no lift)
+
 Operator re-placed the citrus closer to the base, front-left (tray unchanged). Start pose = rest (returned by
 `--home-to`). 45 chunks, 72.8 s, median RTT 0.918 s. Front camera warm-up worked (frame mean 163 on call 1);
 the wrist camera's first frame was under-exposed (mean 10, calls 2+ fine) → warm-up now wants two frames > 40.
 
-What the arm did (frames c06_call*, Acer ~/bench_ep2.jsonl):
+What the arm did (frames c06_call\*, Acer ~/bench_ep2.jsonl):
+
 - calls 1–8: rest → table in 8 chunks, gripper held open (42–43)
 - calls 9–45: hovered at the fruit (pan 6–12, lift 38–45, elbow −18 to −33) and cycled the gripper eight
   times. Unlike trial 1 the fruit sits BETWEEN the jaws in the wrist frames from call 13 on, and the gripper
@@ -60,12 +65,14 @@ a lift would have followed with a graspable orange is not answerable from this t
 Montages: montages/ep2_front_every4.jpg, montages/ep2_wrist_key.jpg.
 
 ## Trial 3 — 2026-10-20 ~04:2x UTC — OFF-PROTOCOL object (onion) — FAIL (reach OK, jaws beside it, one empty lift)
+
 Operator's object: a small brown onion (fits the jaws easily; not an orange, so this is a generalisation probe
 and NOT one of the 20). Placed ~12 cm front-left of the base, tray unchanged. Start = rest (wrist_flex 65
 instead of 79 — the return move after trial 2 had stopped short; harmless). 45 chunks, 89 s, median RTT
 1.285 s (slower network than yesterday's 0.92 s; server compute unchanged). Both cameras warmed up (129 / 176).
 
-What the arm did (frames c07_call*, bench_ep3_onion.jsonl):
+What the arm did (frames c07_call\*, bench_ep3_onion.jsonl):
+
 - calls 1–7: rest → table in 6 chunks, gripper open (48)
 - calls 8–22: hovered over the onion, three partial closes (30, 19, 11), pan drifting 18 → 25
 - calls 23–24: onion BETWEEN the jaws in the wrist view, gripper closed to 3–4 — but the close landed on the
@@ -86,30 +93,35 @@ grasp pose/timing, not object size alone.
 Montages: montages/ep3onion_front_every4.jpg, ep3onion_front_lift.jpg (calls 22–38), ep3onion_wrist_key.jpg.
 
 ## Trial 4 — 2026-10-20 — OFF-PROTOCOL (onion, larger reddish one) — FAIL (jaws beside it, one empty lift)
+
 Operator re-placed a larger red onion (orange-ish colour, fits the jaws) front-left. 45 chunks, 95.6 s, median
 RTT 1.325 s. Rest → table in 4 chunks. Seven close cycles; gripper floor 4 (calls 9, 23–24, 32: empty) and
 13 (calls 40–42: a glancing squeeze on the onion's side, wrist 41–42). Calls 42–43: lift (shoulder_lift 53 → 36)
 with the gripper at 13–17 — empty; onion still on the table in front 43. Onion nudged a few cm. Returned to start.
-Frames c08_call*, log bench_ep4_onion.jsonl, montages ep4onion_front_every4 / ep4onion_wrist_key / ep4onion_front_end.
+Frames c08_call\*, log bench_ep4_onion.jsonl, montages ep4onion_front_every4 / ep4onion_wrist_key / ep4onion_front_end.
 
 ## Trial 5 — 2026-10-20 — OFF-PROTOCOL (same onion, placed closer to the base) — FAIL (aligned, closed ABOVE it)
+
 Onion placed ~8 cm in front of the base, slightly left. 45 chunks, 147.5 s, median RTT 1.618 s with a ZeroTier
 stall on calls 24–30 (10.7 s, 6.6 s, 8.2 s, 6.6 s, 9.6 s, 14.0 s per call; server compute stayed 141–145 ms,
 so the stall was the network). Non-pipelined client → the arm simply waited; no motion during the stall.
+
 - calls 5–9: arm over the onion, **onion squarely between the jaws in the wrist view (calls 8, 9, 13, 14)** —
   the first correctly aligned approach on the bench — yet the gripper closed to 6 (call 9) and 4 (call 15):
   the fingers shut above the onion (approach not low enough) and the close pushed it out (wrist 15)
 - calls 16–45: re-approach with pan −4 to −7, three more closes (17, 11, 18) beside it, then hovering with the
   gripper open through the stall; ended at [−1, 19, 11, 70, −43, 17]; returned to start
-Reading: lateral alignment can be right; the miss here is HEIGHT at the close (fingers above the object), which
-the wrist camera shows plainly. Same family as trials 1–4: grasp pose, not object identity or size.
-Frames c09_call*, log bench_ep5_onion.jsonl, montages ep5onion_front_every4 / ep5onion_wrist_key.
+  Reading: lateral alignment can be right; the miss here is HEIGHT at the close (fingers above the object), which
+  the wrist camera shows plainly. Same family as trials 1–4: grasp pose, not object identity or size.
+  Frames c09_call\*, log bench_ep5_onion.jsonl, montages ep5onion_front_every4 / ep5onion_wrist_key.
 
 ## Trial 6 — 2026-10-20 — COUNTED (orange, fits the jaws) — FAIL (aligned, closed above it, then over-reached)
+
 First counted trial with a real orange (a mandarin-sized orange, fits the open jaws with room). Placed ~15 cm
 straight in front of the base. **Rig change noticed in the first frame: the overhead C270's view differs from
 trials 1–5** (base now top-centre, tray right, table edge visible top-left — the camera was moved or bumped
 between trials 5 and 6; operator asked). 45 chunks, 87.6 s, median RTT 1.135 s; both cameras warmed up.
+
 - calls 1–10: rest → table in 9 chunks (slower start: 3 chunks of small wrist motion first), gripper 40–48
 - calls 11–14: **orange between the jaws (wrist 11–13), gripper closed to 2** — fingers shut above the fruit;
   the orange did not move
@@ -117,17 +129,19 @@ between trials 5 and 6; operator asked). 45 chunks, 87.6 s, median RTT 1.135 s; 
   of any trial) and worked the gripper there (floors 10, 16, 19–22), orange behind/below the jaws in the
   wrist view the whole time; one short lift at 42 (shoulder 55 → 38) with gripper 22, empty; ended at
   [21, 52, −44, 87, −33, 35]; returned to start
-Reading: as trial 5 — correct lateral alignment, close too high — followed by a new failure: an over-reach
-beyond the object, consistent with the moved overhead camera (the front view is the policy's main depth cue;
-a shifted camera shifts where it thinks the object is). Counted as FAIL; the camera move is a CONFOUND for
-this trial and must be fixed (restore the view of trials 1–5 or re-fix the mount and keep it) before trial 7.
-Frames c10_call*, log bench_ep6_orange.jsonl, montages ep6orange_front_every4 / ep6orange_wrist_key / ep6orange_front_end.
+  Reading: as trial 5 — correct lateral alignment, close too high — followed by a new failure: an over-reach
+  beyond the object, consistent with the moved overhead camera (the front view is the policy's main depth cue;
+  a shifted camera shifts where it thinks the object is). Counted as FAIL; the camera move is a CONFOUND for
+  this trial and must be fixed (restore the view of trials 1–5 or re-fix the mount and keep it) before trial 7.
+  Frames c10_call\*, log bench_ep6_orange.jsonl, montages ep6orange_front_every4 / ep6orange_wrist_key / ep6orange_front_end.
 
 ## Trials 7–10 — 2026-10-20 — COUNTED (orange), four back-to-back — all FAIL
+
 Run as one client process (`--episodes 4 --return-start --pause-between 30`; operator re-placed the orange in the
 30 s countdown; one gRPC connection → frames c11_call000001–000180, 45 per trial). Overhead camera in the
 trial-6 position throughout (not restored; consistent for 6–10). Log bench_ep7_10_orange.jsonl + .run.log.
 Median RTT 0.98 / 1.20 / 1.20 / 1.21 s; 78–87 s per trial. Composites: montages/ep{7,8,9,10}orange_composite.jpg.
+
 ```text
 trial  placement                 off-rest at  closes (gripper floor)          what the wrist camera shows
 7      ~15 cm in front, centre   chunk 15     21–22 (4), 28–30 (24), 41 (7)   c21: shut beside; c40→41: orange between the
@@ -143,18 +157,21 @@ trial  placement                 off-rest at  closes (gripper floor)          wh
                                                                               past it (shoulder 68, elbow −74) and hovered
                                                                               with half-closed gripper over nothing
 ```
+
 New in this batch: two trials (7, 8) sat motionless at rest for 14–15 chunks (≈20 s) before starting the reach —
 the policy output "hold" at the start pose; trials 9 and 10 started within 6 chunks. Not seen in trials 1–6.
 Reading: identical failure family across all four — the arm finds the orange and gets it between the jaws,
 and the close is 1–3 cm too high or to one side; it never re-adjusts downward, it retries the same close.
 
 ## Trials 11–16 — 2026-10-20 — COUNTED (orange), six back-to-back — all FAIL
+
 Same client settings as 7–10 (one process, 30 s countdown, return-to-start). Frames c12_call000001–000270
 (45 per trial). Overhead camera still in the trial-6 position. Log bench_ep11_16_orange.jsonl.
 Placements: the operator put the orange close to the base, left side (≈5–10 cm from the base plate) in all
 six — the folded-arm region (shoulder_lift ≈ −15…+20, elbow 25…45 at the object). The "raised" end poses in the
 chunk log are that folded reach, NOT lifts: no wrist frame in any of the six shows the orange inside the jaws.
 Median RTT 0.96 / 1.19 / 1.19 / 1.18 / 1.20 / 1.21 s; 85 s per trial (trial 12: 111 s, one slow call).
+
 ```text
 trial  off-rest at  closes (gripper floor)                    wrist camera
 11     chunk 5      12–14 (2), 22–23 (5), 30–31 (3), 42–43 (9)   orange right of / behind the right jaw at every close;
@@ -170,18 +187,20 @@ trial  off-rest at  closes (gripper floor)                    wrist camera
 16     chunk 12     36–45 (8–21)                                orange never appears in the wrist view (hidden under the
                                                               arm's shoulder from the overhead view too); closes on air
 ```
+
 Reading: no change in behaviour class across a third placement region (far-front in 6–7, mid in 8–10, close-in in
 11–16). The policy reaches the object region reliably from every placement and never completes a grasp.
 Composites: montages/ep{11..16}orange_composite.jpg.
 
 ## Running tally
-| trial | utc | result | chunks | wall s | median RTT s | note |
-|---|---|---|---|---|---|---|
-| 1 | 2026-10-19T19:58:52Z | FAIL | 45 | 74.1 | 0.917 | reached, 10 grasp attempts beside the fruit, black front frames on calls 1–2 |
-| 2 | 2026-10-19T20:12:03Z | FAIL | 45 | 72.8 | 0.918 | reached, jaws on the fruit (gripper floor 10–17), no enclosure, no lift, fruit nudged |
-| 3 (onion, off-protocol) | 2026-10-20 | FAIL | 45 | 89.1 | 1.285 | reached, onion between the jaws once but closed beside it, one empty-handed lift+release, nudged |
-| 4 (onion, off-protocol) | 2026-10-20 | FAIL | 45 | 95.6 | 1.325 | reached, seven closes beside it (floor 4; 13 once = glancing squeeze), empty lift at the end |
-| 5 (onion, off-protocol) | 2026-10-20 | FAIL | 45 | 147.5 | 1.618 | aligned between the jaws at calls 8–14 but closed ABOVE it (floor 4–6), pushed out; ZeroTier stall 7–14 s/call on 24–30 |
+
+| trial                   | utc                  | result | chunks | wall s | median RTT s | note                                                                                                                    |
+| ----------------------- | -------------------- | ------ | ------ | ------ | ------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| 1                       | 2026-10-19T19:58:52Z | FAIL   | 45     | 74.1   | 0.917        | reached, 10 grasp attempts beside the fruit, black front frames on calls 1–2                                            |
+| 2                       | 2026-10-19T20:12:03Z | FAIL   | 45     | 72.8   | 0.918        | reached, jaws on the fruit (gripper floor 10–17), no enclosure, no lift, fruit nudged                                   |
+| 3 (onion, off-protocol) | 2026-10-20           | FAIL   | 45     | 89.1   | 1.285        | reached, onion between the jaws once but closed beside it, one empty-handed lift+release, nudged                        |
+| 4 (onion, off-protocol) | 2026-10-20           | FAIL   | 45     | 95.6   | 1.325        | reached, seven closes beside it (floor 4; 13 once = glancing squeeze), empty lift at the end                            |
+| 5 (onion, off-protocol) | 2026-10-20           | FAIL   | 45     | 147.5  | 1.618        | aligned between the jaws at calls 8–14 but closed ABOVE it (floor 4–6), pushed out; ZeroTier stall 7–14 s/call on 24–30 |
 
 | 6 (orange, counted) | 2026-10-20 | FAIL | 45 | 87.6 | 1.135 | aligned at calls 11–14 but closed above it (floor 2), then over-reached past the orange; overhead camera had moved (confound) |
 

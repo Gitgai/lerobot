@@ -34,10 +34,18 @@ parser.add_argument("--policy_host", type=str, default="localhost", help="Host o
 parser.add_argument("--policy_port", type=int, default=5555, help="Port of the policy server.")
 parser.add_argument("--policy_timeout_ms", type=int, default=15000, help="Timeout of the policy server.")
 parser.add_argument("--policy_action_horizon", type=int, default=16, help="Action horizon of the policy.")
-parser.add_argument("--policy_language_instruction", type=str, default=None, help="Language instruction of the policy.")
+parser.add_argument(
+    "--policy_language_instruction", type=str, default=None, help="Language instruction of the policy."
+)
 parser.add_argument("--policy_checkpoint_path", type=str, default=None, help="Checkpoint path of the policy.")
-parser.add_argument("--results_jsonl", type=str, default=None, help="append one JSON line per episode here (our harness)")
-parser.add_argument("--reseed_each_episode", action="store_true", help="reset env seed to base_seed+episode_index before each episode")
+parser.add_argument(
+    "--results_jsonl", type=str, default=None, help="append one JSON line per episode here (our harness)"
+)
+parser.add_argument(
+    "--reseed_each_episode",
+    action="store_true",
+    help="reset env seed to base_seed+episode_index before each episode",
+)
 
 
 # append AppLauncher cli args
@@ -55,6 +63,7 @@ import time
 
 import carb
 import gymnasium as gym
+import leisaac  # noqa: F401
 import omni
 import torch
 from isaaclab.envs import ManagerBasedRLEnv
@@ -63,8 +72,6 @@ from leisaac.utils.env_utils import (
     dynamic_reset_gripper_effort_limit_sim,
     get_task_type,
 )
-
-import leisaac  # noqa: F401
 
 
 class RateLimiter:
@@ -132,25 +139,31 @@ def preprocess_obs_dict(obs_dict: dict, model_type: str, language_instruction: s
         raise ValueError(f"Model type {model_type} not supported")
 
 
-
 def _oranges_on_plate(env):
     """Our harness (2026-10-22): how many oranges sit inside the plate box of the task's own success predicate
     (x/y within ±0.10 m of the plate, height within ±0.07 m), plus whether the arm is at rest. None on any error."""
     try:
-        import torch as _t
         from leisaac.utils.robot_utils import is_so101_at_rest_pose
-        sc = env.unwrapped.scene; org = sc.env_origins[0]
+
+        sc = env.unwrapped.scene
+        org = sc.env_origins[0]
         pl = sc["Plate"].data.root_pos_w[0] - org
         n = 0
         for name in ("Orange001", "Orange002", "Orange003"):
             o = sc[name].data.root_pos_w[0] - org
-            if abs(float(o[0] - pl[0])) < 0.10 and abs(float(o[1] - pl[1])) < 0.10 and abs(float(o[2] - pl[2])) < 0.07:
+            if (
+                abs(float(o[0] - pl[0])) < 0.10
+                and abs(float(o[1] - pl[1])) < 0.10
+                and abs(float(o[2] - pl[2])) < 0.07
+            ):
                 n += 1
         rb = sc["robot"].data
         rest = bool(is_so101_at_rest_pose(rb.joint_pos, rb.joint_names)[0])
         return n, rest
     except Exception as e:  # noqa: BLE001
-        print(f"[harness] oranges_on_plate failed: {e}", flush=True); return None, None
+        print(f"[harness] oranges_on_plate failed: {e}", flush=True)
+        return None, None
+
 
 def main():
     """Running lerobot teleoperation with leisaac manipulation environment."""
@@ -218,7 +231,9 @@ def main():
             port=args_cli.policy_port,
             timeout_ms=args_cli.policy_timeout_ms,
             camera_infos={
-                key: sensor.image_shape for key, sensor in env.scene.sensors.items() if isinstance(sensor, Camera)
+                key: sensor.image_shape
+                for key, sensor in env.scene.sensors.items()
+                if isinstance(sensor, Camera)
             },
             task_type=task_type,
             policy_type=policy_type,
@@ -245,16 +260,21 @@ def main():
     controller.reset()
 
     # record the results
-    import json as _json, sys as _sys
+    import json as _json
+    import sys as _sys
+
     _res = open(args_cli.results_jsonl, "a") if args_cli.results_jsonl else None
     _base_seed = env_cfg.seed
-    _t_ep = time.time(); _steps = 0; _calls = 0
+    _t_ep = time.time()
+    _steps = 0
+    _calls = 0
     success_count, episode_count = 0, 1
 
     # simulate environment
     while max_episode_count <= 0 or episode_count <= max_episode_count:
         print(f"[Evaluation] Evaluating episode {episode_count}...")
-        success, time_out = False, False; _pre = (None, None)
+        success, time_out = False, False
+        _pre = (None, None)
         while simulation_app.is_running():
             # run everything in inference mode
             with torch.inference_mode():
@@ -264,14 +284,20 @@ def main():
                     episode_count += 1
                     break
 
-                obs_dict = preprocess_obs_dict(obs_dict["policy"], model_type, args_cli.policy_language_instruction)
-                actions = policy.get_action(obs_dict).to(env.device); _calls += 1
+                obs_dict = preprocess_obs_dict(
+                    obs_dict["policy"], model_type, args_cli.policy_language_instruction
+                )
+                actions = policy.get_action(obs_dict).to(env.device)
+                _calls += 1
                 for i in range(min(args_cli.policy_action_horizon, actions.shape[0])):
                     action = actions[i, :, :]
                     if env.cfg.dynamic_reset_gripper_effort_limit:
                         dynamic_reset_gripper_effort_limit_sim(env, task_type)
-                    _pre = _oranges_on_plate(env)   # BEFORE the step: Isaac Lab resets a done env inside step(), so counting after sees the fresh scene (found 2026-10-22)
-                    obs_dict, _, reset_terminated, reset_time_outs, _ = env.step(action); _steps += 1
+                    _pre = _oranges_on_plate(
+                        env
+                    )  # BEFORE the step: Isaac Lab resets a done env inside step(), so counting after sees the fresh scene (found 2026-10-22)
+                    obs_dict, _, reset_terminated, reset_time_outs, _ = env.step(action)
+                    _steps += 1
                     if reset_terminated[0]:
                         success = True
                         break
@@ -282,12 +308,32 @@ def main():
                         rate_limiter.sleep(env)
             if success or time_out:
                 _n_plate, _rest = _pre
-                _rec = {"episode": episode_count, "success": bool(success), "time_out": bool(time_out), "oranges_on_plate": _n_plate, "at_rest": _rest, "steps": _steps, "policy_calls": _calls, "wall_s": round(time.time() - _t_ep, 1), "seed": int(env_cfg.seed), "task": args_cli.task, "instruction": args_cli.policy_language_instruction, "utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}
-                print("[RESULT] " + _json.dumps(_rec), flush=True); _sys.stderr.write("[RESULT] " + _json.dumps(_rec) + "\n"); _sys.stderr.flush()
-                if _res: _res.write(_json.dumps(_rec) + "\n"); _res.flush()
-                _t_ep = time.time(); _steps = 0; _calls = 0
+                _rec = {
+                    "episode": episode_count,
+                    "success": bool(success),
+                    "time_out": bool(time_out),
+                    "oranges_on_plate": _n_plate,
+                    "at_rest": _rest,
+                    "steps": _steps,
+                    "policy_calls": _calls,
+                    "wall_s": round(time.time() - _t_ep, 1),
+                    "seed": int(env_cfg.seed),
+                    "task": args_cli.task,
+                    "instruction": args_cli.policy_language_instruction,
+                    "utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                }
+                print("[RESULT] " + _json.dumps(_rec), flush=True)
+                _sys.stderr.write("[RESULT] " + _json.dumps(_rec) + "\n")
+                _sys.stderr.flush()
+                if _res:
+                    _res.write(_json.dumps(_rec) + "\n")
+                    _res.flush()
+                _t_ep = time.time()
+                _steps = 0
+                _calls = 0
                 if args_cli.reseed_each_episode:
-                    env_cfg.seed = _base_seed + episode_count; env.seed(env_cfg.seed) if hasattr(env, "seed") else None
+                    env_cfg.seed = _base_seed + episode_count
+                    env.seed(env_cfg.seed) if hasattr(env, "seed") else None
             if success:
                 print(f"[Evaluation] Episode {episode_count} is successful!")
                 episode_count += 1

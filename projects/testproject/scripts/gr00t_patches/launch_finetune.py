@@ -6,7 +6,6 @@ import os
 from pathlib import Path
 
 import tyro
-
 from gr00t.configs.base_config import get_default_config
 from gr00t.configs.finetune_config import FinetuneConfig
 from gr00t.experiment.experiment import run
@@ -23,9 +22,15 @@ def _write_lineage(ft_config, config) -> None:
     parent = ft_config.base_model_path
     resolved = str(Path(parent).resolve()) if Path(parent).exists() else parent
     try:
-        commit = subprocess.run(
-            ["git", "-C", str(Path(__file__).resolve().parent), "rev-parse", "--short", "HEAD"],
-            capture_output=True, text=True, timeout=5).stdout.strip() or None
+        commit = (
+            subprocess.run(
+                ["git", "-C", str(Path(__file__).resolve().parent), "rev-parse", "--short", "HEAD"],
+                capture_output=True,
+                text=True,
+                timeout=5,
+            ).stdout.strip()
+            or None
+        )
     except Exception:
         commit = None
     lineage = {
@@ -59,12 +64,18 @@ def _write_lineage(ft_config, config) -> None:
     tasks_file = Path(ft_config.dataset_path) / "meta/tasks.jsonl"
     if tasks_file.exists():
         tasks = [json.loads(line)["task"] for line in tasks_file.read_text().splitlines() if line.strip()]
-        (out / "TASKS.json").write_text(json.dumps({
-            "dataset": ft_config.dataset_path,
-            "tasks": tasks,
-            "note": "The sentences this model was trained on. An instruction that "
+        (out / "TASKS.json").write_text(
+            json.dumps(
+                {
+                    "dataset": ft_config.dataset_path,
+                    "tasks": tasks,
+                    "note": "The sentences this model was trained on. An instruction that "
                     "is not in this list is one the model has never seen.",
-        }, indent=2) + "\n")
+                },
+                indent=2,
+            )
+            + "\n"
+        )
         print(f"[tasks] wrote {out / 'TASKS.json'}  {tasks}")
     else:
         print(f"[tasks] WARNING: {tasks_file} not found - TASKS.json not written")

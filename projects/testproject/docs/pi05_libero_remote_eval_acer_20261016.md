@@ -6,6 +6,7 @@ after discussion: a frozen-time simulator cannot show a latency effect at any di
 real operating latency is already known.
 
 ## The question
+
 Serving π0.5 from AI90 to a robot elsewhere costs **300-500 ms per call end to end (operator's
 measured figure, inference included)**. Does that delay change what the policy achieves? The
 standard LIBERO protocol cannot answer it: the simulator pauses while the policy thinks, so every
@@ -13,6 +14,7 @@ row so far assumes an infinitely fast brain. A simulator's job is to stand in fo
 time is part of the world — so we give the loop a time-faithful mode and sweep the delay.
 
 ## Design (l2_eval_openpi.py --latency-mode realtime, added 2026-10-17)
+
 - Control runs at 20 Hz (LIBERO: one env.step = 50 ms). A query issued at step tq with injected
   delay D arrives at step tq + ceil(D/50 ms). The world keeps stepping in between.
 - Query cadence unchanged: every 5 steps (openpi's replan_steps), at most one request outstanding.
@@ -26,7 +28,9 @@ time is part of the world — so we give the loop a time-faithful mode and sweep
 - openpi has no RTC; LoRA 20k policy (our best, 199/200 frozen), Spatial, layouts 0-19, n=200/row.
 
 ## Sweep and pre-registered reading
-D (ms):  0 (gate)  100  250  500  1000       d (steps): 0 2 5 10 20
+
+D (ms): 0 (gate) 100 250 500 1000 d (steps): 0 2 5 10 20
+
 - G1: D=0 realtime within the CI of frozen 199/200 (97.2-99.9) → mode is faithful; else stop.
 - Operating point 300-500 ms: the 250 and 500 rows bracket it.
 - 500 ms = 10 steps = the whole 10-step chunk: with "skip" nothing of a chunk is usable on
@@ -38,12 +42,14 @@ D (ms):  0 (gate)  100  250  500  1000       d (steps): 0 2 5 10 20
   which is what RTC exists for; the difference between the curves is what RTC buys back.
 
 ## How
+
 results/pi05_libero_20261010/l6_delay_sweep.sh — systemd user unit l6-delay-sweep; server unit
 l6-remote-server (serve_policy.py, LoRA 20k, GPU 0, :8007). Outputs
 L6_delay{D}ms_lora20k_spatial_n200/{per_episode.jsonl,summary.json}; log l6_delay_sweep.log.
 Cost: ~10 min per row locally (holds make episodes hit the 230-step cap → ~15 min) → ~1.2 h.
 
 ## Results (2026-10-17 01:12Z, l6_delay_sweep.log; LoRA 20k, Spatial layouts 0-19, n=200/row, realtime mode, stale=skip)
+
 ```text
 injected delay   steps   success    rate    CI95         holds/episode   steps to success
       0 ms        0     198/200    99.0%   96.4-99.7         0.0             113.5     (gate: frozen protocol gave 199/200)
@@ -52,6 +58,7 @@ injected delay   steps   success    rate    CI95         holds/episode   steps t
     500 ms       10       0/200     0.0%    0.0-1.9        220.0               —       delay = whole chunk: nothing usable arrives, arm holds
    1000 ms       20       0/200     0.0%    0.0-1.9        220.0               —
 ```
+
 Reading. G1 passed (198 vs 199). 100 ms is free. 250 ms costs ~4 points (interval no longer
 overlaps 100 ms) with NO holds after the first chunk — the loss is purely from acting on
 quarter-second-old plans. At 500 ms plain chunking fails structurally: the delay equals the
@@ -64,6 +71,7 @@ choice, documented); openpi policy (no RTC); one suite; sim. Rows are a differen
 the benchmark rows and are never pooled with them.
 
 ## Scope note + follow-up question (2026-10-20, operator)
+
 The sweep's "realtime" mode models a client that KEEPS EXECUTING the old chunk while the new request is in
 flight (pipelined without RTC). A stop-and-wait client sees no staleness at all in a frozen sim — it is the
 standard protocol with a longer wall clock. So the cliff is a statement about pipelined-without-RTC clients,

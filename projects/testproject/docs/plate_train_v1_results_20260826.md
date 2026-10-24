@@ -57,6 +57,7 @@ both present, the command choosing between them. Anything less will reproduce
 this null result.
 
 ## Next
+
 - arm test of checkpoint-6000: score orange-picking and plate-placing SEPARATELY
 - expand to 60-80 plate demos before treating the plate skill as real
 - Phase 2 must use same-scene/different-command data (see above)
@@ -84,6 +85,7 @@ can predict well step-by-step and still stall when driving itself. Passing that
 gate is necessary, not sufficient.
 
 Two candidate causes, not yet separated:
+
 1. THE PLATE IS ON THE TABLE. The baseline has never seen one, and this policy
    family's distractor tolerance measured near zero (four tape markers took it
    90% -> 0% on 2026-08-23). A white plate is a much larger intrusion.

@@ -25,11 +25,11 @@ Original recordings and existing datasets/checkpoints remain untouched. Original
 - Retain original episode 43 frames 0–509. Remove its subsequent 388 timestamps from the derivative only.
 - Preserve each retained episode's original train/validation side.
 
-| Split | Episodes | Timestamps |
-|---|---:|---:|
-| Training | 36 | 33,493 |
-| Validation | 9 | 8,511 |
-| Total | 45 | 42,004 |
+| Split      | Episodes | Timestamps |
+| ---------- | -------: | ---------: |
+| Training   |       36 |     33,493 |
+| Validation |        9 |      8,511 |
+| Total      |       45 |     42,004 |
 
 Selection manifest SHA-256: `e17b50b475aec58209df60e5ec89a6517082f1993a2d12002e6cb7abda8af307`.
 It references frozen review v1, whose original recommendation-only status is preserved as historical evidence.

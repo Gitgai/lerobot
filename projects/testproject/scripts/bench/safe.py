@@ -6,8 +6,8 @@ register and the servos keep their external supply, so it survives the board
 re-enumerating: the arm can still be stiff and holding position.
 """
 
-from lerobot.motors.feetech import FeetechMotorsBus
 from lerobot.motors import Motor, MotorNormMode
+from lerobot.motors.feetech import FeetechMotorsBus
 
 NAMES = ["shoulder_pan", "shoulder_lift", "elbow_flex", "wrist_flex", "wrist_roll", "gripper"]
 motors = {n: Motor(i + 1, "sts3215", MotorNormMode.RANGE_M100_100) for i, n in enumerate(NAMES)}

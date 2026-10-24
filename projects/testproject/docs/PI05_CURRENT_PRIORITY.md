@@ -62,20 +62,20 @@ L5   score every checkpoint, same sim, same seeds, RTC off     done     2026-10-
      on the drawer task (filmed). Rerun traces per episode now recorded.
 ```
 
-L6   does inference latency change success? time-faithful    done     2026-10-17 01:12Z (RESULTS §5.5)
-     LIBERO mode, delay sweep, LoRA 20k, n=200/row:                      0 ms 99.0 · 100 ms 99.5 · 250 ms 95.5 ·
-     plain chunking: free at 100 ms, -4 pts at 250, DEAD at 500 ms        500 ms 0.0 · 1000 ms 0.0
-     (= chunk length). Operating point 300-500 ms is on the cliff →      next: same sweep with RTC ON
-     RTC sweep in the LeIsaac stage.                                      (LeRobot stack, O-stage)
+L6 does inference latency change success? time-faithful done 2026-10-17 01:12Z (RESULTS §5.5)
+LIBERO mode, delay sweep, LoRA 20k, n=200/row: 0 ms 99.0 · 100 ms 99.5 · 250 ms 95.5 ·
+plain chunking: free at 100 ms, -4 pts at 250, DEAD at 500 ms 500 ms 0.0 · 1000 ms 0.0
+(= chunk length). Operating point 300-500 ms is on the cliff → next: same sweep with RTC ON
+RTC sweep in the LeIsaac stage. (LeRobot stack, O-stage)
 
-L7   "EMA-in-RAM full fine-tune": full FT with EMA ON, EMA    parked   2026-10-20: after the simulator work;
-     copy in HOST RAM (bs 32 the only deviation left).                 plan: pi05_libero_fullft_ema_in_ram_plan_20261018.md
-     only deviation left). Isolates whether L4's jagged curve             ~54 h GPU 1 + scoring; ~50-line openpi change
-     (78→93→82→95) is EMA-off or batch-32. Row: "EMA on (host)".        + smoke gate; awaiting operator go
-L6b  latency sweep with RTC ON (LeRobot pi0.5, same 5 delays) proposed  decides local vs remote policy for the arm
-L8   batch-256 on one card IF L7 leaves the swings: gradient       parked   routes + budget in the L7 plan appendix;
-     accumulation (exact, ~2 wk) or activation remat (+offloads,            optimizer-to-RAM alone only reaches ~bs 64
-     exact, ~3-4 d) or a bigger machine                                     — not worth building on its own
+L7 "EMA-in-RAM full fine-tune": full FT with EMA ON, EMA parked 2026-10-20: after the simulator work;
+copy in HOST RAM (bs 32 the only deviation left). plan: pi05_libero_fullft_ema_in_ram_plan_20261018.md
+only deviation left). Isolates whether L4's jagged curve ~54 h GPU 1 + scoring; ~50-line openpi change
+(78→93→82→95) is EMA-off or batch-32. Row: "EMA on (host)". + smoke gate; awaiting operator go
+L6b latency sweep with RTC ON (LeRobot pi0.5, same 5 delays) proposed decides local vs remote policy for the arm
+L8 batch-256 on one card IF L7 leaves the swings: gradient parked routes + budget in the L7 plan appendix;
+accumulation (exact, ~2 wk) or activation remat (+offloads, optimizer-to-RAM alone only reaches ~bs 64
+exact, ~3-4 d) or a bigger machine — not worth building on its own
 
 Answers: does LoRA work here · does full FT work when WE run it · LoRA vs
 full at matched data. A gap to their checkpoint is partly their 7.7M

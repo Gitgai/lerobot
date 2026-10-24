@@ -1,9 +1,10 @@
 # π0.5 first arm run + power / gripper fixes (2026-09-27)
 
 Cross-cutting status + plan. Affects BOTH lanes (GR00T on the SO-101 arm, and the
-π0.5 lane owned by Codex). Written after the first-ever *moving* π0.5 10k trial.
+π0.5 lane owned by Codex). Written after the first-ever _moving_ π0.5 10k trial.
 
 ## Headline
+
 1. **VOLTAGE SOLVED.** The follower ran at ~5 V; STS3215 servos are 7.4 V-rated. Raised
    to 7.4 V. The "input voltage error" (Status 1) that blocked homing + grasps — and that
    killed every prior π0.5 physical attempt "before any policy movement" — is gone.
@@ -13,6 +14,7 @@ Cross-cutting status + plan. Affects BOTH lanes (GR00T on the SO-101 arm, and th
    The gripper clamps hard enough to trip its overload protection.
 
 ## Hardware facts (measured 2026-09-26/27)
+
 ```text
 servos            STS3215 (model 777, confirmed on all 6). 7.4 V nominal.
                   firmware limits: Min_Voltage 4.0 V, Max 8.0 V.
@@ -26,13 +28,15 @@ gripper protection (conservative vs arm joints):
 ```
 
 ## GR00T trials across the fix
+
 ```text
 709/710/711  (5 V)              abort: gripper voltage (1) / overload (32)
-714          (7.4 V, OT 25)     homed CLEAN (voltage fixed), then gripper OVERLOAD (32) on grasp
-715          (7.4 V, OT 50)     stopped by operator mid-run
+714          (7.4 V, Overload_Torque 25)     homed CLEAN (voltage fixed), then gripper OVERLOAD (32) on grasp
+715          (7.4 V, Overload_Torque 50)     stopped by operator mid-run
 ```
 
 ## π0.5 10k first arm run (2026-09-27)
+
 ```text
 model     /home/kiran/sim/pi05-fullft-orange50-20260922/orange45_fullft_15k_candidate/
           checkpoints/010000/pretrained_model  (offline-best: 3.88% full-seq action error)
@@ -46,6 +50,7 @@ result    fake check PASSED (100 targets). Live: 250 commands sent, arm reached 
 ```
 
 ## Plan (in progress)
+
 ```text
 1. Raise gripper protection to match the arm joints:
      Overload_Torque 50 -> 80 ;  Protection_Current 250 -> 500   (reversible EEPROM writes)
@@ -55,6 +60,7 @@ result    fake check PASSED (100 targets). Live: 250 commands sent, arm reached 
 ```
 
 ## Ownership / hygiene
+
 - π0.5 lane (training + the custom launcher) is **Codex's**. This session (Claude) fixed the
   power + gripper protection and ran the first moving π0.5 trial using Codex's recipe.
 - Evidence-preserving: every rerun uses FRESH output dirs; Codex's `raw_physical_trial` and
@@ -82,6 +88,7 @@ pi05 #4  80/500/1000 (patched)  1250  NO overload, orange CENTERED (fair shot). 
 ```
 
 ### Findings
+
 ```text
 - VOLTAGE: solved (7.4V). Confirmed for GR00T and pi05.
 - OVERLOAD: solved by patching the gripper limits. Root cause: lerobot SOFollower.configure()
@@ -96,6 +103,7 @@ pi05 #4  80/500/1000 (patched)  1250  NO overload, orange CENTERED (fair shot). 
 ```
 
 ### The gripper patch — FLAG FOR CODEX
+
 ```text
 file     ~/Documents/ChatGPT/Lerobot/.venv-official-client-061/.../lerobot/robots/so_follower/so_follower.py
 change   in configure(), the `if motor == "gripper":` block:
@@ -109,6 +117,7 @@ scope    ISOLATED to the pi05 client venv (.venv-official-client-061). GR00T's P
 ```
 
 ### Milestone
+
 pi05 10k went from "dies before any policy movement" (voltage fault) to "runs the full policy
 on the arm, no aborts" in this session. The remaining gap (grasp completion) is a policy +
 control-loop problem (RTC + precision), the same as GR00T — not the rig.
@@ -118,6 +127,7 @@ control-loop problem (RTC + precision), the same as GR00T — not the rig.
 ## CONCLUSION (2026-09-27) — pi05 runs on the arm; needs the smooth-motion (RTC) fix to grasp
 
 Three live trials at three orange positions, all with the gripper patch (no overload):
+
 ```text
 trial e  orange far-left     2150 cmds   no overload   →  no grasp
 trial f  orange centered     1250 cmds   no overload   →  no grasp
@@ -130,6 +140,7 @@ It is position-independent (three positions, same result), so it is not the oran
 placement — it is the grasp EXECUTION.**
 
 ### Root cause of the non-grasp: jerky, stop-and-go motion (no RTC)
+
 All runs are SEQUENTIAL (`rtc=False`): the arm executes a 50-action chunk, then FREEZES
 ~2 s waiting for the next inference, then jerks again. That stop-start, open-loop-within-
 a-chunk motion is exactly what stopped GR00T from grasping — GR00T went 4/10 sequential →
@@ -137,6 +148,7 @@ a-chunk motion is exactly what stopped GR00T from grasping — GR00T went 4/10 s
 almost certainly needs the same.
 
 ### Next step (the one work item): give pi05 SMOOTH MOTION (RTC)
+
 ```text
 - pi05's client (~/Documents/ChatGPT/Lerobot/run_fullft10k_raw_trial.py + pi05_10k_transport_
   candidate.py) is a CUSTOM SYNCHRONOUS launcher — no RTC. Adding a pipelined/continuous loop
@@ -147,6 +159,7 @@ almost certainly needs the same.
 ```
 
 ### State of the rig at stop
+
 ```text
 arm        homed, torque off
 gripper    patched to 80/500/1000 in the client venv (backup .bak_20260927; restore to revert)

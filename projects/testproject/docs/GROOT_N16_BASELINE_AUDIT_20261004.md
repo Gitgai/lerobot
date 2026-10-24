@@ -20,18 +20,18 @@ The reference cannot currently run unchanged in Acer's existing venv: the `gr00t
 
 ## Execution comparison
 
-| Aspect | Official reference at this commit | Existing project path | Baseline decision |
-|---|---|---|---|
-| Request timing | Blocking get_action, then execute, then next observation | RTC overlaps requests and execution | Use official synchronous sequence |
-| Execute per response | `action_horizon=8` by default | RTC walks/skips a16-step reply; sequential path defaults8 | Use8 for initial baseline, without claiming16 predicted means16 executed |
-| Pacing | Sleep remainder of1/30s after each send |30Hz plus project diagnostics/scheduling | Keep official pacing; document logging overhead |
-| RTC | No RTC option/loop in this reference | Custom workers, age-based entry index,3-tick blend | Exclude custom RTC |
-| Images | Raw NumPy arrays via msgpack/NPY | JPEG92 extension in recent trials | Raw official wire format for strict baseline |
-| Adapter | front/wrist; five arm joints plus gripper; B=1,T=1; server reply mapped directly | Same observed ordering/shape logic; optional JPEG | Reuse official adapter; do not add current joint state twice |
-| Timeout | Config includes `timeout=60`, but inspected eval loop never uses it and is `while True` | Current numbered launcher has no trial timer | Do not mistake unused60 for enforced runtime limit |
-| Request timeout | Constructor accepts15000ms but official socket initialization does not set RCVTIMEO | Project client explicitly sets RCVTIMEO | Document behavioral difference and stop implications; do not silently claim equivalence |
-| Lifecycle | robot.connect, infinite eval loop; no explicit try/finally disconnect in this file | Project signal/cleanup/Status monitoring | Preserve safe stop integration explicitly; do not drop cleanup just to match a minimal demo |
-| Evidence | Prints actions; no equivalent full two-camera trial journal | Images, motor telemetry, target/stop logs and automatic reporting | Integrate evidence without modifying targets; verify new client coverage |
+| Aspect               | Official reference at this commit                                                       | Existing project path                                             | Baseline decision                                                                           |
+| -------------------- | --------------------------------------------------------------------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Request timing       | Blocking get_action, then execute, then next observation                                | RTC overlaps requests and execution                               | Use official synchronous sequence                                                           |
+| Execute per response | `action_horizon=8` by default                                                           | RTC walks/skips a16-step reply; sequential path defaults8         | Use8 for initial baseline, without claiming16 predicted means16 executed                    |
+| Pacing               | Sleep remainder of1/30s after each send                                                 | 30Hz plus project diagnostics/scheduling                          | Keep official pacing; document logging overhead                                             |
+| RTC                  | No RTC option/loop in this reference                                                    | Custom workers, age-based entry index,3-tick blend                | Exclude custom RTC                                                                          |
+| Images               | Raw NumPy arrays via msgpack/NPY                                                        | JPEG92 extension in recent trials                                 | Raw official wire format for strict baseline                                                |
+| Adapter              | front/wrist; five arm joints plus gripper; B=1,T=1; server reply mapped directly        | Same observed ordering/shape logic; optional JPEG                 | Reuse official adapter; do not add current joint state twice                                |
+| Timeout              | Config includes `timeout=60`, but inspected eval loop never uses it and is `while True` | Current numbered launcher has no trial timer                      | Do not mistake unused60 for enforced runtime limit                                          |
+| Request timeout      | Constructor accepts15000ms but official socket initialization does not set RCVTIMEO     | Project client explicitly sets RCVTIMEO                           | Document behavioral difference and stop implications; do not silently claim equivalence     |
+| Lifecycle            | robot.connect, infinite eval loop; no explicit try/finally disconnect in this file      | Project signal/cleanup/Status monitoring                          | Preserve safe stop integration explicitly; do not drop cleanup just to match a minimal demo |
+| Evidence             | Prints actions; no equivalent full two-camera trial journal                             | Images, motor telemetry, target/stop logs and automatic reporting | Integrate evidence without modifying targets; verify new client coverage                    |
 
 Raw transport changes bandwidth relative to prior JPEG trials. Do not interpret any timing change as RTC-only causation. A remote connection may introduce longer gaps between chunks; official does not imply continuous motion over this network.
 

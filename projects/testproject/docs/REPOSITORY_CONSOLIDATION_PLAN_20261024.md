@@ -4,6 +4,8 @@ Updated: 24 October 2026. Scope: organize and preserve project work, not run a r
 
 ## Current Git status and what merging means
 
+**Quality cleanup in progress:** [remediation record](QUALITY_REMEDIATION_20261024.md) documents the first mechanical cleanup, data-preservation checks and remaining lint/security findings. Draft PR #1 exists at https://github.com/Gitgai/lerobot/pull/1. Its initial GitHub quality run failed, matching the baseline diagnosis. Do not infer a successful merge or green CI from completed formatting work.
+
 The selected migration and all nine earlier local files are committed and pushed on `codex/consolidate-fruit-openpi-20261024`, through `ff0b0b36`. The repository working tree was clean after that push. The main branch remains at `aff7b4c7`; these are two branches of **one repository**, not separate projects. Merging would add the branch's changes to the main project version. Pushing has already saved them remotely; merging is a separate step.
 
 The older Documents/ChatGPT workspace is still retained and only selected contents have migrated. A clean repository does not establish complete workspace consolidation, data backup or hardware readiness. The earlier pending-commit statements below are historical and superseded for these completed batches.

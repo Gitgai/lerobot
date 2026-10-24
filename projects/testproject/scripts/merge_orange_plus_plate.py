@@ -62,7 +62,8 @@ for src, task_idx, task_str in SOURCES:
 
 (DST / "meta/episodes.jsonl").write_text("".join(json.dumps(e) + "\n" for e in eps_meta))
 (DST / "meta/tasks.jsonl").write_text(
-    "".join(json.dumps({"task_index": t, "task": s}) + "\n" for _, t, s in SOURCES))
+    "".join(json.dumps({"task_index": t, "task": s}) + "\n" for _, t, s in SOURCES)
+)
 
 info = json.loads((SOURCES[0][0] / "meta/info.json").read_text())
 info["total_episodes"] = new_i

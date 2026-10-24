@@ -46,8 +46,7 @@ FPS = 30
 CAMS = ["front", "wrist"]
 
 SETS = [
-    ("esp_recovery", "recovery30_v21", False,
-     "pick up the orange and place it on the plate"),
+    ("esp_recovery", "recovery30_v21", False, "pick up the orange and place it on the plate"),
 ]
 
 
@@ -56,7 +55,7 @@ def state_col(df):
 
 
 def video_files(d, cam):
-    vs = sorted(glob.glob("%s/%s/videos/observation.images.%s/**/*.mp4" % (SRC, d, cam), recursive=True))
+    vs = sorted(glob.glob(f"{SRC}/{d}/videos/observation.images.{cam}/**/*.mp4", recursive=True))
     out, n = [], 0
     for v in vs:
         with av.open(v) as c:
@@ -67,16 +66,30 @@ def video_files(d, cam):
 
 
 def frame_count(mp4):
-    r = subprocess.run(["ffprobe", "-v", "error", "-count_frames", "-select_streams", "v:0",
-                        "-show_entries", "stream=nb_read_frames", "-of", "csv=p=0", mp4],
-                       capture_output=True, text=True).stdout.strip()
+    r = subprocess.run(
+        [
+            "ffprobe",
+            "-v",
+            "error",
+            "-count_frames",
+            "-select_streams",
+            "v:0",
+            "-show_entries",
+            "stream=nb_read_frames",
+            "-of",
+            "csv=p=0",
+            mp4,
+        ],
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
     return int(r) if r.isdigit() else -1
 
 
 def canonical_rest():
     finals = []
     for d, _, _, _ in SETS:
-        ps = sorted(glob.glob("%s/%s/data/**/*.parquet" % (SRC, d), recursive=True))
+        ps = sorted(glob.glob(f"{SRC}/{d}/data/**/*.parquet", recursive=True))
         df = pd.concat([pd.read_parquet(p) for p in ps])
         c = state_col(df)
         finals += [np.stack(g[c].values)[-1] for _, g in df.groupby("episode_index")]
@@ -113,33 +126,47 @@ def cut_video(src_mp4, clips, outdir, cam):
         outs.append("%s/observation.images.%s/episode_%06d.mp4" % (outdir, cam, ep))
     cmd = ["ffmpeg", "-v", "error", "-y", "-i", src_mp4, "-filter_complex", ";".join(parts)]
     for i, o in enumerate(outs):
-        cmd += ["-map", "[o%d]" % i, "-an", "-c:v", "libx264", "-pix_fmt", "yuv420p",
-                "-crf", "18", "-preset", "veryfast", "-r", str(FPS), o]
+        cmd += [
+            "-map",
+            "[o%d]" % i,
+            "-an",
+            "-c:v",
+            "libx264",
+            "-pix_fmt",
+            "yuv420p",
+            "-crf",
+            "18",
+            "-preset",
+            "veryfast",
+            "-r",
+            str(FPS),
+            o,
+        ]
     r = subprocess.run(cmd, capture_output=True, text=True)
     if r.returncode != 0:
-        raise SystemExit("ffmpeg failed on %s\n%s" % (src_mp4, r.stderr[-1500:]))
+        raise SystemExit(f"ffmpeg failed on {src_mp4}\n{r.stderr[-1500:]}")
 
 
 def convert(src_name, dst_name, do_trim, task):
-    src = "%s/%s" % (SRC, src_name)
-    dst = "%s/%s" % (DST, dst_name)
+    src = f"{SRC}/{src_name}"
+    dst = f"{DST}/{dst_name}"
     if os.path.exists(dst):
         shutil.rmtree(dst)
     os.makedirs("%s/data/chunk-000" % dst)
     os.makedirs("%s/meta" % dst)
     for c in CAMS:
-        os.makedirs("%s/videos/chunk-000/observation.images.%s" % (dst, c))
+        os.makedirs(f"{dst}/videos/chunk-000/observation.images.{c}")
 
     ps = sorted(glob.glob("%s/data/**/*.parquet" % src, recursive=True))
     df = pd.concat([pd.read_parquet(p) for p in ps]).reset_index(drop=True)
     col = state_col(df)
     vf = {c: video_files(src_name, c) for c in CAMS}
 
-    print("\n  === %s -> %s ===" % (src_name.replace("so101_pick_test_c270_wrist_", ""), dst_name))
+    print("\n  === {} -> {} ===".format(src_name.replace("so101_pick_test_c270_wrist_", ""), dst_name))
     print("     ep   rows    keep   note")
 
     rows, running, notes = [], 0, []
-    clips = {c: {} for c in CAMS}          # source file -> list of clips
+    clips = {c: {} for c in CAMS}  # source file -> list of clips
     for new_i, (ep, g) in enumerate(df.groupby("episode_index")):
         st = np.stack(g[col].values)
         a_glob = int(g.index[0])
@@ -203,12 +230,16 @@ def convert(src_name, dst_name, do_trim, task):
 
 
 os.makedirs(DST, exist_ok=True)
-print("  canonical rest pose: %s   home tol +/-%.0f deg, still within %.1f deg"
-      % (np.round(CANON, 1), HOME_TOL, STILL_DEG))
+print(
+    "  canonical rest pose: %s   home tol +/-%.0f deg, still within %.1f deg"
+    % (np.round(CANON, 1), HOME_TOL, STILL_DEG)
+)
 total, all_bad, all_notes = 0, [], []
 for a, b, t, task in SETS:
     n, bad, notes = convert(a, b, t, task)
-    total += n; all_bad += bad; all_notes += notes
+    total += n
+    all_bad += bad
+    all_notes += notes
 
 print("\n  TOTAL %d frames written to %s" % (total, DST))
 if all_notes:

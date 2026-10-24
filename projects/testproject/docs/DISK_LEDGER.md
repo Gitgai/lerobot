@@ -121,9 +121,9 @@ Projection at 15:30Z: 325 GB free; 7 checkpoints x 31 GB = 217 GB still to write
 (~9 GB/h) + 8 GB/h of log = ~17 GB/h -> root FULL in ~19 h, before the run ends (~22 h).
 Cannot be fixed from this account: syslog is root-owned; the desktop app is the PARENT
 of this Claude Code session (killing it kills the session). Needs the operator:
-  sudo truncate -s 0 /var/log/syslog                      # frees 160 GB at once
-  printf ':msg, contains, "GPU process launch failed" stop\n' | sudo tee /etc/rsyslog.d/05-claude-desktop-gpu-flood.conf
-  sudo systemctl restart rsyslog                          # stops the growth, session survives
+sudo truncate -s 0 /var/log/syslog # frees 160 GB at once
+printf ':msg, contains, "GPU process launch failed" stop\n' | sudo tee /etc/rsyslog.d/05-claude-desktop-gpu-flood.conf
+sudo systemctl restart rsyslog # stops the growth, session survives
 (Restarting the desktop app would also stop it but ends this session.)
 Fallback if neither can happen in time: move landed full-FT checkpoints to /mnt/data4tb
 behind symlinks as the LoRA spares were (RED, needs approval).
@@ -137,6 +137,7 @@ DONE ~17:00Z (operator, root): /var/log/syslog truncated (165 GB → 0) and rsys
 /etc/rsyslog.d/05-claude-desktop-gpu-flood.conf installed. Root 310 → 470 GB free. Incident §5 closed.
 
 ## 6. NOTE 2026-10-15 20:30Z — host RAM at checkpoint time (resumed run)
+
 The 15k save (first since the resume) pushed swap from 18 to 50 GB of 63 for ~1 min with
 500-700 MB/s of swap traffic; trainer unit peak = 39 GB RSS + 37 GB swap (systemd accounting).
 Orbax stages the whole 31 GB train state in host memory to write it; the resumed process seems to
@@ -146,12 +147,14 @@ at 20:31Z and the rate returned to 5.1 s/step; swap settled at 22 GB. Headroom: 
 only MBs; the 11 GB /tmp scratch (DYNUS) is the one reclaimable block if it gets tight.
 
 ## 7. PROPOSED 2026-10-16 (R3, RED — needs operator approval)
+
 L4-noEMA is closed and scored. Keep params/ (+assets) for all 12 checkpoints; strip
 train_state/ (19 GB each) from the 11 non-final ones → frees 209 GB on root (372 → 163 GB
 for the run). Alternative: MOVE the 11 train_state dirs to /mnt/data4tb behind symlinks
 (R4), freeing the same on root with nothing deleted. Either way 29999 stays fully resumable.
 
 ## 8. Snapshot 2026-10-18 23:26Z (changes not made by this lane)
+
 Root 255 → 868 GB free. Found: ~/lerobot_assets 489 → 4.6 GB and ~/.cache 176 → 50 GB; /mnt/data4tb
 now holds lerobot_assets/ and huggingface-cache/ (763 GB used of 3.6 TB) — moved by the operator
 between 10-17 and 10-18. The L4-noEMA checkpoints are untouched (12 × 31 GB = 361 GB, train_state
@@ -160,6 +163,7 @@ is back to 22 GB of DYNUS working trees — the condition that killed the Bash t
 recurs at ~30 GB.
 
 ## 10. NEW ALLOCATION 2026-10-21 — R5 LoRA on top (operator: "choose whichever GPU, SSD you like")
+
 Path: /mnt/data4tb/so101-lora-on-top-20261021/ (data4tb: 772 GB used of 3.6 TB, 2.9 TB free at 04:4xZ).
 Contents: VLASH training outputs every 2.5k steps. CORRECTED 2026-10-21 14:43Z from the smoke: VLASH saves the
 FULL merged model.safetensors (7.5 GB) + lora_adapters/ + 1.2 GB optimizer state = 8.6 GB per checkpoint, not
@@ -175,9 +179,10 @@ root except the repo's small JSON/config under results/so101_lora_on_top_2026101
 and the Isaac gate; GPU 0 untouched (operator's LoRA server pid 2840093, bench wrapper pid 1569398).
 
 ## 9. INCIDENT 2026-10-20 ~02:00Z — /tmp user quota exhausted again (second time; first 2026-10-10)
+
 Measured from the kernel (quotactl_fd on /tmp): uid 1000 hard = soft limit 23.68 GiB, used 23.68 GiB; the
 tmpfs itself is 30 GB with 6 GB free. Content: DYNUS working trees (dynus_a2b2_git, dynus-l2-original,
-attempt-lineage-port, route-rebase, tmp.*; 1-2 GB each; 11,323 files). Effect: the Claude Bash tool fails
+attempt-lineage-port, route-rebase, tmp.\*; 1-2 GB each; 11,323 files). Effect: the Claude Bash tool fails
 every command (it writes under /tmp/claude-1000); Read/Write under /home and systemd units are unaffected;
 short commands still run through the Monitor tool. Not touched by this lane (DYNUS files). Fix = operator
 clears stale scratch or raises the quota. Rule R6: this lane's scripts keep TMPDIR=/home/kiran/tmp; a /tmp

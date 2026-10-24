@@ -107,16 +107,16 @@ Run model work on the GPU box over SSH instead.
 
 ## Which machine for which task
 
-| Task | Machine | Why |
-|---|---|---|
-| Recording demonstrations | **Acer** | the arms and cameras are physically here |
-| Anything touching the arm | **Acer** | same |
-| Camera diagnosis | **Acer** | same |
-| Training / fine-tuning | **kiran-AI90** | the GPU and the weights are here |
-| Reading a checkpoint or its lineage | **kiran-AI90** | the weights are here |
-| Dataset conversion / merging | **kiran-AI90** | the datasets are here |
-| Analysing recorded video | **either** | copy the episode over; they are small |
-| Editing the repo and docs | **kiran-AI90** | the git repo is here |
+| Task                                | Machine        | Why                                      |
+| ----------------------------------- | -------------- | ---------------------------------------- |
+| Recording demonstrations            | **Acer**       | the arms and cameras are physically here |
+| Anything touching the arm           | **Acer**       | same                                     |
+| Camera diagnosis                    | **Acer**       | same                                     |
+| Training / fine-tuning              | **kiran-AI90** | the GPU and the weights are here         |
+| Reading a checkpoint or its lineage | **kiran-AI90** | the weights are here                     |
+| Dataset conversion / merging        | **kiran-AI90** | the datasets are here                    |
+| Analysing recorded video            | **either**     | copy the episode over; they are small    |
+| Editing the repo and docs           | **kiran-AI90** | the git repo is here                     |
 
 A recorded dataset is produced on the Acer and must be **copied to the GPU box**
 before it can be trained on. A few hundred MB, which the link handles.

@@ -34,21 +34,21 @@ This is three times the updates of a 5,000-update experiment and half the update
 
 ## Proposed setup
 
-| Item | Proposal |
-|---|---|
-| Starting model | Fresh general π0.5 base, not the LoRA export or diagnostic checkpoint |
-| Training method | Full fine-tuning; no LoRA or deliberate vision/expert freezing |
-| Memory support | Existing tested custom CPU-offloaded AdamW integration |
-| Training demonstrations | Approved 36 orange episodes, 33,493 timestamps |
-| Held-out validation demonstrations | Approved 9 orange episodes, 8,511 timestamps |
-| Task | Pick up the orange and place it on the plate |
-| Inputs | Front and wrist camera images plus robot state |
-| Batch size | 4 |
-| Updates | 15,000 |
-| Sample presentations | 60,000, including repeated samples |
-| Action representation | Existing absolute six-joint actions, 50-action chunks |
-| RTC | Not part of this training experiment |
-| Proposed checkpoint and validation cadence | Every 5,000 updates: 5k, 10k, 15k |
+| Item                                       | Proposal                                                              |
+| ------------------------------------------ | --------------------------------------------------------------------- |
+| Starting model                             | Fresh general π0.5 base, not the LoRA export or diagnostic checkpoint |
+| Training method                            | Full fine-tuning; no LoRA or deliberate vision/expert freezing        |
+| Memory support                             | Existing tested custom CPU-offloaded AdamW integration                |
+| Training demonstrations                    | Approved 36 orange episodes, 33,493 timestamps                        |
+| Held-out validation demonstrations         | Approved 9 orange episodes, 8,511 timestamps                          |
+| Task                                       | Pick up the orange and place it on the plate                          |
+| Inputs                                     | Front and wrist camera images plus robot state                        |
+| Batch size                                 | 4                                                                     |
+| Updates                                    | 15,000                                                                |
+| Sample presentations                       | 60,000, including repeated samples                                    |
+| Action representation                      | Existing absolute six-joint actions, 50-action chunks                 |
+| RTC                                        | Not part of this training experiment                                  |
+| Proposed checkpoint and validation cadence | Every 5,000 updates: 5k, 10k, 15k                                     |
 
 “Full” here means no deliberate parameter freezing: parameters connected to the action loss receive updates. Earlier checks found some language-output components outside that loss path. The memory-saving integration is custom; it does not modify the clean installed LeRobot files and should not be described as an entirely unmodified official training recipe.
 

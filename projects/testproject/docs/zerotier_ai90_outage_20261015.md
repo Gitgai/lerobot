@@ -5,12 +5,14 @@ wlp10s0, public 73.112.168.241). Laptop = c3ae05328d (ZT .228, India). Neighbour
 9328a213cc (ZT .17, LAN 192.168.0.107, same router).
 
 ## Symptom
+
 Laptop ping to 192.168.194.220 timed out; laptop had no peer entry for AI90. AI90
 `zerotier-cli info` = OFFLINE; all four PLANET roots `RELAY -1`. LAN peers and the
 controller (35.208.4.147) were DIRECT and fine. Workaround used all day:
 `ssh -J kiran@192.168.194.17 kiran@192.168.0.103`.
 
 ## Facts established (all without root unless noted)
+
 - Both nodes authorised in Central; clocks correct; planet files identical on AI90 and kglenova.
 - tcpdump on AI90 (operator, root): HELLOs leave to all four roots from 3 ports every 5 s;
   no UDP reply from any root; only the controller answers.
@@ -27,22 +29,25 @@ controller (35.208.4.147) were DIRECT and fine. Workaround used all day:
 - 10:43Z: laptop reachable from AI90 again, RELAY path, ~260-310 ms. Holding as of 10:52Z.
 
 ## State
+
 Working but degraded: AI90 is TUNNELED (TCP relay to roots), laptop path relayed, not direct.
 Root cause of "roots do not answer AI90's UDP" not identified; needs root on AI90/kglenova:
-  AI90:     sudo timeout 30 tcpdump -ni wlp10s0 'icmp or src host 84.17.53.155 or src host
-            103.195.103.66 or src host 185.152.67.145 or src host 79.127.159.187'
-  kglenova: sudo zerotier-cli info; sudo zerotier-cli peers | grep PLANET
-  laptop:   tracepath -n -p 9993 -m 25 84.17.53.155 | tail -3
+AI90: sudo timeout 30 tcpdump -ni wlp10s0 'icmp or src host 84.17.53.155 or src host
+103.195.103.66 or src host 185.152.67.145 or src host 79.127.159.187'
+kglenova: sudo zerotier-cli info; sudo zerotier-cli peers | grep PLANET
+laptop: tracepath -n -p 9993 -m 25 84.17.53.155 | tail -3
 Candidates still open: router NAT/UPnP confusion with three ZT nodes behind one IP all
 using 9993 (kglenova only works on its secondary port); root-side rate limiting of the
 public IP. Not the cause: clock, planet, path, firewall logs, conntrack, wired 169.254 port.
 
 ## Tools
+
 Token copy at ~/.zeroTierOneAuthToken/authtoken.secret (created 2026-10-14 by the operator)
 lets `zerotier-cli -T"$(cat ~/.zeroTierOneAuthToken/authtoken.secret)" peers` run without sudo.
 Sampler log: ~/tmp/zt_sample_1041.log. STUN probe: ~/tmp/stun_probe.py.
 
 ## Update 16:50Z — relapse, and a step of mine that made it worse
+
 - ~12:00-16:29Z: AI90 lost its ZeroTier data plane entirely (ARP over the overlay fails to every
   member, even kglenova on the same LAN, although ZT control packets flow and peers are listed).
   kglenova itself still reaches the other two house members (.93, .235) but NOT the laptop
@@ -51,12 +56,13 @@ Sampler log: ~/tmp/zt_sample_1041.log. STUN probe: ~/tmp/stun_probe.py.
   network stuck in REQUESTING_CONFIGURATION with no assigned address for >15 min although the
   controller exchanges packets with AI90 every few seconds. Worse than before (had an address,
   no traffic). Not repeating it.
-- Fix needs root on AI90:  sudo rm /var/lib/zerotier-one/local.conf && sudo systemctl restart zerotier-one
+- Fix needs root on AI90: sudo rm /var/lib/zerotier-one/local.conf && sudo systemctl restart zerotier-one
   Lesson: the 09:22-local primaryPort change (my suggestion) correlated with the slide into
   TUNNELED mode and then total loss; revert it first. Access path independent of ZeroTier
   (reverse SSH tunnel to a host the operator controls) proposed, awaiting approval.
 
 ## Resolved 17:13Z
+
 Operator (root) ran `sudo rm /var/lib/zerotier-one/local.conf && sudo systemctl restart zerotier-one`
 at 17:00:54Z (also truncated syslog + installed the rsyslog drop rule). ~12 min later: `ONLINE`,
 all four roots DIRECT over UDP for the first time since the outage, address 192.168.194.220 back,

@@ -4,6 +4,7 @@ Date: 2026-10-19. Status: **R0 + R4 DONE 2026-10-20 (audit.md verdict; manifest_
 Split out of pi05_leisaac_lora_vs_fullft_plan_20261010.md Stage 3 (O3), which now points here.
 
 ## Why this comes before our own recordings
+
 dongyoonkim/so101-pi05-base is π0.5 fully fine-tuned on 13,969 REAL SO-101 episodes merged from 156
 public uploads (7.27M frames, 3 camera slots with masks, v2.1). If it already picks an orange on our
 bench, Stage 3 starts from that floor and our recording becomes fine-tuning on top. Testing that is an
@@ -11,9 +12,11 @@ afternoon of arm time; recording 450 episodes is days. The sim comparison (O1) k
 LoRA vs full FT at matched data, scored on hundreds of seeded episodes, which a real arm cannot do —
 but it can wait behind this. We have NOT evaluated this checkpoint and no published numbers were found.
 
-## R0 — Audit the 13,969 episodes (offline, AI90, no GPU)  ← operator's question 2026-10-19
+## R0 — Audit the 13,969 episodes (offline, AI90, no GPU) ← operator's question 2026-10-19
+
 Large merged sets are only as good as their parts. Before trusting it (or training on it) we look at
 EVERY episode, from metadata first and video second:
+
 ```text
 R0.1  pull meta only: meta/info.json, tasks, episodes table, stats; parquet state/action streams
       (no video) → /mnt/data4tb/huggingface-cache (archive drive, ledger R4)
@@ -34,12 +37,14 @@ R0.7  sample videos: 2 episodes from each of the 20 largest sources, watched (mo
       the metadata story matches the pictures  ← DONE: found 1,810 ep (13%) with SWAPPED camera slots
       (5hadytru ×3, y1y2y3, sabinMlminator) — invisible in metadata; see audit.md
 ```
+
 Output: `results/so101_real_base_audit_20261019/` (manifest.csv, sources.csv, tasks.csv, audit.md).
 Reading: if ≥ ~30% of episodes are duplicates/degenerate, the "14k" is really smaller and the
 checkpoint was trained on repeats → weigh its result accordingly; if orange/fruit episodes are
 few, do not expect zero-shot orange picking.
 
 ## Facts from the dataset card, model card and build repo (read 2026-10-19)
+
 ```text
 dataset   150 Hub sources + 6 of the author's; 13,969 ep / 7.27M fr; v2.1; 3 camera slots + masks;
           per-episode source_dataset in meta/episodes.jsonl, ranges in meta/sources.json, licences in
@@ -66,6 +71,7 @@ checkpoint lerobot/pi05_base → 40k steps, effective batch 256 (8×A100, per-GP
           termination the weakest behaviour; "a base for fine-tuning, not a deployable task policy";
           per-task LoRA recommended (docs/07-lora-finetuning.md).
 ```
+
 What this changes: zero-shot orange picking is NOT expected (the author says so); R3's reading is
 re-weighted — the checkpoint's value is as a real-data STARTING POINT for our fine-tune, which is
 exactly O3's design. R3 stays worth 20 trials (cheap, tells us the floor). The 7.5 GB download and
@@ -73,6 +79,7 @@ the serving stack (0.4.1 + VLASH + patches) are in hand; our probe venv is 0.6.1
 separate 0.4.1 env, as the EnvHub harness already does.
 
 ## Our rig vs the checkpoint's inputs (checked 2026-10-19)
+
 Our real recordings (e.g. lerobot_assets/datasets/so101_orange_89_v21, 89 ep): so101_follower, 30 fps,
 front + wrist cameras at 480x640, joint names/order shoulder_pan, shoulder_lift, elbow_flex, wrist_flex,
 wrist_roll, gripper (.pos) — IDENTICAL to the checkpoint's 6-D state/action and to the author's own
@@ -82,26 +89,29 @@ left_wrist_0_rgb, right_wrist_0_rgb = black dummy with mask 0 (empty_cameras: 1)
 LeRobot 0.4.1 + the author's patched run.py) — building.
 
 ## R3a G2 extension — the replay ladder on PUBLIC episodes (proposed 2026-10-20, operator's question)
+
 Open-loop replay (model's next-10 actions vs the human's) run on three rungs with one metric:
-  rung 1  in-corpus, trained-on episodes (LightwheelAI real orange, 5 ep) → the model's best-case error (floor)
-  rung 2  public real SO-101 sets NOT in the corpus (armnet, hungho77, wsagi real orange; 5 ep each) → the
-          generalisation band on strangers' rigs
-  rung 3  our own 89 (5 ep) → ours vs the two rungs: near rung 1 = in-distribution; in rung 2's band = a
-          normal rig gap; far above = a plumbing/mapping bug on our side
-  bonus   the 5 slot-swapped sources replayed as-shipped vs swapped-corrected → how much the model relies on
-          slot semantics; turns the audit's biggest finding into a number
+rung 1 in-corpus, trained-on episodes (LightwheelAI real orange, 5 ep) → the model's best-case error (floor)
+rung 2 public real SO-101 sets NOT in the corpus (armnet, hungho77, wsagi real orange; 5 ep each) → the
+generalisation band on strangers' rigs
+rung 3 our own 89 (5 ep) → ours vs the two rungs: near rung 1 = in-distribution; in rung 2's band = a
+normal rig gap; far above = a plumbing/mapping bug on our side
+bonus the 5 slot-swapped sources replayed as-shipped vs swapped-corrected → how much the model relies on
+slot semantics; turns the audit's biggest finding into a number
 Cost: ~20 s GPU per episode, < 1 h total; a few hundred MB of video per source; needs the W0 wrapper.
 
 ## R1 — Load and serve the checkpoint from AI90 (no arm needed)
+
 Download dongyoonkim/so101-pi05-base; load in the LeRobot probe venv; confirm input spec (camera
 slots, state dims, instruction format) against our rig's observation layout; serve over the existing
 socket harness with RTC ON (RTCConfig as for the arm); one dry inference on a recorded frame from
 our own August real episodes; measure latency. Ready-to-run state recorded here.
 
 ### R1 run record (2026-10-19)
+
 - Checkpoint (7.0 GB safetensors) and dataset meta are on /mnt/data4tb/huggingface-cache. Serving env built:
   /home/kiran/sim/vlash-venv (py3.11, VLASH @22cbabfe, LeRobot 0.4.1); author's patched run.py and
-  modeling_pi05.py applied over VLASH's copies (upstream kept as *.upstream).
+  modeling_pi05.py applied over VLASH's copies (upstream kept as \*.upstream).
 - Gotcha 1: config.json carries VLASH-only fields (state_cond, fuse_qkv, fuse_gate_up, vlm_config,
   action_expert_config) → the policy must be loaded through vlash.policies.factory, not LeRobot's.
 - Gotcha 2: VLASH's pin pulls torch 2.7.1+cu126, which has NO Blackwell (sm_120) kernels — "no kernel
@@ -117,12 +127,14 @@ our own August real episodes; measure latency. Ready-to-run state recorded here.
   exact-duplicate pass (R0.5); R1 done; R2 optional; R3 blocked on presence.
 
 ## R2 — Closed-loop test in the LeIsaac orange simulator (PROMOTED 2026-10-20 from "hint" to a scored gate)
+
 Why it is worth more than I first said: the public corpus CONTAINS LeIsaac renders of this very task —
 EverNorif/so101_place_orange_isaaclab 83 ep, aaronsu11/so101_fruit_leisaac 57, omkarmayekar555 sim orange 64
 (~200 episodes, all trained on). So the model has seen the simulator's kitchen, lighting and orange; a
 sim run is not an out-of-distribution stunt. It is also CLOSED-LOOP: the model drives the arm for a whole
 attempt, so compounding error, approach, grasp timing and release are exercised — everything the open-loop
 replay (R3a G2) cannot test. What it does NOT settle: real-camera performance; sim can be better or worse.
+
 ```text
 R2.1  serve the VLASH policy to the LeIsaac process over the socket harness we already use for sim
       (the same wrapper as R3a A1; EnvHub pins lerobot 0.4.1 so the policy stays out of process)
@@ -135,6 +147,7 @@ reading  ≥ 60% → the base model already does the task in sim; the bench test
          < 20% → look for a plumbing bug first (R3a G1/G2), then conclude the base does not transfer
 cost     GPU 0: Isaac Sim ~12 GB + policy 9 GB → fits the 5090; ~2 h for 100 episodes
 ```
+
 R2 runs BEFORE the bench and needs no one at the arm; it reuses the adapter's policy wrapper, so it is
 also the first closed-loop consumer of R3a A1.
 Run record 2026-10-20: wrapper up (eager, 137-180 ms/call, GPU 1); 2-episode headless smoke running on GPU 0;
@@ -153,21 +166,22 @@ Note: the 8.8 GB process on GPU 0 port 18916 is the operator's own LIBERO LoRA s
 ever connected); not part of this work.
 
 ## R3 — 20 real trials on the bench (CORRECTED 2026-10-19: the arm is in PUNE with the operator)
+
 The August/September arm trials ran the robot + cameras at the bench in Pune (`n16_realarm_client.py`,
 front = laptop /dev/video0, wrist = Pi camera) against a policy served from AI90 in NJ: measured round
 trip ~633 ms, hidden behind the arm's motion by the client's `--rtc` pipelined loop (95% duty; without it
 31% duty and the grasp fails — memory rtc-pipeline-for-grasp). So R3 does NOT wait for anyone in NJ; it
 waits for (a) the operator at the bench and (b) a serving path the bench client can talk to:
-  option 1  VLASH `run` AT THE BENCH (policy local to the robot): needs a GPU at the bench — none known.
-  option 2  (PLANNED as R3a: pi05_so101_bench_adapter_plan_20261020.md, with arm-less gates G1-G4)
-            serve the VLASH-stack π0.5 from AI90 behind the protocol the bench client speaks
-            (the operator's draft pi05-rtc-remote-draft-20261007 = a ZENOH policy server on LeRobot 0.5.2, with
-            timing captures) → a thin adapter: VLASH policy.predict_action_chunk inside LeRobot's
-            policy_server, chunk 50 → n_action_steps 20, RTC on at the client. ~1 day, operator's call.
-  The 300-500 ms figure the operator quoted is this path. R3 runs the client NON-PIPELINED (stop-and-wait):
-  on a static bench the pause costs time (~57% duty at 500 ms) and stop-start dynamics, not stale
-  observations. Pipelining is used only together with RTC (definitions locked in the R3a plan, 2026-10-20).
-  The August claim that the sequential loop 'crippled' the grasp is a hypothesis, not a measured A/B.
+option 1 VLASH `run` AT THE BENCH (policy local to the robot): needs a GPU at the bench — none known.
+option 2 (PLANNED as R3a: pi05_so101_bench_adapter_plan_20261020.md, with arm-less gates G1-G4)
+serve the VLASH-stack π0.5 from AI90 behind the protocol the bench client speaks
+(the operator's draft pi05-rtc-remote-draft-20261007 = a ZENOH policy server on LeRobot 0.5.2, with
+timing captures) → a thin adapter: VLASH policy.predict_action_chunk inside LeRobot's
+policy_server, chunk 50 → n_action_steps 20, RTC on at the client. ~1 day, operator's call.
+The 300-500 ms figure the operator quoted is this path. R3 runs the client NON-PIPELINED (stop-and-wait):
+on a static bench the pause costs time (~57% duty at 500 ms) and stop-start dynamics, not stale
+observations. Pipelining is used only together with RTC (definitions locked in the R3a plan, 2026-10-20).
+The August claim that the sequential loop 'crippled' the grasp is a hypothesis, not a measured A/B.
 Protocol (revised 2026-10-20): client NON-PIPELINED (stop-and-wait, definitions in the R3a plan); 20
 placements of the orange on a grid; success = orange on the plate/in the bowl with no contact with anything
 else, within a time cap sized for a stop-and-wait arm (duty ~57% at 500 ms RTT → cap = 2× the pipelined
@@ -177,6 +191,7 @@ checkpoint; < 5/20 → our own data is needed and R0 tells us what kind. Pipelin
 own comparison, not mixed into these 20.
 
 Results (record: results/so101_bench_20261019/bench_runs.md — one entry per trial, montages beside it):
+
 ```text
 2026-10-19  serving path = W0 wrapper (LeRobot gRPC, GPU 0 :8080) ← bench_client.py on the Acer over ZeroTier;
             no Zenoh adapter was needed. Measured round trip 0.67 s (dry run) – 0.92 s (live, median) per
@@ -207,6 +222,7 @@ CAMERA       (2026-10-21) all 16 trials used the C270 straight-down OVERHEAD; ou
              = the R5 control row (0/5 → stop; any success → noted, R5 unchanged). Wrist camera unchanged.
              The simulator-pose experiment is NOT done (matches 200 sim episodes only; would split the evidence).
 ```
+
 Protocol amendment PROPOSED 2026-10-19 (operator to confirm): **object-fit rule.** A trial run with a fruit
 that does not fit between the fully open jaws is an object failure, not a policy result. Such trials are
 logged in bench_runs.md with result EXCLUDED and do not count toward the 20; the 20 are run with a fruit
@@ -214,9 +230,11 @@ that fits (measured once, written in the record). If the measurement shows the t
 trials 1–2 stand as counted FAILs.
 
 ## R4 — Cleaned manifest for OUR use of this corpus (added 2026-10-19, after the visual pass)
+
 The audit's product is not a verdict on the author; it is the version of this corpus WE would train on
 (O3 real-arm fine-tune starts from the public checkpoint and adds data; a later full retrain from
 pi05_base on cleaned data is the fallback if the checkpoint's slot noise shows on the bench).
+
 ```text
 R4.1  slot fix       swap base_0_rgb ↔ left_wrist_0_rgb for 5hadytru grasp_1/2/3, y1y2y3/so101_test8,
                      sabinMlminator/so101_pickplace_cubes_test1 (1,810 ep) — manifest-level, no re-encode;
@@ -232,6 +250,7 @@ R4.7  orange subset  the real orange-fruit episodes (LightwheelAI 61 + aaronsu11
 output  DONE 2026-10-20: manifest_clean.csv — 13,292 kept (95.2%); dropped sim 304, 10-fps 350, degenerate 34,
         dup 1; 1,809 kept episodes carry the slot-swap fix; 96 real orange-fruit; verdict in audit.md
 ```
+
 Decision rule after R0/R4: the public checkpoint stays the R3 bench candidate regardless (its slot
 noise is 13% and the author measured ~90% on one trained task). If R3 is poor AND the audit says the
 data is otherwise sound, the next move is "LoRA on top with our real orange episodes + the R4.7 subset"
@@ -239,6 +258,7 @@ data is otherwise sound, the next move is "LoRA on top with our real orange epis
 the third option and a multi-day 8-GPU job; it is not scheduled.
 
 ## R5 — LoRA on top of the public checkpoint with our real orange data (proposed 2026-10-19; SPLIT OUT)
+
 Own plan: **pi05_so101_lora_on_top_plan_20261019.md** (what it means in plain words, the 109-episode data
 table, the author's LoRA recipe read from VLASH's async_lora.yaml, the Isaac "did not break it" gate with
 readings, the bench comparison against the base's 20 trials). Summary: freeze dongyoonkim/so101-pi05-base,
@@ -249,6 +269,7 @@ are consistent with needing this step but are not evidence for it — the rule n
 object-size failure. Not started; after R3 or beside it on a free 5090 when the operator says go.
 
 ## Tracking
+
 R2/R2b DONE 2026-10-19 (orange 76% / 32% by wording; cube 0; toy-table 0; MuJoCo touch 88 / lift 26 / place 6) — see the ladder doc. R0 meta+sample+video DONE; R0.5 (exact duplicates + degenerate) runs automatically when the parquet pull
 ends (~2026-10-20 02:30Z; armed waiter) · R4 cleaned manifest right after (~1 h, no input needed) · R1 DONE ·
 R2 optional · R3 blocked on two things: (a) the Zenoh↔VLASH serving adapter on AI90 (~1 day, awaiting go),

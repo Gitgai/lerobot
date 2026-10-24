@@ -36,6 +36,7 @@ network      settled: direct ZeroTier ~345 ms = the 9/10 regime. No GPU move nee
 ```
 
 **Immediate next steps (in order):**
+
 ```text
 1. FIX POWER   get the follower to ~7.4 V (physical: supply/wiring/battery).
                Re-read with `python3 ~/voltrace.py` on the Acer. Cheapest lever;
@@ -55,8 +56,8 @@ grasp-precision data — nothing else.
 ---
 
 ## Where we were (2026-09-16..17) -- pre-recovery, pre-RTC-finding
-(Note: these numbers were ALSO measured RTC-off; kept as history.)
 
+(Note: these numbers were ALSO measured RTC-off; kept as history.)
 
 **`n16_new30_v1/checkpoint-6000` places the orange about half the time on the
 real arm — measured 5/10 over ten trials, 2026-09-16, every verdict confirmed by
@@ -82,12 +83,12 @@ overlap. When it DOES descend, it grasps and places every time (5/5).
 ```
 
 **Checkpoint 12,000 is worse: PLACE 1/10.** More training (13.3 passes vs 6.6)
-overfit the *holding* state — three of its four grasps clamped the gripper shut
+overfit the _holding_ state — three of its four grasps clamped the gripper shut
 for 250-281 chunks and carried the fruit home without releasing it. 6000 never
 did this. So: use 6000, and never train past ~6,000 steps on this dataset.
 
->>> DIRECTION (operator, 2026-09-17): the way to raise 5/10 is not more testing,
->>> it is more demonstrations aimed at the descent. Record more episodes.
+> > > DIRECTION (operator, 2026-09-17): the way to raise 5/10 is not more testing,
+> > > it is more demonstrations aimed at the descent. Record more episodes.
 
 ---
 
@@ -115,6 +116,7 @@ placement a failure. An automated detector's output is a claim to verify, not
 evidence — confirmed here against the operator's own knowledge of the episodes.
 
 Folded in and training:
+
 ```text
 dataset   new30_plus_recov30 = new30_merged (30) + recovery30 (30) = 60 eps
           (50 orange + 10 tomato). Stats REGENERATED, not copied - ranges
@@ -196,7 +198,7 @@ latency raw    936 ms      duty cycle 29%
 latency jpeg   319 ms      duty cycle 84%      2.9x faster
 ```
 
->>> RULING (2026-09-16): `--jpeg_quality=92` on every trial from now on.
+> > > RULING (2026-09-16): `--jpeg_quality=92` on every trial from now on.
 
 ### The arm must be homed before every trial
 

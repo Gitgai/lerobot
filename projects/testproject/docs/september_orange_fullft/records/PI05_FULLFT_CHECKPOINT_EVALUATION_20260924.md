@@ -11,10 +11,10 @@ The 15,000-update run exited successfully with code 0. The supervisor recorded 4
 It trained from the general π0.5 base, with batch four, full-FT flags, BF16, gradient checkpointing and the previously tested external CPU-offloaded AdamW support. Training used 36 episodes / 33,493 timestamps; validation used nine episodes / 8,511 timestamps. All source recordings and older checkpoints remain preserved.
 
 | Checkpoint | Recorded full-validation loss |
-|---|---:|
-| 5,000 | 0.0327 |
-| 10,000 | 0.0370 |
-| 15,000 | 0.0420 |
+| ---------- | ----------------------------: |
+| 5,000      |                        0.0327 |
+| 10,000     |                        0.0370 |
+| 15,000     |                        0.0420 |
 
 These are the trainer's recorded validation-loss values, not robot success rates. The trainer averages batch loss, including terminal repeated targets in its installed loss path. These are not numerically interchangeable with decoded-action errors below. A rising loss suggests possible overfitting, but a single run does not establish its cause.
 
@@ -57,10 +57,10 @@ Scripts: `evaluate_orange45_checkpoints.py` and `run_orange45_comparison.py` in 
 All three inference processes completed with exit code zero. All 810 seeded predictions were finite; each model's same-seed repeat check had maximum difference zero. Loaded parameters were finite. Sample/input hashes, targets, states, masks and processor-component hashes matched across all checkpoints. An independent local recomputation from the downloaded NPZ arrays reproduced all three aggregate action-error metrics. Each seed has 4,059 valid target positions across the 90 windows; padding is excluded.
 
 | Checkpoint | Full-sequence action error, % span ↓ | First-action error, % span ↓ | First-16-action error, % span ↓ | Dynamic-window error, % span ↓ |
-|---|---:|---:|---:|---:|
-| 5k | 4.5160 | 1.6458 | 2.7748 | 5.1283 |
-| 10k | **3.8819** | 1.3512 | 2.4286 | 4.7303 |
-| 15k | 3.9490 | **1.2988** | **2.3903** | **4.6673** |
+| ---------- | -----------------------------------: | ---------------------------: | ------------------------------: | -----------------------------: |
+| 5k         |                               4.5160 |                       1.6458 |                          2.7748 |                         5.1283 |
+| 10k        |                           **3.8819** |                       1.3512 |                          2.4286 |                         4.7303 |
+| 15k        |                               3.9490 |                   **1.2988** |                      **2.3903** |                     **4.6673** |
 
 There are 62 dynamic windows under the diagnostic definition above. The 10k checkpoint's full-sequence error is about 14.0% lower than 5k. The 15k error is only about 1.73% higher than 10k. No statistical significance is claimed for that small difference.
 
@@ -74,14 +74,14 @@ Consequently, **5k is best by recorded validation loss, but not by this sampled 
 
 Full-sequence native-unit mean absolute errors, nonpadded targets only:
 
-| Joint | Units | 5k | 10k | 15k |
-|---|---|---:|---:|---:|
-| shoulder_pan | degrees | 4.55 | 3.78 | 3.74 |
-| shoulder_lift | degrees | 7.20 | 6.46 | 6.62 |
-| elbow_flex | degrees | 8.34 | 7.91 | 8.01 |
-| wrist_flex | degrees | 11.94 | 8.97 | 10.12 |
-| wrist_roll | degrees | 2.32 | 2.05 | 1.97 |
-| gripper | normalized position points | 3.51 | 3.13 | 2.92 |
+| Joint         | Units                      |    5k |  10k |   15k |
+| ------------- | -------------------------- | ----: | ---: | ----: |
+| shoulder_pan  | degrees                    |  4.55 | 3.78 |  3.74 |
+| shoulder_lift | degrees                    |  7.20 | 6.46 |  6.62 |
+| elbow_flex    | degrees                    |  8.34 | 7.91 |  8.01 |
+| wrist_flex    | degrees                    | 11.94 | 8.97 | 10.12 |
+| wrist_roll    | degrees                    |  2.32 | 2.05 |  1.97 |
+| gripper       | normalized position points |  3.51 | 3.13 |  2.92 |
 
 Wrist-flex disagreement remains substantial, especially later in the horizon. These are disagreements with demonstrated future targets, not measured hardware tracking errors, force errors or evidence that every predicted alternative would fail.
 
