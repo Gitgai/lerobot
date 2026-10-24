@@ -1,0 +1,78 @@
+# R5 row 3 — conservative LoRA (row-2 recipe) on ALL 169 real episodes (2026-10-24). Why: rows 1-2 were trained on the
+# 109 August episodes only (LOW-FRONT camera) and the 60 September episodes (OVERHEAD camera — the view the bench actually
+# has, plus 10 tomato episodes and 30 recovery demos) had been missed. Same frozen-embedding/frozen-norm recipe as row 2
+# (it kept the base's competence); 10k steps ≈ 0.7 pass over 111,518 frames at batch 8; checkpoints every 2k.
+
+policy:
+  type: pi05
+  pretrained_path: /mnt/data4tb/huggingface-cache/models--dongyoonkim--so101-pi05-base/snapshots/56325bafcca9ec3155b8bfdf655be7df17e7f09f
+  push_to_hub: false
+  dtype: bfloat16
+  device: cuda
+  state_cond: true
+
+dataset:
+  repo_id: all169_aug_low_sep_overhead
+  root: /home/kiran/lerobot_assets/datasets/all169_aug_low_sep_overhead
+  video_backend: pyav
+  use_imagenet_stats: false
+
+output_dir: /mnt/data4tb/so101-lora-on-top-20261021/row3_all169_conservative
+job_name: r5_row3_all169_conservative
+batch_size: 8
+grad_accum_steps: 1
+steps: 10000
+num_workers: 4
+seed: 1000
+
+use_policy_training_preset: false
+optimizer:
+  type: adamw
+  lr: 2.0e-5
+  betas: [0.9, 0.95]
+  weight_decay: 1.0e-10
+
+scheduler:
+  type: cosine_decay_with_warmup
+  num_warmup_steps: 500
+  peak_lr: 2.0e-5
+  decay_lr: 1.0e-6
+  num_decay_steps: 10000
+
+save_checkpoint: true
+save_freq: 2000
+
+log_freq: 100
+wandb:
+  enable: false
+  project: vlash
+  entity: null
+  disable_artifact: true
+
+max_delay_steps: 8
+
+lora:
+  enable: true
+  backend: peft
+  extra_trainable_modules:
+    - action_in_proj
+    - action_out_proj
+    - time_mlp_in
+    - time_mlp_out
+    - state_proj
+    - state_mlp_in
+    - state_mlp_out
+  r: 16
+  alpha: 16
+  dropout: 0
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+    - out_proj
+    - fc1
+    - fc2

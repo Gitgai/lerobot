@@ -34,5 +34,10 @@ case "${1:-}" in
     systemd-run --user --unit=r5-row2 --collect "${ENV[@]}" --working-directory=/home/kiran/sim/vlash \
       "$VENV/bin/vlash" train "$HERE/row2_conservative_lora.yaml"
     echo "unit r5-row2 started/resumed; log: journalctl --user -u r5-row2 -f" ;;
-  *) echo "usage: $0 smoke|smoke-resume|train|resume|train2|resume2"; exit 2 ;;
+  train3|resume3)
+    # row 3 (2026-10-24): conservative recipe on all 169 real episodes (both camera placements), unit r5-row3
+    systemd-run --user --unit=r5-row3 --collect "${ENV[@]}" --working-directory=/home/kiran/sim/vlash \
+      "$VENV/bin/vlash" train "$HERE/row3_all169_conservative.yaml"
+    echo "unit r5-row3 started/resumed; log: journalctl --user -u r5-row3 -f" ;;
+  *) echo "usage: $0 smoke|smoke-resume|train|resume|train2|resume2|train3|resume3"; exit 2 ;;
 esac
