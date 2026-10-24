@@ -1,5 +1,7 @@
 # SO-101 Commands
 
+> Historical launcher reference — preservation note, October 24: this file mixes older configurations and commands. Do not execute examples merely because they are now committed. See `LOCAL_CHANGES_REVIEW_20261024.md` for unresolved launcher issues and the project README for current task-specific status. The `positions` command is not torque-free; `--delete` is destructive. Numeric USB paths and old camera examples are not current device verification.
+
 This document keeps the commands we use most often for the SO-101 leader/follower setup.
 
 ## 1. Activate LeRobot Environment
@@ -71,8 +73,10 @@ Run without `max_relative_target`:
 Record 5 fresh episodes:
 
 ```bash
-./bin/so101 record --episodes 5 --delete
+./bin/so101 record --episodes 5 --dataset-root /data/lerobot_datasets/so101_pick_test_new
 ```
+
+The launcher refuses to overwrite an existing dataset unless `--delete` is explicitly supplied. Use `--dataset-root` for a new dataset (recommended when the existing dataset has different camera features), or use `--resume` only when the existing dataset has the same robot and camera configuration.
 
 Replay one episode:
 
@@ -364,8 +368,7 @@ lerobot-teleoperate \
   --robot.type=so101_follower \
   --robot.port=/dev/ttyACM1 \
   --robot.id=my_so101_follower \
-  --robot.disable_torque_on_disconnect=false \
-  --robot.max_relative_target=5 \
+  --robot.disable_torque_on_disconnect=true \
   --teleop.type=so101_leader \
   --teleop.port=/dev/ttyACM0 \
   --teleop.id=my_so101_leader
@@ -380,8 +383,7 @@ lerobot-teleoperate \
   --robot.type=so101_follower \
   --robot.port=/dev/ttyACM1 \
   --robot.id=my_so101_follower \
-  --robot.disable_torque_on_disconnect=false \
-  --robot.max_relative_target=5 \
+  --robot.disable_torque_on_disconnect=true \
   --teleop.type=so101_leader \
   --teleop.port=/dev/ttyACM0 \
   --teleop.id=my_so101_leader \
@@ -399,8 +401,7 @@ lerobot-teleoperate \
   --robot.type=so101_follower \
   --robot.port=/dev/ttyACM1 \
   --robot.id=my_so101_follower \
-  --robot.disable_torque_on_disconnect=false \
-  --robot.max_relative_target=5 \
+  --robot.disable_torque_on_disconnect=true \
   --robot.cameras="{ front: {type: opencv, index_or_path: 0, width: 640, height: 480, fps: 30}}" \
   --teleop.type=so101_leader \
   --teleop.port=/dev/ttyACM0 \
@@ -421,8 +422,7 @@ lerobot-record \
   --robot.type=so101_follower \
   --robot.port=/dev/ttyACM1 \
   --robot.id=my_so101_follower \
-  --robot.disable_torque_on_disconnect=false \
-  --robot.max_relative_target=5 \
+  --robot.disable_torque_on_disconnect=true \
   --robot.cameras="{ front: {type: opencv, index_or_path: 0, width: 640, height: 480, fps: 30}}" \
   --teleop.type=so101_leader \
   --teleop.port=/dev/ttyACM0 \
@@ -446,7 +446,7 @@ lerobot-replay \
   --robot.type=so101_follower \
   --robot.port=/dev/ttyACM1 \
   --robot.id=my_so101_follower \
-  --robot.disable_torque_on_disconnect=false \
+  --robot.disable_torque_on_disconnect=true \
   --dataset.repo_id=local/so101_pick_test \
   --dataset.root=/data/lerobot_datasets/so101_pick_test \
   --dataset.episode=0

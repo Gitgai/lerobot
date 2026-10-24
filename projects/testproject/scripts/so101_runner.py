@@ -6,15 +6,19 @@ from __future__ import annotations
 import argparse
 import contextlib
 import json
+import re
 import shutil
 import signal
 import subprocess
 import sys
+import threading
+import time
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 SIGINT_RETURN_CODE = -signal.SIGINT
+TORQUE_RELEASE_COMMANDS = {"lerobot-teleoperate", "lerobot-record", "lerobot-replay"}
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -35,21 +39,19 @@ def resolve_port(cfg: dict[str, Any], kind: str) -> str:
     port_key = f"{kind}_port"
     serial_path = Path(cfg[serial_key])
     if serial_path.exists():
-        try:
-            return str(serial_path.resolve())
-        except OSError:
-            return str(serial_path)
+        return str(serial_path)
     return str(cfg[port_key])
 
 
 def camera_config(cfg: dict[str, Any]) -> str:
     return (
         "{ "
-        f"{cfg['camera_name']}: "
-        "{"
-        f"type: opencv, index_or_path: {cfg['camera_index']}, "
-        f"width: {cfg['camera_width']}, height: {cfg['camera_height']}, fps: {cfg['camera_fps']}"
-        "}"
+        f'front: {{type: opencv, index_or_path: "{cfg["camera_index"]}", '
+        f"fourcc: {cfg.get('camera_fourcc', 'MJPG')}, warmup_s: {int(cfg.get('camera_warmup_s', 3))}, "
+        f"width: {cfg['camera_width']}, height: {cfg['camera_height']}, fps: {cfg['camera_fps']}}}, "
+        f'wrist: {{type: opencv, index_or_path: "{cfg["wrist_camera_index"]}", '
+        f"fourcc: {cfg.get('wrist_camera_fourcc', 'MJPG')}, warmup_s: {int(cfg.get('wrist_camera_warmup_s', 2))}, "
+        f"width: {cfg['camera_width']}, height: {cfg['camera_height']}, fps: {cfg['camera_fps']}}} "
         "}"
     )
 
@@ -69,16 +71,113 @@ def print_command(cmd: list[str]) -> None:
     print()
 
 
-def run(cmd: list[str], cfg: dict[str, Any], name: str, log: bool = True) -> None:
+class CountdownDisplay:
+    """Show a live recording/reset countdown without hiding child-process logs."""
+
+    def __init__(self) -> None:
+        self.interactive = sys.stdout.isatty()
+        self._lock = threading.Lock()
+        self._stop_event: threading.Event | None = None
+        self._thread: threading.Thread | None = None
+
+    def _write_status(self, text: str) -> None:
+        with self._lock:
+            if self.interactive:
+                sys.stdout.write(f"\r\033[2K{text}")
+                sys.stdout.flush()
+
+    def print_line(self, line: str) -> None:
+        with self._lock:
+            if self.interactive:
+                sys.stdout.write("\r\033[2K")
+            print(line, end="", flush=True)
+
+    def start(self, label: str, duration_s: float) -> None:
+        self.stop()
+        duration_s = max(0.0, float(duration_s))
+        stop_event = threading.Event()
+        self._stop_event = stop_event
+        self._thread = threading.Thread(
+            target=self._countdown,
+            args=(label, duration_s, stop_event),
+            daemon=True,
+        )
+        self._thread.start()
+
+    def _countdown(self, label: str, duration_s: float, stop_event: threading.Event) -> None:
+        deadline = time.monotonic() + duration_s
+        last_remaining: int | None = None
+        while not stop_event.is_set():
+            remaining = max(0, int(deadline - time.monotonic() + 0.999))
+            if remaining != last_remaining:
+                self._write_status(f"{label}: {remaining}s remaining")
+                last_remaining = remaining
+            if remaining == 0:
+                break
+            stop_event.wait(min(1.0, max(0.05, deadline - time.monotonic())))
+        if not stop_event.is_set():
+            self._write_status(f"{label}: complete")
+
+    def stop(self) -> None:
+        if self._stop_event is not None:
+            self._stop_event.set()
+        if self._thread is not None and self._thread is not threading.current_thread():
+            self._thread.join(timeout=0.25)
+        self._stop_event = None
+        self._thread = None
+
+    def close(self) -> None:
+        self.stop()
+        if self.interactive:
+            with self._lock:
+                sys.stdout.write("\r\033[2K")
+                sys.stdout.flush()
+
+
+def release_follower_torque() -> bool:
+    helper = PROJECT_ROOT / "scripts" / "disable_follower_torque.py"
+    result = subprocess.run(
+        [sys.executable, str(helper)],
+        cwd=PROJECT_ROOT,
+        capture_output=True,
+        text=True,
+        timeout=10,
+        check=False,
+    )
+    if result.stdout:
+        print(result.stdout, end="")
+    if result.stderr:
+        print(result.stderr, end="", file=sys.stderr)
+    if result.returncode:
+        print(f"WARNING: follower torque cleanup failed (exit {result.returncode}).")
+        return False
+    return True
+
+
+def run(
+    cmd: list[str],
+    cfg: dict[str, Any],
+    name: str,
+    log: bool = True,
+    countdown: tuple[float, float] | None = None,
+) -> None:
     print_command(cmd)
 
     cwd = cfg["lerobot_dir"] if cfg["lerobot_dir"].exists() else PROJECT_ROOT
+    release_torque = bool(cmd and cmd[0] in TORQUE_RELEASE_COMMANDS)
     if not log:
-        subprocess.run(cmd, cwd=cwd, check=True)
+        try:
+            subprocess.run(cmd, cwd=cwd, check=True)
+        finally:
+            if release_torque:
+                release_follower_torque()
         return
 
     path = log_path(cfg, name)
     print(f"Log file: {path}\n")
+    timer = CountdownDisplay() if countdown is not None else None
+    current_episode: int | None = None
+    recording_pattern = re.compile(r"Recording episode (\d+)")
 
     with path.open("w", buffering=1) as log_file:
         log_file.write("# SO-101 session log\n")
@@ -98,15 +197,35 @@ def run(cmd: list[str], cfg: dict[str, Any], name: str, log: bool = True) -> Non
         try:
             assert process.stdout is not None
             for line in process.stdout:
-                print(line, end="")
+                if timer is not None:
+                    match = recording_pattern.search(line)
+                    if match:
+                        current_episode = int(match.group(1))
+                        timer.start(f"Episode {current_episode + 1} recording", countdown[0])
+                    elif "Reset the environment" in line:
+                        episode_label = (
+                            "" if current_episode is None else f" after episode {current_episode + 1}"
+                        )
+                        timer.start(f"Reset timer{episode_label}", countdown[1])
+                    elif "Stop recording" in line:
+                        timer.stop()
+                    timer.print_line(line)
+                else:
+                    print(line, end="", flush=True)
                 log_file.write(line)
         except KeyboardInterrupt:
             print("\nStopping child command...")
             process.send_signal(signal.SIGINT)
         finally:
+            if timer is not None:
+                timer.close()
             return_code = process.wait()
             log_file.write(f"\n# finished: {datetime.now().isoformat(timespec='seconds')}\n")
             log_file.write(f"# return_code: {return_code}\n")
+
+    cleanup_ok = True
+    if release_torque:
+        cleanup_ok = release_follower_torque()
 
     if return_code == SIGINT_RETURN_CODE:
         print("Command stopped by Ctrl+C.")
@@ -114,6 +233,8 @@ def run(cmd: list[str], cfg: dict[str, Any], name: str, log: bool = True) -> Non
 
     if return_code:
         raise subprocess.CalledProcessError(return_code, cmd)
+    if not cleanup_ok:
+        raise RuntimeError("Follower torque could not be verified as disabled after the command.")
 
 
 def base_robot_args(cfg: dict[str, Any], max_relative_target: float | None) -> list[str]:
@@ -121,7 +242,7 @@ def base_robot_args(cfg: dict[str, Any], max_relative_target: float | None) -> l
         "--robot.type=so101_follower",
         f"--robot.port={resolve_port(cfg, 'follower')}",
         f"--robot.id={cfg['follower_id']}",
-        "--robot.disable_torque_on_disconnect=false",
+        "--robot.disable_torque_on_disconnect=true",
     ]
     if max_relative_target is not None:
         args.append(f"--robot.max_relative_target={max_relative_target}")
@@ -152,9 +273,10 @@ def teleop(args: argparse.Namespace, cfg: dict[str, Any]) -> None:
 
 def record(args: argparse.Namespace, cfg: dict[str, Any]) -> None:
     max_relative_target = None if args.no_max_relative_target else args.max_relative_target
-    if args.delete and cfg["dataset_root"].exists():
-        print(f"Deleting previous dataset: {cfg['dataset_root']}")
-        shutil.rmtree(cfg["dataset_root"])
+    dataset_root = Path(args.dataset_root) if args.dataset_root else cfg["dataset_root"]
+    if args.delete and dataset_root.exists():
+        print(f"Deleting previous dataset: {dataset_root}")
+        shutil.rmtree(dataset_root)
 
     cmd = ["lerobot-record"]
     cmd += base_robot_args(cfg, max_relative_target)
@@ -163,12 +285,22 @@ def record(args: argparse.Namespace, cfg: dict[str, Any]) -> None:
     cmd += [
         "--display_data=true",
         f"--dataset.repo_id={cfg['dataset_repo_id']}",
-        f"--dataset.root={cfg['dataset_root']}",
+        f"--dataset.root={dataset_root}",
         f"--dataset.num_episodes={args.episodes}",
         f"--dataset.single_task={cfg['task']}",
+        f"--dataset.episode_time_s={args.episode_time}",
+        f"--dataset.reset_time_s={args.reset_time}",
         "--dataset.push_to_hub=false",
     ]
-    run(cmd, cfg, "record", log=not args.no_log)
+    if args.resume:
+        cmd.append("--resume=true")
+    run(
+        cmd,
+        cfg,
+        "record",
+        log=not args.no_log,
+        countdown=(args.episode_time, args.reset_time),
+    )
 
 
 def replay(args: argparse.Namespace, cfg: dict[str, Any]) -> None:
@@ -177,7 +309,7 @@ def replay(args: argparse.Namespace, cfg: dict[str, Any]) -> None:
         "--robot.type=so101_follower",
         f"--robot.port={resolve_port(cfg, 'follower')}",
         f"--robot.id={cfg['follower_id']}",
-        "--robot.disable_torque_on_disconnect=false",
+        "--robot.disable_torque_on_disconnect=true",
         f"--dataset.repo_id={cfg['dataset_repo_id']}",
         f"--dataset.root={cfg['dataset_root']}",
         f"--dataset.episode={args.episode}",
@@ -484,7 +616,9 @@ def positions(_: argparse.Namespace, cfg: dict[str, Any]) -> None:
         SOFollowerRobotConfig(
             port=follower_port,
             id=cfg["follower_id"],
-            disable_torque_on_disconnect=False,
+            # A position read connects/configures the follower, which enables torque.
+            # Always release it when this read-only command exits.
+            disable_torque_on_disconnect=True,
         )
     )
 
@@ -571,12 +705,33 @@ def main() -> None:
     record_parser = subparsers.add_parser("record", help="Record a local dataset.")
     record_parser.add_argument("--episodes", type=int, default=5)
     record_parser.add_argument(
+        "--episode-time",
+        type=float,
+        default=60,
+        help="Seconds to record each episode (LeRobot default: 60).",
+    )
+    record_parser.add_argument(
+        "--reset-time",
+        type=float,
+        default=60,
+        help="Seconds available to reset between episodes (LeRobot default: 60).",
+    )
+    record_parser.add_argument(
         "--max-relative-target", type=float, default=cfg["default_max_relative_target"]
     )
     record_parser.add_argument(
         "--no-max-relative-target",
         action="store_true",
         help="Omit robot.max_relative_target. This removes the joint jump limiter.",
+    )
+    record_parser.add_argument(
+        "--dataset-root",
+        help="Use a different dataset directory; the configured dataset is preserved.",
+    )
+    record_parser.add_argument(
+        "--resume",
+        action="store_true",
+        help="Resume an existing compatible dataset instead of creating a new one.",
     )
     record_parser.add_argument("--delete", action="store_true", help="Delete old dataset before recording.")
     record_parser.add_argument("--no-log", action="store_true")

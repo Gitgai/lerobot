@@ -10,6 +10,8 @@ Use **Gitgai/lerobot** as the single source-controlled project. On Acer its root
 
 ## Progress
 
+**Follow-up preservation batch, October 24:** the five pre-existing modified files and four untracked files have now been reviewed and selected for preservation on the same branch. See [local changes review](LOCAL_CHANGES_REVIEW_20261024.md). Historical documents/snapshot are explicitly not current launch instructions. Added five hardware-free command/config tests; these and the fourteen fruit contract/timing tests passed. Scoped quality/security checks passed after formatting and making the cleanup helper's previously silent disconnect exception visible as a warning. Known launcher limitations remain documented, not silently fixed. Once this batch is committed and the remote hash verified, earlier statements about these nine files being uncommitted are historical; other workspace migration and main-branch merging remain incomplete.
+
 - [x] Inventory the original project: environments, evidence, scripts and old instructions are mixed together. The pre-update folder occupied approximately 31 GB; this is not a post-update size measurement.
 - [x] Preserve the five modified tracked files and four untracked files before updating.
 - [x] Fetch GitHub and compare incoming changes. No incoming differences touched those five locally modified paths, `src/`, `pyproject.toml` or `uv.lock`.

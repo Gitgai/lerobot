@@ -2,6 +2,36 @@ This file provides guidance to AI agents when working with code in this reposito
 
 > **User-facing help → [`AGENT_GUIDE.md`](./AGENT_GUIDE.md)** (SO-101 setup, recording, picking a policy, training duration, eval — with copy-pasteable commands).
 
+## Working in this fork (`Gitgai/lerobot`) — read before experiment work
+
+This fork carries an SO-101 research project in `projects/testproject/` on top of
+upstream LeRobot. The architecture notes below describe **upstream**; they say
+nothing about the experiments. For experiment work, orient yourself first:
+
+- **Where the current state lives:** `projects/testproject/docs/`. Docs are
+  session-scoped and named `*_YYYYMMDD.md`. Start from
+  `projects/testproject/README.md`, then the linked task-specific status. A newer
+  date alone does not supersede a different model or experiment. Longer-running
+  threads: `docs/pi05_active_work_tracker.md`, `docs/so101_pi05_agent_handoff.md`.
+  Each doc carries its own `Last updated:` line — trust that, not the file mtime
+  (they were all bulk-touched on 2026-08-22).
+- **`START_HERE.md` is ACT-era history**, already banner-marked outdated. Don't
+  follow it; it predates the move to Pi05.
+- **Two machines.** This box is the **arm/client** side: SO-101 arm, cameras,
+  datasets under `/data/lerobot_datasets/`. Training runs on a separate GPU box
+  (user `kiran`, `/home/kiran/lerobot_assets/`). Commits land from both sides, so
+  **`git fetch && git log --oneline HEAD..origin/main` before assuming local is
+  current** — this checkout is routinely behind.
+- **Do not bulk-read `projects/testproject/artifacts/`.** It is ~21 GB of
+  checkpoints, videos and camera captures (gitignored). Single PNG/JPEG frames
+  arrive as 400–660 KB of base64 and are by far the largest context sink in this
+  project. Read one representative frame, downscaled — never a directory of them.
+- **Secrets:** `projects/testproject/.secrets/huggingface.env` (mode 0600,
+  gitignored). Never read, print, or copy it.
+- **CI:** the `Quality` workflow is just `pre-commit`. Run
+  `pre-commit run --all-files` locally before pushing, and check
+  `gh run list --workflow=quality.yml` rather than assuming its state.
+
 ## Project Overview
 
 LeRobot is a PyTorch-based library for real-world robotics, providing datasets, pretrained policies, and tools for training, evaluation, data collection, and robot control. It integrates with Hugging Face Hub for model/dataset sharing.
