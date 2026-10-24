@@ -1,0 +1,65 @@
+# One-repository consolidation plan
+
+Updated: 24 October 2026. Scope: organize and preserve project work, not run a robot trial.
+
+## The simple rule
+
+Use **Gitgai/lerobot** as the single source-controlled project. On Acer its root is `/home/gaikwad-prakash/PrakashProjects/lerobot/lerobot`; robot-project work belongs under `projects/testproject/`. AI90's checkout is another copy of that same repository, not a different project.
+
+`/home/gaikwad-prakash/Documents/ChatGPT/Lerobot` is the older session workspace containing newer, uncommitted work. Keep it intact until migration is verified. Do not create another remote for it. This session still runs there; documenting a destination does not relocate the session or any running command.
+
+## Progress
+
+- [x] Inventory the original project: environments, evidence, scripts and old instructions are mixed together. The pre-update folder occupied approximately 31 GB; this is not a post-update size measurement.
+- [x] Preserve the five modified tracked files and four untracked files before updating.
+- [x] Fetch GitHub and compare incoming changes. No incoming differences touched those five locally modified paths, `src/`, `pyproject.toml` or `uv.lock`.
+- [x] Fast-forward Acer main from `ad10219f` to `aff7b4c7` (165 commits). This brought in existing shared project scripts/docs/results; it was not merely a documentation update. No environments were rebuilt and no robot commands were run.
+- [x] Add an entry banner to the project README and this plan.
+- [ ] Inventory newer session-workspace code/docs against the now-current repository; identify exact duplicates, conflicts, machine-specific paths and dependencies.
+- [ ] Copy selected active code/tests/docs into agreed locations, without deleting the originals. Record source/destination hashes and provenance. Exclude secrets and generated bulk data.
+- [ ] Check imports, relative links and absolute runtime paths; run relevant non-moving tests before changing launch paths. Existing launch commands remain at their existing locations meanwhile.
+- [ ] Review the exact staged diff and secret/large-file exclusions; run applicable checks; commit and push scoped code/docs. Do not bulk-stage the workspace or unrelated user edits.
+- [ ] Only after verification, label superseded instructions as historical and give the old workspace a redirect. No deletion is required to complete consolidation.
+
+## Preservation record
+
+Archive: `/home/gaikwad-prakash/Documents/ChatGPT/Lerobot/repo_preservation_20261024_PmnCuT/acer_uncommitted_files.tar.gz`.
+
+SHA-256: `854857b65d146ce9e67febed590baae4b35e2bc636ff9c11a7d9746948a5cbfa`.
+
+Contains `AGENTS.md`, project `START_HERE.md`, `config/so101.json`, `docs/so101_commands.md`, `scripts/so101_runner.py`, `docs/CAMERA_RECORDING_STATUS.md`, `docs/CLAUDE_HANDOVER_SO101_20260915.md`, `scripts/disable_follower_torque.py`, and `scripts/realarm/n16_realarm_client.py.aug8-original`. Archive entries were listed and all nine originals byte-compared after the fast-forward. This local archive is not an independent disk backup. No secrets, virtual environments or recordings were included.
+
+## Organization policy
+
+### Second migration batch — documentation and checks
+
+Eleven selected historical training/deployment/storage documents now live under `docs/fruit_openpi_history/`, with an index, provenance manifests and explicit historical banners. Checked 57 local Markdown links: all resolve on Acer; 30 refer to external evidence retained in the old workspace and are not GitHub-portable. No claim is made that the entire workspace is migrated. Later backup activity in source documents is preserved, not independently rechecked here.
+
+Repository hooks formatted the nine copied Python files, sorted/cleaned imports, and applied equivalent literal/loop-variable cleanup. This supersedes the initial byte-identical description below; final hashes are regenerated after formatting. All 14 pure tests and client help passed again. Scoped checks for formatting, spelling, large files, secrets and static security passed. Pre-commit installed its own missing cached formatting-hook environment; robot/network/training environments were not changed.
+
+Only this migration batch and its README/plan/index are selected for commit. Original user changes to AGENTS, START_HERE, rig config, launcher, command docs and the earlier untracked files remain outside the batch. No blanket staging, history rewriting, branch force-push or removal is authorized. Publish a scoped branch, not a silent overwrite of main. Full-workspace migration, active launch-path replacement and raw-data preservation remain separate unfinished work.
+
+### First source migration completed — 24 October
+
+Nine selected Python sources were copied to `scripts/inference/fruit_openpi/`, with original/destination SHA-256 values in its `MIGRATION_HASHES.json`. Seven are identical; `client.py` and `transport.py` only have import/environment path adaptations. Recorder and safety helpers are co-located; original networking environment and pinned codec stay at their current absolute paths. Sources are retained, no installed environment or active launch path was replaced. There was no same-path destination to overwrite.
+
+Verification: all 14 contract/timing tests passed; client `--help` passed; worker/codec imported in the existing network environment without connecting; all nine sources parsed successfully. No server import/load, network handshake, camera or motor operation was performed. This is a migration candidate, not validated deployment. The new `docs/ACER_FRUIT_OPENPI_STATUS.md` is an explicit index to evidence still outside the repository. Full workspace inventory/document migration and commit/push remain outstanding; the unchecked phases above are intentionally not marked complete by this first batch.
+
+- Keep the existing directory name for now; renaming it can break absolute paths.
+- Use README as the stable entry point, linking to explicit task-specific status documents. A newer date alone does not make a document applicable to every model or experiment.
+- Separate active code by recording/training/inference/diagnostics where useful, but audit callers before moving scripts. Preserve historical evidence and original dates.
+- Consolidate `config/` and `configs/` only after auditing references: they currently serve different rig and simulator/model purposes.
+- Keep large datasets, checkpoints, videos, environments and secrets out of new commits. Existing tracked results require case-by-case review, not blanket deletion or history rewriting.
+- Preserve existing environments and machine paths until replacements are verified. Do not relocate `.venv` or remove the old environment as part of this phase.
+
+## Runtime status — historical evidence, not a fresh rig check
+
+The Acer fruit OpenPI work last tested a provisional 4k checkpoint with RTC off and network JPEG off. The October 22 physical trial did not demonstrate placement and had a roughly 56-second host pause correlated with NVMe errors; an earlier October 8 reset was also found. Physical retries remain paused in that workflow. The recovery report is currently at `/home/gaikwad-prakash/Documents/ChatGPT/Lerobot/fruit_openpi_client/storage_investigation_20261022/RECOVERY_PROGRESS.md`. Other AI90 training/simulation tracks have separate status; do not conflate their checkpoints or results.
+
+## Rollback
+
+No destructive reset, clean, forced checkout, force-push or automatic stash is allowed in this workflow. If migration breaks something, retain both copies and restore only the affected, reviewed file from its saved source. Git fast-forward recovery is a separate explicit operation: record old/new revisions, preserve all current modifications, and agree on the target before changing checkout history. Do not run `git reset --hard` to undo this work.
+
+## Completion criteria
+
+One clear project entry point; migrated code/docs tested and committed; remote commit verified; large-data locations and backup scope documented; existing local modifications preserved or explicitly reconciled; no silent runtime/environment changes. Until then, do not claim everything is committed, pushed or migrated.
