@@ -62,4 +62,12 @@ No destructive reset, clean, forced checkout, force-push or automatic stash is a
 
 ## Completion criteria
 
+### Commit and repository-wide check record
+
+Migration batch committed as `13d33c21` on `codex/consolidate-fruit-openpi-20261024`: 27 files, nine Python sources, eleven historical document snapshots, manifests and navigation. This is a selected batch, not all local work.
+
+`pre-commit run --all-files` was executed in a temporary detached checkout of this commit, protecting unrelated local edits from automatic formatters. It failed on older files outside the migration batch: formatting, lint, spelling and static-security findings. The first pass changed 203 existing files in that disposable checkout; none of the 27 migration paths changed. A repeat still reported Ruff, spelling, Markdown-formatting and Bandit failures; secret, large-file and type checks passed. These pre-existing paths were not changed in the actual repository and were not added to the migration commit. Scoped checks for the migration batch passed. Do not claim repository-wide CI is green or merge this branch on that assumption.
+
+Publishing this branch does not merge it into main, migrate all external evidence, replace installed environments, switch active robot commands, or commit the five pre-existing modified files and four pre-existing untracked files. Their preservation archive remains available. Separate review is needed for those local changes and the repository-wide check debt.
+
 One clear project entry point; migrated code/docs tested and committed; remote commit verified; large-data locations and backup scope documented; existing local modifications preserved or explicitly reconciled; no silent runtime/environment changes. Until then, do not claim everything is committed, pushed or migrated.
