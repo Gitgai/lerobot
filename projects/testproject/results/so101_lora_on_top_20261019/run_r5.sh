@@ -10,7 +10,8 @@ HERE=$(cd "$(dirname "$0")" && pwd)
 VENV=/home/kiran/sim/vlash-venv
 OUT=/mnt/data4tb/so101-lora-on-top-20261021
 CFG=$HERE/row1_author_lora.yaml
-ENV=(--setenv=CUDA_VISIBLE_DEVICES=1 --setenv=HF_HOME=/mnt/data4tb/huggingface-cache --setenv=TMPDIR=/home/kiran/tmp
+GPU=${GPU:-1}; EXTRA=${EXTRA:-}   # GPU=0 EXTRA="--batch_size=1 --grad_accum_steps=8" when GPU 1 is taken (2026-10-24)
+ENV=(--setenv=CUDA_VISIBLE_DEVICES=$GPU --setenv=PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True --setenv=HF_HOME=/mnt/data4tb/huggingface-cache --setenv=TMPDIR=/home/kiran/tmp
      --setenv=HOME=/home/kiran --setenv=PYTHONUNBUFFERED=1 --setenv=TOKENIZERS_PARALLELISM=false)
 mkdir -p "$OUT"
 case "${1:-}" in
@@ -37,7 +38,7 @@ case "${1:-}" in
   train3|resume3)
     # row 3 (2026-10-24): conservative recipe on all 169 real episodes (both camera placements), unit r5-row3
     systemd-run --user --unit=r5-row3 --collect "${ENV[@]}" --working-directory=/home/kiran/sim/vlash \
-      "$VENV/bin/vlash" train "$HERE/row3_all169_conservative.yaml"
+      "$VENV/bin/vlash" train "$HERE/row3_all169_conservative.yaml" $EXTRA
     echo "unit r5-row3 started/resumed; log: journalctl --user -u r5-row3 -f" ;;
   *) echo "usage: $0 smoke|smoke-resume|train|resume|train2|resume2|train3|resume3"; exit 2 ;;
 esac

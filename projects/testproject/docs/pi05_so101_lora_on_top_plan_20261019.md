@@ -50,7 +50,11 @@ The September overhead view is the view the bench has had in every trial so far 
 1–2 were trained on the view the bench does NOT have, and the data that matches the bench's actual camera was left
 out. Row 3 = all 169 (both views; the base corpus itself spans many external placements, and the policy conditions on
 the image) → tested on the OVERHEAD bench camera, no camera move needed; the 10 tomato episodes make the operator's
-tomato in-distribution. Merge: scripts/merge_real_sets_v21.py → all169_aug_low_sep_overhead.
+tomato in-distribution. Merge: scripts/merge_real_sets_v21.py → all169_aug_low_sep_overhead (111,518 frames, 3 tasks).
+ROW 3 launched 20:42Z on GPU 1 (row-2 recipe, 10k steps, ckpt every 2k) → OOM at the first step: the operator's new
+openpi job (continue_fruit_20k.py, 51 GB) had taken GPU 1 at the same minute. Relaunched 21:2xZ on GPU 0 (15 GB free)
+with the author's published micro-batching, batch 1 × accum 8 (13 GB), same effective batch 8 → ~1.2 s/step, 10k
+steps ≈ 3.3 h. GPU 0 also serves the bench (base wrapper :8080) — compute is shared, both slow a little.
 Decisions to take at build (each is a knob, not a guess — record the choice):
 - instruction: keep the recorded strings (two of them) — the model sees our wording as the dataset wrote it;
   the bench client then sends the SAME string ("pick up the orange and place it on the plate" for the tray
