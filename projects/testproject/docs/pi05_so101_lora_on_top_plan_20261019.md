@@ -55,6 +55,24 @@ ROW 3 launched 20:42Z on GPU 1 (row-2 recipe, 10k steps, ckpt every 2k) → OOM 
 openpi job (continue_fruit_20k.py, 51 GB) had taken GPU 1 at the same minute. Relaunched 21:2xZ on GPU 0 (15 GB free)
 with the author's published micro-batching, batch 1 × accum 8 (13 GB), same effective batch 8 → ~1.2 s/step, 10k
 steps ≈ 3.3 h. GPU 0 also serves the bench (base wrapper :8080) — compute is shared, both slow a little.
+ROW 3 DONE 2026-10-25 00:20Z: 10k steps in 3 h 37 min, loss 0.040 → 0.011, 5 checkpoints (7.3 GB each). Open-loop
+(00:3xZ; arm-joint MAE ° / gripper MAE / open-close agreement):
+```text
+                      August probes (low-front cam, 302 fr)   September probes (OVERHEAD cam = the bench, 457 fr: 5 orange + 2 tomato)
+base                  5.81 / 8.71 / .70                        3.44 / 5.83 / .75
+row 1 25k (author)    2.67 / 2.01 / .87                        3.20 / 3.21 / .84
+row 2 7k (conserv.)   4.03 / 4.31 / .83                        3.35 / 3.67 / .81
+row 3 2k              4.67 / 4.94 / .81                        3.54 / 3.43 / .79
+row 3 4k              4.51 / 4.71 / .83                        3.02 / 2.99 / .80
+row 3 6k              4.24 / 4.42 / .84                        2.94 / 2.94 / .80
+row 3 8k              4.10 / 4.61 / .84                        3.04 / 3.37 / .79
+row 3 10k (final)     4.18 / 4.37 / .81                        2.84 / 3.06 / .78
+```
+Reading: on the camera the bench actually has, row 3 is the closest to our demonstrations (2.84° vs the base's 3.44°;
+gripper 3.1 vs 5.8) — a modest arm gain, a large gripper gain; the two earlier rows, which never saw that view, sit
+at the base's level there. The September demos are evidently easier to predict than the August ones for every
+model (base 3.4° vs 5.8°). Row 3's August numbers match row 2's (same recipe). Row-3 10k = the bench candidate on
+the overhead camera; its server starts on :8081 (GPU 0) when this queue ends. Isaac gate for row 3: pending a free GPU.
 Decisions to take at build (each is a knob, not a guess — record the choice):
 - instruction: keep the recorded strings (two of them) — the model sees our wording as the dataset wrote it;
   the bench client then sends the SAME string ("pick up the orange and place it on the plate" for the tray

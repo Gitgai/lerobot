@@ -1,0 +1,146 @@
+{
+ "episodes": [
+  2,
+  8,
+  13,
+  14,
+  16,
+  54,
+  56,
+  60,
+  75,
+  80
+ ],
+ "stride": 15,
+ "results": {
+  "base": {
+   "path": "/mnt/data4tb/huggingface-cache/models--dongyoonkim--so101-pi05-base/snapshots/56325bafcca9ec3155b8bfdf655be7df17e7f09f",
+   "n_probes": 302,
+   "mae_per_joint": {
+    "shoulder_pan": 6.460000038146973,
+    "shoulder_lift": 5.789999961853027,
+    "elbow_flex": 8.4399995803833,
+    "wrist_flex": 5.449999809265137,
+    "wrist_roll": 2.890000104904175,
+    "gripper": 8.710000038146973
+   },
+   "mae_arm_joints_mean": 5.809999942779541,
+   "mae_gripper": 8.710000038146973,
+   "gripper_open_close_agreement_at_step10": 0.702,
+   "secs": 42.4
+  },
+  "row1_25k": {
+   "path": "/mnt/data4tb/so101-lora-on-top-20261021/row1_author_lora_b8/checkpoints/025000/pretrained_model",
+   "n_probes": 302,
+   "mae_per_joint": {
+    "shoulder_pan": 1.659999966621399,
+    "shoulder_lift": 3.0199999809265137,
+    "elbow_flex": 3.9200000762939453,
+    "wrist_flex": 3.059999942779541,
+    "wrist_roll": 1.690000057220459,
+    "gripper": 2.009999990463257
+   },
+   "mae_arm_joints_mean": 2.6700000762939453,
+   "mae_gripper": 2.009999990463257,
+   "gripper_open_close_agreement_at_step10": 0.874,
+   "secs": 42.6
+  },
+  "row2_7k": {
+   "path": "/mnt/data4tb/so101-lora-on-top-20261021/row2_conservative_lora/checkpoints/007000/pretrained_model",
+   "n_probes": 302,
+   "mae_per_joint": {
+    "shoulder_pan": 2.5899999141693115,
+    "shoulder_lift": 4.309999942779541,
+    "elbow_flex": 6.130000114440918,
+    "wrist_flex": 4.619999885559082,
+    "wrist_roll": 2.4800000190734863,
+    "gripper": 4.309999942779541
+   },
+   "mae_arm_joints_mean": 4.03000020980835,
+   "mae_gripper": 4.309999942779541,
+   "gripper_open_close_agreement_at_step10": 0.828,
+   "secs": 42.3
+  },
+  "row3_002000": {
+   "path": "/mnt/data4tb/so101-lora-on-top-20261021/row3_all169_conservative/checkpoints/002000/pretrained_model",
+   "n_probes": 302,
+   "mae_per_joint": {
+    "shoulder_pan": 3.3399999141693115,
+    "shoulder_lift": 5.75,
+    "elbow_flex": 6.570000171661377,
+    "wrist_flex": 4.889999866485596,
+    "wrist_roll": 2.7799999713897705,
+    "gripper": 4.940000057220459
+   },
+   "mae_arm_joints_mean": 4.670000076293945,
+   "mae_gripper": 4.940000057220459,
+   "gripper_open_close_agreement_at_step10": 0.811,
+   "secs": 42.4
+  },
+  "row3_004000": {
+   "path": "/mnt/data4tb/so101-lora-on-top-20261021/row3_all169_conservative/checkpoints/004000/pretrained_model",
+   "n_probes": 302,
+   "mae_per_joint": {
+    "shoulder_pan": 3.259999990463257,
+    "shoulder_lift": 4.889999866485596,
+    "elbow_flex": 6.769999980926514,
+    "wrist_flex": 4.869999885559082,
+    "wrist_roll": 2.759999990463257,
+    "gripper": 4.710000038146973
+   },
+   "mae_arm_joints_mean": 4.510000228881836,
+   "mae_gripper": 4.710000038146973,
+   "gripper_open_close_agreement_at_step10": 0.825,
+   "secs": 42.4
+  },
+  "row3_006000": {
+   "path": "/mnt/data4tb/so101-lora-on-top-20261021/row3_all169_conservative/checkpoints/006000/pretrained_model",
+   "n_probes": 302,
+   "mae_per_joint": {
+    "shoulder_pan": 3.009999990463257,
+    "shoulder_lift": 4.659999847412109,
+    "elbow_flex": 6.179999828338623,
+    "wrist_flex": 4.78000020980835,
+    "wrist_roll": 2.569999933242798,
+    "gripper": 4.420000076293945
+   },
+   "mae_arm_joints_mean": 4.239999771118164,
+   "mae_gripper": 4.420000076293945,
+   "gripper_open_close_agreement_at_step10": 0.844,
+   "secs": 42.6
+  },
+  "row3_008000": {
+   "path": "/mnt/data4tb/so101-lora-on-top-20261021/row3_all169_conservative/checkpoints/008000/pretrained_model",
+   "n_probes": 302,
+   "mae_per_joint": {
+    "shoulder_pan": 2.6700000762939453,
+    "shoulder_lift": 4.590000152587891,
+    "elbow_flex": 6.320000171661377,
+    "wrist_flex": 4.699999809265137,
+    "wrist_roll": 2.25,
+    "gripper": 4.610000133514404
+   },
+   "mae_arm_joints_mean": 4.099999904632568,
+   "mae_gripper": 4.610000133514404,
+   "gripper_open_close_agreement_at_step10": 0.838,
+   "secs": 42.5
+  },
+  "row3_010000": {
+   "path": "/mnt/data4tb/so101-lora-on-top-20261021/row3_all169_conservative/checkpoints/010000/pretrained_model",
+   "n_probes": 302,
+   "mae_per_joint": {
+    "shoulder_pan": 2.75,
+    "shoulder_lift": 4.699999809265137,
+    "elbow_flex": 6.269999980926514,
+    "wrist_flex": 4.860000133514404,
+    "wrist_roll": 2.309999942779541,
+    "gripper": 4.369999885559082
+   },
+   "mae_arm_joints_mean": 4.179999828338623,
+   "mae_gripper": 4.369999885559082,
+   "gripper_open_close_agreement_at_step10": 0.808,
+   "secs": 42.5
+  }
+ },
+ "utc": "2026-10-25T00:29:07Z"
+}
