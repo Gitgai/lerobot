@@ -13,7 +13,7 @@ import argparse, json, sys, time, types, pathlib
 import numpy as np, pandas as pd, av, torch
 
 JOINTS = ["shoulder_pan", "shoulder_lift", "elbow_flex", "wrist_flex", "wrist_roll", "gripper"]
-DS = pathlib.Path("/home/kiran/lerobot_assets/datasets/orange89_plus_plate20")
+DS = pathlib.Path("/home/kiran/lerobot_assets/datasets/orange89_plus_plate20")   # overridden by --dataset
 
 
 def frames(cam, ep):
@@ -36,8 +36,10 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--ckpts", nargs="+", required=True, help="name=path ...")
     ap.add_argument("--episodes", default="2,8,13,14,16,54,56,60,75,80"); ap.add_argument("--stride", type=int, default=15)
-    ap.add_argument("--out", default="openloop_mae.json")
+    ap.add_argument("--out", default="openloop_mae.json"); ap.add_argument("--dataset", default=None, help="v2.1 dataset dir (default: the 109-episode merge)")
     a = ap.parse_args()
+    global DS
+    if a.dataset: DS = pathlib.Path(a.dataset)
     eps = [int(x) for x in a.episodes.split(",")]
     tasks = {int(json.loads(l)["task_index"]): json.loads(l)["task"] for l in (DS / "meta/tasks.jsonl").read_text().splitlines() if l.strip()}
     data = []
