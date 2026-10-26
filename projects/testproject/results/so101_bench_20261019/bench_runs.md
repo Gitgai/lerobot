@@ -268,6 +268,24 @@ DAY TOTAL (valid trials, tomato, overhead camera, same client, 45→75-chunk cap
 tray** (B1 and D2 clean grasp-carry-release; A1 at the rim and D4 by an unclear mechanism, operator to adjudicate)
 vs the public base **0 of 5**. Both models' misses are the same close-too-high/beside; fine-tune 3 re-approaches.
 
+### Fine-tune 3 ROW E — THE ORANGE (protocol fruit), 75-chunk cap, 5 placements — 3 of 5 SUCCESS
+Instruction "pick up the orange and place it on the plate" (trained string, 20 August plate demos + 20 September +
+30 recovery). Frames c05_call000001–000375, log bench_row3e_orange_20261026.jsonl, composites bench_row3e_orange_T1..T5.jpg.
+Scene notes: the operator moved the tray from the arm's right to its LEFT from trial 3 on; in trials 2 and 4 the
+orange was in the tray at chunk 1 and on the table by chunk 10 (placed late) — the arm had not engaged yet, so
+those trials are valid. Orange ≈ mandarin size: held at gripper 20–26 (tomato: 28–32).
+```text
+E1  reach c10, jaws on the orange c20 (g20), lift c40, over the tray c50, released, at rest by c60.      SUCCESS
+E2  late placement; orange between the jaws c20–75 (g25–48), never held.                                FAIL
+E3  reach c10, hold c20 (g25), in the tray by c30, arm hovered near the tray, open, to c75.             SUCCESS (25 chunks)
+E4  late placement; hold c30 (g26) and lift, then set it back down on the table to the right and        FAIL (grasp + lift,
+    stayed with it in the jaws, open, to c75; never carried to the tray.                                 no delivery)
+E5  reach c10, hold c20 (g26), carried left, in the tray by c30, arm back near rest, gripper drifting   SUCCESS
+    24 → 13 idle to c75.
+```
+With the protocol fruit: **3/5**, all three clean grasp-carry-release-return in 25–50 chunks; the two failures
+include one grasp+lift. Compare the public base on this bench with the orange: 0/11 (trials 6–16).
+
 Observations for the record: when fine-tune 3 holds the tomato the gripper reads 28–32 (the tomato is near the
 jaw limit — a smaller fruit would close further); its misses are the base's miss (too high / to the side) but it
 re-approaches instead of retrying in place; it starts late (15–30 chunks idle) in about half the trials.

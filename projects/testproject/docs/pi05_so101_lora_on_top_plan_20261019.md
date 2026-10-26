@@ -308,6 +308,23 @@ Decision: BOTH finals go to the bench, with the public base as the control row, 
 Disk: /mnt/data4tb/so101-lora-on-top-20261021 = 145 GB (row 1 94 incl. the stopped first launch, row 2 51); under the
 150 GB alert; nothing to delete without the operator (RED).
 
+### BENCH RESULTS 2026-10-26 (record: results/so101_bench_20261019/bench_runs.md, frames + composites in
+results/so101_lora_on_top_20261019/). Overhead front camera (the September training view), non-pipelined client,
+0.9–1.4 s per 20-step chunk, arm returned to start by the client between trials.
+```text
+model          object   cap     valid trials   in the tray                       notes
+public base    tomato   45      5              0                                  reaches, closes beside/above
+fine-tune 3    tomato   45→75   13             4 (2 clean; 2 to adjudicate)       6 void: tomato left in tray / 1 cam fault
+fine-tune 3    ORANGE   75      5              3 clean grasp-carry-release        + 1 grasp-and-lift without delivery
+public base    orange   45      11 (Oct 19–20) 0                                  trials 6–16 of the R3 record
+```
+Reading: on the protocol fruit the fine-tuned model completes the task 3 times in 5 where the base completed it
+0 times in 11. The sample is small (95% CI on 3/5 is roughly 19–88%); it is a direction, not a rate. Misses are
+the base's miss (close too high / beside); the fine-tune re-approaches and sometimes starts late (15–30 chunks).
+What made the difference, in order of evidence: (1) our own 169 episodes on this arm, (2) the 60 September
+episodes that match the bench camera, (3) the gentle recipe that kept the base's competence. Not separable
+from today's data; rows 1/2 on the bench would separate (1)+(3) from (2).
+
 ## Bench after the gate
 Same R3 protocol, same client, same 20-placement grid, same fruit as the base's trials (so the two 20-trial
 sets compare), instruction = the dataset's own string. The base's 20 are the control row. Reading: the
