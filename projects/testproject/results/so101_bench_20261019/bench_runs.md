@@ -217,6 +217,21 @@ Row: 1 grasp-carry-release of 5 (vs 0/5 base, same placements, same session). Tw
 behaviour the base showed in trials 7–8 and 13–16; our demos are ~25–30 s long so the cap leaves no slack.
 NEXT ROW: --max-chunks 75 (50 s) so a late start can finish; 5 more placements; then the base again at 75 for symmetry.
 
+### Fine-tune 3 ROW B (75-chunk cap) — 1 SUCCESS, 4 VOID
+Frames c02_call000001–000375 in bench_frames_row3_010000/, log bench_row3b_tomato_20261026.jsonl, composites
+bench_row3b_tomato_T1..T5.jpg.
+```text
+B1  tomato front-left; idle 15 chunks, reach, jaws around the tomato c20–30 (gripper 28–32 = holding it), lift and
+    swing (pan −67) c30–45, lowered INTO the tray and released c50, back at rest by c52, held to c75.
+    ★ SUCCESS — tomato inside the tray, arm at rest. The clearest completion on this bench.
+B2–B5  VOID: the tomato was NOT re-placed between trials (it stayed in the tray from B1). The model saw a completed
+    scene and stayed at rest for all 75 chunks each time, gripper drifting 41 → 21. Not failures — an informative
+    "task already done → do nothing" — but not trials either. (A yellow fruit sat at the table's top-left edge
+    throughout; not part of the task, the model ignored it.)
+```
+Fine-tune 3 across VALID trials today: 2 grasp-carry-release in 6 (row A T1 at the tray rim, operator to confirm;
+row B T1 clearly inside) vs the base 0 in 5. 4 placements still owed for row B.
+
 ## Running tally
 | trial | utc | result | chunks | wall s | median RTT s | note |
 |---|---|---|---|---|---|---|
