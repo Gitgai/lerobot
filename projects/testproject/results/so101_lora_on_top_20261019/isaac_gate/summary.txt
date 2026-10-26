@@ -13,3 +13,4 @@ results_row2_007000_cap200_corpusA.jsonl: 2/5
 results_lora_025000_cap200_corpusA.jsonl: 0/5
 === GATE DONE lora_025000_cap200 2026-10-22T07:48:22Z
 === LONGCAP QUEUE DONE 2026-10-22T07:48:22Z
+=== ROW3 EVAL QUEUE DONE 2026-10-25T00:41:31Z; row-3 server on :8081 (GPU 0)
