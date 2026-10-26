@@ -123,8 +123,12 @@ R5   "LoRA on top": freeze the public checkpoint, add rank-16  running  GO 2026-
                                                                         lost Isaac (0/5 even at 200 s); row 2 (frozen emb/
                                                                         norms, lr 2e-5, 7k) fits half as well (4.0°) and keeps
                                                                         it (2/5 full at 200 s, 8–9 of 15 oranges at 100 s).
-                                                                        NEXT: bench, low-front camera: base → row-2 7k →
-                                                                        row-1 25k, 5 placements each (operator at the arm)
+                                                                        2026-10-24: 60 Sept episodes (OVERHEAD cam) found →
+                                                                        row 3 = all 169, best on the bench camera (2.84°).
+                                                                        ★ BENCH 2026-10-26 (tomato, overhead cam): base 0/5;
+                                                                        row 3 1/5 = FIRST grasp-carry-release on this bench
+                                                                        (2 more cut by the 45-chunk cap mid-approach).
+                                                                        NEXT: 5 more at --max-chunks 75, then base at 75
 R3   "bench trials": 20 real attempts in Pune, NON-PIPELINED  running  **0/13 counted** (citrus ×2, orange ×11) + 3 off-protocol
      client, frames recorded server-side                                 onion FAILs (2026-10-19/20): reach 16/16, object at
      record: results/so101_bench_20261019/bench_runs.md                  the jaws 12/16, a close that held it 0/16, 3 empty

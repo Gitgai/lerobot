@@ -174,6 +174,49 @@ Reading: no change in behaviour class across a third placement region (far-front
 11–16). The policy reaches the object region reliably from every placement and never completes a grasp.
 Composites: montages/ep{11..16}orange_composite.jpg.
 
+## 2026-10-26 — Fine-tune comparison day: CONTROL ROW (public base, tomato, OVERHEAD camera) — 0/5
+Object: a tomato (operator's; red, round, fits the jaws). Off-protocol object → these rows compare MODELS, they do
+not count toward the 20. Front camera: overhead, where it has been since trial 6 (= the September training view).
+Instruction for the base: "Grab oranges and place into plate." (corpus wording, as before). 5 placements, left-front
+of the base, 45 chunks each, median RTT 1.05–1.36 s. AI90 had rebooted 2026-10-25; servers recreated.
+Frames: c01_call000001–000225 in frames/ (the recorder restarted with the server; the Oct-19 dry-run c01 frames were
+overwritten — 16 files, no result depended on them). Log bench_ctrl_tomato_20261026.jsonl.
+```text
+trial  off-rest  closes (floor)                        wrist camera
+1      chunk 17  26–27 (11), 32–33 (6), 43 (4)          tomato between the jaws c26–38; every close on its side or above
+2      chunk 9   15–16 (7), 30–34 (21), 45 (12)         c15 beside; c30–33 half-closes with the tomato under the right jaw
+3      chunk 6   15–16 (7), 22–24 (21), 32–34 (15)      between the jaws c15–32; closes above it (floor 7 then 15–21)
+4      chunk 7   16–17 (5), 33 (23), 41 (8)             c16–17 shut on air beside it; c41 above it
+5      chunk 8   15 (16), 34 (21), 40 (22)              beside at c15; only partial closes after
+```
+Result: 0/5, tomato nudged in 3 trials, never lifted. Identical failure family to the 16 orange/onion trials.
+Montages: montages/ctrl_tomato_T1..T5.jpg.
+
+## 2026-10-26 — FINE-TUNE 3 ROW (row3_all169_conservative ckpt 010000, tomato, OVERHEAD camera, :8081 on GPU 1)
+Instruction: "pick up the tomato and place it on the plate" (a trained string; 10 tomato demos in the 169). Same 5
+placements as the control row, same client settings. Frames: results/so101_lora_on_top_20261019/bench_frames_row3_010000/
+(c01_call000001–000225), log bench_row3_tomato_20261026.jsonl, composites bench_row3_tomato_T1..T5.jpg there.
+```text
+trial  what happened (frames + joint log)                                                              result
+1      rest → tomato in 8 chunks; jaws around it c14, gripper stopped at 28–30 = CLOSED ON THE TOMATO;   GRASP + CARRY +
+       lifted and swung (pan → −60) over the tray by c20; opened to 48 over the tray at c24 (release);    RELEASE over the
+       back at rest by c31 and held there. Front c26–45: tomato at the tray's near edge/rim.              tray — operator
+       FIRST GRASP-AND-CARRY ON THIS BENCH (17 base trials: 0).                                           to confirm final
+                                                                                                          spot (in/on rim)
+2      tomato placed near the base; arm reached c8, PUSHED it toward the base (front c8–14), jaws on      FAIL (push, close
+       its side c14–24, full close to 4 at c27–28 beside it, stayed low                                   beside)
+3      tomato left-front close in; arm made a small reach and then held at rest with the gripper wide     FAIL (did not
+       open (41→60) for the whole episode; wrist camera saw only table                                    engage)
+4      tomato left-front; IDLE at rest for 32 chunks, then began the reach at c38; cap at c45 with the    FAIL (cap hit
+       jaws just arriving at the tomato                                                                   mid-approach)
+5      tomato left; idle ~26 chunks, reach from c32, gripper closing to 17 with the tomato entering the   FAIL (cap hit
+       jaws at c30–45; cap hit                                                                            mid-grasp)
+```
+Row: 1 grasp-carry-release of 5 (vs 0/5 base, same placements, same session). Two of the four failures are the
+45-chunk cap (30 s of motion) cutting an in-progress approach after an idle start — the idle start is the same
+behaviour the base showed in trials 7–8 and 13–16; our demos are ~25–30 s long so the cap leaves no slack.
+NEXT ROW: --max-chunks 75 (50 s) so a late start can finish; 5 more placements; then the base again at 75 for symmetry.
+
 ## Running tally
 | trial | utc | result | chunks | wall s | median RTT s | note |
 |---|---|---|---|---|---|---|
