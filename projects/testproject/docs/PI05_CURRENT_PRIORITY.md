@@ -126,8 +126,8 @@ R5   "LoRA on top": freeze the public checkpoint, add rank-16  running  GO 2026-
                                                                         2026-10-24: 60 Sept episodes (OVERHEAD cam) found →
                                                                         row 3 = all 169, best on the bench camera (2.84°).
                                                                         ★ BENCH 2026-10-26 (tomato, overhead cam): base 0/5;
-                                                                        row 3 2/9 valid = FIRST grasp-carry-release here
-                                                                        (1 inside the tray; 5 void trials: tomato left in tray).
+                                                                        row 3 4/13 valid in the tray (2 clean grasp-carry-release)
+                                                                        (base 0/5; 6 void trials: tomato left in tray, 1 cam fault).
                                                                         NEXT: base at 75 chunks for symmetry; orange when available
 R3   "bench trials": 20 real attempts in Pune, NON-PIPELINED  running  **0/13 counted** (citrus ×2, orange ×11) + 3 off-protocol
      client, frames recorded server-side                                 onion FAILs (2026-10-19/20): reach 16/16, object at

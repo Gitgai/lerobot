@@ -246,6 +246,28 @@ C4  tomato placed close to the base; around it c20–60 (gripper 25–43), closi
 ```
 DAY TOTAL, valid trials, tomato, overhead camera, same client: fine-tune 3 **2 of 9** grasp-carry-release
 (both with the tomato placed front-left of the base at a middle distance); public base **0 of 5**.
+### Fine-tune 3 ROW D (75-chunk cap, 5 placements) — 2 in the tray of 4 valid, 1 void (camera fault)
+Frames c04_call000001–000323, log bench_row3d_tomato_20261026.jsonl, composites bench_row3d_tomato_T1..T4.jpg.
+```text
+D1  reached c10 (gripper 14 beside it), then hovered with the tomato between the open jaws (35–54) c20–75,
+    never closed on it.                                                                                   FAIL
+D2  reached c10, tomato between the jaws c20–50 (gripper 20–44), lifted and carried c50–60 (tomato large in
+    the wrist view with the tray edge below, gripper 28), released INTO the tray, back at rest by c75.
+    (An operator hand enters the frame at c75, after the release.)                                        SUCCESS
+D3  tomato was on the tray at c1 and on the table by c10 (moved during the first chunks); reached, tomato
+    between the jaws c20–50, closes to 12 / 19 on its top, open at c60, no hold.                           FAIL
+D4  tomato near the base; reached c10–20 (jaws around it, gripper 41), by c30 the arm is over the tray and the
+    tomato is IN it; arm then idled in front of the tray, gripper 48–52, to c75. The gripper never read below
+    41, so this was a loose carry or a push into the tray, not a firm grasp.                              IN TRAY
+                                                                                                           (mechanism
+                                                                                                           unclear)
+D5  VOID — the wrist camera read failed at chunk 23 and the client exited (arm left at [12,12,28,31,12,44];
+    returned to start with --home-to). bench_client.py now retries a failed read and reopens the device once.
+```
+DAY TOTAL (valid trials, tomato, overhead camera, same client, 45→75-chunk cap): fine-tune 3 **4 of 13 in the
+tray** (B1 and D2 clean grasp-carry-release; A1 at the rim and D4 by an unclear mechanism, operator to adjudicate)
+vs the public base **0 of 5**. Both models' misses are the same close-too-high/beside; fine-tune 3 re-approaches.
+
 Observations for the record: when fine-tune 3 holds the tomato the gripper reads 28–32 (the tomato is near the
 jaw limit — a smaller fruit would close further); its misses are the base's miss (too high / to the side) but it
 re-approaches instead of retrying in place; it starts late (15–30 chunks idle) in about half the trials.

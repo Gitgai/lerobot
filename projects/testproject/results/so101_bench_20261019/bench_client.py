@@ -55,8 +55,8 @@ class Cam:
     """OpenCV device index/path or an MJPEG/HTTP URL; returns HxWx3 RGB uint8 at 640x480."""
     def __init__(self, src, w=640, h=480):
         import cv2
-        self.cv2 = cv2
-        self.cap = cv2.VideoCapture(int(src) if str(src).isdigit() else src)
+        self.cv2 = cv2; self.src = int(src) if str(src).isdigit() else src
+        self.cap = cv2.VideoCapture(self.src)
         if str(src).isdigit():
             self.cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG")); self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, w); self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, h); self.cap.set(cv2.CAP_PROP_FPS, 30)
         if not self.cap.isOpened(): raise RuntimeError(f"camera {src} did not open")
@@ -75,7 +75,14 @@ class Cam:
     def read(self):
         for _ in range(3): self.cap.grab()                      # drop stale frames
         ok, bgr = self.cap.read()
-        if not ok: raise RuntimeError("camera read failed")
+        if not ok:                                               # 2026-10-26: one USB hiccup killed a trial mid-episode; retry, then reopen once
+            for attempt in range(5):
+                time.sleep(0.2); ok, bgr = self.cap.read()
+                if ok: break
+            if not ok:
+                self.cap.release(); self.cap = self.cv2.VideoCapture(self.src)
+                time.sleep(0.5); ok, bgr = self.cap.read()
+            if not ok: raise RuntimeError("camera read failed")
         if bgr.shape[1] != self.w or bgr.shape[0] != self.h: bgr = self.cv2.resize(bgr, (self.w, self.h))
         return np.ascontiguousarray(bgr[:, :, ::-1])
 
