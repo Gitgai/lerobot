@@ -232,6 +232,24 @@ B2–B5  VOID: the tomato was NOT re-placed between trials (it stayed in the tra
 Fine-tune 3 across VALID trials today: 2 grasp-carry-release in 6 (row A T1 at the tray rim, operator to confirm;
 row B T1 clearly inside) vs the base 0 in 5. 4 placements still owed for row B.
 
+### Fine-tune 3 ROW C (75-chunk cap, 4 placements) — 0 of 3 valid, 1 void
+Frames c03_call000001–000300, log bench_row3c_tomato_20261026.jsonl, composites bench_row3c_tomato_T1..T4.jpg.
+```text
+C1  VOID — tomato still in the tray at the start (live frame checked at call 57); moved to the table late in the
+    episode, the arm began a reach at ~c60 and hit the cap.
+C2  reached c10, tomato between the jaws c20 (close to 10 = on its top/side, no hold), three more approaches with
+    the tomato large in the wrist view (gripper 22–37), full close to 1 on air at c60, retreated open.   FAIL
+C3  reached c10, tomato between the jaws c30–40 (gripper 31 → 18, no hold), pushed it, circled, ended extended
+    with the wrist rolled 84° and the gripper open.                                                      FAIL
+C4  tomato placed close to the base; around it c20–60 (gripper 25–43), closing to 14 with the tomato between the
+    jaws at c75 — cap hit mid-grasp.                                                                      FAIL (cap)
+```
+DAY TOTAL, valid trials, tomato, overhead camera, same client: fine-tune 3 **2 of 9** grasp-carry-release
+(both with the tomato placed front-left of the base at a middle distance); public base **0 of 5**.
+Observations for the record: when fine-tune 3 holds the tomato the gripper reads 28–32 (the tomato is near the
+jaw limit — a smaller fruit would close further); its misses are the base's miss (too high / to the side) but it
+re-approaches instead of retrying in place; it starts late (15–30 chunks idle) in about half the trials.
+
 ## Running tally
 | trial | utc | result | chunks | wall s | median RTT s | note |
 |---|---|---|---|---|---|---|
