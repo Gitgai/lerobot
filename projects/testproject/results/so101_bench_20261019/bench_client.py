@@ -100,6 +100,10 @@ def main():
     ap.add_argument("--home-to", default="", help="six comma-separated joint targets (LeRobot units): move there slowly (1.5 deg/step, 3 grip/step at --fps) and exit; no cameras, no policy")
     ap.add_argument("--return-start", action="store_true", help="after each episode move slowly back to the pose the episode started from")
     ap.add_argument("--pause-between", type=float, default=5.0, help="--auto only: seconds to wait before each episode (time for the operator to re-place the object)")
+    ap.add_argument("--reset-between", action="store_true", help="after each episode run the scripted auto-reset (bench_reset.py): orange out of the tray onto the next grid slot")
+    ap.add_argument("--waypoints", default="reset/reset_waypoints.json", help="calibrated waypoint file for the auto-reset")
+    ap.add_argument("--slots", default="", help="slot order for the resets, e.g. 5,0,8,2,...; default = all slots shuffled with seed 0, repeated")
+    ap.add_argument("--reset-dry-run", action="store_true", help="auto-reset with the gripper held open and no close: moves only, nothing touched")
     a = ap.parse_args()
     if a.no_robot: a.dry_run = True
 
@@ -139,6 +143,18 @@ def main():
     front, wrist = Cam(a.front), Cam(a.wrist)
     act = grpc_client(a.server, a.actions_per_chunk)
     out = open(a.out, "a"); stop = {"flag": False}
+    resetter = None; slot_order = []
+    if a.reset_between or a.reset_dry_run:
+        import random
+        from bench_reset import Reset
+        resetter = Reset(robot, front, a.waypoints, log=lambda rec: (out.write(json.dumps(rec) + "\n"), out.flush()), dry_run=a.reset_dry_run)
+        n_slots = len(resetter.W["slots"])
+        slot_order = [int(s) for s in a.slots.split(",")] if a.slots else random.Random(0).sample(range(n_slots), n_slots)
+        print(f"[reset] enabled{' (DRY RUN)' if a.reset_dry_run else ''}, waypoints {a.waypoints}, slot order {slot_order}", flush=True)
+        if a.reset_dry_run:
+            resetter.run(slot_order[0]); print("[reset] dry run complete", flush=True)
+            if robot is not None: robot.disconnect()
+            return
 
     def key_watch():
         try:
@@ -180,6 +196,12 @@ def main():
             res = "d" if a.dry_run else ("unscored" if a.auto else input("result? [s]uccess / [f]ail / [a]bort: ").strip().lower()[:1])
             out.write(json.dumps({"ep": ep + 1, "result": res, "chunks": n_chunks, "wall_s": round(time.time() - t_ep, 1), "latency_median_s": round(float(np.median(lat)), 3) if lat else None, "start_state": q_start.round(1).tolist(), "end_state": joints_now().round(1).tolist(), "task": a.task, "utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}) + "\n"); out.flush()
             if a.return_start and not a.dry_run: move_to(q_start)
+            if resetter is not None and not a.dry_run and ep + 1 < a.episodes:
+                try:
+                    rec = resetter.run(slot_order[ep % len(slot_order)]); print(f"[reset] ok slot {rec['slot']} held {rec['held_gripper']} {rec['wall_s']} s", flush=True)
+                except Exception as e:   # ResetFailed or anything else: stop the row, never guess on
+                    out.write(json.dumps({"event": "reset_failed", "after_ep": ep + 1, "error": str(e), "utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}) + "\n"); out.flush()
+                    print(f"[reset] FAILED after episode {ep+1}: {e} — row stopped; place by hand and restart", flush=True); break
             if res == "a": break
     finally:
         stop["flag"] = True

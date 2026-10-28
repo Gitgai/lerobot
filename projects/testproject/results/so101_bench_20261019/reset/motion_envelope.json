@@ -1,0 +1,28 @@
+{
+ "joints": [
+  "shoulder_pan",
+  "shoulder_lift",
+  "elbow_flex",
+  "wrist_flex",
+  "wrist_roll",
+  "gripper"
+ ],
+ "min": [
+  -111.4,
+  -104.9,
+  -92.0,
+  -99.6,
+  -75.3,
+  1.6
+ ],
+ "max": [
+  84.0,
+  82.9,
+  97.3,
+  103.1,
+  90.9,
+  88.2
+ ],
+ "margin_deg": 5,
+ "source": "all169_aug_low_sep_overhead observation.state, 2026-10-28"
+}

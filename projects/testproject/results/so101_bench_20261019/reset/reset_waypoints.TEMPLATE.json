@@ -1,0 +1,32 @@
+{
+  "_comment": "FILL AT THE CALIBRATION SESSION (plan: docs/so101_bench_auto_reset_plan_20261028.md). Copy to reset_waypoints.json. Joint order: shoulder_pan, shoulder_lift, elbow_flex, wrist_flex, wrist_roll, gripper (LeRobot units). px = overhead-camera pixels at 640x480. Slot px come from reset/demo_placement_area.json (grid_overhead_px.cells); their joint-space hover/place are jogged and read at the bench.",
+  "date": "YYYY-MM-DD",
+  "tray_photo": "reset/tray_calib.jpg",
+  "px_per_cm": 8.0,
+  "start": [0, -99, 97, 75, 2, 41],
+  "tray": {
+    "px_centre": [540, 190],
+    "px_radius": 85,
+    "hover": [null, null, null, null, null, 45],
+    "descend": {
+      "centre": [null, null, null, null, null, 45],
+      "near":   [null, null, null, null, null, 45],
+      "far":    [null, null, null, null, null, 45],
+      "left":   [null, null, null, null, null, 45],
+      "right":  [null, null, null, null, null, 45]
+    }
+  },
+  "slots": [
+    {"slot": 0, "px": [46.8, 296.4], "hover": null, "place": null},
+    {"slot": 1, "px": [71.4, 163.6], "hover": null, "place": null},
+    {"slot": 2, "px": [156.0, 311.5], "hover": null, "place": null},
+    {"slot": 3, "px": [34.0, 459.0], "hover": null, "place": null},
+    {"slot": 4, "px": [37.0, 409.0], "hover": null, "place": null},
+    {"slot": 5, "px": [98.4, 388.0], "hover": null, "place": null},
+    {"slot": 6, "px": [210.7, 423.4], "hover": null, "place": null},
+    {"slot": 7, "px": [243.8, 371.8], "hover": null, "place": null},
+    {"slot": 8, "px": [376.8, 386.2], "hover": null, "place": null},
+    {"slot": 9, "px": [505.8, 385.5], "hover": null, "place": null}
+  ],
+  "envelope": {"min": [-111.4, -104.9, -92.0, -99.6, -75.3, 1.6], "max": [84.0, 82.9, 97.3, 103.1, 90.9, 88.2], "margin_deg": 5}
+}

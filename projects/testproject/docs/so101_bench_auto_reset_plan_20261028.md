@@ -86,6 +86,19 @@ excluded                         slots inside the tray's footprint; slots closer
 The demonstration-area extraction is a 20-minute script over the recordings (detector + camera-to-table map from
 the calibration photo) and its output (a scatter plot + the 10 cells) goes into the plan before V1 runs.
 
+DONE 2026-10-28 (scripts/demo_placement_area.py → results/so101_bench_20261019/reset/demo_placement_area.{json,jpg}):
+the orange was found in the first overhead frame of 55 of the 60 September episodes; the tray stood on the arm's
+RIGHT (the bench layout) in 44 of them, on the left in 16 (the recovery set moved it). Using the 37 demos with the
+tray on the right and the orange on the table, 10 k-means slots (overhead pixels, 640×480; demos per slot):
+```text
+S0 (47,296) 4   S1 (71,164) 5   S2 (156,312) 1   S3 (34,459) 1   S4 (37,409) 4
+S5 (98,388) 8   S6 (211,423) 5  S7 (244,372) 2   S8 (377,386) 3  S9 (506,386) 4
+```
+= the left half of the table and the front edge, 5–25 cm from the base, which is also where Sunday's hand placements
+were. The joint-space hover/place pose for each slot is recorded at the calibration session. Motion envelope from
+the 169 training episodes (reset/motion_envelope.json): pan −111…84, lift −105…83, elbow −92…97, wrist_flex
+−100…103, wrist_roll −75…91, gripper 2…88 (+5° margin).
+
 ## Integration with the client
 `bench_client.py --reset-between --waypoints reset_waypoints.json --slots 0..9x2`:
 - after each episode and the return-to-start, run R0–R9; log one JSON line per reset (slot, gripper readings at R3,
@@ -129,6 +142,23 @@ the arm brushing the tray                       → R9 checks the tray outline e
 moves landing 3–5° short                        → R1b correcting move before every contact leg
 placements that test the untaught table         → MAIN row on the demonstration area; WIDE row separate (operator's decision)
 nobody watching unattended resets               → motion envelope from the training data; frames saved; detector overrulable
+```
+
+## Build record
+```text
+2026-10-28  GO from the operator. Built, not yet run on the arm:
+            results/so101_bench_20261019/bench_reset.py        R0–R9 as a class (look / move-with-correction /
+                                                               close-on-stall / verify / envelope guard); raises
+                                                               ResetFailed, the client stops the row on it
+            bench_client.py --reset-between --waypoints --slots --reset-dry-run   (resets logged as "event": "reset"
+                                                               lines in the row's .jsonl; never counted as chunks)
+            reset/reset_waypoints.TEMPLATE.json                 slots' pixel targets + envelope filled; joint-space
+                                                               hover/place/descend poses are null until calibration
+            reset/demo_placement_area.{json,jpg}, reset/motion_envelope.json
+            copied to the Acer (~/bench_client.py, ~/bench_reset.py). Compiles; no live test yet.
+NEXT        calibration session at the bench (operator + me, ~30 min): tape the tray, photo, jog to the tray
+            centre/near/far/left/right at floor height and the hover above, then to each of the 10 slots (hover +
+            place) — record with --home-to-style moves and the joint readback; write reset_waypoints.json; then V1.
 ```
 
 ## Cost
