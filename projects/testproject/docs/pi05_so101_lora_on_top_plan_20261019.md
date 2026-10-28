@@ -312,7 +312,12 @@ Disk: /mnt/data4tb/so101-lora-on-top-20261021 = 145 GB (row 1 94 incl. the stopp
 Episode 9 (seed 108): timeout with 2 of 3 oranges placed and the arm at rest — the base also failed seed 108.
 Successes took 29–112 s of simulated time (the base's mean was 119 s). So the 169-episode conservative fine-tune
 kept the base's Isaac competence (base 38/50 = 76 % at 100 s; row 3 9/10 at 200 s, 7 of the 9 inside 100 s) AND
-learned our rig (bench orange 3/5, base 0/11). The plate-wording row (seeds 300–309) follows.
+learned our rig (bench orange 3/5, base 0/11).
+Plate-wording row ("pick up the orange and place it on the plate", seeds 300–309, 200 s cap): **8/10**. Misses: seed 300
+timed out with 1 placed; seed 308 stopped at rest with 2 of 3 placed (same pattern as seed 108 above: the model
+decides it is done one orange early). Our wording says "the orange", singular, and the model still cleared all
+three in 8 of 10 — the instruction channel works with our strings. Gate CLOSED 2026-10-28 12:49Z: row 3 passes
+on both wordings (9/10, 8/10). The base's own control was 76 % at 100 s.
 
 ### BENCH RESULTS 2026-10-26 (record: results/so101_bench_20261019/bench_runs.md, frames + composites in
 results/so101_lora_on_top_20261019/). Overhead front camera (the September training view), non-pipelined client,

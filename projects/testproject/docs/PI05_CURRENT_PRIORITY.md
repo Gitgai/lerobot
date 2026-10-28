@@ -126,7 +126,7 @@ R5   "LoRA on top": freeze the public checkpoint, add rank-16  running  GO 2026-
                                                                         2026-10-24: 60 Sept episodes (OVERHEAD cam) found →
                                                                         row 3 = all 169, best on the bench camera (2.84°).
                                                                         ★ BENCH 2026-10-26 (tomato, overhead cam): base 0/5;
-                                                                        row 3: tomato 4/13; ★ ORANGE 3/5 clean; Isaac 9/10 (kept the base skill)
+                                                                        row 3: tomato 4/13; ★ ORANGE 3/5 clean; Isaac 9/10 + 8/10 (kept the base skill)
                                                                         (base: tomato 0/5, orange 0/11). First working policy on this bench.
                                                                         NEXT: auto-reset (plan so101_bench_auto_reset_plan_20261028.md,
                                                                         proposed) → 20-trial orange rows (ft3, base) → Isaac gate
