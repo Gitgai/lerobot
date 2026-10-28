@@ -1,6 +1,6 @@
 # Bench auto-reset: the arm puts the orange back on the table between trials (scripted, not the policy)
 
-Date: 2026-10-28. Status: **PROPOSED — awaiting go.** Operator's idea (2026-10-28): "pick the orange from the plate and
+Date: 2026-10-28. Status: **PROPOSED, reviewed and amended 2026-10-28 (gaps section) — awaiting go to build.** Operator's idea (2026-10-28): "pick the orange from the plate and
 put it back on the table at a different location so we can perform the next trial."
 Parent: R3/R5 bench protocol (pi05_so101_real_base_audit_plan_20261019.md, pi05_so101_lora_on_top_plan_20261019.md);
 record: results/so101_bench_20261019/bench_runs.md. Client: results/so101_bench_20261019/bench_client.py.
@@ -37,19 +37,28 @@ Sequence (every leg is a clamped move, ≤ 1.5°/step on arm joints and ≤ 3/st
 same speed as the existing return-to-start):
 ```text
 R0  preconditions   arm at start pose (read it); tray in its taped position; gripper open (≥ 40)
-R1  above tray      [T_pan, T_lift_high, T_elbow_high, T_wflex, T_wroll, 45]   — hover ~8 cm above the tray centre
-R2  descend         same pan/roll, lift/elbow lowered to the tray floor height minus the orange radius
-R3  close           gripper → 10 over 1 s; read back; HOLD if 16 ≤ reading ≤ 30 (orange between the jaws),
-                    MISS if < 12 (shut on air) or > 34 (blocked)
-R4  retry on MISS   open, lift 3 cm, shift pan ±8° toward the tray's far side (two alternates), repeat R2–R3 once
-                    each; if still MISS → open, go to start, print RESET FAILED, stop the row (operator places)
+R0b LOOK FIRST      grab a front frame; detect the tray outline and the orange centroid (the position-free
+                    detector from the September recovery work); map the orange's pixel offset from the tray
+                    centre to one of 5 calibrated descent poses (centre, near, far, left, right of the tray centre).
+                    No orange found in the tray → RESET FAILED (nothing to reset; the operator places).
+R1  above tray      hover ~8 cm above the chosen descent pose, gripper 45
+R1b correct         re-read joints; if any joint is > 2° off the waypoint, one short correcting move (the
+                    return-to-start was seen to stop 3–5° short on 2026-10-19/20 — a height error at R2)
+R2  descend         to the chosen descent pose (tray floor height minus the orange radius); R1b again
+R3  close           close in 2-unit steps at 30 Hz and STOP when the reading stops changing for 5 steps (never
+                    drive to a fixed target — a held orange stops the jaws at 16–26, driving on bruises it);
+                    HOLD if the stall reading is 16–30, MISS if < 12 (shut on air) or > 34 (blocked)
+R4  retry on MISS   open, lift 3 cm, LOOK again (R0b: the miss may have moved the orange), descend to the new
+                    pose; at most 2 retries; still MISS → open, go to start, RESET FAILED, stop the row
 R5  lift            lift/elbow back to the R1 hover with the gripper held
 R6  carry           pan to the chosen table slot (see grid), hover height
 R7  lower + open    descend to table height + orange radius, gripper → 45, dwell 0.5 s
 R8  retreat         lift 5 cm, return to start pose; re-read: gripper ≥ 40, joints within 2° of start
-R9  verify          grab a front frame; the orange must NOT be inside the tray's pixel box (the detector from the
-                    September recovery work, position-free plate oval + centroid test) and MUST be on the table
-                    region; on failure → RESET FAILED, stop the row
+R9  verify          grab a front frame: (a) the orange centroid is within ±3 cm (in calibrated pixels) of the chosen
+                    slot — not merely "outside the tray", a drop during the carry must be caught; (b) the tray
+                    outline is within 1 cm of its calibrated position (a brushed tray invalidates every waypoint);
+                    (c) the arm is at start. Any failure → RESET FAILED, stop the row. Before/after frames of every
+                    reset are saved; the operator can overrule the detector from them.
 ```
 Calibration session (one-off, with the operator at the bench, ~30 min): tape the tray outline on the table; jog
 the arm to the tray centre at the floor and record T_*; jog to each of the grid slots and record S_i; store them in
@@ -57,15 +66,25 @@ results/so101_bench_20261019/reset_waypoints.json with the date and a photo. Re-
 the camera moves (the client refuses to run a reset if the waypoint file's tray photo differs from the live
 frame by more than a threshold — a cheap guard against the 2026-10-19 "camera moved" repeat).
 
-## Placement grid (where the orange goes back)
-Pre-registered, 10 slots in the arm's reachable fan, left-front to right-front, two depths; the row visits them in
-a fixed shuffled order written into the log so every model sees the same 20 placements (10 slots × 2 rounds):
+## Placement grid (where the orange goes back) — DECIDED 2026-10-28 with the operator
+Where the orange is placed decides how hard the test is, so it is set on purpose, not by the script's reach.
 ```text
-depth near (~12 cm from the base plate):  pan −40, −20, 0, +20, +40
-depth far  (~22 cm):                       pan −35, −17, 0, +17, +35
+MAIN row (the 20-trial number)   placements drawn from WHERE OUR DEMONSTRATIONS PUT THE ORANGE: the start-of-episode
+                                 orange position is read from the overhead frame of each of the 60 September
+                                 episodes (same camera as the bench) and the front frame of the 109 August ones;
+                                 the 2-D distribution is binned into 10 cells covering its central 90 %; each cell
+                                 = one slot (its centre, in calibrated joint space). 10 slots × 2 rounds = 20, in a
+                                 fixed shuffled order written to the log — the SAME 20 for every model
+                                 (fine-tune 3, base, rows 1/2). Measures: how well the model does the task it
+                                 was taught. Comparable with the hand-placed rows of 2026-10-26, which sat in
+                                 this area.
+WIDE row (separate, labelled)    10 slots across the whole reachable fan (two depths, pan −40…+40), run only after
+                                 the main row and reported on its own line. Measures: generalisation beyond the
+                                 taught area. Never pooled with the main row.
+excluded                         slots inside the tray's footprint; slots closer than 6 cm to the base plate
 ```
-Slots inside the tray's footprint are excluded automatically from the calibration. The slot list is the same for
-every model row; the base's trials 6–16 were hand-placed and stay as they are.
+The demonstration-area extraction is a 20-minute script over the recordings (detector + camera-to-table map from
+the calibration photo) and its output (a scatter plot + the 10 cells) goes into the plan before V1 runs.
 
 ## Integration with the client
 `bench_client.py --reset-between --waypoints reset_waypoints.json --slots 0..9x2`:
@@ -83,6 +102,11 @@ every model row; the base's trials 6–16 were hand-placed and stay as they are.
 - the tray must not move: taped position + photo check; the camera must not move: same check
 - the orange only (tomato/onion rows stay hand-placed: different diameters change R2's height)
 - first live resets with the operator at the switch, as for every new arm behaviour on this bench
+- MOTION ENVELOPE: every reset waypoint and every interpolated step must lie inside the per-joint min/max seen in
+  the 169 training episodes (plus 5°); a leg that would leave it is refused before it starts. This is the guard for
+  unattended rows, where ESC on the Acer terminal is the only other stop besides the power switch.
+- lighting: the overhead frame's brightness drifted across 2026-10-26 (frame mean 96 → 162); the verify
+  detector's colour thresholds are checked on both ends of that range before V1, and every verify saves its frame
 - no change to the policy server, the protocol fruit, the instruction, or the chunk cap — the reset is bench
   plumbing, not part of the trial
 
@@ -96,8 +120,19 @@ V4  one 5-trial fine-tune-3 orange row with --reset-between  trial results agree
 ```
 Then the 20-trial rows: fine-tune 3 first, then the base (both at 75 chunks), then rows 1/2 if wanted.
 
+## Gaps found on review (2026-10-28) and how the plan now covers them
+```text
+blind grasp vs an orange anywhere in the tray   → R0b looks first and picks the descent pose from the orange's position
+squeezing a soft fruit to a fixed target        → R3 stops on stall, never drives past the hold reading
+a drop during the carry reported as OK          → R9 requires the orange within ±3 cm of the slot
+the arm brushing the tray                       → R9 checks the tray outline every reset; taped + photo at calibration
+moves landing 3–5° short                        → R1b correcting move before every contact leg
+placements that test the untaught table         → MAIN row on the demonstration area; WIDE row separate (operator's decision)
+nobody watching unattended resets               → motion envelope from the training data; frames saved; detector overrulable
+```
+
 ## Cost
-~1 h to write (sequence + verify + log), 30 min calibration at the bench, 20 min V1–V3. Saves a person-minute per
+~2 h to write (sequence + look/verify + envelope + log) + 20 min for the demonstration-area extraction, 30 min calibration at the bench, 20 min V1–V3. Saves a person-minute per
 trial afterwards and removes the void-trial failure mode.
 
 ## Outputs
