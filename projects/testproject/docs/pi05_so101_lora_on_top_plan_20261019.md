@@ -308,6 +308,12 @@ Decision: BOTH finals go to the bench, with the public base as the control row, 
 Disk: /mnt/data4tb/so101-lora-on-top-20261021 = 145 GB (row 1 94 incl. the stopped first launch, row 2 51); under the
 150 GB alert; nothing to delete without the operator (RED).
 
+### Row 3 Isaac gate (2026-10-28, 200 s cap, seeds 100–109, corpus wording): **9/10 full successes**
+Episode 9 (seed 108): timeout with 2 of 3 oranges placed and the arm at rest — the base also failed seed 108.
+Successes took 29–112 s of simulated time (the base's mean was 119 s). So the 169-episode conservative fine-tune
+kept the base's Isaac competence (base 38/50 = 76 % at 100 s; row 3 9/10 at 200 s, 7 of the 9 inside 100 s) AND
+learned our rig (bench orange 3/5, base 0/11). The plate-wording row (seeds 300–309) follows.
+
 ### BENCH RESULTS 2026-10-26 (record: results/so101_bench_20261019/bench_runs.md, frames + composites in
 results/so101_lora_on_top_20261019/). Overhead front camera (the September training view), non-pipelined client,
 0.9–1.4 s per 20-step chunk, arm returned to start by the client between trials.
