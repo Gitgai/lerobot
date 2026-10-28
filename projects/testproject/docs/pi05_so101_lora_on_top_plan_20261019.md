@@ -332,8 +332,12 @@ public base    orange   45      11 (Oct 19–20) 0                              
 fine-tune 3    ORANGE   75      5 (rows F, G)  0                                  4 of 5 placed under the gripper near the
                                                                                   base — a spot no September demo starts from
 fine-tune 3    tomato   75      5 (row H)      1 clean grasp-carry-release        3 near misses: jaws closed 2–4 cm short
+fine-tune 3    tomato   75      5 (row I)      0                                  1 grasp-carry released outside the rim;
+                                                                                  1 slip; 1 placed under the gripper
 ```
-Running totals for fine-tune 3 on this bench: orange 3/10, tomato 5/18. Today's orange zero traces to placement
+Running totals for fine-tune 3 on this bench: orange 3/10, tomato 5/23 (Sunday 4/13, today 1/10). Today's
+tomato rows are below Sunday's on the same checkpoint; the misses are the known close-short / close-beside
+ones, and the day's fruit placements were less consistent than Sunday's five fixed spots. Today's orange zero traces to placement
 (frames compared against the 60 September starts; bench_runs.md "WHY 0/5 TODAY"); the fix is the demonstration-
 area slot grid the auto-reset plan already specifies. Also today: the frame recorder overwrote part of Sunday's
 raw frames after a server restart (DISK_LEDGER §11; fixed).

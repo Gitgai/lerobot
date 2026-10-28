@@ -400,12 +400,32 @@ Pattern of the row: reach 5/5, fruit between the jaws 4/5, but the close came 2�
 times in a row at the same left-mid spot; the one success was the same spot with the tray closer to the arm.
 With Sunday's 4/13 this makes fine-tune 3 on tomato 5/18 valid trials; orange 3/10.
 
+### ROW I — TOMATO, 5 more trials, same settings — 0/5 (one grasp-and-carry without delivery)
+Log bench_row3i_tomato_20261028.jsonl, frames c08 calls 1–375, composites bench_row3i_tomato_T1..T5.jpg. Tray LEFT
+of the arm throughout. Median RTT 1.26–1.36 s.
+```text
+I1  tomato left mid-table; between the jaws c25, closed to 19 → SLIPPED out, swung empty to the tray and back,   FAIL (slip)
+    hovered beside it open c50–75, nudging it.
+I2  tomato left mid-table; came down BESIDE it, closed to 5 on air at c30 with the fruit against the outside of  FAIL
+    a jaw, then pulled back toward the base with it wedged, wrist_roll to 129 (training max 91).
+I3  tomato RIGHT of the arm; reach c16, GRASP c34, lifted and carried to the tray, RELEASED at c48 just          FAIL (grasp +
+    outside the rim onto the table; went back, re-grasped it (27) at the cap at the tray's edge. No delivery.    carry, no delivery)
+I4  tomato left, close to the arm; between the open jaws c20, swept to the tray WITHOUT closing; operator's      FAIL (operator
+    hand moved the tomato at c40 (after engagement — flagged); hovered over it open to c75.                       intervened c40)
+I5  tomato directly UNDER the gripper near the base; idle 12 chunks, came down on it, between the jaws c30–75    FAIL
+    (24→33), never lifted, pushed it about.
+```
+Row pattern: reach 5/5, fruit between the jaws 5/5, a close that held it 1/5 (I3), delivery 0/5. Misses are the
+old ones — close short / beside, and one slip — plus one placement under the gripper (I5), the spot that beat the
+orange earlier today. Fine-tune 3 on tomato is now 5/23 valid trials (Sunday 4/13, today 1/10); orange 3/10.
+
 ## Session tally 2026-10-28
 | row | fruit | trials counted | in the tray | void / aborted |
 |---|---|---|---|---|
 | F | orange | 4 | 0 | attempt 1 (camera), F5 aborted |
 | G | orange | 1 | 0 | wrong-wording launch |
 | H | tomato | 5 | 1 | one countdown stop |
+| I | tomato | 5 | 0 | I4 operator moved the fruit at c40 |
 
 Pending (unchanged): the auto-reset calibration (tray_centre/tray_hover recorded; 10 slots not yet), then the
 20-trial rows on the demonstration-area slots. Set aside by the operator: tomato adjudications A1/D4.

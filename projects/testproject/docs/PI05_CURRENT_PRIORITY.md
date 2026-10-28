@@ -129,7 +129,8 @@ R5   "LoRA on top": freeze the public checkpoint, add rank-16  running  GO 2026-
                                                                         row 3: tomato 4/13; ★ ORANGE 3/5 clean; Isaac 9/10 + 8/10 (kept the base skill)
                                                                         (base: tomato 0/5, orange 0/11). First working policy on this bench.
                                                                         2026-10-28 session 2: orange 0/5 (placed under the gripper, off the
-                                                                        demo area), tomato 1/5 (3 near misses). Totals: orange 3/10, tomato 5/18.
+                                                                        demo area), tomato 1/10 (near misses, one carry released outside the
+                                                                        rim). Totals: orange 3/10, tomato 5/23.
                                                                         NEXT: auto-reset calibration (tray poses done, 10 slots pending) →
                                                                         20-trial orange rows on the demo-area slots (ft3, base) → Isaac gate
 R3   "bench trials": 20 real attempts in Pune, NON-PIPELINED  running  **0/13 counted** (citrus ×2, orange ×11) + 3 off-protocol
