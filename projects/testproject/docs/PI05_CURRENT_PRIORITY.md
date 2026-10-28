@@ -1,6 +1,6 @@
 # π0.5 lane — Current Priority and Status
 
-Last updated: 2026-10-20
+Last updated: 2026-10-28
 
 **This file is the ROUTER and the TRACKER: what is open, in what order, and
 where each step stands. It is NOT a log.** Detail, gates and pre-registered
@@ -128,7 +128,8 @@ R5   "LoRA on top": freeze the public checkpoint, add rank-16  running  GO 2026-
                                                                         ★ BENCH 2026-10-26 (tomato, overhead cam): base 0/5;
                                                                         row 3: tomato 4/13; ★ ORANGE 3/5 clean successes
                                                                         (base: tomato 0/5, orange 0/11). First working policy on this bench.
-                                                                        NEXT: 20-trial orange row for a CI; base at 75; Isaac gate
+                                                                        NEXT: auto-reset (plan so101_bench_auto_reset_plan_20261028.md,
+                                                                        proposed) → 20-trial orange rows (ft3, base) → Isaac gate
 R3   "bench trials": 20 real attempts in Pune, NON-PIPELINED  running  **0/13 counted** (citrus ×2, orange ×11) + 3 off-protocol
      client, frames recorded server-side                                 onion FAILs (2026-10-19/20): reach 16/16, object at
      record: results/so101_bench_20261019/bench_runs.md                  the jaws 12/16, a close that held it 0/16, 3 empty

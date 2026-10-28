@@ -322,3 +322,8 @@ Pattern over 16: reach 16/16 · object between or touching the jaws at some poin
 lift motions 3 (all empty, trials 3, 4, 6) · placement on the tray 0. Close-too-high: 5, 6, 7, 8, 9, 10, 14; close-beside:
 1, 3, 4, 8, 9, 10, 11, 12, 13, 14, 16; over-reach past the object: 6, 10; idle-at-rest start ≥ 12 chunks: 7, 8, 13, 14, 16;
 "finished" posture (rose and hovered open with nothing held): 12, 15. Three placement regions tried (far-front, mid, close-in).
+
+## Next (2026-10-28): scripted auto-reset between trials — plan docs/so101_bench_auto_reset_plan_20261028.md
+The arm itself takes the orange out of the tray and places it on a pre-registered grid slot between trials
+(blind joint-space routine with a gripper-reading check and a camera verify; the policy is not used). Needs a
+30-min calibration at the bench (tape the tray, record waypoints). Then 20-trial rows per model.
