@@ -116,6 +116,12 @@ def main():
             # per-connection counter for logging; the RECORDING index never resets (a reset made later runs
             # overwrite earlier runs' frames — found 2026-10-19), and each connection gets its own prefix
             self._n = 0
+            if not hasattr(self, "_conn") and RECORD_DIR and os.path.isdir(RECORD_DIR):
+                # 2026-10-28: the counter lived only in the process, so a server restart began again at c01 and the new
+                # run's frames overwrote the earlier run's (lost: first calls of the 2026-10-26 tomato rows c01–c04).
+                # Continue from the highest prefix already on disk instead.
+                existing = [int(f[1:3]) for f in os.listdir(RECORD_DIR) if f[:1] == "c" and f[1:3].isdigit() and "_call" in f]
+                self._conn = max(existing, default=0)
             self._conn = getattr(self, "_conn", 0) + 1
             self._rec = getattr(self, "_rec", 0)
             return services_pb2.Empty()

@@ -182,3 +182,14 @@ every command (it writes under /tmp/claude-1000); Read/Write under /home and sys
 short commands still run through the Monitor tool. Not touched by this lane (DYNUS files). Fix = operator
 clears stale scratch or raises the quota. Rule R6: this lane's scripts keep TMPDIR=/home/kiran/tmp; a /tmp
 usage above ~20 GiB is an alert condition for the health watchdog on the next long run.
+
+## 11. INCIDENT 2026-10-28 — bench frame recorder overwrote part of Sunday's frames (unintended overwrite)
+Where: results/so101_lora_on_top_20261019/bench_frames_row3_010000/ (repo, untracked JPEGs). Cause: the policy
+server (scripts/so101_base_policy_server.py) numbered recording prefixes per connection from an in-process
+counter; the unit was restarted 2026-10-28 06:44 and 08:49 EDT, the counter began at c01 again and today's
+bench rows wrote c01_call000001… over Sunday's files of the same name. Lost: c01 calls 1–48, c02 calls 1–348,
+c03 calls 1–65, c04 calls 1–75 (front + wrist JPEGs of the 2026-10-26 tomato rows' first trials). Kept: Sunday's
+composites (bench_row3*_T*.jpg), joint logs (*.jsonl), calls.csv rows, and the orange row E frames (c05). Not
+recoverable. Fix (same day, 15:17 EDT): the server continues from the highest prefix already on disk. Rule R7:
+a recorder that names files from a counter must seed the counter from the directory, not from the process.
+The same fault lost 16 dry-run frames on 2026-10-26 (bench_runs.md, "recorder restarted with the server").

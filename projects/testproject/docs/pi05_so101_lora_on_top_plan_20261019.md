@@ -328,7 +328,15 @@ public base    tomato   45      5              0                                
 fine-tune 3    tomato   45→75   13             4 (2 clean; 2 to adjudicate)       6 void: tomato left in tray / 1 cam fault
 fine-tune 3    ORANGE   75      5              3 clean grasp-carry-release        + 1 grasp-and-lift without delivery
 public base    orange   45      11 (Oct 19–20) 0                                  trials 6–16 of the R3 record
+--- 2026-10-28, session 2 (same checkpoint; camera devices re-enumerated, handled) ---
+fine-tune 3    ORANGE   75      5 (rows F, G)  0                                  4 of 5 placed under the gripper near the
+                                                                                  base — a spot no September demo starts from
+fine-tune 3    tomato   75      5 (row H)      1 clean grasp-carry-release        3 near misses: jaws closed 2–4 cm short
 ```
+Running totals for fine-tune 3 on this bench: orange 3/10, tomato 5/18. Today's orange zero traces to placement
+(frames compared against the 60 September starts; bench_runs.md "WHY 0/5 TODAY"); the fix is the demonstration-
+area slot grid the auto-reset plan already specifies. Also today: the frame recorder overwrote part of Sunday's
+raw frames after a server restart (DISK_LEDGER §11; fixed).
 Reading: on the protocol fruit the fine-tuned model completes the task 3 times in 5 where the base completed it
 0 times in 11. The sample is small (95% CI on 3/5 is roughly 19–88%); it is a direction, not a rate. Misses are
 the base's miss (close too high / beside); the fine-tune re-approaches and sometimes starts late (15–30 chunks).

@@ -327,3 +327,85 @@ lift motions 3 (all empty, trials 3, 4, 6) · placement on the tray 0. Close-too
 The arm itself takes the orange out of the tray and places it on a pre-registered grid slot between trials
 (blind joint-space routine with a gripper-reading check and a camera verify; the policy is not used). Needs a
 30-min calibration at the bench (tape the tray, record waypoints). Then 20-trial rows per model.
+
+## 2026-10-28 — FINE-TUNE 3, SESSION 2 (row3_all169_conservative ckpt 010000, :8081 on GPU 1, OVERHEAD camera)
+Same checkpoint and serving script as 2026-10-26 (checkpoint files unchanged since 10-24; the server process was
+restarted 06:44 and 08:49 EDT and again 15:17 EDT for the recorder fix below). Client: bench_client.py with the
+2026-10-28 camera hardening (read retries, reopen, reuse of the last good frame — never triggered today), 75-chunk
+cap, 30 s auto pause, return-to-start. CAMERA DEVICES: the Acer re-enumerated its USB cameras — C270 (overhead
+front) = /dev/video4, AK (wrist) = /dev/video6, the reverse of Sunday; confirmed from /dev/v4l/by-id. Median RTT
+1.0–1.4 s (Sunday 1.0–1.2 s). Logs/composites in results/so101_lora_on_top_20261019/.
+
+FRAME-RECORDER INCIDENT: the server's per-connection prefix counter (c01, c02, …) lived only in the process, so
+after the morning restarts today's connections were numbered from c01 again and their JPEGs overwrote Sunday's
+files of the same name in bench_frames_row3_010000/: c01 calls 1–48 (Sunday tomato row, trial 1), c02 calls 1–348
+(Sunday row B), c03 calls 1–65 (row C), c04 calls 1–75 (row D). Sunday's composites, joint logs and calls.csv rows
+are intact; the orange row E frames (c05) are intact. Fixed 15:17 EDT: the server now continues from the highest
+prefix on disk (scripts/so101_base_policy_server.py); today's tomato row is c07. Logged in DISK_LEDGER §11.
+
+### ROW F — orange, 10 planned, instruction "pick up the orange and place it on the plate" — 0/4, 1 aborted
+Attempt 1 died at chunk 48 of trial 1 (AK wrist camera read failure; the arm was homed with --home-to) → VOID,
+files kept as *_attempt1_camfault*; frames c01 calls 1–48. Attempt 2: log bench_row3f_orange_20261028.jsonl,
+frames c02 calls 1–347, composites bench_row3f_orange_T1..T4.jpg (+T5_aborted).
+```text
+F1  orange centre, close to the base (px 271,316); reach, then swept far RIGHT (pan +50, wrist_roll 97),      FAIL
+    gripper shut on air (1) at c75.
+F2  orange not yet on the table at c1 (placed late); arm hovered in front of the base c30–75, gripper 34→26;  FAIL
+    no grasp (min 11 at c14, on air).
+F3  orange left-mid (the one demo-like spot today; the colour detector misfired on it); arm pushed down beside  FAIL
+    it (grip 4 at c39), then swept right (pan +49).
+F4  orange left (px 179,206); hovered near the base, rose, gripper 30 at the end; orange hidden under the      FAIL
+    arm in the last frame, not moved to the tray.
+F5  ABORTED at chunk 47 on the operator's word ("stop trial and send arm to home"); not counted.               —
+```
+### ROW G — orange, relaunch — 0/1, then stopped
+First launch VOID: my error, the client's default instruction "Grab oranges and place into plate." was sent
+instead of the trained string; killed during trial 1 (frames c03 calls 1–64, bench_row3g_orange_20261028_void_wrongtask.jsonl).
+Relaunch with the right wording: log bench_row3g_orange_20261028.jsonl, frames c04 calls 1–75, composite bench_row3g_orange_T1.jpg.
+```text
+G1  orange directly under the gripper, close to the base (px 315,329); stretched far forward and low (wrist   FAIL
+    flex 103), came down beside the orange on the left, gripper open 40–52 throughout.
+```
+Operator stopped the row before trial 2.
+
+WHY 0/5 TODAY AFTER 3/5 ON SUNDAY (checked against the frames): same weights, same script, same instruction, same
+orange (same stem mark, ~65 px), same camera views and brightness, no stale frames. What differed: PLACEMENT. In
+4 of today's 5 orange trials the orange sat directly in front of / under the gripper, close to the arm base. The
+60 September demos (the bench camera's training data) never start there — their oranges sit left mid-table, right
+of the tray, or in the tray (scatter: scratch sept_orange_scatter.jpg; grid why_sunday_vs_today.jpg sent to the
+operator). Sunday's three successes (E1, E3, E5) were in those demo spots. F3, the one demo-like placement today,
+also failed, so placement is not the whole story and five trials are few. Secondary: RTT up ~15 %.
+→ For the main rows the orange goes on the demonstration-area slots (auto-reset plan, MAIN grid) — this is the
+same conclusion the plan already reached, now with a failure mode to show for it.
+
+### ROW H — TOMATO, 5 trials, instruction "pick up the tomato and place it on the plate" — 1/5
+Log bench_row3h_tomato_20261028.jsonl, frames c07 calls 1–375, composites bench_row3h_tomato_T1..T5.jpg. One
+void launch before it (stopped in the countdown, no motion). The operator moved the tray during the row: right
+of the arm for H1–H3, up-centre near the arm for H4, LEFT of the arm for H5. Orange removed from the table after H1.
+```text
+H1  tomato left mid-table; reach c10, tomato between the open jaws in the wrist view by c20, jaws CLOSED TO    FAIL (near miss)
+    12 just short of it (c30), reopened, wrist rolled to 105, tomato pushed left. A yellow orange sat at the
+    table's bottom-left edge throughout (removed after this trial).
+H2  tomato left mid-table; same: between the jaws c20–30, closed to 4 in FRONT of the fruit, reopened,         FAIL (near miss)
+    swept right.
+H3  tomato left mid-table; same: squarely between the jaws c20, closed to 3 just in front of it c26, gave up,  FAIL (near miss)
+    swept away.
+H4  tomato left mid-table, tray moved up-centre; reach, GRASP c22 (held at ~23), carried left, RELEASED IN THE  SUCCESS
+    TRAY by c40, arm at rest c40–62. The operator took the tomato out onto the table at ~c65 and the arm
+    re-engaged it in the last chunks (same situation as Sunday's late placements; result taken at completion).
+H5  tomato placed RIGHT of the arm, tray LEFT; arm went to the tomato's side by c12 and hovered beside it open   FAIL
+    (43–50) to c50, nudging it; closed to 23 on it at the cap (c75), no lift.
+```
+Pattern of the row: reach 5/5, fruit between the jaws 4/5, but the close came 2–4 cm short of the fruit three
+times in a row at the same left-mid spot; the one success was the same spot with the tray closer to the arm.
+With Sunday's 4/13 this makes fine-tune 3 on tomato 5/18 valid trials; orange 3/10.
+
+## Session tally 2026-10-28
+| row | fruit | trials counted | in the tray | void / aborted |
+|---|---|---|---|---|
+| F | orange | 4 | 0 | attempt 1 (camera), F5 aborted |
+| G | orange | 1 | 0 | wrong-wording launch |
+| H | tomato | 5 | 1 | one countdown stop |
+
+Pending (unchanged): the auto-reset calibration (tray_centre/tray_hover recorded; 10 slots not yet), then the
+20-trial rows on the demonstration-area slots. Set aside by the operator: tomato adjudications A1/D4.

@@ -80,11 +80,19 @@ class Cam:
                 time.sleep(0.2); ok, bgr = self.cap.read()
                 if ok: break
             if not ok:
-                self.cap.release(); self.cap = self.cv2.VideoCapture(self.src)
+                self.cap.release(); time.sleep(1.0); self.cap = self.cv2.VideoCapture(self.src)
+                if True:
+                    self.cap.set(self.cv2.CAP_PROP_FOURCC, self.cv2.VideoWriter_fourcc(*"MJPG")); self.cap.set(self.cv2.CAP_PROP_FRAME_WIDTH, self.w); self.cap.set(self.cv2.CAP_PROP_FRAME_HEIGHT, self.h)
                 time.sleep(0.5); ok, bgr = self.cap.read()
-            if not ok: raise RuntimeError("camera read failed")
-        if bgr.shape[1] != self.w or bgr.shape[0] != self.h: bgr = self.cv2.resize(bgr, (self.w, self.h))
-        return np.ascontiguousarray(bgr[:, :, ::-1])
+            if not ok:
+                # 2026-10-28: second mid-trial camera dropout in two sessions (AK wrist cam). Reusing the last good frame for one
+                # chunk is harmless (one stale 20-step plan); crashing mid-reach is not. Logged so the trial record shows it.
+                if getattr(self, "last", None) is not None:
+                    self.stale = getattr(self, "stale", 0) + 1; print(f"[cam {self.src}] READ FAILED, reusing last frame (stale #{self.stale})", flush=True)
+                    return self.last
+                raise RuntimeError(f"camera {self.src} read failed and no previous frame")
+        rgb = np.ascontiguousarray((bgr if bgr.shape[1] == self.w and bgr.shape[0] == self.h else self.cv2.resize(bgr, (self.w, self.h)))[:, :, ::-1])
+        self.last = rgb; return rgb
 
 
 def main():
