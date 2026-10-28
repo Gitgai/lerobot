@@ -1,0 +1,452 @@
+{
+ "date": "2026-10-28",
+ "derived_from": "slots: September demos (joint space, 3 nearest by September pixel; grasp = open->closed transition away from rest); tray hover: Sunday releases; tray descend: UNVERIFIED estimate; slot verify pixels: self-recorded at the first successful place (null until then)",
+ "px_per_cm": 8.0,
+ "start": [
+  0,
+  -99,
+  97,
+  75,
+  2,
+  41
+ ],
+ "tray": {
+  "px_centre": [
+   518.9,
+   200.0
+  ],
+  "px_radius": 80.0,
+  "hover": [
+   -61.9,
+   -7.0,
+   33.9,
+   60.0,
+   -13.1,
+   45.0
+  ],
+  "descend": {
+   "centre": [
+    -61.9,
+    21.0,
+    -0.2,
+    57.1,
+    -13.1,
+    45.0
+   ],
+   "left": [
+    -69.9,
+    21.0,
+    -0.2,
+    57.1,
+    -13.1,
+    45.0
+   ],
+   "right": [
+    -53.9,
+    21.0,
+    -0.2,
+    57.1,
+    -13.1,
+    45.0
+   ],
+   "near": [
+    -61.9,
+    15.0,
+    5.8,
+    57.1,
+    -13.1,
+    45.0
+   ],
+   "far": [
+    -61.9,
+    27.0,
+    -6.2,
+    57.1,
+    -13.1,
+    45.0
+   ]
+  }
+ },
+ "slots": [
+  {
+   "slot": 0,
+   "px": null,
+   "px_september": [
+    46.8,
+    296.4
+   ],
+   "hover": [
+    49.6,
+    22.5,
+    36.8,
+    50.1,
+    -4.4,
+    45.0
+   ],
+   "place": [
+    49.9,
+    22.5,
+    36.9,
+    49.2,
+    -4.4,
+    45.0
+   ],
+   "n_demos": 3,
+   "max_joint_std_deg": 55.7,
+   "donor_px_dist": [
+    15,
+    96,
+    110
+   ],
+   "sources": [
+    "new34",
+    "reco4",
+    "new31"
+   ]
+  },
+  {
+   "slot": 1,
+   "px": null,
+   "px_september": [
+    71.4,
+    163.6
+   ],
+   "hover": [
+    49.6,
+    22.5,
+    36.8,
+    50.1,
+    -4.4,
+    45.0
+   ],
+   "place": [
+    49.9,
+    22.5,
+    36.9,
+    49.2,
+    -4.4,
+    45.0
+   ],
+   "n_demos": 3,
+   "max_joint_std_deg": 55.7,
+   "donor_px_dist": [
+    75,
+    142,
+    245
+   ],
+   "sources": [
+    "reco4",
+    "new34",
+    "new31"
+   ]
+  },
+  {
+   "slot": 2,
+   "px": null,
+   "px_september": [
+    156.0,
+    311.5
+   ],
+   "hover": [
+    49.6,
+    9.3,
+    18.9,
+    50.1,
+    -9.6,
+    45.0
+   ],
+   "place": [
+    49.9,
+    9.3,
+    18.9,
+    49.2,
+    -9.4,
+    45.0
+   ],
+   "n_demos": 3,
+   "max_joint_std_deg": 35.3,
+   "donor_px_dist": [
+    95,
+    96,
+    125
+   ],
+   "sources": [
+    "new319",
+    "reco4",
+    "new34"
+   ]
+  },
+  {
+   "slot": 3,
+   "px": null,
+   "px_september": [
+    34.0,
+    459.0
+   ],
+   "hover": [
+    26.8,
+    30.5,
+    36.8,
+    -48.4,
+    -4.4,
+    45.0
+   ],
+   "place": [
+    26.9,
+    30.5,
+    36.9,
+    -48.4,
+    -4.4,
+    45.0
+   ],
+   "n_demos": 3,
+   "max_joint_std_deg": 48.1,
+   "donor_px_dist": [
+    37,
+    56,
+    105
+   ],
+   "sources": [
+    "new311",
+    "new31",
+    "new318"
+   ]
+  },
+  {
+   "slot": 4,
+   "px": null,
+   "px_september": [
+    37.0,
+    409.0
+   ],
+   "hover": [
+    26.8,
+    30.5,
+    36.8,
+    -48.4,
+    -4.4,
+    45.0
+   ],
+   "place": [
+    26.9,
+    30.5,
+    36.9,
+    -48.4,
+    -4.4,
+    45.0
+   ],
+   "n_demos": 3,
+   "max_joint_std_deg": 48.1,
+   "donor_px_dist": [
+    12,
+    15,
+    105
+   ],
+   "sources": [
+    "new31",
+    "new311",
+    "new318"
+   ]
+  },
+  {
+   "slot": 5,
+   "px": null,
+   "px_september": [
+    98.4,
+    388.0
+   ],
+   "hover": [
+    26.8,
+    30.5,
+    36.8,
+    -48.4,
+    -4.4,
+    45.0
+   ],
+   "place": [
+    26.9,
+    30.5,
+    36.9,
+    -48.4,
+    -4.4,
+    45.0
+   ],
+   "n_demos": 3,
+   "max_joint_std_deg": 48.1,
+   "donor_px_dist": [
+    65,
+    74,
+    77
+   ],
+   "sources": [
+    "new318",
+    "new31",
+    "new311"
+   ]
+  },
+  {
+   "slot": 6,
+   "px": null,
+   "px_september": [
+    210.7,
+    423.4
+   ],
+   "hover": [
+    12.6,
+    17.1,
+    11.7,
+    47.3,
+    -17.0,
+    45.0
+   ],
+   "place": [
+    12.7,
+    17.1,
+    11.7,
+    47.5,
+    -16.7,
+    45.0
+   ],
+   "n_demos": 3,
+   "max_joint_std_deg": 30.8,
+   "donor_px_dist": [
+    30,
+    31,
+    75
+   ],
+   "sources": [
+    "new36",
+    "new319",
+    "new318"
+   ]
+  },
+  {
+   "slot": 7,
+   "px": null,
+   "px_september": [
+    243.8,
+    371.8
+   ],
+   "hover": [
+    12.6,
+    17.1,
+    11.7,
+    47.3,
+    -17.0,
+    45.0
+   ],
+   "place": [
+    12.7,
+    17.1,
+    11.7,
+    47.5,
+    -16.7,
+    45.0
+   ],
+   "n_demos": 3,
+   "max_joint_std_deg": 30.8,
+   "donor_px_dist": [
+    45,
+    63,
+    126
+   ],
+   "sources": [
+    "new319",
+    "new36",
+    "new318"
+   ]
+  },
+  {
+   "slot": 8,
+   "px": null,
+   "px_september": [
+    376.8,
+    386.2
+   ],
+   "hover": [
+    16.0,
+    33.7,
+    15.4,
+    57.9,
+    1.0,
+    45.0
+   ],
+   "place": [
+    16.1,
+    33.7,
+    15.4,
+    57.1,
+    1.1,
+    45.0
+   ],
+   "n_demos": 3,
+   "max_joint_std_deg": 69.9,
+   "donor_px_dist": [
+    123,
+    125,
+    147
+   ],
+   "sources": [
+    "new315",
+    "reco7",
+    "new36"
+   ]
+  },
+  {
+   "slot": 9,
+   "px": null,
+   "px_september": [
+    505.8,
+    385.5
+   ],
+   "hover": [
+    34.4,
+    22.5,
+    15.4,
+    31.0,
+    1.0,
+    45.0
+   ],
+   "place": [
+    34.5,
+    23.6,
+    15.4,
+    30.5,
+    1.1,
+    45.0
+   ],
+   "n_demos": 3,
+   "max_joint_std_deg": 59.6,
+   "donor_px_dist": [
+    29,
+    53,
+    213
+   ],
+   "sources": [
+    "new315",
+    "reco7",
+    "reco2"
+   ]
+  }
+ ],
+ "envelope": {
+  "min": [
+   -111.4,
+   -104.9,
+   -92.0,
+   -99.6,
+   -75.3,
+   1.6
+  ],
+  "max": [
+   84.0,
+   82.9,
+   97.3,
+   103.1,
+   90.9,
+   88.2
+  ],
+  "margin_deg": 5
+ },
+ "status": "UNVERIFIED DRAFT 2026-10-28 \u2014 derived from data; slot poses have 30-70 deg donor spread and must be re-recorded at the bench before any live reset; do not run --reset-between on this file"
+}

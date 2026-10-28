@@ -168,3 +168,22 @@ trial afterwards and removes the void-trial failure mode.
 ## Outputs
 results/so101_bench_20261019/reset_waypoints.json (+ tray photo), reset events inside the row's .jsonl, a
 reset_log.md with V1–V4 and any RESET FAILED cases, and the 20-trial rows in bench_runs.md.
+
+## Attempt to derive the waypoints from existing data instead of a calibration (2026-10-28, operator's request)
+scripts/derive_reset_waypoints.py; outputs reset/reset_waypoints.json (marked UNVERIFIED DRAFT), reset_waypoints_report.txt,
+bench_grasp_samples.json. What the data CAN and CANNOT give:
+```text
+CAN     tray hover in today's layout: median of Sunday's 3 releases = [-62, -7, 34, 60, -13] (pan/lift/elbow/wflex/wroll)
+        coarse slot directions (pan 5–50, lift 9–34) from the 12 September tray-right demos with a clean open→closed grasp
+        the motion envelope; the 10 slot pixel targets (September camera)
+CANNOT  centimetre-accurate grasp poses per slot: the 3 nearest donors per slot sit 30–250 px apart and their joint poses
+        differ by 30–70° (human teleop uses the redundant wrist freely; S3–S5 even came out with wrist_flex −48°);
+        hover == place in the demos (the human was already at the grasp 1 s before closing) → no approach-from-above pose;
+        a September→bench pixel map: the September camera was closer (~0.7×) and the automatic anchor matching between
+        bench holds and September grasps was inconsistent (fitted scale 0.46, rotation −42° → rejected);
+        the tray DESCEND pose: no episode has the gripper around an orange INSIDE the tray in today's layout — the
+        estimate in the file is hover + a table-grasp reach and is unverified (tray floor height, rim clearance)
+```
+Conclusion: existing data shortens the calibration but does not replace it. What remains is ~10 minutes at the bench,
+no hand-moving: I drive the arm from the terminal in 2–3 cm steps to each slot and to the tray centre with the orange
+placed there, the operator says "ok / lower / left…", and the pose is read back — 11 poses. Then V1 (dry run).

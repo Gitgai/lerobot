@@ -1,0 +1,14 @@
+September demos with an open->closed grasp away from rest: 19, tray on the right: 12 (slot donors)
+grasp pose spread over all right-tray donors (std per joint): [31.0, 20.0, 31.0, 52.0, 21.0]
+  S0 place=[50.0, 23.0, 37.0, 49.0, -4.0] hover=[50.0, 23.0, 37.0, 50.0, -4.0] joint-sd 56  donors ['new34', 'reco4', 'new31'] at [15, 96, 110] px
+  S1 place=[50.0, 23.0, 37.0, 49.0, -4.0] hover=[50.0, 23.0, 37.0, 50.0, -4.0] joint-sd 56  donors ['reco4', 'new34', 'new31'] at [75, 142, 245] px
+  S2 place=[50.0, 9.0, 19.0, 49.0, -9.0] hover=[50.0, 9.0, 19.0, 50.0, -10.0] joint-sd 35  donors ['new319', 'reco4', 'new34'] at [95, 96, 125] px
+  S3 place=[27.0, 31.0, 37.0, -48.0, -4.0] hover=[27.0, 31.0, 37.0, -48.0, -4.0] joint-sd 48  donors ['new311', 'new31', 'new318'] at [37, 56, 105] px
+  S4 place=[27.0, 31.0, 37.0, -48.0, -4.0] hover=[27.0, 31.0, 37.0, -48.0, -4.0] joint-sd 48  donors ['new31', 'new311', 'new318'] at [12, 15, 105] px
+  S5 place=[27.0, 31.0, 37.0, -48.0, -4.0] hover=[27.0, 31.0, 37.0, -48.0, -4.0] joint-sd 48  donors ['new318', 'new31', 'new311'] at [65, 74, 77] px
+  S6 place=[13.0, 17.0, 12.0, 47.0, -17.0] hover=[13.0, 17.0, 12.0, 47.0, -17.0] joint-sd 31  donors ['new36', 'new319', 'new318'] at [30, 31, 75] px
+  S7 place=[13.0, 17.0, 12.0, 47.0, -17.0] hover=[13.0, 17.0, 12.0, 47.0, -17.0] joint-sd 31  donors ['new319', 'new36', 'new318'] at [45, 63, 126] px
+  S8 place=[16.0, 34.0, 15.0, 57.0, 1.0] hover=[16.0, 34.0, 15.0, 58.0, 1.0] joint-sd 70  donors ['new315', 'reco7', 'new36'] at [123, 125, 147] px
+  S9 place=[35.0, 24.0, 15.0, 31.0, 1.0] hover=[34.0, 23.0, 15.0, 31.0, 1.0] joint-sd 60  donors ['new315', 'reco7', 'reco2'] at [29, 53, 213] px
+tray hover (median of 3 Sunday releases): [-62.0, -7.0, 34.0, 60.0, -13.0, 45.0]
+tray descend = hover pan +/- with the reach of Sunday's confirmed table grasps [21.0, -0.0, 57.0] -> UNVERIFIED
