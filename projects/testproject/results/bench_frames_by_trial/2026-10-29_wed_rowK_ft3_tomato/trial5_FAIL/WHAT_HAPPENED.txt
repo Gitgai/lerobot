@@ -1,0 +1,3 @@
+2026-10-29 fine-tune 3 / tomato
+FAIL — idle 20 chunks; reach; HOLD from ~c38 (27); carried over the tray; released c44 at the tray's right edge — tomato landed OUTSIDE the rim, touching it; arm back at rest by c60
+placement: right of the arm; tray: left; instruction: pick up the tomato and place it on the plate; cap 75 chunks

@@ -482,3 +482,21 @@ J1  tomato left mid-table, tray left; idle 12 chunks; reach c20; hold from c28 (
     start / after-last-chunk / at-rest pictures (results/bench_frames_by_trial/2026-10-29_wed_rowJ_ft3_tomato/trial1_SUCCESS/).
 ```
 Fine-tune 3 tomato is now 6/24; orange 3/10.
+
+### ROW K — tomato ×5, same settings as J (RTX 5090), tray left — 1/5
+Log bench_row3k_tomato_20261029.jsonl, frames c11 calls 1–375, per-trial folders results/bench_frames_by_trial/2026-10-29_wed_rowK_ft3_tomato/
+(with start / after-last-chunk / at-rest pictures). RTT 1.29–1.33 s.
+```text
+K1  left, forward of mid-table; came down BESIDE it, closed to 16 against its side c40 and pushed it; hovered    FAIL
+    beside it open to the cap.
+K2  left mid-table; reach c10, HOLD by c14 (~29), over the tray c26, released IN the tray by c32, at rest c40.    SUCCESS
+K3  right of the arm; went there fast, hovered beside it open, closed to 23 on its side c40, pushed it OUT of    FAIL
+    the camera view by c56, then stretched fully right over the empty table (lift 67, elbow −76) to the cap.
+K4  left mid-table, placed late (not in the start picture); between the jaws c25, closed to 13 just in front of  FAIL
+    it c40, pushed it right, closed to 3 beside it at the cap.
+K5  right of the arm; idle 20, HOLD from ~c38 (27), carried over the tray, released c44 at the tray's RIGHT      FAIL (released
+    edge — landed outside, touching the rim; at rest by c60.                                                     outside the rim)
+```
+Day: J1 + K = 2/6. Fine-tune 3 tomato 7/29; orange 3/10. Pattern unchanged: both right-side placements (K3, K5)
+went wrong at the close or the release; the two left mid-table placements that were on the table at the start
+(K2, J1) both succeeded; K1 (further forward) and K4 (late) failed at the close.

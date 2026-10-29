@@ -1,0 +1,3 @@
+2026-10-29 fine-tune 3 / tomato
+SUCCESS — reach c10; HOLD by c14 (~29); carried over the tray c26; released IN the tray by c32; back at rest by c40 and held to the cap
+placement: left mid-table; tray: left; instruction: pick up the tomato and place it on the plate; cap 75 chunks

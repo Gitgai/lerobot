@@ -335,7 +335,7 @@ fine-tune 3    tomato   75      5 (row H)      1 clean grasp-carry-release      
 fine-tune 3    tomato   75      5 (row I)      0                                  1 grasp-carry released outside the rim;
                                                                                   1 slip; 1 placed under the gripper
 ```
-Running totals for fine-tune 3 on this bench: orange 3/10, tomato 5/23 (Sunday 4/13, today 1/10). Frame-by-frame
+Running totals for fine-tune 3 on this bench: orange 3/10, tomato 7/29 (Sunday 4/13, Tuesday 1/10, Wednesday 2/6 on the RTX 5090). Frame-by-frame
 re-read 2026-10-29 (bench_runs.md): A1 and D4 confirmed as real grasp-carry-release, so the 5 are firm; two of
 Tuesday's fails were grasp-and-carry released a few cm outside the rim; the dominant miss is the close itself
 (beside 7, short 5, above 3 of 18 fails). Today's

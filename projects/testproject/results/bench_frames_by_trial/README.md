@@ -16,5 +16,6 @@ Hard links into the raw server dump (see scripts/sort_bench_frames.py). Names: `
 | 2026-10-28_tue_rowH_ft3_tomato | 5 |  |
 | 2026-10-28_tue_rowI_ft3_tomato | 5 |  |
 | 2026-10-29_wed_rowJ_ft3_tomato | 1 |  |
+| 2026-10-29_wed_rowK_ft3_tomato | 5 |  |
 
 Trials run from 2026-10-29 on also have `front_start.jpg` (the scene as the trial begins), `front_end_after_last_chunk.jpg` (the pose the policy left the arm in) and `front_end_at_rest.jpg` (back at rest), plus the same for the wrist camera. Earlier trials have no such frames (the client never captured them) and their `chunk001` frame is stale — use chunk002 as the true start frame (bench_runs.md 2026-10-29).

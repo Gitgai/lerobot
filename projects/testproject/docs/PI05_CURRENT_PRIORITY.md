@@ -1,6 +1,6 @@
 # π0.5 lane — Current Priority and Status
 
-Last updated: 2026-10-29 — AI90 restarted 09:22, data drive back, checkpoints intact and now mirrored (ledger §12); RTX PRO 5000 STILL missing → serving on the 5090. Bench running again (row J tomato 1/1).
+Last updated: 2026-10-29 — AI90 restarted 09:22, data drive back, checkpoints intact and now mirrored (ledger §12); RTX PRO 5000 STILL missing → serving on the 5090. Bench running again (10-29: J+K tomato 2/6).
 
 **This file is the ROUTER and the TRACKER: what is open, in what order, and
 where each step stands. It is NOT a log.** Detail, gates and pre-registered
@@ -130,7 +130,7 @@ R5   "LoRA on top": freeze the public checkpoint, add rank-16  running  GO 2026-
                                                                         (base: tomato 0/5, orange 0/11). First working policy on this bench.
                                                                         2026-10-28 session 2: orange 0/5 (placed under the gripper, off the
                                                                         demo area), tomato 1/10 (near misses, one carry released outside the
-                                                                        rim). 10-29 row J tomato 1/1 on the 5090. Totals: orange 3/10, tomato 6/24.
+                                                                        rim). 10-29 rows J+K tomato 2/6 on the 5090. Totals: orange 3/10, tomato 7/29.
                                                                         NEXT: auto-reset calibration (tray poses done, 10 slots pending) →
                                                                         20-trial orange rows on the demo-area slots (ft3, base) → Isaac gate
 R3   "bench trials": 20 real attempts in Pune, NON-PIPELINED  running  **0/13 counted** (citrus ×2, orange ×11) + 3 off-protocol
