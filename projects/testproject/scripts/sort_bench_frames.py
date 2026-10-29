@@ -12,7 +12,8 @@ OUT = pathlib.Path("results/bench_frames_by_trial")
 BASE_TRIALS = {1: ("c05", 1), 2: ("c06", 1), 3: ("c07", 1), 4: ("c08", 1), 5: ("c09", 1), 6: ("c10", 1), 7: ("c11", 1), 8: ("c11", 46), 9: ("c11", 91), 10: ("c11", 136),
                11: ("c12", 1), 12: ("c12", 46), 13: ("c12", 91), 14: ("c12", 136), 15: ("c12", 181), 16: ("c12", 226)}
 M_TRIALS = {1: ("c13", 1), 2: ("c14", 1), 3: ("c14", 76), 4: ("c14", 151), 5: ("c14", 226)}
-ROWS = {"base": (BASE, None, 45, 1, []), "M": (R3, None, 75, 1, []), "ctrl": (BASE, "c01", 45, 1, []), "A": (R3, "c01", 45, 1, [(1, 48)]), "B": (R3, "c02", 75, 1, [(1, 348)]), "C": (R3, "c03", 75, 1, [(1, 65)]),
+N_TRIALS = {1: ("c15", 1), 2: ("c15", 76), 3: ("c17", 1), 4: ("c17", 76), 5: ("c17", 151)}
+ROWS = {"base": (BASE, None, 45, 1, []), "M": (R3, None, 75, 1, []), "N": (R3, None, 75, 1, []), "ctrl": (BASE, "c01", 45, 1, []), "A": (R3, "c01", 45, 1, [(1, 48)]), "B": (R3, "c02", 75, 1, [(1, 348)]), "C": (R3, "c03", 75, 1, [(1, 65)]),
         "D": (R3, "c04", 75, 1, [(1, 75)]), "E": (R3, "c05", 75, 1, []), "F": (R3, "c02", 75, 1, []), "G": (R3, "c04", 75, 1, []),
         "H": (R3, "c07", 75, 1, []), "I": (R3, "c08", 75, 1, []), "J": (R3, "c10", 75, 1, []), "K": (R3, "c11", 75, 1, []), "L": (R3, "c12", 120, 1, [])}
 DAY = {"2026-10-26": "sun", "2026-10-28": "tue", "2026-10-29": "wed"}
@@ -31,6 +32,7 @@ for row, (raw, pref, cap, first, lost) in ROWS.items():
         n = int(t["trial"]); d = folder / f"trial{n}_{t['result'].replace('?','_pending')}"; d.mkdir(exist_ok=True)
         if row == "base": pref, a = BASE_TRIALS[n]; b = a + cap - 1
         elif row == "M": pref, a = M_TRIALS[n]; b = a + cap - 1
+        elif row == "N": pref, a = N_TRIALS[n]; b = a + cap - 1
         else: a, b = first + (n - 1) * cap, first + n * cap - 1
         lost_here = [(max(a, x), min(b, y)) for x, y in lost if x <= b and y >= a]
         if lost_here and lost_here[0][0] == a and lost_here[0][1] >= b - 2:

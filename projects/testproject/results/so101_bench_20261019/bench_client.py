@@ -89,14 +89,16 @@ class Cam:
                     self.cap.set(self.cv2.CAP_PROP_FOURCC, self.cv2.VideoWriter_fourcc(*"MJPG")); self.cap.set(self.cv2.CAP_PROP_FRAME_WIDTH, self.w); self.cap.set(self.cv2.CAP_PROP_FRAME_HEIGHT, self.h)
                 time.sleep(0.5); ok, bgr = self.cap.read()
             if not ok:
-                # 2026-10-28: second mid-trial camera dropout in two sessions (AK wrist cam). Reusing the last good frame for one
-                # chunk is harmless (one stale 20-step plan); crashing mid-reach is not. Logged so the trial record shows it.
+                # One stale 20-step plan lets a transient USB hiccup recover. Never continue for a second chunk on frozen vision.
                 if getattr(self, "last", None) is not None:
-                    self.stale = getattr(self, "stale", 0) + 1; print(f"[cam {self.src}] READ FAILED, reusing last frame (stale #{self.stale})", flush=True)
+                    self.consecutive_stale = getattr(self, "consecutive_stale", 0) + 1
+                    if self.consecutive_stale > 1:
+                        raise RuntimeError(f"camera {self.src} failed for {self.consecutive_stale} consecutive reads")
+                    self.stale = getattr(self, "stale", 0) + 1; print(f"[cam {self.src}] READ FAILED, reusing last frame once (stale #{self.stale})", flush=True)
                     return self.last
                 raise RuntimeError(f"camera {self.src} read failed and no previous frame")
         rgb = np.ascontiguousarray((bgr if bgr.shape[1] == self.w and bgr.shape[0] == self.h else self.cv2.resize(bgr, (self.w, self.h)))[:, :, ::-1])
-        self.last = rgb; return rgb
+        self.last = rgb; self.consecutive_stale = 0; return rgb
 
 
 def main():

@@ -1,0 +1,3 @@
+2026-10-29 fine-tune 3 / orange
+FAIL — partial closes beside/above the orange; no hold or carry; stretched flat across the table (lift 79, elbow -83) to the cap; orange remained on the table
+placement: left mid-table; tray: left; instruction: pick up the orange and place it on the plate; cap 75 chunks

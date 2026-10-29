@@ -533,3 +533,30 @@ Reading: the three placements in front of / right of the base all failed without
 of the two left-mid-table placements one was a clean 40-chunk success and one a close-beside. Same picture as the
 tomato today. Fine-tune 3 orange 4/15 (Sunday 3/5, Tuesday 0/5, Wednesday 1/5); tomato 7/29.
 DAY 2026-10-29 TOTAL (RTX 5090): tomato 2/6, orange 1/5, three-orange experiment 0/3 ×2.
+
+### ROW N — single ORANGE ×5, our wording, 75-chunk cap, tray left — 4/5 (+3 void attempts)
+Same checkpoint, server and placement target as row M. The row began in the Claude session and was recovered and
+completed from Codex after the handoff. Valid logs are `bench_row3n_orange_20261029` (N1–N2) and
+`bench_row3n_orange_20261029_part3` (N3–N5). Raw server frames: c15 for the first launch and c17 for the final
+continuation. Per-trial folders: `results/bench_frames_by_trial/2026-10-29_wed_rowN_ft3_orange/`.
+
+```text
+N1  LEFT MID-TABLE; grasp by c31; carried over the tray c40; released IN the tray c48; rest by c60.              SUCCESS
+N2  LEFT MID-TABLE; grasp by c16; carried c20–24; released IN the tray c24; rest by c30.                         SUCCESS
+N3  LEFT MID-TABLE; partial closes without a hold; stretched flat across the table to the cap; orange unmoved.   FAIL
+N4  LEFT MID-TABLE; held through c36; carried; released IN the tray c37; rest by c45.                             SUCCESS
+N5  LEFT MID-TABLE; held c30–36; carried; released IN the tray c37; rest by c45.                                  SUCCESS
+```
+
+Three launches were void and are retained separately: after N2 the orange was not removed from the tray, so two
+automatic episodes began with the task already complete; the second ended when all six motors stopped returning
+status at c64. A write-blocked probe then confirmed torque off and status clear on all six, and the arm was homed.
+The first continuation was stopped at c25 when the AK wrist camera disconnected and re-enumerated from video6 to
+video7. Torque was explicitly released and verified. The final continuation used camera by-id paths and passed 120
+consecutive reads per camera before motion. The client now permits at most ONE stale camera chunk and aborts on a
+second consecutive failure instead of continuing indefinitely on frozen vision.
+
+Row N: **4/5** valid. Fine-tune 3 orange is now **8/20**; tomato remains **7/29**. On 2026-10-29 the two single-orange
+rows total 5/10 (M 1/5, N 4/5). This weakens the claim that placement alone determines the result: N3 failed from a
+placement matching the four successes. Placement remains important, but policy sampling/closed-loop variation is
+material at the same nominal start scene.
