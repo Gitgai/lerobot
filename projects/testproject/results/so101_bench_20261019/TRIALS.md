@@ -1,7 +1,7 @@
 # Bench trials — comprehensive table (SO-101, Pune)
 
 Source: `trials.csv` (hand-kept, one row per trial). `trials_full.csv` adds the numbers computed from each trial's log. Regenerate with `python3 scripts/bench_trials_table.py`.
-Frames: every policy call's overhead + wrist JPEG, named `<prefix>_call<N>_{front,wrist}.jpg`; fine-tune 3 rows in `results/so101_lora_on_top_20261019/bench_frames_row3_010000/` (prefix per row in the `frames` column, e.g. row I = c08, row H = c07, row E = c05), public-base rows in `results/so101_bench_20261019/frames/`. Trial N of a row covers calls (N-1)*cap+1 … N*cap. Narrative per trial: `bench_runs.md`. VOID = not a trial (camera fault, stop, wrong launch, fruit not re-placed); excluded from every count.
+**Frames, browsable:** `results/bench_frames_by_trial/<date>_<day>_row<X>_<model>_<fruit>/trial<N>_<RESULT>/` (front_chunkNNN.jpg + wrist_chunkNNN.jpg + WHAT_HAPPENED.txt; built by `scripts/sort_bench_frames.py`). Raw dump behind it: every policy call's overhead + wrist JPEG, named `<prefix>_call<N>_{front,wrist}.jpg`; fine-tune 3 rows in `results/so101_lora_on_top_20261019/bench_frames_row3_010000/` (prefix per row in the `frames` column, e.g. row I = c08, row H = c07, row E = c05), public-base rows in `results/so101_bench_20261019/frames/`. Trial N of a row covers calls (N-1)*cap+1 … N*cap. Narrative per trial: `bench_runs.md`. VOID = not a trial (camera fault, stop, wrong launch, fruit not re-placed); excluded from every count.
 
 Trials: 61 recorded, 54 valid, 7 void.
 

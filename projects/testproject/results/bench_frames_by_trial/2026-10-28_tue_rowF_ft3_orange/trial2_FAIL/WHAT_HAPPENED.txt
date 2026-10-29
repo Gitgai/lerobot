@@ -1,0 +1,2 @@
+FAIL — hovered in front of the base; no grasp
+placement: late placement; tray: right; instruction: pick up the orange and place it on the plate; cap 75 chunks

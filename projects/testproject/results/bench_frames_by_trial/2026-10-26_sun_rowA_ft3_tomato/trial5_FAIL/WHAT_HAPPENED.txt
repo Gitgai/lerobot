@@ -1,0 +1,2 @@
+FAIL — idle 26 chunks; cap hit mid-grasp (closing to 17 on it)
+placement: left; tray: —; instruction: pick up the tomato and place it on the plate; cap 45 chunks

@@ -1,0 +1,2 @@
+FAIL — small reach then rest with the gripper open; did not engage
+placement: left-front close; tray: —; instruction: pick up the tomato and place it on the plate; cap 45 chunks

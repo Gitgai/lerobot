@@ -1,0 +1,2 @@
+VOID — same as B2
+placement: —; tray: —; instruction: pick up the tomato and place it on the plate; cap 75 chunks

@@ -1,0 +1,2 @@
+VOID — aborted at chunk 47 on the operator's word
+placement: —; tray: right; instruction: pick up the orange and place it on the plate; cap 75 chunks

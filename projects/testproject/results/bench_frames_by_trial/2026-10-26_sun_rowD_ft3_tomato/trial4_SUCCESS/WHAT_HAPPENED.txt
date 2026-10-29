@@ -1,0 +1,2 @@
+SUCCESS — reach c6-12; HOLD 28-31 c13-28; lifted (table far below in the wrist view c22); released over the tray c30; tomato in the tray c38-75; arm idle in front of it
+placement: near base; tray: —; instruction: pick up the tomato and place it on the plate; cap 75 chunks
