@@ -1,0 +1,3 @@
+2026-10-29 fine-tune 3 / 3 oranges (multi-fruit experiment)
+FAIL — slow start; hovered above the two near oranges from c34; closed to 22-26 ABOVE them five times (c58-64, c100), fruit visible below the closed tips; none of the three moved; 0 of 3 in the tray
+placement: two oranges close to the base (left and right of the gripper), one beside the tray; tray: left; instruction: Grab oranges and place into plate.; cap 120 chunks

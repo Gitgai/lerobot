@@ -1,6 +1,6 @@
 # π0.5 lane — Current Priority and Status
 
-Last updated: 2026-10-29 — AI90 restarted 09:22, data drive back, checkpoints intact and now mirrored (ledger §12); RTX PRO 5000 STILL missing → serving on the 5090. Bench running again (10-29: J+K tomato 2/6).
+Last updated: 2026-10-29 — AI90 restarted 09:22, data drive back, checkpoints intact and now mirrored (ledger §12); RTX PRO 5000 STILL missing → serving on the 5090. Bench running again (10-29: J+K tomato 2/6; 3-orange experiment L 0/3 ×2).
 
 **This file is the ROUTER and the TRACKER: what is open, in what order, and
 where each step stands. It is NOT a log.** Detail, gates and pre-registered

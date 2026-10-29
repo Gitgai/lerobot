@@ -500,3 +500,18 @@ K5  right of the arm; idle 20, HOLD from ~c38 (27), carried over the tray, relea
 Day: J1 + K = 2/6. Fine-tune 3 tomato 7/29; orange 3/10. Pattern unchanged: both right-side placements (K3, K5)
 went wrong at the close or the release; the two left mid-table placements that were on the table at the start
 (K2, J1) both succeeded; K1 (further forward) and K4 (late) failed at the close.
+
+### ROW L — THREE ORANGES at once, corpus wording "Grab oranges and place into plate.", 120-chunk cap — 0 of 3, twice
+Separate experiment (the real demos have one fruit; the base corpus and the Isaac gate have three). Fresh, larger
+oranges than Sunday's. Log bench_row3l_3oranges_20261029.jsonl, frames c12 calls 1–240, folders
+results/bench_frames_by_trial/2026-10-29_wed_rowL_ft3_3/. RTT 1.2–1.4 s.
+```text
+L1  two oranges close to the base (either side of the gripper), one beside the tray. Slow start; from c34 the    0 of 3
+    arm hovered ABOVE the two near oranges and closed to 22–26 on air above them five times; nothing moved.
+L2  same spots. Hovered open above the near-right orange to c62, then stretched flat across the table (lift 73,  0 of 3
+    elbow −83) toward the orange beside the tray and sat with the jaws beside it, never closing.
+```
+Reading: with three oranges the policy never committed to one. It parked above the near pair (the close-to-base
+spot that fails for single fruit too) and closed on air, or drifted to the far one without closing. The Isaac
+multi-orange skill (9/10 at 200 s) did not show on the bench in these two trials; placement was not the
+recommended spread (the operator kept the same three spots for both). Not counted in the single-fruit totals.
