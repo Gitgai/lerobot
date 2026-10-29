@@ -561,18 +561,24 @@ rows total 5/10 (M 1/5, N 4/5). This weakens the claim that placement alone dete
 placement matching the four successes. Placement remains important, but policy sampling/closed-loop variation is
 material at the same nominal start scene.
 
-### ROW O — single ORANGE ×1, changed placement, our wording, 75-chunk cap, tray left — 1/1
-The operator deliberately moved the orange before the trial. It started far to the arm's right near the table edge,
-well outside row N's left-mid-table placement. Log `bench_row3o_orange_20261029`; raw server frames c18 calls 1–75.
+### ROW O — single ORANGE ×5, far-right placements, our wording, 75-chunk cap, tray left — 1/5 (+1 void)
+The operator deliberately moved the orange to the arm's far right near the table edge, well outside row N's
+left-mid-table placement. Logs: `bench_row3o_orange_20261029` (O1), part2 (O2 and the void attempt), and part3
+(O3–O5). Raw server frames: c18 calls 1–75, c19 calls 1–89, and c20 calls 1–225.
 
 ```text
 O1  FAR RIGHT near the table edge; reached right c11–22; grasp held c23–39; carried across the full table;
     released IN the tray c40; back at rest by c44; orange remained in the tray to the cap.                    SUCCESS
+O2  FAR RIGHT, lower edge; repeated closes beside it (minimum 14 c22); no hold; overreached past it to cap.   FAIL
+O3  FAR RIGHT, lower; repeated strong closes (6–15) beside/against it; nudged it left; no carry.              FAIL
+O4  FAR RIGHT, upper; multiple closes beside it (minimum 13 c24); no lift; orange remained in place.          FAIL
+O5  FAR RIGHT, lower; partial closes without a hold; stretched flat past it (lift 81, elbow −77) to cap.      FAIL
 ```
 
-This is a useful counterexample to the earlier claim that right-side placement always fails: the policy completed
-the largest observed cross-table carry from that side. It is one exploratory trial, not a rate estimate. Fine-tune 3
-orange is now **9/21** overall; the 2026-10-29 single-orange total is **6/11**.
+One additional launch was void: the operator's hand remained on the orange in the start frame after the countdown.
+It was stopped at c14, homed, and relaunched. Row O shows that far-right placement can work—the successful O1 was
+the largest observed cross-table carry—but it was unreliable at **1/5**. The four failures all lost the fruit at
+the close. Fine-tune 3 orange is now **9/25** overall; the 2026-10-29 single-orange total is **6/15**.
 
 Post-run safety check: torque and status were zero on all six motors. The installed LeRobot client had reset the
 gripper protection registers during connection from the audited 500/250/25 values to 1000/500/80. They were restored

@@ -1,0 +1,3 @@
+2026-10-29 fine-tune 3 / orange
+FAIL — repeated strong closes beside/against the orange (gripper 6-15) without a hold; no trayward carry; orange was nudged slightly left and remained on the table
+placement: far right of the arm, lower; tray: left; instruction: pick up the orange and place it on the plate; cap 75 chunks
