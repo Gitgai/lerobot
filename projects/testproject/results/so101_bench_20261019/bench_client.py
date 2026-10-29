@@ -77,7 +77,7 @@ class Cam:
     def read(self):
         # drop queued frames: 3 normally, 8 after an idle gap (between trials the queue is full of the OLD scene — found 2026-10-29
         # from the recorded frames: chunk 1 of trials 2+ showed the arm still extended at the previous trial's end)
-        for _ in range(8 if time.time() - self.t_last > 1.0 else 3): self.cap.grab()
+        for _ in range(8 if time.time() - self.t_last > 5.0 else 3): self.cap.grab()   # 5 s: within a trial reads are ~2 s apart (3 grabs = 0.1 s); only the between-trial pause triggers the long flush
         ok, bgr = self.cap.read(); self.t_last = time.time()
         if not ok:                                               # 2026-10-26: one USB hiccup killed a trial mid-episode; retry, then reopen once
             for attempt in range(5):

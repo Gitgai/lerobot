@@ -193,3 +193,22 @@ composites (bench_row3*_T*.jpg), joint logs (*.jsonl), calls.csv rows, and the o
 recoverable. Fix (same day, 15:17 EDT): the server continues from the highest prefix already on disk. Rule R7:
 a recorder that names files from a counter must seed the counter from the directory, not from the process.
 The same fault lost 16 dry-run frames on 2026-10-26 (bench_runs.md, "recorder restarted with the server").
+
+## 12. INCIDENT 2026-10-28 19:26–19:51 EDT — AI90 rebooted; /mnt/data4tb (WD Blue SN5100 4 TB) DIED 25 min later; RTX PRO 5000 absent
+Found 2026-10-29 while trying to restart the bench servers. Facts from the kernel log (no sudo used):
+- 19:08 both bench policy servers were stopped by the shutdown; 19:26 boot. Only ONE GPU on the PCI bus after boot:
+  the RTX 5090 at 01:00.0. The RTX PRO 5000 (GPU 1, 72 GB) is not enumerated at all — not a driver state, the card is
+  not seen by the PCI scan. Needs the operator at the machine (seating / power / BIOS).
+- The 4 TB WD drive mounted normally at 19:26:17, then at 19:51:11 "controller is down; will reset: CSTS=0xffffffff",
+  reset failed, "Disabling device after reset failure", ext4 journal aborted, buffered writes lost. /sys state = dead;
+  lsblk shows 0 B. The kernel's own hint: "Does your device have a faulty power saving mode enabled? Try
+  nvme_core.default_ps_max_latency_us=0 pcie_aspm=off pcie_port_pm=off". fstab has nofail, so boot survives it.
+- What is on that drive and nowhere else: all three LoRA fine-tune rows (row1_author_lora_b8 25k, row2_conservative_lora
+  7k, row3_all169_conservative 10k — the bench policy — ~145 GB incl. checkpoints, lora_adapters/, train logs) and the
+  HF cache (public so101-pi05-base, VLASH deps). The repo holds only configs, small JSON, logs summaries, frames.
+- Consequence: NO bench server can start (both checkpoints live there). Bench work is BLOCKED until the drive is back.
+- Likely recoverable: the failure is the controller dropping off the bus (classic APST/ASPM NVMe drop-out), not a
+  media error; a power cycle usually brings it back and the kernel parameters above prevent the repeat. Not for this
+  lane: mounting, kernel parameters and the physical check are the operator's (sudo + hands on the box).
+- Rule R8 (proposed): after the drive is back, copy lora_adapters/ of each row's final checkpoint (tens of MB) into
+  the repo-side results dir, and mirror the three final merged checkpoints (7.3–8.6 GB each) to a second disk.

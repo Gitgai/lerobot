@@ -468,4 +468,4 @@ twice at the moment of release, a few cm short of the rim. Both are precision-at
    chunk 1 of I3 shows I2's end. The camera driver queue filled during the 30 s pause and read() dropped only 3
    frames, one short of the queue depth. The policy therefore planned its first chunk from the previous scene. Its
    first chunk is a near-no-op at rest, so the trials stand, but it is a real defect. FIX: queue depth set to 1 and
-   8 frames dropped after any idle gap > 1 s. The true start-of-trial frame is chunk 2 in the existing folders.
+   8 frames dropped after any idle gap > 5 s. The true start-of-trial frame is chunk 2 in the existing folders.

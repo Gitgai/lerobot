@@ -1,6 +1,6 @@
 # π0.5 lane — Current Priority and Status
 
-Last updated: 2026-10-28
+Last updated: 2026-10-29 — ⚠ BENCH BLOCKED: AI90 rebooted 10-28 19:26, the 4 TB data drive (all fine-tune checkpoints + HF cache) died 25 min later, the RTX PRO 5000 is not on the PCI bus (DISK_LEDGER §12). Operator needed at the machine.
 
 **This file is the ROUTER and the TRACKER: what is open, in what order, and
 where each step stands. It is NOT a log.** Detail, gates and pre-registered
