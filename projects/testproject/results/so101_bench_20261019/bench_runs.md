@@ -429,3 +429,7 @@ orange earlier today. Fine-tune 3 on tomato is now 5/23 valid trials (Sunday 4/1
 
 Pending (unchanged): the auto-reset calibration (tray_centre/tray_hover recorded; 10 slots not yet), then the
 20-trial rows on the demonstration-area slots. Set aside by the operator: tomato adjudications A1/D4.
+
+## Master table (2026-10-29)
+Every trial, one row each, in `trials.csv` (source) and `TRIALS.md` (readable; regenerate with
+`scripts/bench_trials_table.py`). Add a CSV row per trial from now on; this narrative file stays the detail record.
