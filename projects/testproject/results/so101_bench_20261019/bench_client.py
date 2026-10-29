@@ -129,6 +129,12 @@ def main():
             from lerobot.robots.so101_follower import SO101Follower, SO101FollowerConfig     # lerobot 0.4.x / 0.6.x
         robot = SO101Follower(SO101FollowerConfig(port=a.port, id=a.robot_id, cameras={}))   # cameras handled here, not by lerobot
         robot.connect(calibrate=False)
+        # This installed LeRobot release configures the gripper to 1000/500/80 on every connect. Restore the
+        # bench's audited protection limits before any holding or motion command and verify the raw readback.
+        protections = {"Max_Torque_Limit": 500, "Protection_Current": 250, "Overload_Torque": 25}
+        for register, value in protections.items(): robot.bus.write(register, "gripper", value, normalize=False)
+        got = {register: robot.bus.read(register, "gripper", normalize=False) for register in protections}
+        if got != protections: raise RuntimeError(f"gripper protection readback mismatch: {got}")
 
     def joints_now():
         if robot is None: return np.zeros(6, dtype=np.float32)

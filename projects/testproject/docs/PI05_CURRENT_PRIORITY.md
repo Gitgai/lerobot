@@ -1,6 +1,6 @@
 # π0.5 lane — Current Priority and Status
 
-Last updated: 2026-10-29 — AI90 restarted 09:22, data drive back, checkpoints intact and now mirrored (ledger §12); RTX PRO 5000 STILL missing → serving on the 5090. Bench row N completed 4/5; 10-29 totals: tomato 2/6, single orange 5/10, 3-orange experiment 0/3 ×2.
+Last updated: 2026-10-29 — AI90 restarted 09:22, data drive back, checkpoints intact and now mirrored (ledger §12); RTX PRO 5000 STILL missing → serving on the 5090. Bench row N completed 4/5 and exploratory O1 succeeded; 10-29 totals: tomato 2/6, single orange 6/11, 3-orange experiment 0/3 ×2.
 
 **This file is the ROUTER and the TRACKER: what is open, in what order, and
 where each step stands. It is NOT a log.** Detail, gates and pre-registered
@@ -130,7 +130,7 @@ R5   "LoRA on top": freeze the public checkpoint, add rank-16  running  GO 2026-
                                                                         (base: tomato 0/5, orange 0/11). First working policy on this bench.
                                                                         2026-10-28 session 2: orange 0/5 (placed under the gripper, off the
                                                                         demo area), tomato 1/10 (near misses, one carry released outside the
-                                                                        rim). 10-29 on the 5090: tomato 2/6, orange 5/10 (M 1/5, N 4/5). Totals: orange 8/20, tomato 7/29. Demo-area placement is necessary but not deterministic: N3 failed among four successes at the same nominal spot.
+                                                                        rim). 10-29 on the 5090: tomato 2/6, orange 6/11 (M 1/5, N 4/5, exploratory O1 1/1 from far right). Totals: orange 9/21, tomato 7/29. Placement matters but is not deterministic.
                                                                         NEXT: auto-reset calibration (tray poses done, 10 slots pending) →
                                                                         20-trial orange rows on the demo-area slots (ft3, base) → Isaac gate
 R3   "bench trials": 20 real attempts in Pune, NON-PIPELINED  running  **0/13 counted** (citrus ×2, orange ×11) + 3 off-protocol

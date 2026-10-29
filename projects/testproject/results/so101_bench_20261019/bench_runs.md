@@ -560,3 +560,21 @@ Row N: **4/5** valid. Fine-tune 3 orange is now **8/20**; tomato remains **7/29*
 rows total 5/10 (M 1/5, N 4/5). This weakens the claim that placement alone determines the result: N3 failed from a
 placement matching the four successes. Placement remains important, but policy sampling/closed-loop variation is
 material at the same nominal start scene.
+
+### ROW O — single ORANGE ×1, changed placement, our wording, 75-chunk cap, tray left — 1/1
+The operator deliberately moved the orange before the trial. It started far to the arm's right near the table edge,
+well outside row N's left-mid-table placement. Log `bench_row3o_orange_20261029`; raw server frames c18 calls 1–75.
+
+```text
+O1  FAR RIGHT near the table edge; reached right c11–22; grasp held c23–39; carried across the full table;
+    released IN the tray c40; back at rest by c44; orange remained in the tray to the cap.                    SUCCESS
+```
+
+This is a useful counterexample to the earlier claim that right-side placement always fails: the policy completed
+the largest observed cross-table carry from that side. It is one exploratory trial, not a rate estimate. Fine-tune 3
+orange is now **9/21** overall; the 2026-10-29 single-orange total is **6/11**.
+
+Post-run safety check: torque and status were zero on all six motors. The installed LeRobot client had reset the
+gripper protection registers during connection from the audited 500/250/25 values to 1000/500/80. They were restored
+and read back as 500/250/25 with torque off. `bench_client.py` now restores and verifies those values immediately
+after every connection, before any holding or motion command.
