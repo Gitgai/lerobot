@@ -37,4 +37,21 @@ for row, (raw, pref, cap, first, lost) in ROWS.items():
                     made += 1
         (d / "WHAT_HAPPENED.txt").write_text(f"{t['result']} — {t['what_happened']}\nplacement: {t['placement']}; tray: {t['tray']}; instruction: {t['instruction']}; cap {cap} chunks\n")
     readme.append(f"| {folder.name} | {len(tr)} | {'; '.join(notes) if notes else ''} |")
-(OUT / "README.md").write_text("\n".join(readme) + "\n"); print("linked files:", made)
+# end-of-trial snapshots saved by the client on the Acer (bench_client.py snap(): after_last_chunk, at_rest) — pull with --pull
+import sys, subprocess, shutil
+if "--pull" in sys.argv:
+    subprocess.run(["rsync", "-a", "--include=*/", "--include=*.jpg", "--exclude=*", "gaikwad-prakash@192.168.194.228:bench_client_frames/", "results/bench_client_frames/"], check=False)
+SNAP = pathlib.Path("results/bench_client_frames"); pulled = 0
+for row, (raw, pref, cap, first, lost) in ROWS.items():
+    tr = [t for t in trials if t["row"] == row]
+    for t in tr:
+        src_dir = SNAP / t["log"]
+        if not src_dir.is_dir(): continue
+        t0 = tr[0]; model = "base" if t0["model"] == "base" else "ft3"; fruit = t0["fruit"].split()[0]
+        d = OUT / f"{t0['date']}_{DAY.get(t0['date'],'')}_row{row}_{model}_{fruit}" / f"trial{int(t['trial'])}_{t['result'].replace('?','_pending')}"
+        for tag in ("after_last_chunk", "at_rest"):
+            for cam in ("front", "wrist"):
+                src = src_dir / f"ep{int(t['ep_in_log'])}_{tag}_{cam}.jpg"; dst = d / f"{cam}_end_{tag}.jpg"
+                if src.exists() and d.is_dir() and not dst.exists(): shutil.copy2(src, dst); pulled += 1
+readme += ["", "Trials run from 2026-10-29 on also have `front_end_after_last_chunk.jpg` / `front_end_at_rest.jpg` (and wrist): the pose the policy left the arm in, and the arm back at rest. Earlier trials have no such frames (the client never captured them) and their `chunk001` frame is stale — use chunk002 as the true start frame (bench_runs.md 2026-10-29)."]
+(OUT / "README.md").write_text("\n".join(readme) + "\n"); print("linked files:", made, "end snapshots copied:", pulled)

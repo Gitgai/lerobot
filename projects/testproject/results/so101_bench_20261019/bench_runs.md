@@ -457,3 +457,15 @@ outside the rim 2 · cap-hit after an idle start 2 · no-engage 1 (several trial
 first is counted). What this says: the arm reaches and gets the fruit between the jaws in 21 of 23 trials; the
 loss is at the moment of closing — the jaws shut a few cm before the fruit, or next to it, or on its top — and
 twice at the moment of release, a few cm short of the rim. Both are precision-at-contact errors, not navigation.
+
+## 2026-10-29 — "No rest frames": what the operator noticed, and two findings from it
+1. By design the server records only what the client sends it — the two images captured BEFORE each chunk. After
+   chunk 75 the client moves the arm home itself without calling the policy, so the trial's final pose and the
+   arm back at rest were never on file. FIX: bench_client.py now saves both cameras after the last chunk's motion
+   ("after_last_chunk") and after the return to the start pose ("at_rest"), on the Acer under
+   ~/bench_client_frames/<log stem>/; scripts/sort_bench_frames.py pulls them into the per-trial folders.
+2. The first frame of every trial after the first was STALE: chunk 1 of H4 shows the arm still extended at H3's end,
+   chunk 1 of I3 shows I2's end. The camera driver queue filled during the 30 s pause and read() dropped only 3
+   frames, one short of the queue depth. The policy therefore planned its first chunk from the previous scene. Its
+   first chunk is a near-no-op at rest, so the trials stand, but it is a real defect. FIX: queue depth set to 1 and
+   8 frames dropped after any idle gap > 1 s. The true start-of-trial frame is chunk 2 in the existing folders.

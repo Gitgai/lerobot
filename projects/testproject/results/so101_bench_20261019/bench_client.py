@@ -11,7 +11,7 @@ Safety: per-step joint change clamped to --max-delta-deg (default 8°) and the g
 stops immediately; the arm is NOT moved to any pose at start — it starts wherever it is. Keep a hand on the power.
 Logs one JSON line per chunk (state, first action, latency) and one per episode to --out.
 """
-import argparse, json, pickle, sys, time, types, threading, pathlib
+import argparse, os, json, pickle, sys, time, types, threading, pathlib
 import numpy as np
 
 JOINTS = ["shoulder_pan", "shoulder_lift", "elbow_flex", "wrist_flex", "wrist_roll", "gripper"]
@@ -59,6 +59,8 @@ class Cam:
         self.cap = cv2.VideoCapture(self.src)
         if str(src).isdigit():
             self.cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG")); self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, w); self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, h); self.cap.set(cv2.CAP_PROP_FPS, 30)
+        self.cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)   # 2026-10-29: the driver queue held frames from BEFORE the 30 s pause; chunk 1 of every trial saw the previous trial's end
+        self.t_last = 0.0
         if not self.cap.isOpened(): raise RuntimeError(f"camera {src} did not open")
         self.w, self.h = w, h
         # warm-up: the C270 returns fully black frames for its first ~1 s after open (bench ep1 2026-10-19: policy
@@ -73,8 +75,10 @@ class Cam:
         if mean == 0.0: raise RuntimeError(f"camera {src} still dark after 4 s")
 
     def read(self):
-        for _ in range(3): self.cap.grab()                      # drop stale frames
-        ok, bgr = self.cap.read()
+        # drop queued frames: 3 normally, 8 after an idle gap (between trials the queue is full of the OLD scene — found 2026-10-29
+        # from the recorded frames: chunk 1 of trials 2+ showed the arm still extended at the previous trial's end)
+        for _ in range(8 if time.time() - self.t_last > 1.0 else 3): self.cap.grab()
+        ok, bgr = self.cap.read(); self.t_last = time.time()
         if not ok:                                               # 2026-10-26: one USB hiccup killed a trial mid-episode; retry, then reopen once
             for attempt in range(5):
                 time.sleep(0.2); ok, bgr = self.cap.read()
@@ -150,6 +154,16 @@ def main():
 
     front, wrist = Cam(a.front), Cam(a.wrist)
     act = grpc_client(a.server, a.actions_per_chunk)
+    snap_dir = os.path.join(os.path.expanduser("~/bench_client_frames"), os.path.splitext(os.path.basename(a.out))[0]); os.makedirs(snap_dir, exist_ok=True)
+
+    def snap(ep_no, tag):
+        """save both cameras NOW (fresh, flushed) — the server only records what it is sent, i.e. the frame BEFORE each chunk,
+        so the trial's final pose and the return to rest were never on file (operator noticed 2026-10-29)"""
+        try:
+            for cam, name in ((front, "front"), (wrist, "wrist")):
+                rgb = cam.read(); cam.cv2.imwrite(os.path.join(snap_dir, f"ep{ep_no}_{tag}_{name}.jpg"), np.ascontiguousarray(rgb[:, :, ::-1]), [cam.cv2.IMWRITE_JPEG_QUALITY, 85])
+        except Exception as e:
+            print(f"[snap] {tag} failed: {e}", flush=True)
     out = open(a.out, "a"); stop = {"flag": False}
     resetter = None; slot_order = []
     if a.reset_between or a.reset_dry_run:
@@ -201,9 +215,10 @@ def main():
                     robot.send_action({f"{j}.pos": float(v) for j, v in zip(JOINTS, tgt)})
                     prev = tgt; time.sleep(1.0 / a.fps)
                 n_chunks += 1
+            snap(ep + 1, "after_last_chunk")                                      # the pose the policy left the arm in (the server never sees it)
             res = "d" if a.dry_run else ("unscored" if a.auto else input("result? [s]uccess / [f]ail / [a]bort: ").strip().lower()[:1])
             out.write(json.dumps({"ep": ep + 1, "result": res, "chunks": n_chunks, "wall_s": round(time.time() - t_ep, 1), "latency_median_s": round(float(np.median(lat)), 3) if lat else None, "start_state": q_start.round(1).tolist(), "end_state": joints_now().round(1).tolist(), "task": a.task, "utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}) + "\n"); out.flush()
-            if a.return_start and not a.dry_run: move_to(q_start)
+            if a.return_start and not a.dry_run: move_to(q_start); snap(ep + 1, "at_rest")
             if resetter is not None and not a.dry_run and ep + 1 < a.episodes:
                 try:
                     rec = resetter.run(slot_order[ep % len(slot_order)]); print(f"[reset] ok slot {rec['slot']} held {rec['held_gripper']} {rec['wall_s']} s", flush=True)
