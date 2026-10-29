@@ -54,7 +54,7 @@ for row, (raw, pref, cap, first, lost) in ROWS.items():
     tr = [t for t in trials if t["row"] == row]
     for t in tr:
         src_dir = SNAP / t["log"]
-        if not src_dir.is_dir(): continue
+        if not src_dir.is_dir() or not t["trial"].isdigit(): continue
         t0 = tr[0]; model = "base" if t0["model"] == "base" else "ft3"; fruit = t0["fruit"].split()[0]
         d = OUT / f"{t0['date']}_{DAY.get(t0['date'],'')}_row{row}_{model}_{fruit}" / f"trial{int(t['trial'])}_{t['result'].replace('?','_pending')}"
         for tag in ("start", "after_last_chunk", "at_rest"):
