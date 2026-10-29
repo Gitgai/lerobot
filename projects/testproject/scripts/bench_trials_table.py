@@ -39,7 +39,9 @@ def summary(keyf, title):
         s = sum(r["result"] == "SUCCESS" for r in rs); q = sum(r["result"] == "SUCCESS?" for r in rs); f = sum(r["result"] == "FAIL" for r in rs)
         out.append(f"| {k} | {len(rs)} | {s} | {q} | {f} | {s}/{len(rs)}" + (f" (up to {s+q}/{len(rs)})" if q else "") + " |")
     return out + [""]
-fm = collections.Counter(r["failure_mode"] for r in valid if r["result"] == "FAIL")
+import re
+def primary(m): return re.split(r",| then | \(|;", m)[0].strip()
+fm = collections.Counter(primary(r["failure_mode"]) for r in valid if r["result"] == "FAIL")
 md = ["# Bench trials — comprehensive table (SO-101, Pune)", "",
       "Source: `trials.csv` (hand-kept, one row per trial). `trials_full.csv` adds the numbers computed from each trial's log. Regenerate with `python3 scripts/bench_trials_table.py`.",
       "Narrative per trial: `bench_runs.md`. VOID = not a trial (camera fault, stop, wrong launch, fruit not re-placed); excluded from every count.", "",
@@ -47,7 +49,7 @@ md = ["# Bench trials — comprehensive table (SO-101, Pune)", "",
 md += summary(lambda r: f"{r['model']} / {r['fruit']}", "model / fruit")
 md += summary(lambda r: f"{r['date']} / {r['model']} / {r['fruit']}", "day / model / fruit")
 md += summary(lambda r: f"{r['model']} / {r['fruit']} / cap {r['cap']}", "model / fruit / cap")
-md += ["### Failure modes (valid FAIL trials)", "", "| failure mode | count |", "|---|---|"] + [f"| {k} | {v} |" for k, v in fm.most_common()] + [""]
+md += ["### Failure modes (valid FAIL trials; the FIRST mode when a trial shows two in sequence)", "", "| failure mode | count |", "|---|---|"] + [f"| {k} | {v} |" for k, v in fm.most_common()] + [""]
 md += ["### Every trial — conditions", "", "| date | row | # | model | checkpoint | server | fruit | instruction | cap | front camera | tray | placement |", "|---|---|---|---|---|---|---|---|---|---|---|---|"]
 for r in full: md.append(f"| {r['date']} | {r['row']} | {r['trial']} | {r['model']} | {r['checkpoint']} | {r['server']} | {r['fruit']} | {r['instruction']} | {r['cap']} | {r['front_camera']} | {r['tray']} | {r['placement']} |")
 md += ["", "### Every trial — outcome", "", "| date | row | # | result | failure mode | what happened | first move | grip min (chunk) | wrist roll max | chunks | wall s | RTT s | adjudication | log / frames |", "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|"]

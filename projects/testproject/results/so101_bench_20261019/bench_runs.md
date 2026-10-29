@@ -433,3 +433,27 @@ Pending (unchanged): the auto-reset calibration (tray_centre/tray_hover recorded
 ## Master table (2026-10-29)
 Every trial, one row each, in `trials.csv` (source) and `TRIALS.md` (readable; regenerate with
 `scripts/bench_trials_table.py`). Add a CSV row per trial from now on; this narrative file stays the detail record.
+
+## 2026-10-29 — FRAME-BY-FRAME RE-READ of all 23 valid fine-tune-3 tomato trials (operator's request)
+Method: per trial, 8 overhead + 8 wrist frames across the episode plus 8 wrist frames around the first deep close,
+read against the gripper reading per chunk (strips in the session scratchpad; A1, B1, D1 from Sunday's composites
+because their raw frames were overwritten on 10-28). Verdict changes:
+```text
+A1  SUCCESS?  → SUCCESS   the tomato is INSIDE the tray (left end, against the inner wall) at c26 and c32; the hand
+                           takes it out at c38. Released c24 after a 28-30 hold. Adjudication closed from the frames.
+D4  SUCCESS?  → SUCCESS   the gripper reads 28-31 from c13 to c28 with the tomato between the jaws and the table far
+                           below in the wrist view at c22 = a real hold, not a push. The Sunday note "never below 41"
+                           was wrong (it described c31 onward). Adjudication closed from the trace.
+I4  no-close  → released outside the rim: hold 28 at c22-28, carried, opened at c29-30 short of the rim, the tomato
+                           landed outside at the tray's near edge; the operator moved it at c40 (after the release).
+I1  slip      → close-short: jaws closed to 7-8 at c27-29 in front of the fruit, then an empty trip to the tray.
+I5  no-close  → close-above (partial squeeze 16-24 on its top); H5 no-close → close-beside (side squeeze 23-24).
+C2  → close-short first (10 at c19), beside later;  C4 → partial squeeze (13-19) then beside, cap;  D1 → beside
+    first (14 at c10) then hovered open;  D2 → three partial closes (17/15/15) before the hold (29-31) at ~c51.
+```
+Totals after the re-read: fine-tune 3 tomato **5/23** (A1, B1, D2, D4, H4), nothing pending; orange 3/10.
+Failure modes over the 18 tomato fails: close-beside 7 · close-short 5 · close-above/partial squeeze 3 · released
+outside the rim 2 · cap-hit after an idle start 2 · no-engage 1 (several trials show two modes in sequence; the
+first is counted). What this says: the arm reaches and gets the fruit between the jaws in 21 of 23 trials; the
+loss is at the moment of closing — the jaws shut a few cm before the fruit, or next to it, or on its top — and
+twice at the moment of release, a few cm short of the rim. Both are precision-at-contact errors, not navigation.

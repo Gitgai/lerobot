@@ -335,7 +335,10 @@ fine-tune 3    tomato   75      5 (row H)      1 clean grasp-carry-release      
 fine-tune 3    tomato   75      5 (row I)      0                                  1 grasp-carry released outside the rim;
                                                                                   1 slip; 1 placed under the gripper
 ```
-Running totals for fine-tune 3 on this bench: orange 3/10, tomato 5/23 (Sunday 4/13, today 1/10). Today's
+Running totals for fine-tune 3 on this bench: orange 3/10, tomato 5/23 (Sunday 4/13, today 1/10). Frame-by-frame
+re-read 2026-10-29 (bench_runs.md): A1 and D4 confirmed as real grasp-carry-release, so the 5 are firm; two of
+Tuesday's fails were grasp-and-carry released a few cm outside the rim; the dominant miss is the close itself
+(beside 7, short 5, above 3 of 18 fails). Today's
 tomato rows are below Sunday's on the same checkpoint; the misses are the known close-short / close-beside
 ones, and the day's fruit placements were less consistent than Sunday's five fixed spots. Today's orange zero traces to placement
 (frames compared against the 60 September starts; bench_runs.md "WHY 0/5 TODAY"); the fix is the demonstration-
