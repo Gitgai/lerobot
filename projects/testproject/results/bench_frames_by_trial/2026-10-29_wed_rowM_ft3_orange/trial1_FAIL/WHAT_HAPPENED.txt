@@ -1,0 +1,3 @@
+2026-10-29 fine-tune 3 / orange
+FAIL — had the orange between the open jaws c20, moved on past it to the right, closed on air over empty table c40, searched right to the cap
+placement: in front of the base; tray: left; instruction: pick up the orange and place it on the plate; cap 75 chunks

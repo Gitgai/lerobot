@@ -515,3 +515,21 @@ Reading: with three oranges the policy never committed to one. It parked above t
 spot that fails for single fruit too) and closed on air, or drifted to the far one without closing. The Isaac
 multi-orange skill (9/10 at 200 s) did not show on the bench in these two trials; placement was not the
 recommended spread (the operator kept the same three spots for both). Not counted in the single-fruit totals.
+
+### ROW M — single ORANGE ×5, our wording, 75-chunk cap, tray left — 1/5 (+1 void)
+Fresh, larger orange than Sunday's. Part 1 (c13): M1, then a VOID trial — the operator's hand was on the gripper at
+c12 while the policy was driving; stopped at c20, homed, row relaunched as part 2 (c14) for the remaining four.
+Logs bench_row3m_orange_20261029_part{1,2}.jsonl; folders results/bench_frames_by_trial/2026-10-29_wed_rowM_ft3_orange/.
+```text
+M1  in front of the base; orange between the open jaws c20, then passed it by to the right and searched there      FAIL
+    (closed on air c40) to the cap.
+M2  LEFT MID-TABLE; reach c14, HOLD by c26 (~30), over the tray c30, released IN the tray by c34, at rest by c40.   SUCCESS
+M3  forward of the base, right; hovered beside it open c14–40, then stretched flat across the table past it.        FAIL
+M4  LEFT MID-TABLE; came down off-centre, closed to 32 with the fruit against the OUTSIDE of the left jaw c40,        FAIL
+    pushed it right, followed it open to the cap.
+M5  forward of the base, right; hovered above it open c20–40, then stretched flat across the table past it.          FAIL
+```
+Reading: the three placements in front of / right of the base all failed without a close (pass-by or over-reach);
+of the two left-mid-table placements one was a clean 40-chunk success and one a close-beside. Same picture as the
+tomato today. Fine-tune 3 orange 4/15 (Sunday 3/5, Tuesday 0/5, Wednesday 1/5); tomato 7/29.
+DAY 2026-10-29 TOTAL (RTX 5090): tomato 2/6, orange 1/5, three-orange experiment 0/3 ×2.
