@@ -197,6 +197,7 @@ def main():
                 print(f"\n=== episode {ep+1}: starting in {a.pause_between:.0f} s (auto) — place the object now ===", flush=True)
                 for left in range(int(a.pause_between), 0, -5):
                     print(f"    {left} s", flush=True); time.sleep(min(5, left))
+            snap(ep + 1, "start")                                                 # the scene as the trial begins (fresh, after the pause)
             t_ep = time.time(); n_chunks = 0; lat = []; q_start = joints_now()
             for ci in range(a.max_chunks):
                 if stop["flag"]: break

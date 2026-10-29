@@ -49,9 +49,9 @@ for row, (raw, pref, cap, first, lost) in ROWS.items():
         if not src_dir.is_dir(): continue
         t0 = tr[0]; model = "base" if t0["model"] == "base" else "ft3"; fruit = t0["fruit"].split()[0]
         d = OUT / f"{t0['date']}_{DAY.get(t0['date'],'')}_row{row}_{model}_{fruit}" / f"trial{int(t['trial'])}_{t['result'].replace('?','_pending')}"
-        for tag in ("after_last_chunk", "at_rest"):
+        for tag in ("start", "after_last_chunk", "at_rest"):
             for cam in ("front", "wrist"):
-                src = src_dir / f"ep{int(t['ep_in_log'])}_{tag}_{cam}.jpg"; dst = d / f"{cam}_end_{tag}.jpg"
+                src = src_dir / f"ep{int(t['ep_in_log'])}_{tag}_{cam}.jpg"; dst = d / (f"{cam}_start.jpg" if tag == "start" else f"{cam}_end_{tag}.jpg")
                 if src.exists() and d.is_dir() and not dst.exists(): shutil.copy2(src, dst); pulled += 1
-readme += ["", "Trials run from 2026-10-29 on also have `front_end_after_last_chunk.jpg` / `front_end_at_rest.jpg` (and wrist): the pose the policy left the arm in, and the arm back at rest. Earlier trials have no such frames (the client never captured them) and their `chunk001` frame is stale — use chunk002 as the true start frame (bench_runs.md 2026-10-29)."]
+readme += ["", "Trials run from 2026-10-29 on also have `front_start.jpg` (the scene as the trial begins), `front_end_after_last_chunk.jpg` (the pose the policy left the arm in) and `front_end_at_rest.jpg` (back at rest), plus the same for the wrist camera. Earlier trials have no such frames (the client never captured them) and their `chunk001` frame is stale — use chunk002 as the true start frame (bench_runs.md 2026-10-29)."]
 (OUT / "README.md").write_text("\n".join(readme) + "\n"); print("linked files:", made, "end snapshots copied:", pulled)
