@@ -1,0 +1,3 @@
+2026-10-29 fine-tune 3 / tomato
+SUCCESS — idle 12 chunks; reach c20; HOLD from c28 (gripper ~30); lifted, carried to the tray, released IN the tray c38-40; back at rest by c50 and held to the cap. First trial with start/end pictures. (A first launch with the orange wording on this tomato was stopped at c40 — void.)
+placement: left mid-table (tray left); tray: left; instruction: pick up the tomato and place it on the plate; cap 75 chunks

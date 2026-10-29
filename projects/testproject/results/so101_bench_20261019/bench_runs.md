@@ -469,3 +469,16 @@ twice at the moment of release, a few cm short of the rim. Both are precision-at
    frames, one short of the queue depth. The policy therefore planned its first chunk from the previous scene. Its
    first chunk is a near-no-op at rest, so the trials stand, but it is a real defect. FIX: queue depth set to 1 and
    8 frames dropped after any idle gap > 5 s. The true start-of-trial frame is chunk 2 in the existing folders.
+
+## 2026-10-29 — ROW J: one tomato trial after the AI90 restart — SUCCESS (served on the RTX 5090)
+AI90 came back at 09:22; the 4 TB drive mounted again, checkpoints intact (sizes unchanged); the RTX PRO 5000 is still
+absent, so the fine-tune 3 server runs on GPU 0 (the 5090). First thing: the three final checkpoints mirrored to
+/home/kiran/lerobot_assets/ckpt_mirror/ and their lora_adapters/ copied to results/so101_lora_on_top_20261019/adapters/
+(135–571 MB each, kept out of git). A first launch sent the ORANGE wording while a tomato was on the table — stopped at
+c40, void (bench_row3j_void_tomato_with_orange_wording.jsonl). Relaunch with the tomato wording:
+```text
+J1  tomato left mid-table, tray left; idle 12 chunks; reach c20; hold from c28 (gripper 24–30); lifted, carried,   SUCCESS
+    released IN the tray c38–40; back at rest by c50 and held to the cap. RTT 1.22 s. First trial with the new
+    start / after-last-chunk / at-rest pictures (results/bench_frames_by_trial/2026-10-29_wed_rowJ_ft3_tomato/trial1_SUCCESS/).
+```
+Fine-tune 3 tomato is now 6/24; orange 3/10.

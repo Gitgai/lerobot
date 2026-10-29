@@ -3,7 +3,7 @@
 Source: `trials.csv` (hand-kept, one row per trial). `trials_full.csv` adds the numbers computed from each trial's log. Regenerate with `python3 scripts/bench_trials_table.py`.
 **Frames, browsable:** `results/bench_frames_by_trial/<date>_<day>_row<X>_<model>_<fruit>/trial<N>_<RESULT>/` (front_chunkNNN.jpg + wrist_chunkNNN.jpg + WHAT_HAPPENED.txt; built by `scripts/sort_bench_frames.py`). Raw dump behind it: every policy call's overhead + wrist JPEG, named `<prefix>_call<N>_{front,wrist}.jpg`; fine-tune 3 rows in `results/so101_lora_on_top_20261019/bench_frames_row3_010000/` (prefix per row in the `frames` column, e.g. row I = c08, row H = c07, row E = c05), public-base rows in `results/so101_bench_20261019/frames/`. Trial N of a row covers calls (N-1)*cap+1 … N*cap. Narrative per trial: `bench_runs.md`. VOID = not a trial (camera fault, stop, wrong launch, fruit not re-placed); excluded from every count.
 
-Trials: 61 recorded, 54 valid, 7 void.
+Trials: 62 recorded, 55 valid, 7 void.
 
 ### By model / fruit
 
@@ -13,7 +13,7 @@ Trials: 61 recorded, 54 valid, 7 void.
 | base / onion (off-protocol) | 3 | 0 | 0 | 3 | 0/3 |
 | base / orange | 11 | 0 | 0 | 11 | 0/11 |
 | base / tomato | 5 | 0 | 0 | 5 | 0/5 |
-| fine-tune 3 / tomato | 23 | 5 | 0 | 18 | 5/23 |
+| fine-tune 3 / tomato | 24 | 6 | 0 | 18 | 6/24 |
 | fine-tune 3 / orange | 10 | 3 | 0 | 7 | 3/10 |
 
 ### By day / model / fruit
@@ -28,6 +28,7 @@ Trials: 61 recorded, 54 valid, 7 void.
 | 2026-10-26 / fine-tune 3 / orange | 5 | 3 | 0 | 2 | 3/5 |
 | 2026-10-28 / fine-tune 3 / orange | 5 | 0 | 0 | 5 | 0/5 |
 | 2026-10-28 / fine-tune 3 / tomato | 10 | 1 | 0 | 9 | 1/10 |
+| 2026-10-29 / fine-tune 3 / tomato | 1 | 1 | 0 | 0 | 1/1 |
 
 ### By model / fruit / cap
 
@@ -38,7 +39,7 @@ Trials: 61 recorded, 54 valid, 7 void.
 | base / orange / cap 45 | 11 | 0 | 0 | 11 | 0/11 |
 | base / tomato / cap 45 | 5 | 0 | 0 | 5 | 0/5 |
 | fine-tune 3 / tomato / cap 45 | 5 | 1 | 0 | 4 | 1/5 |
-| fine-tune 3 / tomato / cap 75 | 18 | 4 | 0 | 14 | 4/18 |
+| fine-tune 3 / tomato / cap 75 | 19 | 5 | 0 | 14 | 5/19 |
 | fine-tune 3 / orange / cap 75 | 10 | 3 | 0 | 7 | 3/10 |
 
 ### Failure modes (valid FAIL trials; the FIRST mode when a trial shows two in sequence)
@@ -124,6 +125,7 @@ Trials: 61 recorded, 54 valid, 7 void.
 | 2026-10-28 | I | 3 | fine-tune 3 | row3_all169_conservative ckpt 010000 (LoRA merged) | AI90 :8081 GPU 1 | tomato | pick up the tomato and place it on the plate | 75 | overhead, position 2 | left | right of the arm (tray left) |
 | 2026-10-28 | I | 4 | fine-tune 3 | row3_all169_conservative ckpt 010000 (LoRA merged) | AI90 :8081 GPU 1 | tomato | pick up the tomato and place it on the plate | 75 | overhead, position 2 | left | left close to the arm (tray left) |
 | 2026-10-28 | I | 5 | fine-tune 3 | row3_all169_conservative ckpt 010000 (LoRA merged) | AI90 :8081 GPU 1 | tomato | pick up the tomato and place it on the plate | 75 | overhead, position 2 | left | under the gripper near the base |
+| 2026-10-29 | J | 1 | fine-tune 3 | row3_all169_conservative ckpt 010000 (LoRA merged) | AI90 :8081 GPU 0 (RTX 5090 — the PRO 5000 is missing since the 10-28 reboot) | tomato | pick up the tomato and place it on the plate | 75 | overhead, position 2 | left | left mid-table (tray left) |
 
 ### Every trial — outcome
 
@@ -190,3 +192,4 @@ Trials: 61 recorded, 54 valid, 7 void.
 | 2026-10-28 | I | 3 | **FAIL** | released outside the rim | reach c16; HOLD 28-30 c25-47; lifted and carried to the tray; opened at c49 above the rim and the tomato fell just OUTSIDE it; jaws shut on air (14) c50; re-grasped it (26-28) at the cap | 9 | 14 (51) | 18 | 75 | 147.8 | 1.351 |  | bench_row3i_tomato_20261028 ep3; results/so101_lora_on_top_20261019/bench_frames_row3_010000/c08_call* |
 | 2026-10-28 | I | 4 | **FAIL** | released outside the rim (then operator moved the fruit c40) | reach c14; HOLD 28 c22-28; carried toward the tray; opened to 54 at c29-30 short of the rim, tomato landed outside at the trays near edge; operator moved it c40; partial close 20-22 on it c53-57; open at the cap | 3 | 14 (54) | 23 | 75 | 150.2 | 1.351 |  | bench_row3i_tomato_20261028 ep4; results/so101_lora_on_top_20261019/bench_frames_row3_010000/c08_call* |
 | 2026-10-28 | I | 5 | **FAIL** | close-above (partial squeeze) | idle 12; came down on it; jaws closed to 24 on its top c30 and to 16-22 c43-47 (no hold); stayed over it to the cap; never lifted | 4 | 16 (49) | 34 | 75 | 152.4 | 1.355 |  | bench_row3i_tomato_20261028 ep5; results/so101_lora_on_top_20261019/bench_frames_row3_010000/c08_call* |
+| 2026-10-29 | J | 1 | **SUCCESS** | — | idle 12 chunks; reach c20; HOLD from c28 (gripper ~30); lifted, carried to the tray, released IN the tray c38-40; back at rest by c50 and held to the cap. First trial with start/end pictures. (A first launch with the orange wording on this tomato was stopped at c40 — void.) | 9 | 24 (37) | 24 | 75 | 181.9 | 1.215 |  | bench_row3j_tomato_20261029 ep1; results/so101_lora_on_top_20261019/bench_frames_row3_010000/c10_call* |

@@ -13,7 +13,7 @@ BASE_TRIALS = {1: ("c05", 1), 2: ("c06", 1), 3: ("c07", 1), 4: ("c08", 1), 5: ("
                11: ("c12", 1), 12: ("c12", 46), 13: ("c12", 91), 14: ("c12", 136), 15: ("c12", 181), 16: ("c12", 226)}
 ROWS = {"base": (BASE, None, 45, 1, []), "ctrl": (BASE, "c01", 45, 1, []), "A": (R3, "c01", 45, 1, [(1, 48)]), "B": (R3, "c02", 75, 1, [(1, 348)]), "C": (R3, "c03", 75, 1, [(1, 65)]),
         "D": (R3, "c04", 75, 1, [(1, 75)]), "E": (R3, "c05", 75, 1, []), "F": (R3, "c02", 75, 1, []), "G": (R3, "c04", 75, 1, []),
-        "H": (R3, "c07", 75, 1, []), "I": (R3, "c08", 75, 1, [])}
+        "H": (R3, "c07", 75, 1, []), "I": (R3, "c08", 75, 1, []), "J": (R3, "c10", 75, 1, [])}
 DAY = {"2026-10-26": "sun", "2026-10-28": "tue", "2026-10-29": "wed"}
 trials = list(csv.DictReader(open("results/so101_bench_20261019/trials.csv")))
 made = 0; readme = ["# Bench frames, one folder per trial", "", "Hard links into the raw server dump (see scripts/sort_bench_frames.py). "

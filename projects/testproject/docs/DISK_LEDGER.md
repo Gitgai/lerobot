@@ -212,3 +212,5 @@ Found 2026-10-29 while trying to restart the bench servers. Facts from the kerne
   lane: mounting, kernel parameters and the physical check are the operator's (sudo + hands on the box).
 - Rule R8 (proposed): after the drive is back, copy lora_adapters/ of each row's final checkpoint (tens of MB) into
   the repo-side results dir, and mirror the three final merged checkpoints (7.3–8.6 GB each) to a second disk.
+
+UPDATE 2026-10-29 12:1x EDT: AI90 restarted 09:22; nvme1 live again, /mnt/data4tb mounted, the three final checkpoints present with unchanged sizes (7,481,485,688 B each). Mirrored to /home/kiran/lerobot_assets/ckpt_mirror/{row1_author_lora_b8_025000,row2_conservative_lora_007000,row3_all169_conservative_010000}/ (~22 GB on root) and lora_adapters/ + json to results/so101_lora_on_top_20261019/adapters/ (untracked, 0.8 GB). The RTX PRO 5000 is still not on the PCI bus. Rule R8 applied.
