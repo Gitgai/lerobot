@@ -7,7 +7,11 @@ import os, csv, pathlib
 R3 = "results/so101_lora_on_top_20261019/bench_frames_row3_010000"; BASE = "results/so101_bench_20261019/frames"
 OUT = pathlib.Path("results/bench_frames_by_trial")
 # row -> (raw dir, prefix, cap, first call of trial 1, lost call ranges)
-ROWS = {"ctrl": (BASE, "c01", 45, 1, []), "A": (R3, "c01", 45, 1, [(1, 48)]), "B": (R3, "c02", 75, 1, [(1, 348)]), "C": (R3, "c03", 75, 1, [(1, 65)]),
+# the 16 public-base trials (Oct 19-20) were served one connection per launch: trials 1-6 = c05..c10 (45 calls each),
+# trials 7-10 = c11 (4 x 45), trials 11-16 = c12 (6 x 45); (prefix, first call) per trial
+BASE_TRIALS = {1: ("c05", 1), 2: ("c06", 1), 3: ("c07", 1), 4: ("c08", 1), 5: ("c09", 1), 6: ("c10", 1), 7: ("c11", 1), 8: ("c11", 46), 9: ("c11", 91), 10: ("c11", 136),
+               11: ("c12", 1), 12: ("c12", 46), 13: ("c12", 91), 14: ("c12", 136), 15: ("c12", 181), 16: ("c12", 226)}
+ROWS = {"base": (BASE, None, 45, 1, []), "ctrl": (BASE, "c01", 45, 1, []), "A": (R3, "c01", 45, 1, [(1, 48)]), "B": (R3, "c02", 75, 1, [(1, 348)]), "C": (R3, "c03", 75, 1, [(1, 65)]),
         "D": (R3, "c04", 75, 1, [(1, 75)]), "E": (R3, "c05", 75, 1, []), "F": (R3, "c02", 75, 1, []), "G": (R3, "c04", 75, 1, []),
         "H": (R3, "c07", 75, 1, []), "I": (R3, "c08", 75, 1, [])}
 DAY = {"2026-10-26": "sun", "2026-10-28": "tue", "2026-10-29": "wed"}
@@ -19,11 +23,12 @@ for row, (raw, pref, cap, first, lost) in ROWS.items():
     tr = [t for t in trials if t["row"] == row]
     if not tr: continue
     t0 = tr[0]; model = "base" if t0["model"] == "base" else "ft3"; fruit = t0["fruit"].split()[0]
-    folder = OUT / f"{t0['date']}_{DAY.get(t0['date'],'')}_row{row}_{model}_{fruit}"; folder.mkdir(parents=True, exist_ok=True)
+    folder = OUT / ("2026-10-19_20_rowbase_base_citrus_onion_orange" if row == "base" else f"{t0['date']}_{DAY.get(t0['date'],'')}_row{row}_{model}_{fruit}"); folder.mkdir(parents=True, exist_ok=True)
     notes = []
     for t in tr:
         n = int(t["trial"]); d = folder / f"trial{n}_{t['result'].replace('?','_pending')}"; d.mkdir(exist_ok=True)
-        a, b = first + (n - 1) * cap, first + n * cap - 1
+        if row == "base": pref, a = BASE_TRIALS[n]; b = a + cap - 1
+        else: a, b = first + (n - 1) * cap, first + n * cap - 1
         lost_here = [(max(a, x), min(b, y)) for x, y in lost if x <= b and y >= a]
         if lost_here and lost_here[0][0] == a and lost_here[0][1] >= b - 2:
             (d / "LOST.txt").write_text(f"raw frames {pref} calls {a}-{b} were overwritten by the 2026-10-28 server restart; see results/so101_lora_on_top_20261019/bench_row3*_T{n}.jpg for the composite built before the loss\n"); notes.append(f"trial {n} frames lost"); continue
@@ -35,7 +40,7 @@ for row, (raw, pref, cap, first, lost) in ROWS.items():
                     try: os.link(src, dst)
                     except OSError: import shutil; shutil.copy2(src, dst)
                     made += 1
-        (d / "WHAT_HAPPENED.txt").write_text(f"{t['result']} — {t['what_happened']}\nplacement: {t['placement']}; tray: {t['tray']}; instruction: {t['instruction']}; cap {cap} chunks\n")
+        (d / "WHAT_HAPPENED.txt").write_text(f"{t['date']} {t['model']} / {t['fruit']}\n{t['result']} — {t['what_happened']}\nplacement: {t['placement']}; tray: {t['tray']}; instruction: {t['instruction']}; cap {cap} chunks\n")
     readme.append(f"| {folder.name} | {len(tr)} | {'; '.join(notes) if notes else ''} |")
 # end-of-trial snapshots saved by the client on the Acer (bench_client.py snap(): after_last_chunk, at_rest) — pull with --pull
 import sys, subprocess, shutil

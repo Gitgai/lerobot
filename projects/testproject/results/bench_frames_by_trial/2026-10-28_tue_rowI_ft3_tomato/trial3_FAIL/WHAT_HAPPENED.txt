@@ -1,2 +1,3 @@
+2026-10-28 fine-tune 3 / tomato
 FAIL — reach c16; HOLD 28-30 c25-47; lifted and carried to the tray; opened at c49 above the rim and the tomato fell just OUTSIDE it; jaws shut on air (14) c50; re-grasped it (26-28) at the cap
 placement: right of the arm (tray left); tray: left; instruction: pick up the tomato and place it on the plate; cap 75 chunks

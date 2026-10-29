@@ -1,0 +1,3 @@
+2026-10-20 base / orange
+FAIL — 16 chunks idle; side squeeze then above; pushed ~10 cm
+placement: mid; tray: —; instruction: Grab oranges and place into plate.; cap 45 chunks

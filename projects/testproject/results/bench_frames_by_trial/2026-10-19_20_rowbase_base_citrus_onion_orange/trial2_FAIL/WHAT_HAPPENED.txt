@@ -1,0 +1,3 @@
+2026-10-19 base / citrus
+FAIL — jaws on the fruit (floor 10-17); no enclosure; no lift
+placement: —; tray: —; instruction: Grab oranges and place into plate.; cap 45 chunks

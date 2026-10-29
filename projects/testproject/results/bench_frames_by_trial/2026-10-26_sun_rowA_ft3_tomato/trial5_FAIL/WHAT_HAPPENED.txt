@@ -1,2 +1,3 @@
+2026-10-26 fine-tune 3 / tomato
 FAIL — idle 26 chunks; cap hit mid-grasp (closing to 17 on it)
 placement: left; tray: —; instruction: pick up the tomato and place it on the plate; cap 45 chunks

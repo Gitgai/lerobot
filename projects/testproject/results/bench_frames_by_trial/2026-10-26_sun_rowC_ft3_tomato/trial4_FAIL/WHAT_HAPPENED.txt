@@ -1,2 +1,3 @@
+2026-10-26 fine-tune 3 / tomato
 FAIL — reach c6-13; jaws closed to 13-19 on its upper side c14-16 (no hold); around it c22-38; close to 9 beside it c46; between the jaws closing to 13 at the cap
 placement: close to base; tray: —; instruction: pick up the tomato and place it on the plate; cap 75 chunks

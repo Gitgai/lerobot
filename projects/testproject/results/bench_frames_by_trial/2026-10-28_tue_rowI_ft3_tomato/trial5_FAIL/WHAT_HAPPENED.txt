@@ -1,2 +1,3 @@
+2026-10-28 fine-tune 3 / tomato
 FAIL — idle 12; came down on it; jaws closed to 24 on its top c30 and to 16-22 c43-47 (no hold); stayed over it to the cap; never lifted
 placement: under the gripper near the base; tray: left; instruction: pick up the tomato and place it on the plate; cap 75 chunks

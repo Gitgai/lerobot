@@ -1,2 +1,3 @@
+2026-10-26 fine-tune 3 / tomato
 SUCCESS — three partial closes (17 at c12, 15 at c21-23, 15 at c46) before a hold (29-31) from ~c51; carried; released INTO the tray by c70
 placement: —; tray: —; instruction: pick up the tomato and place it on the plate; cap 75 chunks

@@ -1,0 +1,3 @@
+2026-10-20 base / orange
+FAIL — 19 chunks idle; closes beside/above at the jaw tip
+placement: close-in; tray: —; instruction: Grab oranges and place into plate.; cap 45 chunks

@@ -1,0 +1,3 @@
+2026-10-20 base / orange
+FAIL — four closes all beside it
+placement: close-in; tray: —; instruction: Grab oranges and place into plate.; cap 45 chunks

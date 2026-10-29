@@ -1,0 +1,3 @@
+2026-10-20 base / onion (off-protocol)
+FAIL — aligned then closed above it; pushed out; network stall 7-14 s/call
+placement: —; tray: —; instruction: Grab oranges and place into plate.; cap 45 chunks

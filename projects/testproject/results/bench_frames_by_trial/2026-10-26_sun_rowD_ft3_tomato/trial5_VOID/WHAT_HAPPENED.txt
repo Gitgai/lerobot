@@ -1,2 +1,3 @@
+2026-10-26 fine-tune 3 / tomato
 VOID — wrist camera read failed at chunk 23; client exited
 placement: —; tray: —; instruction: pick up the tomato and place it on the plate; cap 75 chunks
