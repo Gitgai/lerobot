@@ -1,0 +1,3 @@
+2026-10-31 fine-tune 3 / orange
+FAIL — repeated closes to 12-14 with the orange outside the right jaw; no hold or carry; stretched flat across the table to the cap
+placement: forward-right; tray: left; instruction: pick up the orange and place it on the plate; cap 75 chunks

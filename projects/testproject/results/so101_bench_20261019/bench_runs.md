@@ -604,3 +604,21 @@ tomato 0/1. Both valid failures lost the fruit at the close and never establishe
 
 Post-run safety check: torque and status zero on all six motors; gripper protection registers verified at
 500/250/25; gripper temperature 35 °C.
+
+### 2026-10-31 — ROW R: single ORANGE ×5, our wording, 75-chunk cap, tray left — 3/5
+Same fine-tune 3 checkpoint on the RTX 5090, camera by-id paths, 20 actions executed per policy call. The requested
+placement was left mid-table, but the start pictures show the orange forward and to the arm's right in every trial;
+R1 was farthest right. Log: `bench_row3r_orange_20261031.jsonl`; raw server frames: c26 calls 1–375.
+
+```text
+R1  FORWARD-RIGHT, farthest right; closed to 13 at c16 without a hold; repeated closes, then flat overreach.   FAIL
+R2  FORWARD-RIGHT; grasp held c15–32 (24–28); carried left; released IN tray c33; near rest c37.              SUCCESS
+R3  FORWARD-RIGHT; grasp held from c11 (20–26); carried left; opened over tray c17–19; near rest c21.         SUCCESS
+R4  FORWARD-RIGHT; repeated closes to 12–14 with orange outside right jaw; no carry; flat overreach.          FAIL
+R5  FORWARD-RIGHT; grasp held c14–30 (14–23); carried left; released IN tray c31–33; near rest c37.           SUCCESS
+```
+
+Row R is **3/5**. All three successful deliveries were complete grasp-carry-release cycles; both failures lost the
+orange at the close and ended in the familiar overreach posture. Fine-tune 3 orange is now **12/31** overall;
+tomato remains **7/30**. Post-run torque and status were zero on all six motors, gripper protections read back
+500/250/25, and gripper temperature was 36 °C.

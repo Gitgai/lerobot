@@ -16,10 +16,11 @@ N_TRIALS = {1: ("c15", 1), 2: ("c15", 76), 3: ("c17", 1), 4: ("c17", 76), 5: ("c
 O_TRIALS = {1: ("c18", 1), 2: ("c19", 1), 3: ("c20", 1), 4: ("c20", 76), 5: ("c20", 151)}
 P_TRIALS = {1: ("c22", 1)}
 Q_TRIALS = {1: ("c25", 1)}
-ROWS = {"base": (BASE, None, 45, 1, []), "M": (R3, None, 75, 1, []), "N": (R3, None, 75, 1, []), "O": (R3, None, 75, 1, []), "P": (R3, None, 75, 1, []), "Q": (R3, None, 75, 1, []), "ctrl": (BASE, "c01", 45, 1, []), "A": (R3, "c01", 45, 1, [(1, 48)]), "B": (R3, "c02", 75, 1, [(1, 348)]), "C": (R3, "c03", 75, 1, [(1, 65)]),
+R_TRIALS = {n: ("c26", 1 + (n - 1) * 75) for n in range(1, 6)}
+ROWS = {"base": (BASE, None, 45, 1, []), "M": (R3, None, 75, 1, []), "N": (R3, None, 75, 1, []), "O": (R3, None, 75, 1, []), "P": (R3, None, 75, 1, []), "Q": (R3, None, 75, 1, []), "R": (R3, None, 75, 1, []), "ctrl": (BASE, "c01", 45, 1, []), "A": (R3, "c01", 45, 1, [(1, 48)]), "B": (R3, "c02", 75, 1, [(1, 348)]), "C": (R3, "c03", 75, 1, [(1, 65)]),
         "D": (R3, "c04", 75, 1, [(1, 75)]), "E": (R3, "c05", 75, 1, []), "F": (R3, "c02", 75, 1, []), "G": (R3, "c04", 75, 1, []),
         "H": (R3, "c07", 75, 1, []), "I": (R3, "c08", 75, 1, []), "J": (R3, "c10", 75, 1, []), "K": (R3, "c11", 75, 1, []), "L": (R3, "c12", 120, 1, [])}
-DAY = {"2026-10-26": "sun", "2026-10-28": "tue", "2026-10-29": "wed", "2026-10-30": "thu"}
+DAY = {"2026-10-26": "sun", "2026-10-28": "tue", "2026-10-29": "wed", "2026-10-30": "thu", "2026-10-31": "fri"}
 trials = list(csv.DictReader(open("results/so101_bench_20261019/trials.csv")))
 made = 0; readme = ["# Bench frames, one folder per trial", "", "Hard links into the raw server dump (see scripts/sort_bench_frames.py). "
           "Names: `<date>_<day>_row<X>_<model>_<fruit>/trial<N>_<RESULT>/front_chunk<NNN>.jpg` (overhead camera) and `wrist_chunk<NNN>.jpg`. "
@@ -39,6 +40,7 @@ for row, (raw, pref, cap, first, lost) in ROWS.items():
         elif row == "O": pref, a = O_TRIALS[n]; b = a + cap - 1
         elif row == "P": pref, a = P_TRIALS[n]; b = a + cap - 1
         elif row == "Q": pref, a = Q_TRIALS[n]; b = a + cap - 1
+        elif row == "R": pref, a = R_TRIALS[n]; b = a + cap - 1
         else: a, b = first + (n - 1) * cap, first + n * cap - 1
         lost_here = [(max(a, x), min(b, y)) for x, y in lost if x <= b and y >= a]
         if lost_here and lost_here[0][0] == a and lost_here[0][1] >= b - 2:

@@ -1,0 +1,3 @@
+2026-10-31 fine-tune 3 / orange
+FAIL — closed to 13 at c16 without a hold; repeated closes without a carry; stretched flat across the table to the cap; orange remained on the table
+placement: forward-right, farthest right in row; tray: left; instruction: pick up the orange and place it on the plate; cap 75 chunks

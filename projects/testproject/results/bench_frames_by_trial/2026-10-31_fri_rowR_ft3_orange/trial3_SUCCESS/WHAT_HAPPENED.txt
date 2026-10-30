@@ -1,0 +1,3 @@
+2026-10-31 fine-tune 3 / orange
+SUCCESS — grasp held from c11 (20-26); carried left; opened over the tray c17-19; orange IN the tray; back near rest c21
+placement: forward-right; tray: left; instruction: pick up the orange and place it on the plate; cap 75 chunks
