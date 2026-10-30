@@ -584,3 +584,23 @@ Post-run safety check: torque and status were zero on all six motors. The instal
 gripper protection registers during connection from the audited 500/250/25 values to 1000/500/80. They were restored
 and read back as 500/250/25 with torque off. `bench_client.py` now restores and verifies those values immediately
 after every connection, before any holding or motion command.
+
+### 2026-10-30 — ROWS P/Q: one ORANGE and one TOMATO, our wording, 75-chunk cap — 0/1 each
+Same fine-tune 3 checkpoint on the RTX 5090, tray left, camera by-id paths. The orange was placed directly in front
+of the base, slightly left of centre. The tomato was placed in front and to the right. Raw server frames are c22
+and c25; the intervening c23/c24 launches are preserved as void attempts.
+
+```text
+P1  ORANGE; closed to about 20 around c25–26 without a sustained hold, reopened over the fruit, then overreached;
+    orange remained on the table.                                                                   FAIL
+Q1  TOMATO; multiple closes around the fruit (minimum 9 at c34), each reopened; no lift or trayward carry;
+    tomato remained on the table after being nudged slightly left.                                  FAIL
+```
+
+One P launch was stopped during the countdown before a policy call. Two Q launches began with the orange still on
+the table while the tomato instruction was active; they were stopped at c14 and c5. All three are VOID and excluded
+from the totals. Fine-tune 3 is now **orange 9/26** and **tomato 7/30**. The 2026-10-30 tally is orange 0/1 and
+tomato 0/1. Both valid failures lost the fruit at the close and never established a carry.
+
+Post-run safety check: torque and status zero on all six motors; gripper protection registers verified at
+500/250/25; gripper temperature 35 °C.

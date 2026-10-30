@@ -130,7 +130,7 @@ R5   "LoRA on top": freeze the public checkpoint, add rank-16  running  GO 2026-
                                                                         (base: tomato 0/5, orange 0/11). First working policy on this bench.
                                                                         2026-10-28 session 2: orange 0/5 (placed under the gripper, off the
                                                                         demo area), tomato 1/10 (near misses, one carry released outside the
-                                                                        rim). 10-29 on the 5090: tomato 2/6, orange 6/15 (M 1/5, N 4/5, O 1/5 from far right). Totals: orange 9/25, tomato 7/29. Placement matters but is not deterministic.
+                                                                        rim). 10-29 on the 5090: tomato 2/6, orange 6/15 (M 1/5, N 4/5, O 1/5 from far right). 10-30: one orange and one tomato, both close failures. Totals: orange 9/26, tomato 7/30. Placement matters but is not deterministic.
                                                                         NEXT: auto-reset calibration (tray poses done, 10 slots pending) →
                                                                         20-trial orange rows on the demo-area slots (ft3, base) → Isaac gate
 R3   "bench trials": 20 real attempts in Pune, NON-PIPELINED  running  **0/13 counted** (citrus ×2, orange ×11) + 3 off-protocol
