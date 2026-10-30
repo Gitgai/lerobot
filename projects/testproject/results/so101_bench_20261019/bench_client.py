@@ -17,6 +17,45 @@ import numpy as np
 JOINTS = ["shoulder_pan", "shoulder_lift", "elbow_flex", "wrist_flex", "wrist_roll", "gripper"]
 
 
+class TraceWriter:
+    """Append-only live-trial trace consumed by watch_bench_trial.py.
+
+    This instrumentation has no robot or policy control path.  Each event is a
+    complete JSON line so the viewer can safely follow the file while a trial is
+    running.
+    """
+    def __init__(self, root):
+        self.root = pathlib.Path(root).expanduser().resolve()
+        self.frames = self.root / "frames"
+        self.frames.mkdir(parents=True, exist_ok=False)
+        self.stream = (self.root / "events.jsonl").open("x", buffering=1)
+        self.event("trace_started", joints=JOINTS)
+
+    def event(self, kind, **fields):
+        rec = {"kind": kind, "monotonic_ns": time.monotonic_ns(), "unix_s": time.time(), **fields}
+        self.stream.write(json.dumps(rec, separators=(",", ":")) + "\n")
+
+    def observation(self, ep, chunk, front, wrist, state, front_cam, wrist_cam):
+        import cv2
+        paths = {}
+        for name, rgb in (("front", front), ("wrist", wrist)):
+            rel = pathlib.Path("frames") / f"ep{ep:02d}_chunk{chunk:03d}_{name}.jpg"
+            ok, encoded = cv2.imencode(".jpg", np.ascontiguousarray(rgb[:, :, ::-1]),
+                                       [int(cv2.IMWRITE_JPEG_QUALITY), 85])
+            if not ok:
+                raise RuntimeError(f"could not encode traced {name} frame")
+            (self.root / rel).write_bytes(encoded.tobytes())
+            paths[name] = str(rel)
+        self.event("observation", ep=ep, chunk=chunk, state=np.asarray(state).round(4).tolist(),
+                   images=paths, camera_stale={"front": int(getattr(front_cam, "stale", 0)),
+                                               "wrist": int(getattr(wrist_cam, "stale", 0))})
+
+    def close(self, complete=True):
+        if not self.stream.closed:
+            self.event("trace_closed", complete=bool(complete))
+            self.stream.close()
+
+
 def grpc_client(server, actions_per_chunk):
     import grpc
     from lerobot.async_inference import helpers as H
@@ -89,11 +128,12 @@ class Cam:
                     self.cap.set(self.cv2.CAP_PROP_FOURCC, self.cv2.VideoWriter_fourcc(*"MJPG")); self.cap.set(self.cv2.CAP_PROP_FRAME_WIDTH, self.w); self.cap.set(self.cv2.CAP_PROP_FRAME_HEIGHT, self.h)
                 time.sleep(0.5); ok, bgr = self.cap.read()
             if not ok:
-                # One stale 20-step plan lets a transient USB hiccup recover. Never continue for a second chunk on frozen vision.
+                # 2026-10-28: second mid-trial camera dropout in two sessions (AK wrist cam). Reusing the last good frame for one
+                # chunk is harmless (one stale 20-step plan); crashing mid-reach is not. Logged so the trial record shows it.
                 if getattr(self, "last", None) is not None:
                     self.consecutive_stale = getattr(self, "consecutive_stale", 0) + 1
                     if self.consecutive_stale > 1:
-                        raise RuntimeError(f"camera {self.src} failed for {self.consecutive_stale} consecutive reads")
+                        raise RuntimeError(f"camera {self.src} failed twice consecutively; refusing continued control on stale vision")
                     self.stale = getattr(self, "stale", 0) + 1; print(f"[cam {self.src}] READ FAILED, reusing last frame once (stale #{self.stale})", flush=True)
                     return self.last
                 raise RuntimeError(f"camera {self.src} read failed and no previous frame")
@@ -109,6 +149,7 @@ def main():
     ap.add_argument("--actions-per-chunk", type=int, default=20); ap.add_argument("--max-chunks", type=int, default=90, help="per episode (90 x 20 steps at 30 fps = 60 s of motion)")
     ap.add_argument("--episodes", type=int, default=1); ap.add_argument("--max-delta-deg", type=float, default=8.0); ap.add_argument("--max-delta-grip", type=float, default=15.0)
     ap.add_argument("--out", default="bench_log.jsonl"); ap.add_argument("--dry-run", action="store_true", help="read cameras + arm, query the policy, do NOT send actions")
+    ap.add_argument("--trace-dir", default="", help="fresh directory for full live-view trace (images, full predictions, sends, timing and status)")
     ap.add_argument("--no-robot", action="store_true", help="dry run without the arm: cameras + network + policy only (state = zeros)")
     ap.add_argument("--auto", action="store_true", help="no prompts: start the episode immediately, record the result as 'unscored' (operator scores it afterwards)")
     ap.add_argument("--home-to", default="", help="six comma-separated joint targets (LeRobot units): move there slowly (1.5 deg/step, 3 grip/step at --fps) and exit; no cameras, no policy")
@@ -120,6 +161,12 @@ def main():
     ap.add_argument("--reset-dry-run", action="store_true", help="auto-reset with the gripper held open and no close: moves only, nothing touched")
     a = ap.parse_args()
     if a.no_robot: a.dry_run = True
+    trace = TraceWriter(a.trace_dir) if a.trace_dir else None
+    if trace:
+        trace.event("session_config", server=a.server, task=a.task, fps=a.fps,
+                    actions_per_chunk=a.actions_per_chunk, max_chunks=a.max_chunks,
+                    episodes=a.episodes, pause_between=a.pause_between,
+                    return_start=a.return_start, dry_run=a.dry_run, no_robot=a.no_robot)
 
     robot = None
     if not a.no_robot:
@@ -197,37 +244,53 @@ def main():
         except Exception: pass
     threading.Thread(target=key_watch, daemon=True).start()
 
+    run_complete = False
     try:
         for ep in range(a.episodes):
             if not a.dry_run and not a.auto:
                 print(f"\n=== episode {ep+1}: place the orange, then press Enter (q/ESC stops) ===", flush=True); input()
             elif not a.dry_run:
                 print(f"\n=== episode {ep+1}: starting in {a.pause_between:.0f} s (auto) — place the object now ===", flush=True)
+                if trace: trace.event("countdown_started", ep=ep + 1, seconds=a.pause_between)
                 for left in range(int(a.pause_between), 0, -5):
+                    if trace: trace.event("countdown", ep=ep + 1, seconds_left=left)
                     print(f"    {left} s", flush=True); time.sleep(min(5, left))
             snap(ep + 1, "start")                                                 # the scene as the trial begins (fresh, after the pause)
             t_ep = time.time(); n_chunks = 0; lat = []; q_start = joints_now()
+            if trace: trace.event("episode_started", ep=ep + 1, start_state=q_start.round(4).tolist())
             for ci in range(a.max_chunks):
                 if stop["flag"]: break
                 q = joints_now(); f, w = front.read(), wrist.read()
+                if trace: trace.observation(ep + 1, ci + 1, f, w, q, front, wrist)
                 t0 = time.time(); chunk = act(f, w, q, a.task); dt = time.time() - t0; lat.append(dt)
+                if trace: trace.event("action_chunk_received", ep=ep + 1, chunk=ci + 1,
+                                      latency_s=dt, actions=chunk.round(4).tolist())
                 rec = {"ep": ep + 1, "chunk": ci + 1, "latency_s": round(dt, 3), "state": q.round(1).tolist(), "a0": chunk[0].round(1).tolist(), "max_a0_minus_state": float(np.abs(chunk[0] - q).max())}
                 out.write(json.dumps(rec) + "\n"); out.flush()
                 print(f"chunk {ci+1:3d}  {1000*dt:5.0f} ms  state {q.round(0).tolist()}  a0 {chunk[0].round(0).tolist()}", flush=True)
                 if a.dry_run: continue
                 prev = q.copy()
-                for act_vec in chunk:
+                for action_index, act_vec in enumerate(chunk):
                     if stop["flag"]: break
                     tgt = act_vec.copy()
                     d = tgt - prev; lim = np.array([a.max_delta_deg] * 5 + [a.max_delta_grip], dtype=np.float32)
                     tgt = prev + np.clip(d, -lim, lim)                        # per-step clamp
                     robot.send_action({f"{j}.pos": float(v) for j, v in zip(JOINTS, tgt)})
+                    if trace: trace.event("action_dispatched", ep=ep + 1, chunk=ci + 1,
+                                          action_index=action_index, predicted=act_vec.round(4).tolist(),
+                                          sent=tgt.round(4).tolist(), clamped=bool(np.any(np.abs(tgt-act_vec) > 1e-5)))
                     prev = tgt; time.sleep(1.0 / a.fps)
                 n_chunks += 1
             snap(ep + 1, "after_last_chunk")                                      # the pose the policy left the arm in (the server never sees it)
             res = "d" if a.dry_run else ("unscored" if a.auto else input("result? [s]uccess / [f]ail / [a]bort: ").strip().lower()[:1])
             out.write(json.dumps({"ep": ep + 1, "result": res, "chunks": n_chunks, "wall_s": round(time.time() - t_ep, 1), "latency_median_s": round(float(np.median(lat)), 3) if lat else None, "start_state": q_start.round(1).tolist(), "end_state": joints_now().round(1).tolist(), "task": a.task, "utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}) + "\n"); out.flush()
-            if a.return_start and not a.dry_run: move_to(q_start); snap(ep + 1, "at_rest")
+            if trace: trace.event("episode_ended", ep=ep + 1, result=res, chunks=n_chunks,
+                                  wall_s=time.time() - t_ep, median_latency_s=float(np.median(lat)) if lat else None,
+                                  end_state=joints_now().round(4).tolist(), stopped=stop["flag"])
+            if a.return_start and not a.dry_run:
+                if trace: trace.event("return_started", ep=ep + 1, target=q_start.round(4).tolist())
+                move_to(q_start); snap(ep + 1, "at_rest")
+                if trace: trace.event("return_ended", ep=ep + 1, state=joints_now().round(4).tolist())
             if resetter is not None and not a.dry_run and ep + 1 < a.episodes:
                 try:
                     rec = resetter.run(slot_order[ep % len(slot_order)]); print(f"[reset] ok slot {rec['slot']} held {rec['held_gripper']} {rec['wall_s']} s", flush=True)
@@ -235,8 +298,12 @@ def main():
                     out.write(json.dumps({"event": "reset_failed", "after_ep": ep + 1, "error": str(e), "utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}) + "\n"); out.flush()
                     print(f"[reset] FAILED after episode {ep+1}: {e} — row stopped; place by hand and restart", flush=True); break
             if res == "a": break
+        run_complete = True
     finally:
         stop["flag"] = True
+        if trace:
+            try: trace.close(complete=run_complete)
+            except Exception as e: print(f"[trace] close failed: {e}", flush=True)
         try:
             if robot is not None: robot.disconnect()
         except Exception: pass

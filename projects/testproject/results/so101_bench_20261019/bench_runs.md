@@ -622,3 +622,17 @@ Row R is **3/5**. All three successful deliveries were complete grasp-carry-rele
 orange at the close and ended in the familiar overreach posture. Fine-tune 3 orange is now **12/31** overall;
 tomato remains **7/30**. Post-run torque and status were zero on all six motors, gripper protections read back
 500/250/25, and gripper temperature was 36 °C.
+
+### 2026-10-31 — ROW S: single ORANGE ×1 with full live trace, 75-chunk cap, tray left — 0/1
+Same fine-tune 3 checkpoint on the RTX 5090. This was the first current-client run with the restored full Rerun
+dashboard: exact front and wrist policy inputs, complete 20-action predictions, all 1,500 dispatched actions,
+measured state, latency, countdown, and return state were visible live and retained for replay. Trace:
+`bench_trace_row3s_orange_live_20261031/`; compact log: `bench_row3s_orange_live_20261031.jsonl`.
+
+The orange started forward-right near the lower table edge. The arm reached it and closed to 30–38 during chunks
+32–44, but the fruit remained against the outside of the right jaw. There was no hold or trayward carry. The gripper
+reopened and the arm hovered beside the orange through chunk 75. The orange remained on the table. **FAIL**.
+
+The client returned the arm to its recorded start pose. The trace contains 75 observations, 75 complete prediction
+chunks, and 1,500 dispatched actions. Fine-tune 3 orange is now **12/32**; tomato remains **7/30**. Post-run torque
+and status were zero on all six motors, protections were 500/250/25, and gripper temperature was 35 °C.
