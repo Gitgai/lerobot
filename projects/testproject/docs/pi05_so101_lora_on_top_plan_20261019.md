@@ -346,9 +346,9 @@ fine-tune 3    ORANGE   75      5 (row R)      3 clean grasp-carry-release      
 fine-tune 3    ORANGE   75      1 (row S)      0                                  full live trace; close outside right jaw
 fine-tune 3    ORANGE   75      5 (row T)      1 clean grasp-carry-release        GPU 1; T4 recovered after losing its first grasp
 fine-tune 3    ORANGE   75      5 (row U)      1 clean grasp-carry-release        GPU 1; JPEG quality 85; RTC disabled; 4 close failures
-fine-tune 3    tomato   75      4 valid (row V) 0                                  GPU 1; JPEG quality 85; all failed; V4 camera-moved void excluded
+fine-tune 3    tomato   75      5 valid (row V) 1                                  GPU 1; JPEG quality 85; V6 success; V4 camera-moved void excluded
 ```
-Running totals for fine-tune 3 on this bench: orange 14/42 (row M 1/5, row N 4/5, row O 1/5 on 10-29; row P 0/1 on 10-30; row R 3/5, row S 0/1, row T 1/5, and row U 1/5 on 10-31), tomato 7/34 (Sunday 4/13, Tuesday 1/10, Wednesday 2/6, Thursday row Q 0/1 on the RTX 5090, Friday row V 0/4 on GPU 1, plus one camera-moved void). Three-orange experiment (row L, corpus wording, 120 chunks): 0 of 3 in both trials — hovered above the near pair closing on air, or drifted to the far one without closing; not part of the single-fruit totals. Frame-by-frame
+Running totals for fine-tune 3 on this bench: orange 14/42 (row M 1/5, row N 4/5, row O 1/5 on 10-29; row P 0/1 on 10-30; row R 3/5, row S 0/1, row T 1/5, and row U 1/5 on 10-31), tomato 8/35 (Sunday 4/13, Tuesday 1/10, Wednesday 2/6, Thursday row Q 0/1 on the RTX 5090, Friday row V 1/5 on GPU 1, plus one camera-moved void). Three-orange experiment (row L, corpus wording, 120 chunks): 0 of 3 in both trials — hovered above the near pair closing on air, or drifted to the far one without closing; not part of the single-fruit totals. Frame-by-frame
 re-read 2026-10-29 (bench_runs.md): A1 and D4 confirmed as real grasp-carry-release, so the 5 are firm; two of
 Tuesday's fails were grasp-and-carry released a few cm outside the rim; the dominant miss is the close itself
 (beside 7, short 5, above 3 of 18 fails). Today's

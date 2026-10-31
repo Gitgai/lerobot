@@ -1,0 +1,3 @@
+2026-10-31 fine-tune 3 / tomato
+SUCCESS — secured tomato by c13 with gripper near 22; visibly lifted by c15; carried left over the tray by c17; opened over the tray c19-20 and released inside; arm returned near home by c24; tomato remained in the tray through c75
+placement: forward-right, mid-table, slightly closer; orange partly visible at lower-left edge; tray: left; instruction: pick up the tomato and place it on the plate; cap 75 chunks

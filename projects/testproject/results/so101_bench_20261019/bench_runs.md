@@ -683,7 +683,7 @@ recorded start pose after every trial. Row U is **1/5**. Fine-tune 3 orange is n
 **7/30**. Post-run read-only checks passed: torque and status were zero on all six motors, gripper protections were
 500/250/25, voltage was 7.3 V, and gripper temperature was 34 °C. The GPU server was stopped after the run.
 
-### 2026-10-31 — ROW V: single TOMATO ×4 valid, JPEG without RTC, 75-chunk cap, tray left — 0/4
+### 2026-10-31 — ROW V: single TOMATO ×5 valid, JPEG without RTC, 75-chunk cap, tray left — 1/5
 Same fine-tune 3 checkpoint and transport settings as row U: AI90 GPU 1, JPEG quality 85, RTC disabled, and the
 stop-and-wait client executing 20 actions per request at 30 Hz. The instruction was
 `pick up the tomato and place it on the plate`.
@@ -693,14 +693,15 @@ V1  front-center near base; idle through c45; brief grasp c53–56; released bef
 V2  forward-right mid-table; reached from c34; centered c47–57; repeated closes, no sustained hold/lift.   FAIL
 V3  tomato-only, forward-right near edge; stayed beside it; two closes; no contact, lift, or carry.           FAIL
 V5  forward-right mid-table; repeated centered closes to 19 and 25–28; no clear lift or carry.                FAIL
+V6  slightly closer; grasp by c13; lifted c15; over tray c17; released inside c19–20; stayed through c75.     SUCCESS
 ```
 
 V1 ran 75 chunks in 188.8 s with 1.239 s median request latency. V2 ran 75 chunks in 191.0 s with 1.232 s median
-request latency. V3 ran 75 chunks in 194.0 s with 1.232 s median request latency. V5 ran 75 chunks in 179.9 s with 1.297 s
-median request latency. The scripted return restored the start pose after all four valid trials. Fine-tune 3 tomato
-is now **7/34**; orange remains **14/42**. V3 is the clean fruit-only comparison; the orange remained at the frame
-edge in V5. Post-run checks after V5 passed: torque and status were zero on all six motors, protections were
-500/250/25, voltage was 7.1 V, and gripper temperature was 34 °C. The GPU server was stopped.
+request latency. V3 ran 75 chunks in 194.0 s with 1.232 s median request latency. V5 ran 75 chunks in 179.9 s with 1.297 s median request latency. V6 ran 75 chunks in 204.8 s with 1.347 s
+median request latency. The scripted return restored the recorded start pose after all five valid trials. Fine-tune
+3 tomato is now **8/35**; orange remains **14/42**. V3 is the clean fruit-only comparison; the orange remained at
+the frame edge in V5 and V6. Post-run checks after V6 passed: torque and status were zero on all six motors,
+protections were 500/250/25, voltage was 7.0 V, and gripper temperature was 34 °C. The GPU server was stopped.
 
 A fourth launch is logged separately as **VOID**. The overhead camera moved substantially during placement, rotating
 toward the table corner and putting the tray outside the policy input. The arm stayed near home for most of the 75
