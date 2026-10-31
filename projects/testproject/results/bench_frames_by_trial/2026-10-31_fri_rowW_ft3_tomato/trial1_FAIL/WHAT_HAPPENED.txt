@@ -1,0 +1,3 @@
+2026-10-31 fine-tune 3 / tomato
+FAIL — reached tomato by c12; repeated closes to 22 and lower occurred against or beside a jaw; tomato remained on the table; arm searched around it through c75 with no sustained hold, lift, or trayward carry
+placement: forward-right, mid-table, slightly closer; orange partly visible at lower-left edge; tray: left; instruction: pick up the tomato and place it on the plate; cap 75 chunks

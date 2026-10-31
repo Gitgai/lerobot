@@ -1,0 +1,3 @@
+2026-10-31 fine-tune 3 / tomato
+FAIL — close at c16 rolled the tomato left toward the tray without securing it; arm followed and searched around the fruit, which stayed on the table; no hold, lift, or delivery
+placement: forward-right, mid-table, slightly closer; orange partly visible at lower-left edge; tray: left; instruction: pick up the tomato and place it on the plate; cap 75 chunks

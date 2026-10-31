@@ -707,3 +707,26 @@ A fourth launch is logged separately as **VOID**. The overhead camera moved subs
 toward the table corner and putting the tray outside the policy input. The arm stayed near home for most of the 75
 chunks and made only a late reach at c74–75. It ran 196.4 s with 1.317 s median request latency, returned to start,
 and is excluded from Row V and aggregate success rates.
+
+
+### 2026-10-31 — ROW W: single TOMATO ×5, JPEG without RTC, 75-chunk cap, tray left — 0/5
+Same fine-tune 3 checkpoint and settings as row V: AI90 GPU 1, JPEG quality 85, RTC disabled, 20 actions
+per stop-and-wait request at 30 Hz, and the instruction `pick up the tomato and place it on the plate`.
+W1–W3 are in `bench_trace_ft3_jpeg_no_rtc_row_w_tomato_20261031/`; W4–W5 are in the matching
+`_part2` trace after the wrist camera re-enumerated between trials. The client reported zero stale frames,
+and hashes confirmed every W3 wrist frame after the warning was unique, so W3 remains valid.
+
+```text
+W1  reached c12; repeated closes against/beside a jaw; searched through c75; no lift or carry.             FAIL
+W2  close c16 rolled tomato left toward tray without securing it; followed it; no hold or lift.            FAIL
+W3  clean tomato-only; reached c15 outside right jaw; hovered/searches mostly open; no grasp.               FAIL
+W4  clean tomato-only; tomato outside right jaw by c24; closes pushed it right; no hold or lift.            FAIL
+W5  clean tomato-only; closes from c19 landed beside it and pushed it right; no hold or lift.               FAIL
+```
+
+All five episodes ran the full 75 chunks. Wall times were 183.5, 193.7, 189.0, 179.5, and 183.5 s; median request
+latencies were 1.301, 1.308, 1.303, 1.239, and 1.281 s. The scripted return restored the recorded start pose after
+every trial. Row W is **0/5**. Fine-tune 3 tomato is now **8/40**; orange remains **14/42**. W1–W2 retained the
+orange at the lower-left frame edge; W3–W5 were clean tomato-only scenes. Post-run checks passed: torque and status
+were zero on all six motors, protections were 500/250/25, voltage was 7.1 V, and gripper temperature was 34 °C.
+The GPU server was stopped.
