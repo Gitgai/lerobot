@@ -1,0 +1,3 @@
+2026-10-31 fine-tune 3 / tomato
+FAIL — late reach beginning c34; tomato centered between the jaws c47-57; repeated closes to 14-29 reopened without a sustained hold; no lift or trayward carry; tomato remained on the table
+placement: forward-right, mid-table; orange visible at lower-left edge; tray: left; instruction: pick up the tomato and place it on the plate; cap 75 chunks
