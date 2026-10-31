@@ -1,0 +1,3 @@
+2026-10-31 fine-tune 3 / orange
+FAIL — off-centre closes at c15 and c21-24 with the orange outside a jaw; no sustained hold or carry; ended stretched forward
+placement: forward-right, mid-table; tray: left; instruction: Grab oranges and place into plate.; cap 75 chunks

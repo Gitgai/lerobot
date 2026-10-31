@@ -1,0 +1,48 @@
+{
+  "status": "passed",
+  "writes": 0,
+  "motor_commands": 0,
+  "torque": {
+    "shoulder_pan": 0,
+    "shoulder_lift": 0,
+    "elbow_flex": 0,
+    "wrist_flex": 0,
+    "wrist_roll": 0,
+    "gripper": 0
+  },
+  "motor_status": {
+    "shoulder_pan": 0,
+    "shoulder_lift": 0,
+    "elbow_flex": 0,
+    "wrist_flex": 0,
+    "wrist_roll": 0,
+    "gripper": 0
+  },
+  "calibration_matches": true,
+  "pose": {
+    "shoulder_pan": -7.824175824175824,
+    "shoulder_lift": -103.82417582417582,
+    "elbow_flex": 96.74725274725274,
+    "wrist_flex": 78.32967032967034,
+    "wrist_roll": -1.1868131868131868,
+    "gripper": 51.33287764866712
+  },
+  "pose_captured_at": "2026-10-31T14:17:02.840506+05:30",
+  "gripper_registers": {
+    "Max_Torque_Limit": 500,
+    "Protection_Current": 250,
+    "Overload_Torque": 25,
+    "Present_Voltage": 74,
+    "Present_Temperature": 33
+  },
+  "cameras": {
+    "front": {
+      "device": "/dev/v4l/by-id/usb-046d_C270_HD_WEBCAM_FC7A6780-video-index0",
+      "captured_at": "2026-10-31T14:17:02.856767+05:30"
+    },
+    "wrist": {
+      "device": "/dev/v4l/by-id/usb-SunplusIT_Inc_AK-Camera_JV-video-index0",
+      "captured_at": "2026-10-31T14:17:02.869683+05:30"
+    }
+  }
+}

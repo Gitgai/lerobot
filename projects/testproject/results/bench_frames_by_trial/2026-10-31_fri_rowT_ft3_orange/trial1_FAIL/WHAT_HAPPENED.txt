@@ -1,0 +1,3 @@
+2026-10-31 fine-tune 3 / orange
+FAIL — centered grasp at c32 (gripper 14); released the orange back onto the table by c37 before any trayward carry; no recovery
+placement: forward-right, mid-table; tray: left; instruction: Grab oranges and place into plate.; cap 75 chunks

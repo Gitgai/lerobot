@@ -1,0 +1,3 @@
+2026-10-31 fine-tune 3 / orange
+FAIL — brief grasp c23 was lost; re-grasped at c43, carried fully left, then opened at c48-49 and released beside the tray lower-right rim
+placement: forward-right, mid-table; tray: left; instruction: Grab oranges and place into plate.; cap 75 chunks

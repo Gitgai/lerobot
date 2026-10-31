@@ -3,7 +3,7 @@
 Source: `trials.csv` (hand-kept, one row per trial). `trials_full.csv` adds the numbers computed from each trial's log. Regenerate with `python3 scripts/bench_trials_table.py`.
 **Frames, browsable:** `results/bench_frames_by_trial/<date>_<day>_row<X>_<model>_<fruit>/trial<N>_<RESULT>/` (front_chunkNNN.jpg + wrist_chunkNNN.jpg + WHAT_HAPPENED.txt; built by `scripts/sort_bench_frames.py`). Raw dump behind it: every policy call's overhead + wrist JPEG, named `<prefix>_call<N>_{front,wrist}.jpg`; fine-tune 3 rows in `results/so101_lora_on_top_20261019/bench_frames_row3_010000/` (prefix per row in the `frames` column, e.g. row I = c08, row H = c07, row E = c05), public-base rows in `results/so101_bench_20261019/frames/`. Trial N of a row covers calls (N-1)*cap+1 … N*cap. Narrative per trial: `bench_runs.md`. VOID = not a trial (camera fault, stop, wrong launch, fruit not re-placed); excluded from every count.
 
-Trials: 100 recorded, 85 valid, 15 void.
+Trials: 105 recorded, 90 valid, 15 void.
 
 ### By model / fruit
 
@@ -14,7 +14,7 @@ Trials: 100 recorded, 85 valid, 15 void.
 | base / orange | 11 | 0 | 0 | 11 | 0/11 |
 | base / tomato | 5 | 0 | 0 | 5 | 0/5 |
 | fine-tune 3 / tomato | 30 | 7 | 0 | 23 | 7/30 |
-| fine-tune 3 / orange | 32 | 12 | 0 | 20 | 12/32 |
+| fine-tune 3 / orange | 37 | 12 | 0 | 25 | 12/37 |
 | fine-tune 3 / 3 oranges (multi-fruit experiment) | 2 | 0 | 0 | 2 | 0/2 |
 
 ### By day / model / fruit
@@ -34,7 +34,7 @@ Trials: 100 recorded, 85 valid, 15 void.
 | 2026-10-29 / fine-tune 3 / orange | 15 | 6 | 0 | 9 | 6/15 |
 | 2026-10-30 / fine-tune 3 / orange | 1 | 0 | 0 | 1 | 0/1 |
 | 2026-10-30 / fine-tune 3 / tomato | 1 | 0 | 0 | 1 | 0/1 |
-| 2026-10-31 / fine-tune 3 / orange | 6 | 3 | 0 | 3 | 3/6 |
+| 2026-10-31 / fine-tune 3 / orange | 11 | 3 | 0 | 8 | 3/11 |
 
 ### By model / fruit / cap
 
@@ -46,23 +46,24 @@ Trials: 100 recorded, 85 valid, 15 void.
 | base / tomato / cap 45 | 5 | 0 | 0 | 5 | 0/5 |
 | fine-tune 3 / tomato / cap 45 | 5 | 1 | 0 | 4 | 1/5 |
 | fine-tune 3 / tomato / cap 75 | 25 | 6 | 0 | 19 | 6/25 |
-| fine-tune 3 / orange / cap 75 | 32 | 12 | 0 | 20 | 12/32 |
+| fine-tune 3 / orange / cap 75 | 37 | 12 | 0 | 25 | 12/37 |
 | fine-tune 3 / 3 oranges (multi-fruit experiment) / cap 120 | 2 | 0 | 0 | 2 | 0/2 |
 
 ### Failure modes (valid FAIL trials; the FIRST mode when a trial shows two in sequence)
 
 | failure mode | count |
 |---|---|
-| close-beside | 27 |
+| close-beside | 29 |
 | close-above | 7 |
 | no-close | 6 |
 | close-short | 6 |
 | wrong-place | 5 |
+| released outside the rim | 4 |
 | close-beside/above | 3 |
-| released outside the rim | 3 |
 | close-above + over-reach | 2 |
 | close-above/beside | 2 |
 | cap-hit | 2 |
+| grasp | 2 |
 | push + close-beside | 1 |
 | no-engage | 1 |
 | lift | 1 |
@@ -171,6 +172,11 @@ Trials: 100 recorded, 85 valid, 15 void.
 | 2026-10-31 | R | 4 | fine-tune 3 | row3_all169_conservative ckpt 010000 (LoRA merged) | AI90 :8081 GPU 0 (RTX 5090) | orange | pick up the orange and place it on the plate | 75 | overhead, position 2 | left | forward-right |
 | 2026-10-31 | R | 5 | fine-tune 3 | row3_all169_conservative ckpt 010000 (LoRA merged) | AI90 :8081 GPU 0 (RTX 5090) | orange | pick up the orange and place it on the plate | 75 | overhead, position 2 | left | forward-right |
 | 2026-10-31 | S | 1 | fine-tune 3 | row3_all169_conservative ckpt 010000 (LoRA merged) | AI90 :8081 GPU 0 (RTX 5090) | orange | pick up the orange and place it on the plate | 75 | overhead, position 2 | left | forward-right, near lower table edge |
+| 2026-10-31 | T | 1 | fine-tune 3 | row3_all169_conservative ckpt 010000 (LoRA merged) | AI90 :8081 GPU 1 (RTX PRO 5000 72GB Blackwell) | orange | Grab oranges and place into plate. | 75 | overhead, position 2 | left | forward-right, mid-table |
+| 2026-10-31 | T | 2 | fine-tune 3 | row3_all169_conservative ckpt 010000 (LoRA merged) | AI90 :8081 GPU 1 (RTX PRO 5000 72GB Blackwell) | orange | Grab oranges and place into plate. | 75 | overhead, position 2 | left | forward-right, mid-table |
+| 2026-10-31 | T | 3 | fine-tune 3 | row3_all169_conservative ckpt 010000 (LoRA merged) | AI90 :8081 GPU 1 (RTX PRO 5000 72GB Blackwell) | orange | Grab oranges and place into plate. | 75 | overhead, position 2 | left | far forward-right |
+| 2026-10-31 | T | 4 | fine-tune 3 | row3_all169_conservative ckpt 010000 (LoRA merged) | AI90 :8081 GPU 1 (RTX PRO 5000 72GB Blackwell) | orange | Grab oranges and place into plate. | 75 | overhead, position 2 | left | forward-right, mid-table |
+| 2026-10-31 | T | 5 | fine-tune 3 | row3_all169_conservative ckpt 010000 (LoRA merged) | AI90 :8081 GPU 1 (RTX PRO 5000 72GB Blackwell) | orange | Grab oranges and place into plate. | 75 | overhead, position 2 | left | forward-right, mid-table |
 
 ### Every trial — outcome
 
@@ -276,3 +282,8 @@ Trials: 100 recorded, 85 valid, 15 void.
 | 2026-10-31 | R | 4 | **FAIL** | close-beside, over-reach | repeated closes to 12-14 with the orange outside the right jaw; no hold or carry; stretched flat across the table to the cap | 6 | 12 (16) | 33 | 75 | 173.1 | 1.219 |  | bench_row3r_orange_20261031 ep4; results/so101_lora_on_top_20261019/bench_frames_row3_010000/c26_call* |
 | 2026-10-31 | R | 5 | **SUCCESS** | — | grasp held from c14 through c30 (14-23); carried left; released IN the tray c31-33; back near rest c37; orange remained in the tray to the cap | 2 | 14 (30) | 33 | 75 | 177.0 | 1.217 |  | bench_row3r_orange_20261031 ep5; results/so101_lora_on_top_20261019/bench_frames_row3_010000/c26_call* |
 | 2026-10-31 | S | 1 | **FAIL** | close-beside, over-reach | closed to 30-38 at c32-44 with the orange against the outside of the right jaw; no hold or trayward carry; reopened and hovered beside it to the cap; orange remained on the table | 13 | 30 (41) | 36 | 75 | 172.8 | 1.205 |  | bench_row3s_orange_live_20261031 ep1; results/so101_lora_on_top_20261019/bench_trace_row3s_orange_live_20261031 |
+| 2026-10-31 | T | 1 | **FAIL** | grasp then early release | centered grasp at c32 (gripper 14); released the orange back onto the table by c37 before any trayward carry; no recovery | 9 | 14 (33) | 26 | 75 | 181.8 | 1.234 |  | bench_row3t_orange_live_gpu1_20261031 ep1; results/so101_lora_on_top_20261019/bench_trace_row3t_orange_live_gpu1_20261031 |
+| 2026-10-31 | T | 2 | **FAIL** | close-beside, over-reach | off-centre closes at c15 and c21-24 with the orange outside a jaw; no sustained hold or carry; ended stretched forward | 5 | 16 (24) | 24 | 75 | 179.7 | 1.231 |  | bench_row3t_orange_live_gpu1_20261031 ep2; results/so101_lora_on_top_20261019/bench_trace_row3t_orange_live_gpu1_20261031 |
+| 2026-10-31 | T | 3 | **FAIL** | close-beside, over-reach | closed beside the far-right orange at c18 and c28-29 with the fruit outside the left jaw; no hold or trayward carry | 3 | 15 (75) | 37 | 75 | 191.6 | 1.233 |  | bench_row3t_orange_live_gpu1_20261031 ep3; results/so101_lora_on_top_20261019/bench_trace_row3t_orange_live_gpu1_20261031 |
+| 2026-10-31 | T | 4 | **FAIL** | released outside the rim | brief grasp c23 was lost; re-grasped at c43, carried fully left, then opened at c48-49 and released beside the tray lower-right rim | 3 | 3 (72) | 19 | 75 | 179.3 | 1.236 |  | bench_row3t_orange_live_gpu1_20261031 ep4; results/so101_lora_on_top_20261019/bench_trace_row3t_orange_live_gpu1_20261031 |
+| 2026-10-31 | T | 5 | **FAIL** | grasp then early release | centered grasp at c39 (gripper 7) but released the orange back onto the table by c44 before any carry; later closes did not recover it | 11 | 7 (39) | 23 | 75 | 181.6 | 1.234 |  | bench_row3t_orange_live_gpu1_20261031 ep5; results/so101_lora_on_top_20261019/bench_trace_row3t_orange_live_gpu1_20261031 |
