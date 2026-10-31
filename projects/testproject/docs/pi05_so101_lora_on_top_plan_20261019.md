@@ -351,8 +351,9 @@ fine-tune 3    tomato   75      5 (row W)      0                                
 --- 2026-11-01, GPU 1, off-protocol generalization ---
 fine-tune 3    PEN      75      1 (row X)      0                                  grasped, lifted, carried near tray, then slipped outside
 fine-tune 3    BLUE BOX 75      1 (row Y)      0                                  grasped and slightly lifted; no trayward carry
+fine-tune 3    HIPPO CELL 75    1 (row Z)      0                                  centered close; rolled outside jaws; no lift or carry
 ```
-Rows X and Y are off-protocol object-generalization probes and do not change the fruit totals: X grasped/lifted/carried a pen before slipping outside the tray; Y grasped and slightly lifted a blue box but made no trayward carry.
+Rows X–Z are off-protocol object-generalization probes and do not change the fruit totals: X grasped/lifted/carried a pen before slipping outside the tray; Y grasped and slightly lifted a blue box but made no trayward carry; Z centered an upright cylindrical cell, then rolled it outside the jaws without a sustained lift.
 Running totals for fine-tune 3 on this bench: orange 14/42 (row M 1/5, row N 4/5, row O 1/5 on 10-29; row P 0/1 on 10-30; row R 3/5, row S 0/1, row T 1/5, and row U 1/5 on 10-31), tomato 8/40 (Sunday 4/13, Tuesday 1/10, Wednesday 2/6, Thursday row Q 0/1 on the RTX 5090, Friday rows V 1/5 and W 0/5 on GPU 1, plus one camera-moved void). Three-orange experiment (row L, corpus wording, 120 chunks): 0 of 3 in both trials — hovered above the near pair closing on air, or drifted to the far one without closing; not part of the single-fruit totals. Frame-by-frame
 re-read 2026-10-29 (bench_runs.md): A1 and D4 confirmed as real grasp-carry-release, so the 5 are firm; two of
 Tuesday's fails were grasp-and-carry released a few cm outside the rim; the dominant miss is the close itself

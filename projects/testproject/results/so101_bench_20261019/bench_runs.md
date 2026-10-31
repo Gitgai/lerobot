@@ -758,3 +758,17 @@ carry and delivery did not occur**. The episode ran 177.2 s with 1.242 s median 
 the recorded start pose. Post-run checks passed: torque and status were zero on all six motors, protections were
 500/250/25, voltage was 7.0 V, and gripper temperature was 44 °C. The GPU server was stopped. This experiment is
 excluded from orange and tomato rates.
+
+### 2026-11-01 — ROW Z: HIPPO CELL / CYLINDRICAL BATTERY off-protocol ×1, JPEG without RTC, 75-chunk cap — 0/1
+One exploratory test used the user's Hippo cell: an upright cylindrical Energizer battery placed front-right near
+the base, with the other test objects and fruit removed. The instruction was
+`pick up the cell and place it on the plate`; all other settings matched rows X–Y.
+
+The arm reached quickly by c8. The cell was centered between the jaws and the gripper closed from 42 to 13 at
+c15–16, but no clear lift followed. The gripper reopened to 28 at c19 and then made several tight closes while
+adjusting around the cylinder. By c36 the cell had rolled outside the right side of the jaws. It remained upright
+on the table through c75, with no sustained grasp, lift, carry, or delivery. Outcome: **FAIL — centered initial
+close, then the cell rolled outside the jaws**. The episode ran 178.5 s with 1.263 s median request latency. The
+scripted return restored the start pose. Post-run checks passed: torque and status were zero on all six motors,
+protections were 500/250/25, voltage was 7.0 V, and gripper temperature was 41 °C. The GPU server was stopped.
+This experiment is excluded from orange and tomato rates.

@@ -1,0 +1,3 @@
+2026-11-01 fine-tune 3 / hippo cell / cylindrical battery (off-protocol)
+FAIL — fast reach by c8; cell centered between jaws and gripper closed from 42 to 13 at c15-c16; no clear lift; gripper reopened to 28 at c19 and made repeated tight closes; by c36 the cell had rolled outside the right side of the jaws; it remained upright on the table through c75 with no sustained grasp, lift, carry, or delivery
+placement: front-right near base, upright; blue box, pen, and fruit removed; tray: left; instruction: pick up the cell and place it on the plate; cap 75 chunks
