@@ -637,7 +637,7 @@ The client returned the arm to its recorded start pose. The trace contains 75 ob
 chunks, and 1,500 dispatched actions. Fine-tune 3 orange is now **12/32**; tomato remains **7/30**. Post-run torque
 and status were zero on all six motors, protections were 500/250/25, and gripper temperature was 35 °C.
 
-### 2026-10-31 — ROW T: single ORANGE ×5 with full live trace, 75-chunk cap, tray left — 0/5
+### 2026-10-31 — ROW T: single ORANGE ×5 with full live trace, 75-chunk cap, tray left — 1/5
 Same fine-tune 3 checkpoint, served on AI90 GPU 1 (RTX PRO 5000 72GB Blackwell). The client used the corpus-style
 instruction `Grab oranges and place into plate.`. Exact front and wrist inputs, predictions, 7,500 dispatched
 actions, measured states, latency, countdowns, and returns were shown live and retained. Trace:
@@ -650,11 +650,11 @@ left mid-table demonstration area requested during the countdown.
 T1  grasp centered c32 (gripper 14), but released back on the table c37 before any carry.                 FAIL
 T2  closes c15 and c21-24 with the orange outside a jaw; no hold or carry; ended stretched forward.      FAIL
 T3  far-right placement; closes c18 and c28-29 beside it; no hold or trayward carry.                     FAIL
-T4  brief grasp c23 lost; re-grasp c43, full cross-table carry, release beside the tray rim c48-49.       FAIL
+T4  brief grasp c23 lost; re-grasp c43, full carry; orange settled inside the tray by c55 and stayed.   SUCCESS
 T5  centered grasp c39 (gripper 7), released back on the table by c44; later closes did not recover it.  FAIL
 ```
 
-Row T is **0/5**. Three trials enclosed the orange at least briefly, and T4 completed the carry, but none retained
-the full grasp-carry-release chain into the tray. Fine-tune 3 orange is now **12/37**; tomato remains **7/30**.
+Row T is **1/5**. Three trials enclosed the orange at least briefly; T4 recovered after losing its first grasp,
+completed the carry, and left the orange inside the tray. Fine-tune 3 orange is now **13/37**; tomato remains **7/30**.
 Post-run read-only checks passed: torque and status were zero on all six motors, calibration matched, gripper
 protections were 500/250/25, voltage was 7.4 V, and gripper temperature was 33 °C.

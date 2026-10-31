@@ -14,7 +14,7 @@ Trials: 105 recorded, 90 valid, 15 void.
 | base / orange | 11 | 0 | 0 | 11 | 0/11 |
 | base / tomato | 5 | 0 | 0 | 5 | 0/5 |
 | fine-tune 3 / tomato | 30 | 7 | 0 | 23 | 7/30 |
-| fine-tune 3 / orange | 37 | 12 | 0 | 25 | 12/37 |
+| fine-tune 3 / orange | 37 | 13 | 0 | 24 | 13/37 |
 | fine-tune 3 / 3 oranges (multi-fruit experiment) | 2 | 0 | 0 | 2 | 0/2 |
 
 ### By day / model / fruit
@@ -34,7 +34,7 @@ Trials: 105 recorded, 90 valid, 15 void.
 | 2026-10-29 / fine-tune 3 / orange | 15 | 6 | 0 | 9 | 6/15 |
 | 2026-10-30 / fine-tune 3 / orange | 1 | 0 | 0 | 1 | 0/1 |
 | 2026-10-30 / fine-tune 3 / tomato | 1 | 0 | 0 | 1 | 0/1 |
-| 2026-10-31 / fine-tune 3 / orange | 11 | 3 | 0 | 8 | 3/11 |
+| 2026-10-31 / fine-tune 3 / orange | 11 | 4 | 0 | 7 | 4/11 |
 
 ### By model / fruit / cap
 
@@ -46,7 +46,7 @@ Trials: 105 recorded, 90 valid, 15 void.
 | base / tomato / cap 45 | 5 | 0 | 0 | 5 | 0/5 |
 | fine-tune 3 / tomato / cap 45 | 5 | 1 | 0 | 4 | 1/5 |
 | fine-tune 3 / tomato / cap 75 | 25 | 6 | 0 | 19 | 6/25 |
-| fine-tune 3 / orange / cap 75 | 37 | 12 | 0 | 25 | 12/37 |
+| fine-tune 3 / orange / cap 75 | 37 | 13 | 0 | 24 | 13/37 |
 | fine-tune 3 / 3 oranges (multi-fruit experiment) / cap 120 | 2 | 0 | 0 | 2 | 0/2 |
 
 ### Failure modes (valid FAIL trials; the FIRST mode when a trial shows two in sequence)
@@ -58,8 +58,8 @@ Trials: 105 recorded, 90 valid, 15 void.
 | no-close | 6 |
 | close-short | 6 |
 | wrong-place | 5 |
-| released outside the rim | 4 |
 | close-beside/above | 3 |
+| released outside the rim | 3 |
 | close-above + over-reach | 2 |
 | close-above/beside | 2 |
 | cap-hit | 2 |
@@ -285,5 +285,5 @@ Trials: 105 recorded, 90 valid, 15 void.
 | 2026-10-31 | T | 1 | **FAIL** | grasp then early release | centered grasp at c32 (gripper 14); released the orange back onto the table by c37 before any trayward carry; no recovery | 9 | 14 (33) | 26 | 75 | 181.8 | 1.234 |  | bench_row3t_orange_live_gpu1_20261031 ep1; results/so101_lora_on_top_20261019/bench_trace_row3t_orange_live_gpu1_20261031 |
 | 2026-10-31 | T | 2 | **FAIL** | close-beside, over-reach | off-centre closes at c15 and c21-24 with the orange outside a jaw; no sustained hold or carry; ended stretched forward | 5 | 16 (24) | 24 | 75 | 179.7 | 1.231 |  | bench_row3t_orange_live_gpu1_20261031 ep2; results/so101_lora_on_top_20261019/bench_trace_row3t_orange_live_gpu1_20261031 |
 | 2026-10-31 | T | 3 | **FAIL** | close-beside, over-reach | closed beside the far-right orange at c18 and c28-29 with the fruit outside the left jaw; no hold or trayward carry | 3 | 15 (75) | 37 | 75 | 191.6 | 1.233 |  | bench_row3t_orange_live_gpu1_20261031 ep3; results/so101_lora_on_top_20261019/bench_trace_row3t_orange_live_gpu1_20261031 |
-| 2026-10-31 | T | 4 | **FAIL** | released outside the rim | brief grasp c23 was lost; re-grasped at c43, carried fully left, then opened at c48-49 and released beside the tray lower-right rim | 3 | 3 (72) | 19 | 75 | 179.3 | 1.236 |  | bench_row3t_orange_live_gpu1_20261031 ep4; results/so101_lora_on_top_20261019/bench_trace_row3t_orange_live_gpu1_20261031 |
+| 2026-10-31 | T | 4 | **SUCCESS** | — | brief grasp c23 was lost; re-grasped at c43, carried fully left, opened over the tray c48-49, and the orange settled inside by c55 and remained there through c75 | 3 | 3 (72) | 19 | 75 | 179.3 | 1.236 |  | bench_row3t_orange_live_gpu1_20261031 ep4; results/so101_lora_on_top_20261019/bench_trace_row3t_orange_live_gpu1_20261031 |
 | 2026-10-31 | T | 5 | **FAIL** | grasp then early release | centered grasp at c39 (gripper 7) but released the orange back onto the table by c44 before any carry; later closes did not recover it | 11 | 7 (39) | 23 | 75 | 181.6 | 1.234 |  | bench_row3t_orange_live_gpu1_20261031 ep5; results/so101_lora_on_top_20261019/bench_trace_row3t_orange_live_gpu1_20261031 |

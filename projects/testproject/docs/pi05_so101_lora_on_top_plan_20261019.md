@@ -344,9 +344,9 @@ fine-tune 3    tomato   75      1 (row Q)      0                                
 --- 2026-10-31, RTX 5090 serving ---
 fine-tune 3    ORANGE   75      5 (row R)      3 clean grasp-carry-release        forward-right placements; 2 close failures
 fine-tune 3    ORANGE   75      1 (row S)      0                                  full live trace; close outside right jaw
-fine-tune 3    ORANGE   75      5 (row T)      0                                  GPU 1; 3 brief grasps, one carry released beside rim
+fine-tune 3    ORANGE   75      5 (row T)      1 clean grasp-carry-release        GPU 1; T4 recovered after losing its first grasp
 ```
-Running totals for fine-tune 3 on this bench: orange 12/37 (row M 1/5, row N 4/5, row O 1/5 on 10-29; row P 0/1 on 10-30; row R 3/5, row S 0/1, and row T 0/5 on 10-31), tomato 7/30 (Sunday 4/13, Tuesday 1/10, Wednesday 2/6, Thursday row Q 0/1 on the RTX 5090). Three-orange experiment (row L, corpus wording, 120 chunks): 0 of 3 in both trials — hovered above the near pair closing on air, or drifted to the far one without closing; not part of the single-fruit totals. Frame-by-frame
+Running totals for fine-tune 3 on this bench: orange 13/37 (row M 1/5, row N 4/5, row O 1/5 on 10-29; row P 0/1 on 10-30; row R 3/5, row S 0/1, and row T 1/5 on 10-31), tomato 7/30 (Sunday 4/13, Tuesday 1/10, Wednesday 2/6, Thursday row Q 0/1 on the RTX 5090). Three-orange experiment (row L, corpus wording, 120 chunks): 0 of 3 in both trials — hovered above the near pair closing on air, or drifted to the far one without closing; not part of the single-fruit totals. Frame-by-frame
 re-read 2026-10-29 (bench_runs.md): A1 and D4 confirmed as real grasp-carry-release, so the 5 are firm; two of
 Tuesday's fails were grasp-and-carry released a few cm outside the rim; the dominant miss is the close itself
 (beside 7, short 5, above 3 of 18 fails). Today's
@@ -356,8 +356,8 @@ ones, and the day's fruit placements were less consistent than Sunday's five fix
 demo-area spot while one nominally matched trial still over-reached, so placement is important but not sufficient;
 closed-loop sampling variation remains. The auto-reset grid is still required for a controlled estimate. Also today: the frame recorder overwrote part of Sunday's
 raw frames after a server restart (DISK_LEDGER §11; fixed).
-Reading: on the protocol fruit the fine-tuned model has completed 12 of 37 trials where the base completed 0 of 11.
-The completed orange rows vary sharply (3/5, 0/5, 1/5, 4/5, 1/5, 3/5, 0/1, 0/5), so 12/37 is evidence of capability rather than a stable
+Reading: on the protocol fruit the fine-tuned model has completed 13 of 37 trials where the base completed 0 of 11.
+The completed orange rows vary sharply (3/5, 0/5, 1/5, 4/5, 1/5, 3/5, 0/1, 1/5), so 13/37 is evidence of capability rather than a stable
 deployment rate. Misses are
 the base's miss (close too high / beside); the fine-tune re-approaches and sometimes starts late (15–30 chunks).
 What made the difference, in order of evidence: (1) our own 169 episodes on this arm, (2) the 60 September
