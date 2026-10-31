@@ -3,7 +3,7 @@
 Source: `trials.csv` (hand-kept, one row per trial). `trials_full.csv` adds the numbers computed from each trial's log. Regenerate with `python3 scripts/bench_trials_table.py`.
 **Frames, browsable:** `results/bench_frames_by_trial/<date>_<day>_row<X>_<model>_<fruit>/trial<N>_<RESULT>/` (front_chunkNNN.jpg + wrist_chunkNNN.jpg + WHAT_HAPPENED.txt; built by `scripts/sort_bench_frames.py`). Raw dump behind it: every policy call's overhead + wrist JPEG, named `<prefix>_call<N>_{front,wrist}.jpg`; fine-tune 3 rows in `results/so101_lora_on_top_20261019/bench_frames_row3_010000/` (prefix per row in the `frames` column, e.g. row I = c08, row H = c07, row E = c05), public-base rows in `results/so101_bench_20261019/frames/`. Trial N of a row covers calls (N-1)*cap+1 … N*cap. Narrative per trial: `bench_runs.md`. VOID = not a trial (camera fault, stop, wrong launch, fruit not re-placed); excluded from every count.
 
-Trials: 114 recorded, 98 valid, 16 void.
+Trials: 115 recorded, 99 valid, 16 void.
 
 ### By model / fruit
 
@@ -13,7 +13,7 @@ Trials: 114 recorded, 98 valid, 16 void.
 | base / onion (off-protocol) | 3 | 0 | 0 | 3 | 0/3 |
 | base / orange | 11 | 0 | 0 | 11 | 0/11 |
 | base / tomato | 5 | 0 | 0 | 5 | 0/5 |
-| fine-tune 3 / tomato | 33 | 7 | 0 | 26 | 7/33 |
+| fine-tune 3 / tomato | 34 | 7 | 0 | 27 | 7/34 |
 | fine-tune 3 / orange | 42 | 14 | 0 | 28 | 14/42 |
 | fine-tune 3 / 3 oranges (multi-fruit experiment) | 2 | 0 | 0 | 2 | 0/2 |
 
@@ -35,7 +35,7 @@ Trials: 114 recorded, 98 valid, 16 void.
 | 2026-10-30 / fine-tune 3 / orange | 1 | 0 | 0 | 1 | 0/1 |
 | 2026-10-30 / fine-tune 3 / tomato | 1 | 0 | 0 | 1 | 0/1 |
 | 2026-10-31 / fine-tune 3 / orange | 16 | 5 | 0 | 11 | 5/16 |
-| 2026-10-31 / fine-tune 3 / tomato | 3 | 0 | 0 | 3 | 0/3 |
+| 2026-10-31 / fine-tune 3 / tomato | 4 | 0 | 0 | 4 | 0/4 |
 
 ### By model / fruit / cap
 
@@ -46,7 +46,7 @@ Trials: 114 recorded, 98 valid, 16 void.
 | base / orange / cap 45 | 11 | 0 | 0 | 11 | 0/11 |
 | base / tomato / cap 45 | 5 | 0 | 0 | 5 | 0/5 |
 | fine-tune 3 / tomato / cap 45 | 5 | 1 | 0 | 4 | 1/5 |
-| fine-tune 3 / tomato / cap 75 | 28 | 6 | 0 | 22 | 6/28 |
+| fine-tune 3 / tomato / cap 75 | 29 | 6 | 0 | 23 | 6/29 |
 | fine-tune 3 / orange / cap 75 | 42 | 14 | 0 | 28 | 14/42 |
 | fine-tune 3 / 3 oranges (multi-fruit experiment) / cap 120 | 2 | 0 | 0 | 2 | 0/2 |
 
@@ -65,10 +65,10 @@ Trials: 114 recorded, 98 valid, 16 void.
 | close-above + over-reach | 2 |
 | close-above/beside | 2 |
 | cap-hit | 2 |
+| close without lift | 2 |
 | push + close-beside | 1 |
 | no-engage | 1 |
 | lift | 1 |
-| close without lift | 1 |
 
 ### Every trial — conditions
 
@@ -188,6 +188,7 @@ Trials: 114 recorded, 98 valid, 16 void.
 | 2026-10-31 | V | 2 | fine-tune 3 | row3_all169_conservative ckpt 010000 (LoRA merged) | AI90 :8081 GPU 1 (RTX PRO 5000 72GB Blackwell) | tomato | pick up the tomato and place it on the plate | 75 | overhead, position 2 | left | forward-right, mid-table; orange visible at lower-left edge |
 | 2026-10-31 | V | 3 | fine-tune 3 | row3_all169_conservative ckpt 010000 (LoRA merged) | AI90 :8081 GPU 1 (RTX PRO 5000 72GB Blackwell) | tomato | pick up the tomato and place it on the plate | 75 | overhead, position 2 | left | forward-right near lower table edge; tomato only |
 | 2026-10-31 | V | 4 | fine-tune 3 | row3_all169_conservative ckpt 010000 (LoRA merged) | AI90 :8081 GPU 1 (RTX PRO 5000 72GB Blackwell) | tomato | pick up the tomato and place it on the plate | 75 | moved/rotated from overhead position 2 | outside front-camera view | tomato visible near lower edge in moved camera view |
+| 2026-10-31 | V | 5 | fine-tune 3 | row3_all169_conservative ckpt 010000 (LoRA merged) | AI90 :8081 GPU 1 (RTX PRO 5000 72GB Blackwell) | tomato | pick up the tomato and place it on the plate | 75 | overhead, position 2 restored | left | forward-right, mid-table; orange partly visible at lower-left edge |
 
 ### Every trial — outcome
 
@@ -307,3 +308,4 @@ Trials: 114 recorded, 98 valid, 16 void.
 | 2026-10-31 | V | 2 | **FAIL** | close without lift | late reach beginning c34; tomato centered between the jaws c47-57; repeated closes to 14-29 reopened without a sustained hold; no lift or trayward carry; tomato remained on the table | 3 | 14 (73) | 20 | 75 | 191.0 | 1.232 | JPEG quality 85; RTC disabled; orange distractor at frame edge | bench_ft3_jpeg_no_rtc_trial_v2_tomato_20261031 ep1; results/so101_lora_on_top_20261019/bench_trace_ft3_jpeg_no_rtc_trial_v2_tomato_20261031 |
 | 2026-10-31 | V | 3 | **FAIL** | close-beside | meaningful reach began c14; arm stayed to the tomato’s right; closes to 33 at c29-34 and 30 at c53-58 occurred beside the fruit; no contact, hold, lift, or trayward carry; tomato remained at its starting location | 6 | 30 (57) | 15 | 75 | 194.0 | 1.232 | JPEG quality 85; RTC disabled; clean tomato-only scene | bench_ft3_jpeg_no_rtc_trial_v3_tomato_20261031 ep1; results/so101_lora_on_top_20261019/bench_trace_ft3_jpeg_no_rtc_trial_v3_tomato_20261031 |
 | 2026-10-31 | V | 4 | **VOID** | camera moved | overhead camera moved substantially during placement and the tray disappeared from view; arm remained near home through most of the run, with a late reach only at c74-75; no meaningful tomato attempt; excluded from rates | 6 | 41 (72) | 10 | 75 | 196.4 | 1.317 | VOID; camera geometry changed before episode start; JPEG quality 85; RTC disabled | bench_ft3_jpeg_no_rtc_trial_v4_tomato_20261031 ep1; results/so101_lora_on_top_20261019/bench_trace_ft3_jpeg_no_rtc_trial_v4_tomato_20261031 |
+| 2026-10-31 | V | 5 | **FAIL** | close without lift | reached quickly c3-8; tomato centered between the jaws; closed to 19 at c16 then reopened at c17; repeated closes to 25-28 at c28-39 never produced a clear lift or carry; opened by c54; tomato remained on the table | 3 | 19 (16) | 34 | 75 | 179.9 | 1.297 | JPEG quality 85; RTC disabled; orange distractor at frame edge; prior wrist-camera startup abort was not a trial | bench_ft3_jpeg_no_rtc_trial_v5_tomato_20261031 ep1; results/so101_lora_on_top_20261019/bench_trace_ft3_jpeg_no_rtc_trial_v5_tomato_20261031 |

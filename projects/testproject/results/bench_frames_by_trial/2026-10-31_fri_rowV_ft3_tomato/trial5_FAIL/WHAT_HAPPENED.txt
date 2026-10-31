@@ -1,0 +1,3 @@
+2026-10-31 fine-tune 3 / tomato
+FAIL — reached quickly c3-8; tomato centered between the jaws; closed to 19 at c16 then reopened at c17; repeated closes to 25-28 at c28-39 never produced a clear lift or carry; opened by c54; tomato remained on the table
+placement: forward-right, mid-table; orange partly visible at lower-left edge; tray: left; instruction: pick up the tomato and place it on the plate; cap 75 chunks
