@@ -1,0 +1,3 @@
+2026-10-31 fine-tune 3 / orange
+SUCCESS — first close beside it c37-40; re-grasp held by c50-52; lifted and carried left over the tray c52-55; released IN the tray by c60; orange remained there through c75; scripted return restored the start pose
+placement: forward-right, mid-table; tray: left; instruction: Grab oranges and place into plate.; cap 75 chunks
