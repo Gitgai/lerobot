@@ -1,0 +1,3 @@
+2026-10-31 fine-tune 3 / tomato
+VOID — overhead camera moved substantially during placement and the tray disappeared from view; arm remained near home through most of the run, with a late reach only at c74-75; no meaningful tomato attempt; excluded from rates
+placement: tomato visible near lower edge in moved camera view; tray: outside front-camera view; instruction: pick up the tomato and place it on the plate; cap 75 chunks

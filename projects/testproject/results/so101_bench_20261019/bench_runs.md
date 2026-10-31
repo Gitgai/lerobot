@@ -700,3 +700,8 @@ start pose after all three trials. Fine-tune 3 tomato is now **7/33**; orange re
 fruit-only comparison: only the tomato was visible. Post-run checks after V3 passed: torque and status were zero on
 all six motors, protections were 500/250/25, voltage was 7.0 V, and gripper temperature was 34 °C. The GPU server
 was stopped.
+
+A fourth launch is logged separately as **VOID**. The overhead camera moved substantially during placement, rotating
+toward the table corner and putting the tray outside the policy input. The arm stayed near home for most of the 75
+chunks and made only a late reach at c74–75. It ran 196.4 s with 1.317 s median request latency, returned to start,
+and is excluded from Row V and aggregate success rates.
