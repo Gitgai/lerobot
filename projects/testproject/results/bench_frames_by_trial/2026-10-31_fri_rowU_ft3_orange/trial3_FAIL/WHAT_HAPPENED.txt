@@ -1,0 +1,3 @@
+2026-10-31 fine-tune 3 / orange
+FAIL — long idle start; orange repeatedly between the jaws c39-64, but closes to 23-29 reopened without a hold; no lift or trayward carry; orange remained on the table
+placement: forward-right, mid-table; tray: left; instruction: Grab oranges and place into plate.; cap 75 chunks

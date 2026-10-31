@@ -659,20 +659,26 @@ completed the carry, and left the orange inside the tray. Fine-tune 3 orange is 
 Post-run read-only checks passed: torque and status were zero on all six motors, calibration matched, gripper
 protections were 500/250/25, voltage was 7.4 V, and gripper temperature was 33 °C.
 
-### 2026-10-31 — ROW U: single ORANGE ×1, JPEG without RTC, 75-chunk cap, tray left — 1/1
+### 2026-10-31 — ROW U: single ORANGE ×5, JPEG without RTC, 75-chunk cap, tray left — 1/5
 Same fine-tune 3 checkpoint, served on AI90 GPU 1 (RTX PRO 5000 72GB Blackwell), using the corpus instruction
 `Grab oranges and place into plate.`. Both camera inputs were JPEG encoded at quality 85. The client remained
 stop-and-wait: it requested one 20-action chunk, executed it at 30 Hz, then requested the next; RTC was disabled.
 The full live trace retained both policy-input images, measured state, predictions, dispatched actions, latency,
-countdown, and scripted return. Trace: `bench_trace_ft3_jpeg_no_rtc_trial_u1_20261031/`; compact log:
-`bench_ft3_jpeg_no_rtc_trial_u1_20261031.jsonl`.
+countdown, and scripted return. U1 trace: `bench_trace_ft3_jpeg_no_rtc_trial_u1_20261031/`; U2–U5 trace:
+`bench_trace_ft3_jpeg_no_rtc_row_u2_u5_20261031/`. The matching compact logs use the same names without
+`bench_trace_`.
 
-The orange started forward-right at mid-table, outside the usual left mid-table demonstration area. The first close
-at c37–40 landed beside it. The policy re-approached, established a hold by about c50–52, lifted and carried the
-orange left over the tray c52–55, then released it inside. The orange was visibly in the tray by c60 and remained
-there through c75. **SUCCESS**.
+All five placements were forward-right at mid-table, outside the usual left mid-table demonstration area.
 
-The episode ran all 75 chunks in 187.1 s with 1.236 s median request latency. The scripted return restored the
-recorded start pose. Fine-tune 3 orange is now **14/38**; tomato remains **7/30**. Post-run read-only checks passed:
-torque and status were zero on all six motors, gripper protections were 500/250/25, voltage was 7.2 V, and gripper
-temperature was 34 °C. The GPU server was stopped after the run.
+```text
+U1  first close missed; re-grasp held c50–52; carried left; orange IN the tray by c60 and stayed.          SUCCESS
+U2  orange repeatedly between/near jaws c28–58; closes to 26–34 did not hold; ended in overreach.          FAIL
+U3  long idle start; repeated centered closes to 23–29 reopened; no lift or carry.                         FAIL
+U4  late reach; repeated closes to 25–26 against the outside of the left jaw; no lift or carry.            FAIL
+U5  late reach; repeated close-beside, including a close to 8 at c61 on air; no lift or carry.              FAIL
+```
+
+All five episodes ran the full 75 chunks; median request latency was 1.234–1.237 s. The scripted return restored the
+recorded start pose after every trial. Row U is **1/5**. Fine-tune 3 orange is now **14/42**; tomato remains
+**7/30**. Post-run read-only checks passed: torque and status were zero on all six motors, gripper protections were
+500/250/25, voltage was 7.3 V, and gripper temperature was 34 °C. The GPU server was stopped after the run.

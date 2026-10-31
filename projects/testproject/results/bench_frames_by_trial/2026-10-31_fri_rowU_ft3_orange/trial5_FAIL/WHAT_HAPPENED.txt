@@ -1,0 +1,3 @@
+2026-10-31 fine-tune 3 / orange
+FAIL — late reach; repeated closes beside the orange, including a full close to 8 at c61 with the fruit outside the left jaw; no lift or trayward carry; orange remained on the table
+placement: forward-right, mid-table; tray: left; instruction: Grab oranges and place into plate.; cap 75 chunks
