@@ -772,3 +772,16 @@ close, then the cell rolled outside the jaws**. The episode ran 178.5 s with 1.2
 scripted return restored the start pose. Post-run checks passed: torque and status were zero on all six motors,
 protections were 500/250/25, voltage was 7.0 V, and gripper temperature was 41 °C. The GPU server was stopped.
 This experiment is excluded from orange and tomato rates.
+
+### 2026-11-01 — ROW AA: BLACK RUBBER RING off-protocol ×1, JPEG without RTC, 75-chunk cap — 0/1
+The unnamed object was identified from the camera view as a small black rubber ring: donut-shaped, with a central
+hole, lying flat front-right near the base. The instruction was `pick up the black ring and place it on the plate`;
+all other settings matched rows X–Z.
+
+The reach began at c10–12. The ring was partly between the jaws by c21, and repeated closes held gripper values
+around 25–33 while moving the ring slightly around the pickup area. There was no clear sustained lift. The
+shoulder-pan joint stayed near −12° to −18°, so no leftward tray carry began, and the ring remained on the table
+outside the tray at c75. Outcome: **FAIL — repeated enclosure without a sustained lift or carry**. The episode ran
+179.6 s with 1.269 s median request latency. The scripted return restored the start pose. Post-run checks passed:
+torque and status were zero on all six motors, protections were 500/250/25, voltage was 7.1 V, and gripper
+temperature was 39 °C. The GPU server was stopped. This experiment is excluded from orange and tomato rates.

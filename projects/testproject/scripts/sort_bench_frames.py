@@ -32,7 +32,8 @@ W4_W5_TRACE = "results/so101_lora_on_top_20261019/bench_trace_ft3_jpeg_no_rtc_ro
 X_TRACE = "results/so101_lora_on_top_20261019/bench_trace_ft3_jpeg_no_rtc_trial_x1_pen_20261031/frames"
 Y_TRACE = "results/so101_lora_on_top_20261019/bench_trace_ft3_jpeg_no_rtc_trial_y1_blue_box_20261101/frames"
 Z_TRACE = "results/so101_lora_on_top_20261019/bench_trace_ft3_jpeg_no_rtc_trial_z1_hippo_cell_20261101/frames"
-ROWS = {"base": (BASE, None, 45, 1, []), "M": (R3, None, 75, 1, []), "N": (R3, None, 75, 1, []), "O": (R3, None, 75, 1, []), "P": (R3, None, 75, 1, []), "Q": (R3, None, 75, 1, []), "R": (R3, None, 75, 1, []), "S": (S_TRACE, None, 75, 1, []), "T": (T_TRACE, None, 75, 1, []), "U": (U1_TRACE, None, 75, 1, []), "V": (V1_TRACE, None, 75, 1, []), "W": (W1_W3_TRACE, None, 75, 1, []), "X": (X_TRACE, None, 75, 1, []), "Y": (Y_TRACE, None, 75, 1, []), "Z": (Z_TRACE, None, 75, 1, []), "ctrl": (BASE, "c01", 45, 1, []), "A": (R3, "c01", 45, 1, [(1, 48)]), "B": (R3, "c02", 75, 1, [(1, 348)]), "C": (R3, "c03", 75, 1, [(1, 65)]),
+AA_TRACE = "results/so101_lora_on_top_20261019/bench_trace_ft3_jpeg_no_rtc_trial_aa1_black_ring_20261101/frames"
+ROWS = {"base": (BASE, None, 45, 1, []), "M": (R3, None, 75, 1, []), "N": (R3, None, 75, 1, []), "O": (R3, None, 75, 1, []), "P": (R3, None, 75, 1, []), "Q": (R3, None, 75, 1, []), "R": (R3, None, 75, 1, []), "S": (S_TRACE, None, 75, 1, []), "T": (T_TRACE, None, 75, 1, []), "U": (U1_TRACE, None, 75, 1, []), "V": (V1_TRACE, None, 75, 1, []), "W": (W1_W3_TRACE, None, 75, 1, []), "X": (X_TRACE, None, 75, 1, []), "Y": (Y_TRACE, None, 75, 1, []), "Z": (Z_TRACE, None, 75, 1, []), "AA": (AA_TRACE, None, 75, 1, []), "ctrl": (BASE, "c01", 45, 1, []), "A": (R3, "c01", 45, 1, [(1, 48)]), "B": (R3, "c02", 75, 1, [(1, 348)]), "C": (R3, "c03", 75, 1, [(1, 65)]),
         "D": (R3, "c04", 75, 1, [(1, 75)]), "E": (R3, "c05", 75, 1, []), "F": (R3, "c02", 75, 1, []), "G": (R3, "c04", 75, 1, []),
         "H": (R3, "c07", 75, 1, []), "I": (R3, "c08", 75, 1, []), "J": (R3, "c10", 75, 1, []), "K": (R3, "c11", 75, 1, []), "L": (R3, "c12", 120, 1, [])}
 DAY = {"2026-10-26": "sun", "2026-10-28": "tue", "2026-10-29": "wed", "2026-10-30": "thu", "2026-10-31": "fri", "2026-11-01": "sat"}
@@ -76,6 +77,9 @@ for row, (raw, pref, cap, first, lost) in ROWS.items():
         elif row == "Z":
             a, b = 1, cap
             raw_trial, ep_idx = Z_TRACE, 1
+        elif row == "AA":
+            a, b = 1, cap
+            raw_trial, ep_idx = AA_TRACE, 1
         else: a, b = first + (n - 1) * cap, first + n * cap - 1
         lost_here = [(max(a, x), min(b, y)) for x, y in lost if x <= b and y >= a]
         if lost_here and lost_here[0][0] == a and lost_here[0][1] >= b - 2:
@@ -83,7 +87,7 @@ for row, (raw, pref, cap, first, lost) in ROWS.items():
         for c in range(a, b + 1):
             if any(x <= c <= y for x, y in lost_here): continue
             for cam in ("front", "wrist"):
-                src = (pathlib.Path(raw_trial) / f"ep{ep_idx:02d}_chunk{c:03d}_{cam}.jpg" if row in {"S", "T", "U", "V", "W", "X", "Y", "Z"} else pathlib.Path(raw) / f"{pref}_call{c:06d}_{cam}.jpg"); dst = d / f"{cam}_chunk{c - a + 1:03d}.jpg"
+                src = (pathlib.Path(raw_trial) / f"ep{ep_idx:02d}_chunk{c:03d}_{cam}.jpg" if row in {"S", "T", "U", "V", "W", "X", "Y", "Z", "AA"} else pathlib.Path(raw) / f"{pref}_call{c:06d}_{cam}.jpg"); dst = d / f"{cam}_chunk{c - a + 1:03d}.jpg"
                 if src.exists() and not dst.exists():
                     try: os.link(src, dst)
                     except OSError: import shutil; shutil.copy2(src, dst)

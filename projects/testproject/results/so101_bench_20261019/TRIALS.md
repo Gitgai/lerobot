@@ -3,7 +3,7 @@
 Source: `trials.csv` (hand-kept, one row per trial). `trials_full.csv` adds the numbers computed from each trial's log. Regenerate with `python3 scripts/bench_trials_table.py`.
 **Frames, browsable:** `results/bench_frames_by_trial/<date>_<day>_row<X>_<model>_<fruit>/trial<N>_<RESULT>/` (front_chunkNNN.jpg + wrist_chunkNNN.jpg + WHAT_HAPPENED.txt; built by `scripts/sort_bench_frames.py`). Raw dump behind it: every policy call's overhead + wrist JPEG, named `<prefix>_call<N>_{front,wrist}.jpg`; fine-tune 3 rows in `results/so101_lora_on_top_20261019/bench_frames_row3_010000/` (prefix per row in the `frames` column, e.g. row I = c08, row H = c07, row E = c05), public-base rows in `results/so101_bench_20261019/frames/`. Trial N of a row covers calls (N-1)*cap+1 … N*cap. Narrative per trial: `bench_runs.md`. VOID = not a trial (camera fault, stop, wrong launch, fruit not re-placed); excluded from every count.
 
-Trials: 124 recorded, 108 valid, 16 void.
+Trials: 125 recorded, 109 valid, 16 void.
 
 ### By model / fruit
 
@@ -19,6 +19,7 @@ Trials: 124 recorded, 108 valid, 16 void.
 | fine-tune 3 / pen (off-protocol) | 1 | 0 | 0 | 1 | 0/1 |
 | fine-tune 3 / blue box (off-protocol) | 1 | 0 | 0 | 1 | 0/1 |
 | fine-tune 3 / hippo cell / cylindrical battery (off-protocol) | 1 | 0 | 0 | 1 | 0/1 |
+| fine-tune 3 / black rubber ring (off-protocol) | 1 | 0 | 0 | 1 | 0/1 |
 
 ### By day / model / fruit
 
@@ -42,6 +43,7 @@ Trials: 124 recorded, 108 valid, 16 void.
 | 2026-11-01 / fine-tune 3 / pen (off-protocol) | 1 | 0 | 0 | 1 | 0/1 |
 | 2026-11-01 / fine-tune 3 / blue box (off-protocol) | 1 | 0 | 0 | 1 | 0/1 |
 | 2026-11-01 / fine-tune 3 / hippo cell / cylindrical battery (off-protocol) | 1 | 0 | 0 | 1 | 0/1 |
+| 2026-11-01 / fine-tune 3 / black rubber ring (off-protocol) | 1 | 0 | 0 | 1 | 0/1 |
 
 ### By model / fruit / cap
 
@@ -58,6 +60,7 @@ Trials: 124 recorded, 108 valid, 16 void.
 | fine-tune 3 / pen (off-protocol) / cap 75 | 1 | 0 | 0 | 1 | 0/1 |
 | fine-tune 3 / blue box (off-protocol) / cap 75 | 1 | 0 | 0 | 1 | 0/1 |
 | fine-tune 3 / hippo cell / cylindrical battery (off-protocol) / cap 75 | 1 | 0 | 0 | 1 | 0/1 |
+| fine-tune 3 / black rubber ring (off-protocol) / cap 75 | 1 | 0 | 0 | 1 | 0/1 |
 
 ### Failure modes (valid FAIL trials; the FIRST mode when a trial shows two in sequence)
 
@@ -82,6 +85,7 @@ Trials: 124 recorded, 108 valid, 16 void.
 | grasp-carry | 1 |
 | grasp-lift without carry | 1 |
 | close | 1 |
+| enclosure without sustained lift | 1 |
 
 ### Every trial — conditions
 
@@ -211,6 +215,7 @@ Trials: 124 recorded, 108 valid, 16 void.
 | 2026-11-01 | X | 1 | fine-tune 3 | row3_all169_conservative ckpt 010000 (LoRA merged) | AI90 :8081 GPU 1 (RTX PRO 5000 72GB Blackwell) | pen (off-protocol) | pick up the pen and place it on the plate | 75 | overhead, position 2 restored | left | forward-right, mid-table, diagonal; all fruit removed |
 | 2026-11-01 | Y | 1 | fine-tune 3 | row3_all169_conservative ckpt 010000 (LoRA merged) | AI90 :8081 GPU 1 (RTX PRO 5000 72GB Blackwell) | blue box (off-protocol) | pick up the blue box and place it on the plate | 75 | overhead, position 2 restored | left | front-center near base, broad face flat; pen and fruit removed |
 | 2026-11-01 | Z | 1 | fine-tune 3 | row3_all169_conservative ckpt 010000 (LoRA merged) | AI90 :8081 GPU 1 (RTX PRO 5000 72GB Blackwell) | hippo cell / cylindrical battery (off-protocol) | pick up the cell and place it on the plate | 75 | overhead, position 2 restored | left | front-right near base, upright; blue box, pen, and fruit removed |
+| 2026-11-01 | AA | 1 | fine-tune 3 | row3_all169_conservative ckpt 010000 (LoRA merged) | AI90 :8081 GPU 1 (RTX PRO 5000 72GB Blackwell) | black rubber ring (off-protocol) | pick up the black ring and place it on the plate | 75 | overhead, position 2 restored | left | front-right near base, lying flat; other test objects and fruit removed |
 
 ### Every trial — outcome
 
@@ -340,3 +345,4 @@ Trials: 124 recorded, 108 valid, 16 void.
 | 2026-11-01 | X | 1 | **FAIL** | grasp-carry then slip outside tray | first full close c19 pinned or trapped the pen but it returned to the table by c31; re-grasped and visibly lifted by c43; carried left near the tray while held through c70; pen slipped from the still-closed gripper and was back on the table outside the tray by c75 | 5 | 2 (74) | 32 | 75 | 196.8 | 1.34 | OFF-PROTOCOL generalization experiment; exclude from orange/tomato rates; JPEG quality 85; RTC disabled | bench_ft3_jpeg_no_rtc_trial_x1_pen_20261031 ep1; results/so101_lora_on_top_20261019/bench_trace_ft3_jpeg_no_rtc_trial_x1_pen_20261031 |
 | 2026-11-01 | Y | 1 | **FAIL** | grasp-lift without carry | reached the box by c20; positioned it between the jaws and progressively closed from c22-c30; sustained grasp near gripper 28 through c75; lifted slightly and changed wrist/arm posture but base stayed near -9 to -13 degrees, so there was no leftward carry or tray delivery; scripted return opened the gripper and left the box near the pickup area | 13 | 28 (49) | 12 | 75 | 177.2 | 1.242 | OFF-PROTOCOL generalization experiment; exclude from orange/tomato rates; JPEG quality 85; RTC disabled | bench_ft3_jpeg_no_rtc_trial_y1_blue_box_20261101 ep1; results/so101_lora_on_top_20261019/bench_trace_ft3_jpeg_no_rtc_trial_y1_blue_box_20261101 |
 | 2026-11-01 | Z | 1 | **FAIL** | close then roll outside jaws | fast reach by c8; cell centered between jaws and gripper closed from 42 to 13 at c15-c16; no clear lift; gripper reopened to 28 at c19 and made repeated tight closes; by c36 the cell had rolled outside the right side of the jaws; it remained upright on the table through c75 with no sustained grasp, lift, carry, or delivery | 2 | 2 (45) | 23 | 75 | 178.5 | 1.263 | OFF-PROTOCOL generalization experiment; exclude from orange/tomato rates; JPEG quality 85; RTC disabled | bench_ft3_jpeg_no_rtc_trial_z1_hippo_cell_20261101 ep1; results/so101_lora_on_top_20261019/bench_trace_ft3_jpeg_no_rtc_trial_z1_hippo_cell_20261101 |
+| 2026-11-01 | AA | 1 | **FAIL** | enclosure without sustained lift | slow reach began c10-c12; ring partly between the jaws by c21; repeated closes held 25-33 and moved the ring slightly around the pickup area; no clear sustained lift and shoulder pan stayed near -12 to -18 degrees with no trayward carry; ring remained on the table outside the tray at c75 | 7 | 20 (63) | 24 | 75 | 179.6 | 1.269 | OFF-PROTOCOL generalization experiment; object named black rubber ring from camera view; exclude from orange/tomato rates; JPEG quality 85; RTC disabled | bench_ft3_jpeg_no_rtc_trial_aa1_black_ring_20261101 ep1; results/so101_lora_on_top_20261019/bench_trace_ft3_jpeg_no_rtc_trial_aa1_black_ring_20261101 |

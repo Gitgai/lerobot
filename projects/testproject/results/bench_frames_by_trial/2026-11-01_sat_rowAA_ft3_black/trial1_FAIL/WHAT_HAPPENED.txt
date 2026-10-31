@@ -1,0 +1,3 @@
+2026-11-01 fine-tune 3 / black rubber ring (off-protocol)
+FAIL — slow reach began c10-c12; ring partly between the jaws by c21; repeated closes held 25-33 and moved the ring slightly around the pickup area; no clear sustained lift and shoulder pan stayed near -12 to -18 degrees with no trayward carry; ring remained on the table outside the tray at c75
+placement: front-right near base, lying flat; other test objects and fruit removed; tray: left; instruction: pick up the black ring and place it on the plate; cap 75 chunks
