@@ -1,0 +1,3 @@
+2026-10-31 fine-tune 3 / tomato
+FAIL — idle through c45; reached c46-52; brief centered tomato grasp c53-56 (gripper 20-25); tomato released back onto the table by c58 before the carry; arm moved left and later closed on empty space to 9 at c68; tomato remained on the table
+placement: front-center near base; orange visible at lower-left edge; tray: left; instruction: pick up the tomato and place it on the plate; cap 75 chunks
