@@ -744,3 +744,17 @@ outside the tray by c75. Outcome: **FAIL — grasp, lift, and carry succeeded; d
 196.8 s with 1.340 s median request latency. The scripted return restored the start pose. Post-run checks passed:
 torque and status were zero on all six motors, protections were 500/250/25, voltage was 7.0 V, and gripper
 temperature was 34 °C. The GPU server was stopped. This experiment is excluded from orange and tomato rates.
+
+### 2026-11-01 — ROW Y: BLUE BOX off-protocol generalization ×1, JPEG without RTC, 75-chunk cap — 0/1
+One exploratory test used a small translucent blue plastic box placed broad-face flat, front-center near the base,
+with the pen and fruit removed. The instruction was `pick up the blue box and place it on the plate`; all other
+settings matched row X.
+
+The arm reached the box by c20, put it between the jaws, and progressively closed around its narrow side. It held
+the box with the gripper near 28 through c75 and lifted it slightly while changing the wrist and arm posture. The
+base stayed near −9° to −13°, however, so the policy never began the leftward carry toward the tray. The scripted
+return opened the gripper and left the box near the pickup area. Outcome: **FAIL — grasp and slight lift succeeded;
+carry and delivery did not occur**. The episode ran 177.2 s with 1.242 s median request latency. The return restored
+the recorded start pose. Post-run checks passed: torque and status were zero on all six motors, protections were
+500/250/25, voltage was 7.0 V, and gripper temperature was 44 °C. The GPU server was stopped. This experiment is
+excluded from orange and tomato rates.

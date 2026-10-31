@@ -1,0 +1,3 @@
+2026-11-01 fine-tune 3 / blue box (off-protocol)
+FAIL — reached the box by c20; positioned it between the jaws and progressively closed from c22-c30; sustained grasp near gripper 28 through c75; lifted slightly and changed wrist/arm posture but base stayed near -9 to -13 degrees, so there was no leftward carry or tray delivery; scripted return opened the gripper and left the box near the pickup area
+placement: front-center near base, broad face flat; pen and fruit removed; tray: left; instruction: pick up the blue box and place it on the plate; cap 75 chunks

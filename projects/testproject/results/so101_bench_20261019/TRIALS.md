@@ -3,7 +3,7 @@
 Source: `trials.csv` (hand-kept, one row per trial). `trials_full.csv` adds the numbers computed from each trial's log. Regenerate with `python3 scripts/bench_trials_table.py`.
 **Frames, browsable:** `results/bench_frames_by_trial/<date>_<day>_row<X>_<model>_<fruit>/trial<N>_<RESULT>/` (front_chunkNNN.jpg + wrist_chunkNNN.jpg + WHAT_HAPPENED.txt; built by `scripts/sort_bench_frames.py`). Raw dump behind it: every policy call's overhead + wrist JPEG, named `<prefix>_call<N>_{front,wrist}.jpg`; fine-tune 3 rows in `results/so101_lora_on_top_20261019/bench_frames_row3_010000/` (prefix per row in the `frames` column, e.g. row I = c08, row H = c07, row E = c05), public-base rows in `results/so101_bench_20261019/frames/`. Trial N of a row covers calls (N-1)*cap+1 … N*cap. Narrative per trial: `bench_runs.md`. VOID = not a trial (camera fault, stop, wrong launch, fruit not re-placed); excluded from every count.
 
-Trials: 122 recorded, 106 valid, 16 void.
+Trials: 123 recorded, 107 valid, 16 void.
 
 ### By model / fruit
 
@@ -17,6 +17,7 @@ Trials: 122 recorded, 106 valid, 16 void.
 | fine-tune 3 / orange | 42 | 14 | 0 | 28 | 14/42 |
 | fine-tune 3 / 3 oranges (multi-fruit experiment) | 2 | 0 | 0 | 2 | 0/2 |
 | fine-tune 3 / pen (off-protocol) | 1 | 0 | 0 | 1 | 0/1 |
+| fine-tune 3 / blue box (off-protocol) | 1 | 0 | 0 | 1 | 0/1 |
 
 ### By day / model / fruit
 
@@ -38,6 +39,7 @@ Trials: 122 recorded, 106 valid, 16 void.
 | 2026-10-31 / fine-tune 3 / orange | 16 | 5 | 0 | 11 | 5/16 |
 | 2026-10-31 / fine-tune 3 / tomato | 10 | 1 | 0 | 9 | 1/10 |
 | 2026-11-01 / fine-tune 3 / pen (off-protocol) | 1 | 0 | 0 | 1 | 0/1 |
+| 2026-11-01 / fine-tune 3 / blue box (off-protocol) | 1 | 0 | 0 | 1 | 0/1 |
 
 ### By model / fruit / cap
 
@@ -52,6 +54,7 @@ Trials: 122 recorded, 106 valid, 16 void.
 | fine-tune 3 / orange / cap 75 | 42 | 14 | 0 | 28 | 14/42 |
 | fine-tune 3 / 3 oranges (multi-fruit experiment) / cap 120 | 2 | 0 | 0 | 2 | 0/2 |
 | fine-tune 3 / pen (off-protocol) / cap 75 | 1 | 0 | 0 | 1 | 0/1 |
+| fine-tune 3 / blue box (off-protocol) / cap 75 | 1 | 0 | 0 | 1 | 0/1 |
 
 ### Failure modes (valid FAIL trials; the FIRST mode when a trial shows two in sequence)
 
@@ -74,6 +77,7 @@ Trials: 122 recorded, 106 valid, 16 void.
 | lift | 1 |
 | push without grasp | 1 |
 | grasp-carry | 1 |
+| grasp-lift without carry | 1 |
 
 ### Every trial — conditions
 
@@ -201,6 +205,7 @@ Trials: 122 recorded, 106 valid, 16 void.
 | 2026-10-31 | W | 4 | fine-tune 3 | row3_all169_conservative ckpt 010000 (LoRA merged) | AI90 :8081 GPU 1 (RTX PRO 5000 72GB Blackwell) | tomato | pick up the tomato and place it on the plate | 75 | overhead, position 2 restored | left | forward-right, mid-table, slightly closer; tomato only |
 | 2026-10-31 | W | 5 | fine-tune 3 | row3_all169_conservative ckpt 010000 (LoRA merged) | AI90 :8081 GPU 1 (RTX PRO 5000 72GB Blackwell) | tomato | pick up the tomato and place it on the plate | 75 | overhead, position 2 restored | left | forward-right, mid-table, slightly closer; tomato only |
 | 2026-11-01 | X | 1 | fine-tune 3 | row3_all169_conservative ckpt 010000 (LoRA merged) | AI90 :8081 GPU 1 (RTX PRO 5000 72GB Blackwell) | pen (off-protocol) | pick up the pen and place it on the plate | 75 | overhead, position 2 restored | left | forward-right, mid-table, diagonal; all fruit removed |
+| 2026-11-01 | Y | 1 | fine-tune 3 | row3_all169_conservative ckpt 010000 (LoRA merged) | AI90 :8081 GPU 1 (RTX PRO 5000 72GB Blackwell) | blue box (off-protocol) | pick up the blue box and place it on the plate | 75 | overhead, position 2 restored | left | front-center near base, broad face flat; pen and fruit removed |
 
 ### Every trial — outcome
 
@@ -328,3 +333,4 @@ Trials: 122 recorded, 106 valid, 16 void.
 | 2026-10-31 | W | 4 | **FAIL** | close-beside | reached over the tomato by c14; fruit reappeared outside the right jaw by c24; repeated closes pushed it slightly right; no hold, lift, or trayward carry | 8 | 34 (48) | 41 | 75 | 179.5 | 1.239 | JPEG quality 85; RTC disabled; clean tomato-only scene; continued in fresh trace after wrist-camera re-enumeration between trials | bench_ft3_jpeg_no_rtc_row_w_tomato_20261031_part2 ep1; results/so101_lora_on_top_20261019/bench_trace_ft3_jpeg_no_rtc_row_w_tomato_20261031_part2 |
 | 2026-10-31 | W | 5 | **FAIL** | close-beside | reached by c15; closes from c19 onward landed beside the tomato and pushed it right; later tight closes still produced no sustained hold, lift, or trayward carry | 8 | 13 (42) | 64 | 75 | 183.5 | 1.281 | JPEG quality 85; RTC disabled; clean tomato-only scene | bench_ft3_jpeg_no_rtc_row_w_tomato_20261031_part2 ep2; results/so101_lora_on_top_20261019/bench_trace_ft3_jpeg_no_rtc_row_w_tomato_20261031_part2 |
 | 2026-11-01 | X | 1 | **FAIL** | grasp-carry then slip outside tray | first full close c19 pinned or trapped the pen but it returned to the table by c31; re-grasped and visibly lifted by c43; carried left near the tray while held through c70; pen slipped from the still-closed gripper and was back on the table outside the tray by c75 | 5 | 2 (74) | 32 | 75 | 196.8 | 1.34 | OFF-PROTOCOL generalization experiment; exclude from orange/tomato rates; JPEG quality 85; RTC disabled | bench_ft3_jpeg_no_rtc_trial_x1_pen_20261031 ep1; results/so101_lora_on_top_20261019/bench_trace_ft3_jpeg_no_rtc_trial_x1_pen_20261031 |
+| 2026-11-01 | Y | 1 | **FAIL** | grasp-lift without carry | reached the box by c20; positioned it between the jaws and progressively closed from c22-c30; sustained grasp near gripper 28 through c75; lifted slightly and changed wrist/arm posture but base stayed near -9 to -13 degrees, so there was no leftward carry or tray delivery; scripted return opened the gripper and left the box near the pickup area | 13 | 28 (49) | 12 | 75 | 177.2 | 1.242 | OFF-PROTOCOL generalization experiment; exclude from orange/tomato rates; JPEG quality 85; RTC disabled | bench_ft3_jpeg_no_rtc_trial_y1_blue_box_20261101 ep1; results/so101_lora_on_top_20261019/bench_trace_ft3_jpeg_no_rtc_trial_y1_blue_box_20261101 |
