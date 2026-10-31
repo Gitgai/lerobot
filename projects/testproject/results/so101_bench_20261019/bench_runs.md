@@ -683,7 +683,7 @@ recorded start pose after every trial. Row U is **1/5**. Fine-tune 3 orange is n
 **7/30**. Post-run read-only checks passed: torque and status were zero on all six motors, gripper protections were
 500/250/25, voltage was 7.3 V, and gripper temperature was 34 °C. The GPU server was stopped after the run.
 
-### 2026-10-31 — ROW V: single TOMATO ×2, JPEG without RTC, 75-chunk cap, tray left — 0/2
+### 2026-10-31 — ROW V: single TOMATO ×3, JPEG without RTC, 75-chunk cap, tray left — 0/3
 Same fine-tune 3 checkpoint and transport settings as row U: AI90 GPU 1, JPEG quality 85, RTC disabled, and the
 stop-and-wait client executing 20 actions per request at 30 Hz. The instruction was
 `pick up the tomato and place it on the plate`.
@@ -691,11 +691,12 @@ stop-and-wait client executing 20 actions per request at 30 Hz. The instruction 
 ```text
 V1  front-center near base; idle through c45; brief grasp c53–56; released before carry.                    FAIL
 V2  forward-right mid-table; reached from c34; centered c47–57; repeated closes, no sustained hold/lift.   FAIL
+V3  tomato-only, forward-right near edge; stayed beside it; two closes; no contact, lift, or carry.           FAIL
 ```
 
 V1 ran 75 chunks in 188.8 s with 1.239 s median request latency. V2 ran 75 chunks in 191.0 s with 1.232 s median
-request latency. The scripted return restored the start pose after both trials. Fine-tune 3 tomato is now
-**7/32**; orange remains **14/42**. V2 used the intended forward-right placement, but neither trial is a clean
-fruit-only comparison because the orange remained visible at the lower-left frame edge. Post-run checks after V2
-passed: torque and status were zero on all six motors, protections were 500/250/25, voltage was 7.0 V, and gripper
-temperature was 34 °C. The GPU server was stopped.
+request latency. V3 ran 75 chunks in 194.0 s with 1.232 s median request latency. The scripted return restored the
+start pose after all three trials. Fine-tune 3 tomato is now **7/33**; orange remains **14/42**. V3 is the clean
+fruit-only comparison: only the tomato was visible. Post-run checks after V3 passed: torque and status were zero on
+all six motors, protections were 500/250/25, voltage was 7.0 V, and gripper temperature was 34 °C. The GPU server
+was stopped.

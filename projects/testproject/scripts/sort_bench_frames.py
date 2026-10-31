@@ -23,6 +23,7 @@ U1_TRACE = "results/so101_lora_on_top_20261019/bench_trace_ft3_jpeg_no_rtc_trial
 U2_U5_TRACE = "results/so101_lora_on_top_20261019/bench_trace_ft3_jpeg_no_rtc_row_u2_u5_20261031/frames"
 V1_TRACE = "results/so101_lora_on_top_20261019/bench_trace_ft3_jpeg_no_rtc_trial_v1_tomato_20261031/frames"
 V2_TRACE = "results/so101_lora_on_top_20261019/bench_trace_ft3_jpeg_no_rtc_trial_v2_tomato_20261031/frames"
+V3_TRACE = "results/so101_lora_on_top_20261019/bench_trace_ft3_jpeg_no_rtc_trial_v3_tomato_20261031/frames"
 ROWS = {"base": (BASE, None, 45, 1, []), "M": (R3, None, 75, 1, []), "N": (R3, None, 75, 1, []), "O": (R3, None, 75, 1, []), "P": (R3, None, 75, 1, []), "Q": (R3, None, 75, 1, []), "R": (R3, None, 75, 1, []), "S": (S_TRACE, None, 75, 1, []), "T": (T_TRACE, None, 75, 1, []), "U": (U1_TRACE, None, 75, 1, []), "V": (V1_TRACE, None, 75, 1, []), "ctrl": (BASE, "c01", 45, 1, []), "A": (R3, "c01", 45, 1, [(1, 48)]), "B": (R3, "c02", 75, 1, [(1, 348)]), "C": (R3, "c03", 75, 1, [(1, 65)]),
         "D": (R3, "c04", 75, 1, [(1, 75)]), "E": (R3, "c05", 75, 1, []), "F": (R3, "c02", 75, 1, []), "G": (R3, "c04", 75, 1, []),
         "H": (R3, "c07", 75, 1, []), "I": (R3, "c08", 75, 1, []), "J": (R3, "c10", 75, 1, []), "K": (R3, "c11", 75, 1, []), "L": (R3, "c12", 120, 1, [])}
@@ -54,7 +55,7 @@ for row, (raw, pref, cap, first, lost) in ROWS.items():
             raw_trial, ep_idx = (U1_TRACE, 1) if n == 1 else (U2_U5_TRACE, n - 1)
         elif row == "V":
             a, b = 1, cap
-            raw_trial, ep_idx = (V1_TRACE, 1) if n == 1 else (V2_TRACE, 1)
+            raw_trial, ep_idx = {1: (V1_TRACE, 1), 2: (V2_TRACE, 1), 3: (V3_TRACE, 1)}[n]
         else: a, b = first + (n - 1) * cap, first + n * cap - 1
         lost_here = [(max(a, x), min(b, y)) for x, y in lost if x <= b and y >= a]
         if lost_here and lost_here[0][0] == a and lost_here[0][1] >= b - 2:
