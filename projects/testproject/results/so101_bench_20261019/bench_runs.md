@@ -730,3 +730,17 @@ every trial. Row W is **0/5**. Fine-tune 3 tomato is now **8/40**; orange remain
 orange at the lower-left frame edge; W3–W5 were clean tomato-only scenes. Post-run checks passed: torque and status
 were zero on all six motors, protections were 500/250/25, voltage was 7.1 V, and gripper temperature was 34 °C.
 The GPU server was stopped.
+
+
+### 2026-11-01 — ROW X: PEN off-protocol generalization ×1, JPEG without RTC, 75-chunk cap — 0/1
+One exploratory test of fine-tune 3 on an object class absent from the fruit protocol. A silver-and-black pen was
+placed diagonally forward-right at mid-table with all fruit removed. The instruction was
+`pick up the pen and place it on the plate`; all other settings matched rows V–W.
+
+The first full close at c19 pinned or trapped the pen, but it was back on the table by c31. The policy then
+re-grasped it and produced a clear lift by c43. It carried the pen left near the tray while maintaining a very tight
+gripper through c70. The pen slipped from the still-closed gripper during the final motion and lay on the table
+outside the tray by c75. Outcome: **FAIL — grasp, lift, and carry succeeded; delivery failed**. The episode ran
+196.8 s with 1.340 s median request latency. The scripted return restored the start pose. Post-run checks passed:
+torque and status were zero on all six motors, protections were 500/250/25, voltage was 7.0 V, and gripper
+temperature was 34 °C. The GPU server was stopped. This experiment is excluded from orange and tomato rates.

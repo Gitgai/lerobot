@@ -16,6 +16,7 @@ Hard links into the raw server dump (see scripts/sort_bench_frames.py). Names: `
 | 2026-10-31_fri_rowU_ft3_orange | 5 |  |
 | 2026-10-31_fri_rowV_ft3_tomato | 6 |  |
 | 2026-10-31_fri_rowW_ft3_tomato | 5 |  |
+| 2026-11-01_sat_rowX_ft3_pen | 1 |  |
 | 2026-10-26_sun_rowctrl_base_tomato | 5 |  |
 | 2026-10-26_sun_rowA_ft3_tomato | 5 | trial 1 frames lost |
 | 2026-10-26_sun_rowB_ft3_tomato | 5 | trial 1 frames lost; trial 2 frames lost; trial 3 frames lost; trial 4 frames lost |
