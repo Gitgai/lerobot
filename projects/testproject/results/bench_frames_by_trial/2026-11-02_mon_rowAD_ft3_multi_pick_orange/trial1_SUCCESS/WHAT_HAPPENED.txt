@@ -1,0 +1,3 @@
+SUCCESS — selected the requested orange among multiple objects and delivered it to the tray.
+
+The start scene contained an orange on the right, a green bell pepper on the left, a pen between them, a transparent bowl farther right, and the target tray on the left. The arm turned toward the orange by chunk 11, reached it by chunk 18, and closed around it through chunks 20–24. It lifted and carried the orange left across the table through chunks 25–31, opened over the tray at chunk 32, and left the orange inside by chunk 33. The pepper, pen, and bowl were untouched. The orange remained in the tray through chunk 75 and the scripted return restored the recorded start pose.

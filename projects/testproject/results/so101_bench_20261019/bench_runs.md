@@ -830,3 +830,17 @@ The first launch attempt ended before the countdown or any policy action because
 of the established VLASH wrapper and rejected the checkpoint configuration. The client disconnected with torque off;
 this setup abort is not a trial and is excluded from all rates. The valid relaunch used the established wrapper and a
 fresh trace: `bench_trace_ft3_jpeg_no_rtc_row_ac_pen_20261102_retry/`.
+
+### 2026-11-02 — ROW AD: MULTI-OBJECT SELECTION, PICK ORANGE ×1, JPEG without RTC — 1/1
+One off-protocol selection trial placed four visible objects in the start scene: an orange on the right, a green bell
+pepper on the left, a pen between them, and a transparent bowl farther right. The tray remained on the left. The
+instruction explicitly requested `pick up the orange and place it on the plate`.
+
+The policy turned toward the orange by c11 and reached it by c18, ignoring the pepper, pen, and bowl. It closed around
+the orange from c20-c24, lifted and carried it left across the table through c25-c31, opened over the tray at c32,
+and left the orange inside by c33. The distractors remained untouched, and the orange stayed in the tray through c75
+and the scripted return. Outcome: **SUCCESS — correct object selected, grasped, carried, and delivered**. The episode
+ran 182.3 s with 1.234 s median request latency. Post-run checks passed: torque and status were zero on all six motors,
+protections were 500/250/25, voltage was 7.0 V, and gripper temperature was 33 °C. The GPU server was stopped. This
+multi-object selection probe is recorded separately and does not change the controlled single-fruit orange 14/42 or
+tomato 8/40 totals.
