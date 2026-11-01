@@ -844,3 +844,20 @@ ran 182.3 s with 1.234 s median request latency. Post-run checks passed: torque 
 protections were 500/250/25, voltage was 7.0 V, and gripper temperature was 33 °C. The GPU server was stopped. This
 multi-object selection probe is recorded separately and does not change the controlled single-fruit orange 14/42 or
 tomato 8/40 totals.
+
+### 2026-11-02 — ROW AE: PICK CAPSICUM AND PUT IT IN BOWL ×1, JPEG without RTC — 1/1
+One off-protocol language-conditioned object-and-receptacle trial used fine-tune 3 on AI90 GPU 1. The start scene
+contained an orange at lower left, a pen in the center, a green capsicum at lower right, a transparent bowl at upper
+right, and the usual tray at upper left. The instruction explicitly requested `pick up the capsicum and put it in the
+bowl`.
+
+The policy made a wrong-object approach first: it reached the orange by c37, closed around it c42-c45, carried it to
+the transparent bowl, and released it there by c53. It then moved to the requested capsicum, secured it c62-c67,
+lifted and carried it to the same bowl, and opened at c71. Both the capsicum and orange were visibly inside the bowl
+through c75; the pen and tray were untouched. Outcome: **SUCCESS on the requested final state, with a wrong-object-first
+selection error**. The episode ran 168.6 s with 1.212 s median request latency, and the scripted return restored the
+recorded start pose. The first launch aborted before countdown or motion when the wrist camera did not warm up and is
+not a trial. During the valid retry the wrist camera re-enumerated several times, but all 75 saved front and wrist
+frames were fresh and unique. Post-run checks passed: torque and status were zero on all six motors, protections were
+500/250/25, voltage was 7.1 V, and gripper temperature was 34 °C. The GPU server was stopped. This probe is excluded
+from the controlled orange 14/42 and tomato 8/40 totals.
