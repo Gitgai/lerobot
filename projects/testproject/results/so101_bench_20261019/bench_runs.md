@@ -861,3 +861,18 @@ not a trial. During the valid retry the wrist camera re-enumerated several times
 frames were fresh and unique. Post-run checks passed: torque and status were zero on all six motors, protections were
 500/250/25, voltage was 7.1 V, and gripper temperature was 34 °C. The GPU server was stopped. This probe is excluded
 from the controlled orange 14/42 and tomato 8/40 totals.
+
+### 2026-11-02 — ROW AF: PICK CAPSICUM FROM BOWL AND PUT IT IN PLATE ×1, JPEG without RTC — 0/1
+One off-protocol object-extraction and receptacle-transfer trial used fine-tune 3 on AI90 GPU 1. The capsicum and
+orange began together in the transparent bowl on the right, the plate remained on the left, and the pen stayed on
+the table. The instruction explicitly requested `pick up the capsicum from the bowl and put it in the plate`.
+
+The arm stayed near home through c24, then reached the bowl from c25-c37 and moved around its rim. The capsicum
+remained visible inside the bowl. The gripper closed from 30 at c43 to 1 by c59, but the jaws were beside the capsicum
+and no object was held. It maintained the empty close near the bowl through c75 without a lift or plateward carry.
+Both fruits remained in the bowl and the plate stayed empty. Outcome: **FAIL — close-beside inside the bowl**. The
+episode ran 185.9 s with 1.189 s median request latency; one c9 request took 4.613 s, after which latency returned to
+normal. The scripted return restored the recorded start pose. All 75 saved front frames and all 75 wrist frames were
+fresh and unique. Post-run checks passed: torque and status were zero on all six motors, protections were 500/250/25,
+voltage was 7.0 V, and gripper temperature was 33 °C. The GPU server was stopped. This probe is excluded from the
+controlled orange 14/42 and tomato 8/40 totals.

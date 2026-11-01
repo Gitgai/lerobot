@@ -1,0 +1,3 @@
+FAIL — closed beside the capsicum inside the bowl; no lift or delivery to the plate.
+
+The trial began with the capsicum and orange together in the transparent bowl on the right, the plate on the left, and a pen on the table. The instruction was "pick up the capsicum from the bowl and put it in the plate". The arm stayed near home through chunk 24, reached the bowl from chunks 25-37, and moved around the rim while the capsicum remained inside. It closed from gripper 30 at chunk 43 to 1 by chunk 59, but the jaws were beside the capsicum and no object was held. The arm kept the empty close near the bowl through chunk 75. Both fruits remained in the bowl, the plate stayed empty, and the scripted return restored the recorded start pose.
