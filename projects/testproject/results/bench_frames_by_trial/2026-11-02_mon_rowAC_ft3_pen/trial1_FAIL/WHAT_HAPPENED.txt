@@ -1,0 +1,3 @@
+FAIL — repeated close/reopen attempts moved the pen but did not establish a sustained grasp.
+
+The pen began front-center, slightly right of the gripper centerline, aligned lengthwise. The arm reached by chunk 9. It closed repeatedly from chunks 17–40, reaching a minimum gripper value of 1.6 at chunk 35. The pen remained off-center beside the jaws. Further closes at chunks 47–56 moved it, but by chunk 58 it was clearly lying on the table beside the gripper. No sustained hold, lift, trayward carry, or tray delivery occurred through chunk 75. The scripted return restored the recorded start pose.

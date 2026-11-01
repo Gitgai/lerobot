@@ -814,3 +814,19 @@ torque. A wrist-camera re-enumeration warning occurred during AB1 but recovered 
 Rerun live viewer recorded front and wrist policy inputs, measured joints, predicted chunks, dispatched actions,
 latency, and progress. Final checks passed: torque and status were zero on all six motors, protections remained
 500/250/25, voltage was 7.0 V, and gripper temperature was 34 °C. The GPU server was stopped.
+
+### 2026-11-02 — ROW AC: PEN off-protocol generalization ×1, JPEG without RTC, 75-chunk cap — 0/1
+One additional pen trial used the same fine-tune 3 checkpoint and Row AB settings on AI90 GPU 1. The pen began
+front-center, slightly right of the gripper centerline and aligned lengthwise. The arm reached it by c9. Repeated
+closes from c17-c40 reached a minimum gripper value of 1.6 at c35, but the pen stayed off-center beside the jaws.
+Later closes at c47-c56 moved it without establishing a sustained hold. By c58 the pen was clearly lying on the
+table beside the gripper, and no lift, trayward carry, or delivery occurred through c75. Outcome: **FAIL — repeated
+close-beside attempts moved the pen without a sustained grasp**. The episode ran 178.8 s with 1.217 s median request
+latency. The scripted return restored the recorded start pose. Post-run checks passed: torque and status were zero
+on all six motors, protections were 500/250/25, voltage was 7.2 V, and gripper temperature was 33 °C. The GPU server
+was stopped. Valid fine-tune 3 pen performance is now **1/7** across rows X, AB, and AC; fruit totals are unchanged.
+
+The first launch attempt ended before the countdown or any policy action because a stock server was started instead
+of the established VLASH wrapper and rejected the checkpoint configuration. The client disconnected with torque off;
+this setup abort is not a trial and is excluded from all rates. The valid relaunch used the established wrapper and a
+fresh trace: `bench_trace_ft3_jpeg_no_rtc_row_ac_pen_20261102_retry/`.
