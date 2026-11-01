@@ -1,0 +1,3 @@
+2026-11-02 fine-tune 3 / pen (off-protocol)
+SUCCESS — held near home through c9; reached and closed around the pen by c19; sustained the grasp while lifting and carrying left from c31; pen was over the tray by c39; gripper opened at c43 and released it inside; policy returned near home by c49 and the pen stayed in the tray through c75
+placement: front-center, aligned lengthwise straight out from the gripper; all fruit removed; tray: left; instruction: pick up the pen and place it on the plate; cap 75 chunks

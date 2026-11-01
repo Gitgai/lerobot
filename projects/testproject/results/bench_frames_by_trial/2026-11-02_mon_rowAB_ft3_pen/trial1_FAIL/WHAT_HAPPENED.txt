@@ -1,0 +1,3 @@
+2026-11-02 fine-tune 3 / pen (off-protocol)
+FAIL — reached the pen by c10; repeated closes at c13-15, c30-34, c39-50, and c61-72 landed beside or against it; the black cap separated from the silver body; neither part was lifted or carried; both remained outside the tray at c75
+placement: right side, mid-table, nearly vertical; all fruit removed; tray: left; instruction: pick up the pen and place it on the plate; cap 75 chunks

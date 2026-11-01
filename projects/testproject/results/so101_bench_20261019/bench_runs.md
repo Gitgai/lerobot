@@ -785,3 +785,32 @@ outside the tray at c75. Outcome: **FAIL — repeated enclosure without a sustai
 179.6 s with 1.269 s median request latency. The scripted return restored the start pose. Post-run checks passed:
 torque and status were zero on all six motors, protections were 500/250/25, voltage was 7.1 V, and gripper
 temperature was 39 °C. The GPU server was stopped. This experiment is excluded from orange and tomato rates.
+
+### 2026-11-02 — ROW AB: PEN off-protocol generalization ×5, JPEG without RTC, 75-chunk cap — 1/5
+Five valid single-pen trials used fine-tune 3 on AI90 GPU 1 with JPEG quality 85, RTC disabled, 20 actions per
+stop-and-wait request at 30 Hz, a 30 s placement countdown, and scripted return to the recorded start pose. The
+instruction was `pick up the pen and place it on the plate`. AB1–AB3 are in
+`bench_trace_ft3_jpeg_no_rtc_row_ab_pen_20261102/`; replacement AB4–AB5 are in the matching `_part2` trace.
+
+```text
+AB1  right mid-table; repeated close-beside attempts detached the cap; neither part lifted or carried.        FAIL
+AB2  far right; closed beside it, then swept across and pushed/dragged it without a sustained grasp.          FAIL
+AB3  front-center, aligned lengthwise; grasp c19; carry left c31–39; released inside tray c43.                SUCCESS
+AB4  front-center, aligned slightly right; pen stayed outside left jaw through repeated closes.               FAIL
+AB5  front-center, aligned; closes missed outside right jaw and pushed pen diagonal; no lift or carry.         FAIL
+```
+
+The valid episodes ran 75 chunks each. Wall times were 159.4, 187.8, 166.8, 176.2, and 174.4 s; median request
+latencies were 1.197, 1.429, 1.239, 1.223, and 1.217 s. The arm returned to its recorded start after every valid
+trial. Outcome: **1/5 delivery (20%)**. Together with row X, fine-tune 3 is now **1/6 on valid pen trials**; pen
+experiments remain off-protocol and do not change the orange 14/42 or tomato 8/40 totals.
+
+Two launches are retained separately as **VOID**. An earlier 29-chunk launch ended when the local bench client was
+interrupted while the arm was extended; torque was explicitly disabled and verified before relaunch. During the
+first AB4 attempt, a hand entered the active workspace near the arm/gripper; the run was stopped at c62, returned
+to start, and replaced. Neither launch is included in the 1/5 rate. Before the row, a power cycle had restored the
+gripper servo's 1000/500/80 defaults; the client rewrote and verified the audited 500/250/25 limits before enabling
+torque. A wrist-camera re-enumeration warning occurred during AB1 but recovered without a stale-frame event. The
+Rerun live viewer recorded front and wrist policy inputs, measured joints, predicted chunks, dispatched actions,
+latency, and progress. Final checks passed: torque and status were zero on all six motors, protections remained
+500/250/25, voltage was 7.0 V, and gripper temperature was 34 °C. The GPU server was stopped.

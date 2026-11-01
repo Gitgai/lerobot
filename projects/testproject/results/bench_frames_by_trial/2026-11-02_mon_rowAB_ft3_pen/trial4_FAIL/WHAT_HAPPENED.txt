@@ -1,0 +1,3 @@
+2026-11-02 fine-tune 3 / pen (off-protocol)
+FAIL — reached the aligned pen by c10 and closed from c12; the pen remained outside the left jaw in the wrist view; repeated tight closes through c75 never produced a sustained grasp, lift, or leftward carry; pen remained on the table outside the tray
+placement: front-center, aligned lengthwise, slightly right of gripper centerline; all fruit removed; tray: left; instruction: pick up the pen and place it on the plate; cap 75 chunks

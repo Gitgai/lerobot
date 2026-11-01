@@ -3,7 +3,7 @@
 Source: `trials.csv` (hand-kept, one row per trial). `trials_full.csv` adds the numbers computed from each trial's log. Regenerate with `python3 scripts/bench_trials_table.py`.
 **Frames, browsable:** `results/bench_frames_by_trial/<date>_<day>_row<X>_<model>_<fruit>/trial<N>_<RESULT>/` (front_chunkNNN.jpg + wrist_chunkNNN.jpg + WHAT_HAPPENED.txt; built by `scripts/sort_bench_frames.py`). Raw dump behind it: every policy call's overhead + wrist JPEG, named `<prefix>_call<N>_{front,wrist}.jpg`; fine-tune 3 rows in `results/so101_lora_on_top_20261019/bench_frames_row3_010000/` (prefix per row in the `frames` column, e.g. row I = c08, row H = c07, row E = c05), public-base rows in `results/so101_bench_20261019/frames/`. Trial N of a row covers calls (N-1)*cap+1 … N*cap. Narrative per trial: `bench_runs.md`. VOID = not a trial (camera fault, stop, wrong launch, fruit not re-placed); excluded from every count.
 
-Trials: 125 recorded, 109 valid, 16 void.
+Trials: 132 recorded, 114 valid, 18 void.
 
 ### By model / fruit
 
@@ -16,7 +16,7 @@ Trials: 125 recorded, 109 valid, 16 void.
 | fine-tune 3 / tomato | 40 | 8 | 0 | 32 | 8/40 |
 | fine-tune 3 / orange | 42 | 14 | 0 | 28 | 14/42 |
 | fine-tune 3 / 3 oranges (multi-fruit experiment) | 2 | 0 | 0 | 2 | 0/2 |
-| fine-tune 3 / pen (off-protocol) | 1 | 0 | 0 | 1 | 0/1 |
+| fine-tune 3 / pen (off-protocol) | 6 | 1 | 0 | 5 | 1/6 |
 | fine-tune 3 / blue box (off-protocol) | 1 | 0 | 0 | 1 | 0/1 |
 | fine-tune 3 / hippo cell / cylindrical battery (off-protocol) | 1 | 0 | 0 | 1 | 0/1 |
 | fine-tune 3 / black rubber ring (off-protocol) | 1 | 0 | 0 | 1 | 0/1 |
@@ -44,6 +44,7 @@ Trials: 125 recorded, 109 valid, 16 void.
 | 2026-11-01 / fine-tune 3 / blue box (off-protocol) | 1 | 0 | 0 | 1 | 0/1 |
 | 2026-11-01 / fine-tune 3 / hippo cell / cylindrical battery (off-protocol) | 1 | 0 | 0 | 1 | 0/1 |
 | 2026-11-01 / fine-tune 3 / black rubber ring (off-protocol) | 1 | 0 | 0 | 1 | 0/1 |
+| 2026-11-02 / fine-tune 3 / pen (off-protocol) | 5 | 1 | 0 | 4 | 1/5 |
 
 ### By model / fruit / cap
 
@@ -57,7 +58,7 @@ Trials: 125 recorded, 109 valid, 16 void.
 | fine-tune 3 / tomato / cap 75 | 35 | 7 | 0 | 28 | 7/35 |
 | fine-tune 3 / orange / cap 75 | 42 | 14 | 0 | 28 | 14/42 |
 | fine-tune 3 / 3 oranges (multi-fruit experiment) / cap 120 | 2 | 0 | 0 | 2 | 0/2 |
-| fine-tune 3 / pen (off-protocol) / cap 75 | 1 | 0 | 0 | 1 | 0/1 |
+| fine-tune 3 / pen (off-protocol) / cap 75 | 6 | 1 | 0 | 5 | 1/6 |
 | fine-tune 3 / blue box (off-protocol) / cap 75 | 1 | 0 | 0 | 1 | 0/1 |
 | fine-tune 3 / hippo cell / cylindrical battery (off-protocol) / cap 75 | 1 | 0 | 0 | 1 | 0/1 |
 | fine-tune 3 / black rubber ring (off-protocol) / cap 75 | 1 | 0 | 0 | 1 | 0/1 |
@@ -66,7 +67,7 @@ Trials: 125 recorded, 109 valid, 16 void.
 
 | failure mode | count |
 |---|---|
-| close-beside | 37 |
+| close-beside | 39 |
 | close-above | 7 |
 | no-close | 6 |
 | close-short | 6 |
@@ -78,6 +79,7 @@ Trials: 125 recorded, 109 valid, 16 void.
 | close-above + over-reach | 2 |
 | close-above/beside | 2 |
 | cap-hit | 2 |
+| repeated close-beside | 2 |
 | push + close-beside | 1 |
 | no-engage | 1 |
 | lift | 1 |
@@ -216,6 +218,13 @@ Trials: 125 recorded, 109 valid, 16 void.
 | 2026-11-01 | Y | 1 | fine-tune 3 | row3_all169_conservative ckpt 010000 (LoRA merged) | AI90 :8081 GPU 1 (RTX PRO 5000 72GB Blackwell) | blue box (off-protocol) | pick up the blue box and place it on the plate | 75 | overhead, position 2 restored | left | front-center near base, broad face flat; pen and fruit removed |
 | 2026-11-01 | Z | 1 | fine-tune 3 | row3_all169_conservative ckpt 010000 (LoRA merged) | AI90 :8081 GPU 1 (RTX PRO 5000 72GB Blackwell) | hippo cell / cylindrical battery (off-protocol) | pick up the cell and place it on the plate | 75 | overhead, position 2 restored | left | front-right near base, upright; blue box, pen, and fruit removed |
 | 2026-11-01 | AA | 1 | fine-tune 3 | row3_all169_conservative ckpt 010000 (LoRA merged) | AI90 :8081 GPU 1 (RTX PRO 5000 72GB Blackwell) | black rubber ring (off-protocol) | pick up the black ring and place it on the plate | 75 | overhead, position 2 restored | left | front-right near base, lying flat; other test objects and fruit removed |
+| 2026-11-02 | AB | 1 | fine-tune 3 | row3_all169_conservative ckpt 010000 (LoRA merged) | AI90 :8081 GPU 1 (RTX PRO 5000 72GB Blackwell) | pen (off-protocol) | pick up the pen and place it on the plate | 75 | overhead, position 2 restored | left | right side, mid-table, nearly vertical; all fruit removed |
+| 2026-11-02 | AB | 2 | fine-tune 3 | row3_all169_conservative ckpt 010000 (LoRA merged) | AI90 :8081 GPU 1 (RTX PRO 5000 72GB Blackwell) | pen (off-protocol) | pick up the pen and place it on the plate | 75 | overhead, position 2 restored | left | far right, mid-table, nearly vertical; reassembled pen; all fruit removed |
+| 2026-11-02 | AB | 3 | fine-tune 3 | row3_all169_conservative ckpt 010000 (LoRA merged) | AI90 :8081 GPU 1 (RTX PRO 5000 72GB Blackwell) | pen (off-protocol) | pick up the pen and place it on the plate | 75 | overhead, position 2 restored | left | front-center, aligned lengthwise straight out from the gripper; all fruit removed |
+| 2026-11-02 | AB | 4 | fine-tune 3 | row3_all169_conservative ckpt 010000 (LoRA merged) | AI90 :8081 GPU 1 (RTX PRO 5000 72GB Blackwell) | pen (off-protocol) | pick up the pen and place it on the plate | 75 | overhead, position 2 restored | left | front-center, aligned lengthwise, slightly right of gripper centerline; all fruit removed |
+| 2026-11-02 | AB | 5 | fine-tune 3 | row3_all169_conservative ckpt 010000 (LoRA merged) | AI90 :8081 GPU 1 (RTX PRO 5000 72GB Blackwell) | pen (off-protocol) | pick up the pen and place it on the plate | 75 | overhead, position 2 restored | left | front-center, aligned lengthwise straight out from the gripper; all fruit removed |
+| 2026-11-01 | AB | void1 | fine-tune 3 | row3_all169_conservative ckpt 010000 (LoRA merged) | AI90 :8081 GPU 1 (RTX PRO 5000 72GB Blackwell) | pen (off-protocol) | pick up the pen and place it on the plate | 75 | overhead, position 2 restored | left | front-center / lower-center, diagonal; all fruit removed |
+| 2026-11-02 | AB | void2 | fine-tune 3 | row3_all169_conservative ckpt 010000 (LoRA merged) | AI90 :8081 GPU 1 (RTX PRO 5000 72GB Blackwell) | pen (off-protocol) | pick up the pen and place it on the plate | 75 | overhead, position 2 restored | left | front-center, aligned lengthwise straight out from the gripper; all fruit removed |
 
 ### Every trial — outcome
 
@@ -346,3 +355,10 @@ Trials: 125 recorded, 109 valid, 16 void.
 | 2026-11-01 | Y | 1 | **FAIL** | grasp-lift without carry | reached the box by c20; positioned it between the jaws and progressively closed from c22-c30; sustained grasp near gripper 28 through c75; lifted slightly and changed wrist/arm posture but base stayed near -9 to -13 degrees, so there was no leftward carry or tray delivery; scripted return opened the gripper and left the box near the pickup area | 13 | 28 (49) | 12 | 75 | 177.2 | 1.242 | OFF-PROTOCOL generalization experiment; exclude from orange/tomato rates; JPEG quality 85; RTC disabled | bench_ft3_jpeg_no_rtc_trial_y1_blue_box_20261101 ep1; results/so101_lora_on_top_20261019/bench_trace_ft3_jpeg_no_rtc_trial_y1_blue_box_20261101 |
 | 2026-11-01 | Z | 1 | **FAIL** | close then roll outside jaws | fast reach by c8; cell centered between jaws and gripper closed from 42 to 13 at c15-c16; no clear lift; gripper reopened to 28 at c19 and made repeated tight closes; by c36 the cell had rolled outside the right side of the jaws; it remained upright on the table through c75 with no sustained grasp, lift, carry, or delivery | 2 | 2 (45) | 23 | 75 | 178.5 | 1.263 | OFF-PROTOCOL generalization experiment; exclude from orange/tomato rates; JPEG quality 85; RTC disabled | bench_ft3_jpeg_no_rtc_trial_z1_hippo_cell_20261101 ep1; results/so101_lora_on_top_20261019/bench_trace_ft3_jpeg_no_rtc_trial_z1_hippo_cell_20261101 |
 | 2026-11-01 | AA | 1 | **FAIL** | enclosure without sustained lift | slow reach began c10-c12; ring partly between the jaws by c21; repeated closes held 25-33 and moved the ring slightly around the pickup area; no clear sustained lift and shoulder pan stayed near -12 to -18 degrees with no trayward carry; ring remained on the table outside the tray at c75 | 7 | 20 (63) | 24 | 75 | 179.6 | 1.269 | OFF-PROTOCOL generalization experiment; object named black rubber ring from camera view; exclude from orange/tomato rates; JPEG quality 85; RTC disabled | bench_ft3_jpeg_no_rtc_trial_aa1_black_ring_20261101 ep1; results/so101_lora_on_top_20261019/bench_trace_ft3_jpeg_no_rtc_trial_aa1_black_ring_20261101 |
+| 2026-11-02 | AB | 1 | **FAIL** | repeated close-beside; pen cap detached | reached the pen by c10; repeated closes at c13-15, c30-34, c39-50, and c61-72 landed beside or against it; the black cap separated from the silver body; neither part was lifted or carried; both remained outside the tray at c75 | 2 | 1 (71) | 53 | 75 | 159.4 | 1.197 | OFF-PROTOCOL generalization experiment; exclude from orange/tomato rates; JPEG quality 85; RTC disabled | bench_ft3_jpeg_no_rtc_row_ab_pen_20261102 ep1; results/so101_lora_on_top_20261019/bench_trace_ft3_jpeg_no_rtc_row_ab_pen_20261102 |
+| 2026-11-02 | AB | 2 | **FAIL** | close-beside then push/drag | reached across the table by c10; tight closes from c17 onward occurred beside the pen; the arm swept across the table from c54-c64 and pushed or dragged the pen without holding it; no sustained grasp, lift, or tray delivery through c75 | 3 | 4 (60) | 62 | 75 | 187.8 | 1.429 | OFF-PROTOCOL generalization experiment; exclude from orange/tomato rates; JPEG quality 85; RTC disabled | bench_ft3_jpeg_no_rtc_row_ab_pen_20261102 ep2; results/so101_lora_on_top_20261019/bench_trace_ft3_jpeg_no_rtc_row_ab_pen_20261102 |
+| 2026-11-02 | AB | 3 | **SUCCESS** | — | held near home through c9; reached and closed around the pen by c19; sustained the grasp while lifting and carrying left from c31; pen was over the tray by c39; gripper opened at c43 and released it inside; policy returned near home by c49 and the pen stayed in the tray through c75 | 10 | 4 (20) | 16 | 75 | 166.8 | 1.239 | OFF-PROTOCOL generalization experiment; exclude from orange/tomato rates; JPEG quality 85; RTC disabled | bench_ft3_jpeg_no_rtc_row_ab_pen_20261102 ep3; results/so101_lora_on_top_20261019/bench_trace_ft3_jpeg_no_rtc_row_ab_pen_20261102 |
+| 2026-11-02 | AB | 4 | **FAIL** | repeated close-beside | reached the aligned pen by c10 and closed from c12; the pen remained outside the left jaw in the wrist view; repeated tight closes through c75 never produced a sustained grasp, lift, or leftward carry; pen remained on the table outside the tray | 4 | 3 (23) | 60 | 75 | 176.2 | 1.223 | replacement for the hand-intrusion void; OFF-PROTOCOL generalization experiment; exclude from orange/tomato rates; JPEG quality 85; RTC disabled | bench_ft3_jpeg_no_rtc_row_ab_pen_20261102_part2 ep1; results/so101_lora_on_top_20261019/bench_trace_ft3_jpeg_no_rtc_row_ab_pen_20261102_part2 |
+| 2026-11-02 | AB | 5 | **FAIL** | close-beside then push | held near home through c8; reached by c12; initial close at c21 missed with the pen outside the right jaw; later closes pushed it into a diagonal position beside the gripper; no sustained hold, lift, carry, or tray delivery through c75 | 5 | 1 (63) | 45 | 75 | 174.4 | 1.217 | OFF-PROTOCOL generalization experiment; exclude from orange/tomato rates; JPEG quality 85; RTC disabled | bench_ft3_jpeg_no_rtc_row_ab_pen_20261102_part2 ep2; results/so101_lora_on_top_20261019/bench_trace_ft3_jpeg_no_rtc_row_ab_pen_20261102_part2 |
+| 2026-11-01 | AB | void1 | **VOID** | client interrupted | local monitoring turn was interrupted at c29 and terminated the bench client while the arm was extended; pen was not securely grasped; torque was explicitly disabled and verified on all six motors; remote server was stopped; not counted | 2 | 27 (24) | 18 | 28 |  |  | VOID; incomplete 29-chunk launch before the five-trial row; raw partial trace retained | bench_ft3_jpeg_no_rtc_row_ab_pen_20261101 ep1; results/so101_lora_on_top_20261019/bench_trace_ft3_jpeg_no_rtc_row_ab_pen_20261101 |
+| 2026-11-02 | AB | void2 | **VOID** | hand intrusion | a hand entered the active workspace and appeared near the gripper/arm in multiple frames; operator stop requested at c61 and the client completed c62 before returning to the recorded start; torque-off was verified; replacement AB4 was run later; not counted | 3 | 1 (61) | 95 | 62 | 134.8 | 1.228 | VOID; safety stop; JPEG quality 85; RTC disabled | bench_ft3_jpeg_no_rtc_row_ab_pen_20261102 ep4; results/so101_lora_on_top_20261019/bench_trace_ft3_jpeg_no_rtc_row_ab_pen_20261102 |
