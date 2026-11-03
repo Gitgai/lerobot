@@ -1,0 +1,3 @@
+FAIL — reached past the forward-right capsicum and made tight closes on empty table. The capsicum remained untouched and the bowl stayed empty through chunk 75.
+
+Trials 1-4 used the same isolated scene and forward-right placement. Trial 5 added an orange distractor. The instruction throughout was "pick up the capsicum and put it in the bowl". The scripted return restored the recorded start pose after every trial.

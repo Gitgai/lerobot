@@ -1,0 +1,3 @@
+FAIL — wrong object first, then capsicum dropped beside bowl. An orange distractor was added at lower-center. The policy grasped the orange by chunk 32 and released it inside the bowl by chunk 43. It then grasped the requested capsicum by chunk 53 and carried it toward the bowl, but opened around chunk 67 and dropped the capsicum on the table beside the bowl. At chunk 75 the orange was in the bowl and the capsicum was outside it.
+
+Trials 1-4 used the same isolated scene and forward-right placement. Trial 5 added an orange distractor. The instruction throughout was "pick up the capsicum and put it in the bowl". The scripted return restored the recorded start pose after every trial.

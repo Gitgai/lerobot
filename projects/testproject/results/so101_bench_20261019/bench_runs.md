@@ -876,3 +876,24 @@ normal. The scripted return restored the recorded start pose. All 75 saved front
 fresh and unique. Post-run checks passed: torque and status were zero on all six motors, protections were 500/250/25,
 voltage was 7.0 V, and gripper temperature was 33 °C. The GPU server was stopped. This probe is excluded from the
 controlled orange 14/42 and tomato 8/40 totals.
+
+### 2026-11-03 — ROW AG: CAPSICUM TO BOWL ×5, JPEG without RTC — 0/5
+Five off-protocol capsicum-to-bowl trials used fine-tune 3 on AI90 GPU 1, the physical NVIDIA RTX PRO 5000 72GB
+Blackwell. The instruction was `pick up the capsicum and put it in the bowl`. All trials used 75 chunks, a 30 s
+placement countdown, JPEG quality 85, RTC disabled, and scripted return to the recorded start pose.
+
+AG1-AG4 used an isolated scene with the capsicum in the same forward-right position and an empty transparent bowl at
+upper right. Despite repeated instructions to move the capsicum into the demonstrated pickup area, its placement did
+not change between trials. Each policy rollout reached past or left of it, stretched across empty table, and made
+empty closes; the capsicum remained untouched and the bowl stayed empty. AG5 added an orange distractor at lower
+center. The policy grasped the orange by c32 and released it inside the bowl by c43, then corrected to the requested
+capsicum and grasped it by c53. It carried the capsicum toward the bowl but opened around c67 and dropped it on the
+table beside the bowl. At c75 the orange was inside the bowl and the capsicum was outside, so the requested outcome
+was not achieved.
+
+Outcome: **0/5**. Per-trial wall times were 175.3, 173.8, 173.0, 175.0, and 172.0 s; median request latencies were
+1.252, 1.241, 1.232, 1.206, and 1.217 s. All 375 front and 375 wrist policy-input frames were fresh and unique. The
+power cycle before the row restored the gripper's 1000/500/80 defaults; the bench client rewrote and verified the
+audited 500/250/25 limits before enabling torque. Post-run checks passed: torque and status were zero on all six
+motors, protections remained 500/250/25, voltage was 7.5 V, and gripper temperature was 34 °C. The GPU server was
+stopped. Row AG is excluded from the controlled orange 14/42 and tomato 8/40 totals.
