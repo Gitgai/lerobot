@@ -307,6 +307,50 @@
      ],
      "source_path": "live visual calibration from verified slots 0 and 1"
     }
+   },
+   "successful_grasp_retry_20261104": {
+    "status": "GRASP AND CARRY VERIFIED; release point overlaps slot 0, so slot 2 is not accepted yet",
+    "placed_px": [
+     536.2,
+     362.7
+    ],
+    "released_px": [
+     500.8,
+     382.8
+    ],
+    "candidate_hover_target": [
+     -49.8,
+     13.8,
+     20.0,
+     33.8,
+     -19.5,
+     45.0
+    ],
+    "candidate_place_target": [
+     -50.1,
+     22.9,
+     19.6,
+     21.1,
+     -19.2,
+     45.0
+    ],
+    "grasp_command": 15.0,
+    "grasp_stall": 18.6,
+    "carry_pan_range_deg": 25.0,
+    "release_shift_px": [
+     -35.4,
+     20.1
+    ],
+    "distance_from_slot0_final_px": 33.2,
+    "verified_checks": [
+     "matched prior successful R5 wrist geometry",
+     "gripper stalled against orange at 18.6",
+     "orange visibly followed a 25 degree sideways carry",
+     "original table position became visibly empty",
+     "orange returned and released",
+     "arm retreated home collision-free"
+    ],
+    "acceptance_blocker": "released fruit settles too close to verified slot 0; compensate release target and retest"
    }
   },
   {
@@ -581,5 +625,5 @@
   ],
   "margin_deg": 5
  },
- "status": "PARTIAL LIVE CALIBRATION 2026-11-04 \u2014 tray-centre pickup and table slots 0-1 verified; slot 2 retry in progress; slots 2-9 and off-centre tray descents remain unverified; do not run --reset-between yet"
+ "status": "PARTIAL LIVE CALIBRATION 2026-11-04 \u2014 tray-centre pickup and table slots 0-1 verified; slot 2 grasp/carry verified but release overlaps slot 0 and is not accepted; slots 2-9 and off-centre tray descents remain unverified; do not run --reset-between yet"
 }
