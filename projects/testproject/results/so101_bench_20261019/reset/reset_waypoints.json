@@ -174,25 +174,28 @@
   },
   {
    "slot": 1,
-   "px": null,
+   "px": [
+    407.1,
+    345.0
+   ],
    "px_september": [
     71.4,
     163.6
    ],
    "hover": [
-    49.6,
-    22.5,
-    36.8,
-    50.1,
-    -4.4,
+    -16.3,
+    -9.1,
+    42.8,
+    32.8,
+    -20.9,
     45.0
    ],
    "place": [
-    49.9,
-    22.5,
-    36.9,
-    49.2,
-    -4.4,
+    -16.2,
+    1.8,
+    43.8,
+    18.5,
+    -22.1,
     45.0
    ],
    "n_demos": 3,
@@ -206,7 +209,29 @@
     "reco4",
     "new34",
     "new31"
-   ]
+   ],
+   "calibration_20261104": {
+    "status": "VERIFIED orange placement and pickup",
+    "placed_px": [
+     411.0,
+     364.0
+    ],
+    "released_px": [
+     407.1,
+     345.0
+    ],
+    "grasp_command": 15.0,
+    "grasp_reached": 15.1,
+    "verified_checks": [
+     "aligned from prior successful R3 grasp geometry",
+     "closed with both jaws around orange",
+     "lifted clear of table",
+     "returned to calibrated slot",
+     "released and settled at target",
+     "retreated collision-free"
+    ],
+    "source_path": "R3 successful forward-right approach, visually checked against live placement"
+   }
   },
   {
    "slot": 2,
@@ -516,5 +541,5 @@
   ],
   "margin_deg": 5
  },
- "status": "PARTIAL LIVE CALIBRATION 2026-11-04 \u2014 tray-centre pickup and table slot 0 verified; slots 1-9 and off-centre tray descents remain unverified; do not run --reset-between yet"
+ "status": "PARTIAL LIVE CALIBRATION 2026-11-04 \u2014 tray-centre pickup and table slots 0-1 verified; slots 2-9 and off-centre tray descents remain unverified; do not run --reset-between yet"
 }
