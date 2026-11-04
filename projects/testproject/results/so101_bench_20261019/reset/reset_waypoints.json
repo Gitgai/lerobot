@@ -235,28 +235,25 @@
   },
   {
    "slot": 2,
-   "px": [
-    426.5,
-    285.9
-   ],
+   "px": null,
    "px_september": [
     156.0,
     311.5
    ],
    "hover": [
-    -30.2,
-    -5.1,
-    54.6,
-    22.0,
-    -20.4,
+    49.6,
+    9.3,
+    18.9,
+    50.1,
+    -9.6,
     45.0
    ],
    "place": [
-    -30.2,
-    2.8,
-    55.0,
-    7.8,
-    -20.6,
+    49.9,
+    9.3,
+    18.9,
+    49.2,
+    -9.4,
     45.0
    ],
    "n_demos": 3,
@@ -271,32 +268,45 @@
     "reco4",
     "new34"
    ],
-   "calibration_20261104": {
-    "status": "VERIFIED orange placement and pickup",
-    "placed_px": [
+   "failed_calibration_20261104": {
+    "status": "REJECTED by operator: no successful grasp",
+    "attempted_start_px": [
      469.3,
      301.5
     ],
-    "released_px": [
+    "settled_px": [
      426.5,
      285.9
     ],
-    "grasp_command": 15.0,
-    "grasp_reached": 15.1,
-    "verified_checks": [
-     "aligned by extrapolating verified slots 0 and 1",
-     "closed with both jaws around orange",
-     "lifted clear of table in two stages",
-     "paused safely while maintaining hold",
-     "returned along the same descent path",
-     "released and settled clear of the gripper",
-     "retreated collision-free"
-    ],
-    "release_shift_px": [
-     -42.8,
-     -15.6
-    ],
-    "source_path": "live visual calibration from verified slots 0 and 1"
+    "gripper_reached": 15.1,
+    "reason": "orange did not visibly leave the table or complete a verified carry",
+    "previous_record": {
+     "status": "VERIFIED orange placement and pickup",
+     "placed_px": [
+      469.3,
+      301.5
+     ],
+     "released_px": [
+      426.5,
+      285.9
+     ],
+     "grasp_command": 15.0,
+     "grasp_reached": 15.1,
+     "verified_checks": [
+      "aligned by extrapolating verified slots 0 and 1",
+      "closed with both jaws around orange",
+      "lifted clear of table in two stages",
+      "paused safely while maintaining hold",
+      "returned along the same descent path",
+      "released and settled clear of the gripper",
+      "retreated collision-free"
+     ],
+     "release_shift_px": [
+      -42.8,
+      -15.6
+     ],
+     "source_path": "live visual calibration from verified slots 0 and 1"
+    }
    }
   },
   {
@@ -571,5 +581,5 @@
   ],
   "margin_deg": 5
  },
- "status": "PARTIAL LIVE CALIBRATION 2026-11-04 \u2014 tray-centre pickup and table slots 0-2 verified; slots 3-9 and off-centre tray descents remain unverified; do not run --reset-between yet"
+ "status": "PARTIAL LIVE CALIBRATION 2026-11-04 \u2014 tray-centre pickup and table slots 0-1 verified; slot 2 retry in progress; slots 2-9 and off-centre tray descents remain unverified; do not run --reset-between yet"
 }
