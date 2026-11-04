@@ -417,25 +417,28 @@
   },
   {
    "slot": 3,
-   "px": null,
+   "px": [
+    454.3,
+    205.8
+   ],
    "px_september": [
     34.0,
     459.0
    ],
    "hover": [
-    26.8,
-    30.5,
-    36.8,
-    -48.4,
-    -4.4,
+    -60.0,
+    -35.0,
+    60.0,
+    48.0,
+    -20.0,
     45.0
    ],
    "place": [
-    26.9,
-    30.5,
-    36.9,
-    -48.4,
-    -4.4,
+    -60.0,
+    -24.0,
+    61.0,
+    34.0,
+    -20.0,
     45.0
    ],
    "n_demos": 3,
@@ -449,7 +452,63 @@
     "new311",
     "new31",
     "new318"
-   ]
+   ],
+   "calibration_20261105": {
+    "status": "VERIFIED orange placement and pickup; accepted as slot 3",
+    "initial_pickup_source": "operator moved orange from unreachable lower-right boundary into the marked verified pickup area",
+    "initial_pickup_grasp_command": 15.0,
+    "initial_pickup_grasp_stall": 18.8,
+    "first_release_held_px": [
+     486.0,
+     300.0
+    ],
+    "first_release_settled_px": [
+     458.5,
+     344.2
+    ],
+    "first_release_shift_px": [
+     -27.5,
+     44.2
+    ],
+    "first_release_result": "rejected because it settled only 54.7 px from slot 0 and 51.4 px from slot 1",
+    "recovery_grasp_command": 15.0,
+    "recovery_grasp_reached": 15.1,
+    "recovery_grasp_proof": "orange visibly followed lift and sideways carry; original table position became empty",
+    "accepted_hover_target": [
+     -60.0,
+     -35.0,
+     60.0,
+     48.0,
+     -20.0,
+     45.0
+    ],
+    "accepted_place_target": [
+     -60.0,
+     -24.0,
+     61.0,
+     34.0,
+     -20.0,
+     45.0
+    ],
+    "released_px": [
+     454.3,
+     205.8
+    ],
+    "distance_from_slot0_px": 192.4,
+    "distance_from_slot1_px": 147.0,
+    "distance_from_slot2_px": 246.9,
+    "measurement_note": "HSV centroid with saturation >=150 inside the orange ROI",
+    "verified_checks": [
+     "initial orange pickup centred between both jaws",
+     "initial gripper stalled against orange at 18.8",
+     "first release overlap was measured and rejected",
+     "orange was recovered from the rejected endpoint",
+     "recovery pickup was proven by lift and sideways carry despite no gripper stall",
+     "compensated release settled more than 75 pixels from verified slots 0-2",
+     "arm retreated home collision-free"
+    ],
+    "evidence_dir": "calibration_evidence/slot3_20261105"
+   }
   },
   {
    "slot": 4,
@@ -687,5 +746,5 @@
   ],
   "margin_deg": 5
  },
- "status": "PARTIAL LIVE CALIBRATION 2026-11-04/05 \u2014 tray-centre pickup and table slots 0-2 verified; slots 3-9 and off-centre tray descents remain unverified; do not run --reset-between yet"
+ "status": "PARTIAL LIVE CALIBRATION 2026-11-04/05 \u2014 tray-centre pickup and table slots 0-3 verified; slots 4-9 and off-centre tray descents remain unverified; do not run --reset-between yet"
 }
