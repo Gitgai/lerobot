@@ -1,9 +1,29 @@
 # Bench auto-reset: the arm puts the orange back on the table between trials (scripted, not the policy)
 
-Date: 2026-10-28. Status: **PROPOSED, reviewed and amended 2026-10-28 (gaps section) — awaiting go to build.** Operator's idea (2026-10-28): "pick the orange from the plate and
+Date: 2026-10-28. Status updated 2026-11-05: **BUILT; tray-centre pickup and all ten table slots are live-calibrated. Off-centre tray descents and V1–V4 remain, so `--reset-between` is still blocked.** Operator's idea (2026-10-28): "pick the orange from the plate and
 put it back on the table at a different location so we can perform the next trial."
 Parent: R3/R5 bench protocol (pi05_so101_real_base_audit_plan_20261019.md, pi05_so101_lora_on_top_plan_20261019.md);
 record: results/so101_bench_20261019/bench_runs.md. Client: results/so101_bench_20261019/bench_client.py.
+
+Detailed live-calibration record and reproducible procedure:
+[`so101_bench_auto_reset_calibration_20261104_05.md`](so101_bench_auto_reset_calibration_20261104_05.md).
+
+## Current execution status (2026-11-05)
+
+```text
+DONE        scripted Reset R0-R9 implementation and client integration
+DONE        motion-envelope guard, stop-on-stall close, visual verification and reset logging
+DONE        tray-centre orange pickup, lift, sideways carry and release verification
+DONE        table slots 0-9: pickup, carry, placement, final pixel measurement and spacing verification
+NOT DONE    tray descents left/right/near/far
+NOT DONE    V1 dry run, V2 three watched resets, V3 ten-slot reset-only test, V4 five-trial integrated row
+BLOCK       do not use --reset-between until the four tray descents and V1-V3 pass
+```
+
+The authoritative live values are in
+`results/so101_bench_20261019/reset/reset_waypoints.json`. The `px_september` values remain provenance from the
+demonstration analysis; `px`, `hover`, and `place` are the accepted live-bench values. Every accepted slot is at
+least 82.7 pixels from its nearest neighbour, above the 75-pixel acceptance threshold.
 
 ## Why
 A trial row today needs a person at the table every 60–90 s to move the orange out of the tray and place it again.
@@ -156,9 +176,12 @@ nobody watching unattended resets               → motion envelope from the tra
                                                                hover/place/descend poses are null until calibration
             reset/demo_placement_area.{json,jpg}, reset/motion_envelope.json
             copied to the Acer (~/bench_client.py, ~/bench_reset.py). Compiles; no live test yet.
-NEXT        calibration session at the bench (operator + me, ~30 min): tape the tray, photo, jog to the tray
-            centre/near/far/left/right at floor height and the hover above, then to each of the 10 slots (hover +
-            place) — record with --home-to-style moves and the joint readback; write reset_waypoints.json; then V1.
+2026-11-04  tray-centre pickup and table slots 0-2 calibrated live. Slot 2 required rejection, a verified grasp
+            retry, and a compensated release before acceptance.
+2026-11-05  table slots 3-9 calibrated live. All ten slots now have accepted hover/place targets, settled pixel
+            centroids, spacing checks and evidence. See the detailed calibration record linked above.
+NEXT        calibrate tray descents left/right/near/far with the same grasp-proof procedure, then run V1-V3.
+            Only after V3 passes may the first integrated V4 row use --reset-between.
 ```
 
 ## Cost
