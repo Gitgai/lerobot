@@ -853,25 +853,28 @@
   },
   {
    "slot": 7,
-   "px": null,
+   "px": [
+    308.7,
+    303.8
+   ],
    "px_september": [
     243.8,
     371.8
    ],
    "hover": [
-    12.6,
-    17.1,
-    11.7,
-    47.3,
-    -17.0,
+    -10.0,
+    -41.0,
+    65.0,
+    48.0,
+    -18.0,
     45.0
    ],
    "place": [
-    12.7,
-    17.1,
-    11.7,
-    47.5,
-    -16.7,
+    -10.0,
+    -30.0,
+    66.0,
+    34.0,
+    -18.0,
     45.0
    ],
    "n_demos": 3,
@@ -885,7 +888,67 @@
     "new319",
     "new36",
     "new318"
-   ]
+   ],
+   "calibration_20261105": {
+    "status": "VERIFIED orange placement and pickup; accepted as slot 7",
+    "pickup_source_slot": 6,
+    "pickup_alignment_target": [
+     -10.0,
+     15.0,
+     25.0,
+     30.0,
+     -18.0,
+     45.0
+    ],
+    "pickup_grasp_command": 15.0,
+    "pickup_grasp_stall": 18.3,
+    "pickup_grasp_proof": "orange visibly followed lift and sideways base carry while remaining between both jaws",
+    "accepted_hover_target": [
+     -10.0,
+     -41.0,
+     65.0,
+     48.0,
+     -18.0,
+     45.0
+    ],
+    "accepted_place_target": [
+     -10.0,
+     -30.0,
+     66.0,
+     34.0,
+     -18.0,
+     45.0
+    ],
+    "accepted_release_actual_q": [
+     -9.7,
+     -26.5,
+     67.6,
+     34.0,
+     -18.1,
+     44.8
+    ],
+    "released_px": [
+     308.7,
+     303.8
+    ],
+    "distance_from_slot0_px": 187.4,
+    "distance_from_slot1_px": 106.7,
+    "distance_from_slot2_px": 302.6,
+    "distance_from_slot3_px": 175.5,
+    "distance_from_slot4_px": 212.5,
+    "distance_from_slot5_px": 294.7,
+    "distance_from_slot6_px": 111.9,
+    "measurement_note": "tight HSV centroid in clean top-camera frame after arm returned home",
+    "verified_checks": [
+     "pickup aligned deep between both jaws",
+     "gripper stalled against orange at 18.3",
+     "pickup proven by lift and sideways carry",
+     "release remained fully inside camera and arm workspace",
+     "settled position is more than 75 pixels from verified slots 0-6",
+     "arm retreated home collision-free"
+    ],
+    "evidence_dir": "calibration_evidence/slot7_20261105"
+   }
   },
   {
    "slot": 8,
@@ -979,5 +1042,5 @@
   ],
   "margin_deg": 5
  },
- "status": "PARTIAL LIVE CALIBRATION 2026-11-04/05 \u2014 tray-centre pickup and table slots 0-6 verified; slots 7-9 and off-centre tray descents remain unverified; do not run --reset-between yet"
+ "status": "PARTIAL LIVE CALIBRATION 2026-11-04/05 \u2014 tray-centre pickup and table slots 0-7 verified; slots 8-9 and off-centre tray descents remain unverified; do not run --reset-between yet"
 }
