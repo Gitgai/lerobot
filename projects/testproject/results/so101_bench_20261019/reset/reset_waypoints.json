@@ -627,25 +627,28 @@
   },
   {
    "slot": 5,
-   "px": null,
+   "px": [
+    594.7,
+    232.6
+   ],
    "px_september": [
     98.4,
     388.0
    ],
    "hover": [
-    26.8,
-    30.5,
-    36.8,
-    -48.4,
-    -4.4,
+    -75.0,
+    0.0,
+    30.0,
+    45.0,
+    -18.0,
     45.0
    ],
    "place": [
-    26.9,
-    30.5,
-    36.9,
-    -48.4,
-    -4.4,
+    -75.0,
+    15.0,
+    25.0,
+    30.0,
+    -18.0,
     45.0
    ],
    "n_demos": 3,
@@ -659,7 +662,96 @@
     "new318",
     "new31",
     "new311"
-   ]
+   ],
+   "calibration_20261105": {
+    "status": "VERIFIED orange placement and pickup; accepted as slot 5",
+    "initial_source_slot": 4,
+    "failed_pickup_attempts": 2,
+    "failed_pickup_reason": "gripper closed behind the orange; fruit remained on the table during the carry check",
+    "first_verified_pickup_target": [
+     -55.0,
+     15.0,
+     20.0,
+     28.0,
+     -18.0,
+     45.0
+    ],
+    "first_verified_pickup_grasp_command": 15.0,
+    "first_verified_pickup_grasp_stall": 18.3,
+    "first_release_target": [
+     -68.0,
+     15.0,
+     25.0,
+     30.0,
+     -18.0,
+     45.0
+    ],
+    "first_release_px": [
+     582.8,
+     282.3
+    ],
+    "first_release_result": "rejected because it settled only 63.5 px from slot 4",
+    "recovery_result": "orange was pushed to the far-right camera boundary and manually returned to a reachable point by the operator",
+    "retry_pickup_start_px": [
+     545.0,
+     239.0
+    ],
+    "retry_pickup_target": [
+     -70.0,
+     8.0,
+     25.0,
+     35.0,
+     -18.0,
+     45.0
+    ],
+    "retry_grasp_command": 15.0,
+    "retry_grasp_stall": 18.1,
+    "retry_grasp_proof": "orange visibly followed the lift and five-degree sideways base carry; original table position became empty",
+    "accepted_hover_target": [
+     -75.0,
+     0.0,
+     30.0,
+     45.0,
+     -18.0,
+     45.0
+    ],
+    "accepted_place_target": [
+     -75.0,
+     15.0,
+     25.0,
+     30.0,
+     -18.0,
+     45.0
+    ],
+    "accepted_release_actual_q": [
+     -74.8,
+     15.4,
+     25.3,
+     31.1,
+     -18.2,
+     45.0
+    ],
+    "released_px": [
+     594.7,
+     232.6
+    ],
+    "distance_from_slot0_px": 206.1,
+    "distance_from_slot1_px": 218.7,
+    "distance_from_slot2_px": 178.3,
+    "distance_from_slot3_px": 142.9,
+    "distance_from_slot4_px": 87.5,
+    "measurement_note": "HSV centroid in right-side orange ROI after arm returned home",
+    "verified_checks": [
+     "failed pickups were rejected using carry checks",
+     "first release overlap with slot 4 was measured and rejected",
+     "retry orange was centred deep between both jaws",
+     "retry gripper stalled against orange at 18.1",
+     "retry pickup was proven by lift and sideways carry",
+     "compensated release settled more than 75 pixels from verified slots 0-4",
+     "arm retreated home collision-free"
+    ],
+    "evidence_dir": "calibration_evidence/slot5_20261105"
+   }
   },
   {
    "slot": 6,
@@ -825,5 +917,5 @@
   ],
   "margin_deg": 5
  },
- "status": "PARTIAL LIVE CALIBRATION 2026-11-04/05 \u2014 tray-centre pickup and table slots 0-4 verified; slots 5-9 and off-centre tray descents remain unverified; do not run --reset-between yet"
+ "status": "PARTIAL LIVE CALIBRATION 2026-11-04/05 \u2014 tray-centre pickup and table slots 0-5 verified; slots 6-9 and off-centre tray descents remain unverified; do not run --reset-between yet"
 }
