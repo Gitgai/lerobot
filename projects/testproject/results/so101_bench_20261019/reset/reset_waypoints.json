@@ -512,25 +512,28 @@
   },
   {
    "slot": 4,
-   "px": null,
+   "px": [
+    519.5,
+    277.3
+   ],
    "px_september": [
     37.0,
     409.0
    ],
    "hover": [
-    26.8,
-    30.5,
-    36.8,
-    -48.4,
-    -4.4,
+    -60.0,
+    -35.0,
+    60.0,
+    48.0,
+    -20.0,
     45.0
    ],
    "place": [
-    26.9,
-    30.5,
-    36.9,
-    -48.4,
-    -4.4,
+    -60.0,
+    -5.0,
+    61.0,
+    25.0,
+    -20.0,
     45.0
    ],
    "n_demos": 3,
@@ -544,7 +547,83 @@
     "new31",
     "new311",
     "new318"
-   ]
+   ],
+   "calibration_20261105": {
+    "status": "VERIFIED orange placement and pickup; accepted as slot 4",
+    "pickup_start_px": [
+     459.0,
+     356.0
+    ],
+    "pickup_place_target": [
+     -39.5,
+     9.8,
+     30.0,
+     32.4,
+     -11.2,
+     45.0
+    ],
+    "pickup_grasp_command": 15.0,
+    "pickup_grasp_stall": 18.7,
+    "pickup_grasp_proof": "orange visibly followed lift and sideways carry while remaining centred between both jaws",
+    "first_release_target": [
+     -60.0,
+     -15.0,
+     61.0,
+     30.0,
+     -20.0,
+     45.0
+    ],
+    "first_release_px": [
+     480.8,
+     271.7
+    ],
+    "first_release_result": "rejected because distance from slot 3 was about 71 px, below the 75 px acceptance minimum",
+    "recovery_grasp_command": 15.0,
+    "recovery_grasp_stall": 18.7,
+    "accepted_hover_target": [
+     -60.0,
+     -35.0,
+     60.0,
+     48.0,
+     -20.0,
+     45.0
+    ],
+    "accepted_place_target": [
+     -60.0,
+     -5.0,
+     61.0,
+     25.0,
+     -20.0,
+     45.0
+    ],
+    "accepted_release_actual_q": [
+     -60.0,
+     -10.3,
+     60.6,
+     25.1,
+     -20.1,
+     45.0
+    ],
+    "released_px": [
+     519.5,
+     277.3
+    ],
+    "distance_from_slot0_px": 129.7,
+    "distance_from_slot1_px": 131.3,
+    "distance_from_slot2_px": 151.9,
+    "distance_from_slot3_px": 96.8,
+    "measurement_note": "HSV centroid in lower-right orange ROI after arm returned home",
+    "verified_checks": [
+     "pickup aligned with both jaws around orange",
+     "gripper stalled against orange at 18.7",
+     "orange visibly followed lift and sideways carry",
+     "first release endpoint was measured and rejected for insufficient spacing",
+     "orange was recovered from the rejected endpoint",
+     "compensated release settled more than 75 pixels from verified slots 0-3",
+     "arm retreated home collision-free"
+    ],
+    "evidence_dir": "calibration_evidence/slot4_20261105"
+   }
   },
   {
    "slot": 5,
@@ -746,5 +825,5 @@
   ],
   "margin_deg": 5
  },
- "status": "PARTIAL LIVE CALIBRATION 2026-11-04/05 \u2014 tray-centre pickup and table slots 0-3 verified; slots 4-9 and off-centre tray descents remain unverified; do not run --reset-between yet"
+ "status": "PARTIAL LIVE CALIBRATION 2026-11-04/05 \u2014 tray-centre pickup and table slots 0-4 verified; slots 5-9 and off-centre tray descents remain unverified; do not run --reset-between yet"
 }

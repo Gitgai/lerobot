@@ -1,0 +1,750 @@
+{
+ "date": "2026-11-04",
+ "derived_from": "slots: September demos (joint space, 3 nearest by September pixel; grasp = open->closed transition away from rest); tray hover: Sunday releases; tray descend: UNVERIFIED estimate; slot verify pixels: self-recorded at the first successful place (null until then)",
+ "px_per_cm": 8.0,
+ "start": [
+  0.4,
+  -104.4,
+  96.5,
+  78.3,
+  -8.2,
+  45.0
+ ],
+ "tray": {
+  "px_centre": [
+   150.0,
+   143.5
+  ],
+  "px_radius": 90.0,
+  "hover": [
+   77.2,
+   -68.4,
+   86.8,
+   42.4,
+   0.0,
+   45.0
+  ],
+  "descend": {
+   "centre": [
+    79.9,
+    -64.6,
+    83.2,
+    40.8,
+    -0.2,
+    37.0
+   ],
+   "left": [
+    -69.9,
+    21.0,
+    -0.2,
+    57.1,
+    -13.1,
+    45.0
+   ],
+   "right": [
+    -53.9,
+    21.0,
+    -0.2,
+    57.1,
+    -13.1,
+    45.0
+   ],
+   "near": [
+    -61.9,
+    15.0,
+    5.8,
+    57.1,
+    -13.1,
+    45.0
+   ],
+   "far": [
+    -61.9,
+    27.0,
+    -6.2,
+    57.1,
+    -13.1,
+    45.0
+   ]
+  },
+  "calibration_20261104": {
+   "status": "VERIFIED for orange at tray centre only",
+   "approach_open37": [
+    79.9,
+    -64.6,
+    83.2,
+    40.8,
+    -0.2,
+    36.8
+   ],
+   "grasp_hold22": [
+    79.9,
+    -64.6,
+    82.1,
+    40.7,
+    -0.2,
+    22.2
+   ],
+   "lifted_hold22": [
+    77.2,
+    -68.4,
+    86.8,
+    42.4,
+    0.0,
+    22.2
+   ],
+   "verified_checks": [
+    "orange centred using closed-jaw midpoint",
+    "symmetric jaw contact",
+    "lift",
+    "2.6 degree horizontal carry",
+    "release into tray"
+   ],
+   "unverified_descents": [
+    "left",
+    "right",
+    "near",
+    "far"
+   ],
+   "camera_note": "C270 emits about 25-30 blank startup frames; acquire at least 45 frames when opening a fresh capture process."
+  }
+ },
+ "slots": [
+  {
+   "slot": 0,
+   "px": [
+    471.0,
+    397.5
+   ],
+   "px_september": [
+    46.8,
+    296.4
+   ],
+   "hover": [
+    -30.9,
+    -13.7,
+    27.5,
+    46.0,
+    -11.2,
+    45.0
+   ],
+   "place": [
+    -30.7,
+    9.8,
+    30.0,
+    32.4,
+    -11.1,
+    45.0
+   ],
+   "n_demos": 3,
+   "max_joint_std_deg": 55.7,
+   "donor_px_dist": [
+    15,
+    96,
+    110
+   ],
+   "sources": [
+    "new34",
+    "reco4",
+    "new31"
+   ],
+   "calibration_20261104": {
+    "status": "VERIFIED orange placement and pickup",
+    "placed_px": [
+     452.5,
+     397.5
+    ],
+    "released_px": [
+     471.0,
+     397.5
+    ],
+    "grasp_stall": 18.3,
+    "verified_checks": [
+     "closed symmetrically",
+     "stalled in orange hold range",
+     "lifted clear of table",
+     "released and settled inside successful Row N region",
+     "retreated collision-free"
+    ],
+    "source_path": "U1 successful approach, visually corrected for live placement",
+    "release_frame_px": [
+     447.5,
+     404.0
+    ]
+   }
+  },
+  {
+   "slot": 1,
+   "px": [
+    407.1,
+    345.0
+   ],
+   "px_september": [
+    71.4,
+    163.6
+   ],
+   "hover": [
+    -16.3,
+    -9.1,
+    42.8,
+    32.8,
+    -20.9,
+    45.0
+   ],
+   "place": [
+    -16.2,
+    1.8,
+    43.8,
+    18.5,
+    -22.1,
+    45.0
+   ],
+   "n_demos": 3,
+   "max_joint_std_deg": 55.7,
+   "donor_px_dist": [
+    75,
+    142,
+    245
+   ],
+   "sources": [
+    "reco4",
+    "new34",
+    "new31"
+   ],
+   "calibration_20261104": {
+    "status": "VERIFIED orange placement and pickup",
+    "placed_px": [
+     411.0,
+     364.0
+    ],
+    "released_px": [
+     407.1,
+     345.0
+    ],
+    "grasp_command": 15.0,
+    "grasp_reached": 15.1,
+    "verified_checks": [
+     "aligned from prior successful R3 grasp geometry",
+     "closed with both jaws around orange",
+     "lifted clear of table",
+     "returned to calibrated slot",
+     "released and settled at target",
+     "retreated collision-free"
+    ],
+    "source_path": "R3 successful forward-right approach, visually checked against live placement"
+   }
+  },
+  {
+   "slot": 2,
+   "px": [
+    591.7,
+    410.9
+   ],
+   "px_september": [
+    156.0,
+    311.5
+   ],
+   "hover": [
+    -49.5,
+    14.0,
+    20.0,
+    34.0,
+    -17.0,
+    45.0
+   ],
+   "place": [
+    -49.5,
+    23.0,
+    20.0,
+    21.0,
+    -17.0,
+    45.0
+   ],
+   "n_demos": 3,
+   "max_joint_std_deg": 35.3,
+   "donor_px_dist": [
+    95,
+    96,
+    125
+   ],
+   "sources": [
+    "new319",
+    "reco4",
+    "new34"
+   ],
+   "failed_calibration_20261104": {
+    "status": "REJECTED by operator: no successful grasp",
+    "attempted_start_px": [
+     469.3,
+     301.5
+    ],
+    "settled_px": [
+     426.5,
+     285.9
+    ],
+    "gripper_reached": 15.1,
+    "reason": "orange did not visibly leave the table or complete a verified carry",
+    "previous_record": {
+     "status": "VERIFIED orange placement and pickup",
+     "placed_px": [
+      469.3,
+      301.5
+     ],
+     "released_px": [
+      426.5,
+      285.9
+     ],
+     "grasp_command": 15.0,
+     "grasp_reached": 15.1,
+     "verified_checks": [
+      "aligned by extrapolating verified slots 0 and 1",
+      "closed with both jaws around orange",
+      "lifted clear of table in two stages",
+      "paused safely while maintaining hold",
+      "returned along the same descent path",
+      "released and settled clear of the gripper",
+      "retreated collision-free"
+     ],
+     "release_shift_px": [
+      -42.8,
+      -15.6
+     ],
+     "source_path": "live visual calibration from verified slots 0 and 1"
+    }
+   },
+   "successful_grasp_retry_20261104": {
+    "status": "GRASP AND CARRY VERIFIED; release point overlaps slot 0, so slot 2 is not accepted yet",
+    "placed_px": [
+     536.2,
+     362.7
+    ],
+    "released_px": [
+     500.8,
+     382.8
+    ],
+    "candidate_hover_target": [
+     -49.8,
+     13.8,
+     20.0,
+     33.8,
+     -19.5,
+     45.0
+    ],
+    "candidate_place_target": [
+     -50.1,
+     22.9,
+     19.6,
+     21.1,
+     -19.2,
+     45.0
+    ],
+    "grasp_command": 15.0,
+    "grasp_stall": 18.6,
+    "carry_pan_range_deg": 25.0,
+    "release_shift_px": [
+     -35.4,
+     20.1
+    ],
+    "distance_from_slot0_final_px": 33.2,
+    "verified_checks": [
+     "matched prior successful R5 wrist geometry",
+     "gripper stalled against orange at 18.6",
+     "orange visibly followed a 25 degree sideways carry",
+     "original table position became visibly empty",
+     "orange returned and released",
+     "arm retreated home collision-free"
+    ],
+    "acceptance_blocker": "released fruit settles too close to verified slot 0; compensate release target and retest"
+   },
+   "compensated_release_20261105": {
+    "status": "VERIFIED orange placement and pickup; accepted as slot 2",
+    "pickup_start_px": [
+     500.8,
+     382.8
+    ],
+    "pickup_place_target": [
+     -45.0,
+     24.0,
+     20.0,
+     21.0,
+     -15.0,
+     45.0
+    ],
+    "pickup_grasp_command": 15.0,
+    "pickup_grasp_stall": 17.6,
+    "first_compensated_release_target_rejected": [
+     -57.0,
+     23.0,
+     20.0,
+     21.0,
+     -19.0,
+     45.0
+    ],
+    "first_compensated_release_result": "rejected because the orange settled at the far-right camera boundary",
+    "accepted_hover_target": [
+     -49.5,
+     14.0,
+     20.0,
+     34.0,
+     -17.0,
+     45.0
+    ],
+    "accepted_place_target": [
+     -49.5,
+     23.0,
+     20.0,
+     21.0,
+     -17.0,
+     45.0
+    ],
+    "released_px": [
+     591.7,
+     410.9
+    ],
+    "distance_from_slot0_px": 121.4,
+    "distance_from_slot1_px": 196.1,
+    "measurement_note": "HSV centroid; orange reaches the right camera boundary but remains on the table and inside the verified arm workspace",
+    "verified_checks": [
+     "orange centred between both jaws",
+     "gripper stalled against orange at 17.6",
+     "orange visibly followed the sideways carry and the original position became empty",
+     "far-right overshoot was rejected rather than accepted",
+     "orange was recovered from the overshoot",
+     "accepted release settled more than 75 pixels from verified slots 0 and 1",
+     "arm retreated home collision-free"
+    ],
+    "evidence_dir": "calibration_evidence/slot2_compensated_20261105"
+   }
+  },
+  {
+   "slot": 3,
+   "px": [
+    454.3,
+    205.8
+   ],
+   "px_september": [
+    34.0,
+    459.0
+   ],
+   "hover": [
+    -60.0,
+    -35.0,
+    60.0,
+    48.0,
+    -20.0,
+    45.0
+   ],
+   "place": [
+    -60.0,
+    -24.0,
+    61.0,
+    34.0,
+    -20.0,
+    45.0
+   ],
+   "n_demos": 3,
+   "max_joint_std_deg": 48.1,
+   "donor_px_dist": [
+    37,
+    56,
+    105
+   ],
+   "sources": [
+    "new311",
+    "new31",
+    "new318"
+   ],
+   "calibration_20261105": {
+    "status": "VERIFIED orange placement and pickup; accepted as slot 3",
+    "initial_pickup_source": "operator moved orange from unreachable lower-right boundary into the marked verified pickup area",
+    "initial_pickup_grasp_command": 15.0,
+    "initial_pickup_grasp_stall": 18.8,
+    "first_release_held_px": [
+     486.0,
+     300.0
+    ],
+    "first_release_settled_px": [
+     458.5,
+     344.2
+    ],
+    "first_release_shift_px": [
+     -27.5,
+     44.2
+    ],
+    "first_release_result": "rejected because it settled only 54.7 px from slot 0 and 51.4 px from slot 1",
+    "recovery_grasp_command": 15.0,
+    "recovery_grasp_reached": 15.1,
+    "recovery_grasp_proof": "orange visibly followed lift and sideways carry; original table position became empty",
+    "accepted_hover_target": [
+     -60.0,
+     -35.0,
+     60.0,
+     48.0,
+     -20.0,
+     45.0
+    ],
+    "accepted_place_target": [
+     -60.0,
+     -24.0,
+     61.0,
+     34.0,
+     -20.0,
+     45.0
+    ],
+    "released_px": [
+     454.3,
+     205.8
+    ],
+    "distance_from_slot0_px": 192.4,
+    "distance_from_slot1_px": 147.0,
+    "distance_from_slot2_px": 246.9,
+    "measurement_note": "HSV centroid with saturation >=150 inside the orange ROI",
+    "verified_checks": [
+     "initial orange pickup centred between both jaws",
+     "initial gripper stalled against orange at 18.8",
+     "first release overlap was measured and rejected",
+     "orange was recovered from the rejected endpoint",
+     "recovery pickup was proven by lift and sideways carry despite no gripper stall",
+     "compensated release settled more than 75 pixels from verified slots 0-2",
+     "arm retreated home collision-free"
+    ],
+    "evidence_dir": "calibration_evidence/slot3_20261105"
+   }
+  },
+  {
+   "slot": 4,
+   "px": null,
+   "px_september": [
+    37.0,
+    409.0
+   ],
+   "hover": [
+    26.8,
+    30.5,
+    36.8,
+    -48.4,
+    -4.4,
+    45.0
+   ],
+   "place": [
+    26.9,
+    30.5,
+    36.9,
+    -48.4,
+    -4.4,
+    45.0
+   ],
+   "n_demos": 3,
+   "max_joint_std_deg": 48.1,
+   "donor_px_dist": [
+    12,
+    15,
+    105
+   ],
+   "sources": [
+    "new31",
+    "new311",
+    "new318"
+   ]
+  },
+  {
+   "slot": 5,
+   "px": null,
+   "px_september": [
+    98.4,
+    388.0
+   ],
+   "hover": [
+    26.8,
+    30.5,
+    36.8,
+    -48.4,
+    -4.4,
+    45.0
+   ],
+   "place": [
+    26.9,
+    30.5,
+    36.9,
+    -48.4,
+    -4.4,
+    45.0
+   ],
+   "n_demos": 3,
+   "max_joint_std_deg": 48.1,
+   "donor_px_dist": [
+    65,
+    74,
+    77
+   ],
+   "sources": [
+    "new318",
+    "new31",
+    "new311"
+   ]
+  },
+  {
+   "slot": 6,
+   "px": null,
+   "px_september": [
+    210.7,
+    423.4
+   ],
+   "hover": [
+    12.6,
+    17.1,
+    11.7,
+    47.3,
+    -17.0,
+    45.0
+   ],
+   "place": [
+    12.7,
+    17.1,
+    11.7,
+    47.5,
+    -16.7,
+    45.0
+   ],
+   "n_demos": 3,
+   "max_joint_std_deg": 30.8,
+   "donor_px_dist": [
+    30,
+    31,
+    75
+   ],
+   "sources": [
+    "new36",
+    "new319",
+    "new318"
+   ]
+  },
+  {
+   "slot": 7,
+   "px": null,
+   "px_september": [
+    243.8,
+    371.8
+   ],
+   "hover": [
+    12.6,
+    17.1,
+    11.7,
+    47.3,
+    -17.0,
+    45.0
+   ],
+   "place": [
+    12.7,
+    17.1,
+    11.7,
+    47.5,
+    -16.7,
+    45.0
+   ],
+   "n_demos": 3,
+   "max_joint_std_deg": 30.8,
+   "donor_px_dist": [
+    45,
+    63,
+    126
+   ],
+   "sources": [
+    "new319",
+    "new36",
+    "new318"
+   ]
+  },
+  {
+   "slot": 8,
+   "px": null,
+   "px_september": [
+    376.8,
+    386.2
+   ],
+   "hover": [
+    16.0,
+    33.7,
+    15.4,
+    57.9,
+    1.0,
+    45.0
+   ],
+   "place": [
+    16.1,
+    33.7,
+    15.4,
+    57.1,
+    1.1,
+    45.0
+   ],
+   "n_demos": 3,
+   "max_joint_std_deg": 69.9,
+   "donor_px_dist": [
+    123,
+    125,
+    147
+   ],
+   "sources": [
+    "new315",
+    "reco7",
+    "new36"
+   ]
+  },
+  {
+   "slot": 9,
+   "px": null,
+   "px_september": [
+    505.8,
+    385.5
+   ],
+   "hover": [
+    34.4,
+    22.5,
+    15.4,
+    31.0,
+    1.0,
+    45.0
+   ],
+   "place": [
+    34.5,
+    23.6,
+    15.4,
+    30.5,
+    1.1,
+    45.0
+   ],
+   "n_demos": 3,
+   "max_joint_std_deg": 59.6,
+   "donor_px_dist": [
+    29,
+    53,
+    213
+   ],
+   "sources": [
+    "new315",
+    "reco7",
+    "reco2"
+   ]
+  }
+ ],
+ "envelope": {
+  "min": [
+   -111.4,
+   -104.9,
+   -92.0,
+   -99.6,
+   -75.3,
+   1.6
+  ],
+  "max": [
+   84.0,
+   82.9,
+   97.3,
+   103.1,
+   90.9,
+   88.2
+  ],
+  "margin_deg": 5
+ },
+ "status": "PARTIAL LIVE CALIBRATION 2026-11-04/05 \u2014 tray-centre pickup and table slots 0-3 verified; slots 4-9 and off-centre tray descents remain unverified; do not run --reset-between yet"
+}
