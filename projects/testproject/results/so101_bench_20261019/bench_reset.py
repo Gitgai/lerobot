@@ -31,28 +31,37 @@ class ResetFailed(RuntimeError):
 
 
 # ---------- vision (the September recovery-work detector) ----------
-def orange_centroid(bgr):
+def orange_centroid(bgr, anchor=None, max_distance=None):
     import cv2
     hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV); m = cv2.inRange(hsv, (5, 120, 90), (28, 255, 255))
     m = cv2.morphologyEx(m, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8)); m = cv2.morphologyEx(m, cv2.MORPH_CLOSE, np.ones((7, 7), np.uint8))
-    best = None
+    found = []
     for c in cv2.findContours(m, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[0]:
         a = cv2.contourArea(c)
         if a < 400: continue
         x, y, w, h = cv2.boundingRect(c)
         if a / (w * h) < 0.5 or min(w, h) / max(w, h) < 0.45: continue
-        if best is None or a > best[0]: best = (a, (x + w / 2, y + h / 2))
-    return None if best is None else best[1]
+        found.append((a, (x + w / 2, y + h / 2)))
+    if not found: return None
+    if anchor is None: return max(found, key=lambda item: item[0])[1]
+    anchor = np.asarray(anchor, dtype=np.float32)
+    best = min(found, key=lambda item: float(np.linalg.norm(np.asarray(item[1]) - anchor)))
+    distance = float(np.linalg.norm(np.asarray(best[1]) - anchor))
+    return None if max_distance is not None and distance > max_distance else best[1]
 
 
 def tray_centre(bgr):
     import cv2
-    b, g, r = cv2.split(bgr.astype(np.int16)); val = bgr.max(2)
-    mask = (((b - r) > 10) & (val > 60) & (val < 210)).astype(np.uint8) * 255
+    # The tray hue is stable near 110.  A saturation floor rejects the blue-tinted
+    # glare on the table that made the older B-R threshold merge with the image edge.
+    hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)
+    mask = cv2.inRange(hsv, (95, 60, 45), (125, 255, 230))
     mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, np.ones((5, 5), np.uint8)); mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, np.ones((15, 15), np.uint8))
-    cs = [c for c in cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[0] if cv2.contourArea(c) > 12000]
+    cs = [c for c in cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[0]
+          if cv2.contourArea(c) > 12000 and cv2.boundingRect(c)[2] > 80 and cv2.boundingRect(c)[3] > 80]
     if not cs: return None
-    M = cv2.moments(max(cs, key=cv2.contourArea)); return (M["m10"] / M["m00"], M["m01"] / M["m00"])
+    x, y, w, h = cv2.boundingRect(max(cs, key=cv2.contourArea))
+    return (x + w / 2, y + h / 2)
 
 
 # ---------- the routine ----------
@@ -112,11 +121,12 @@ class Reset:
 
     # -- steps --
     def look(self):
-        bgr = self.snap("look"); o = orange_centroid(bgr); t = tray_centre(bgr)
+        bgr = self.snap("look"); t = tray_centre(bgr)
         if t is None: raise ResetFailed("tray not found in the overhead frame")
         tc = np.array(self.W["tray"]["px_centre"]); drift = float(np.hypot(*(np.array(t) - tc)))
         if drift > 1.0 * self.px_per_cm: raise ResetFailed(f"tray moved {drift / self.px_per_cm:.1f} cm from calibration")
-        if o is None or np.hypot(*(np.array(o) - tc)) > self.W["tray"]["px_radius"]: raise ResetFailed("no orange inside the tray")
+        o = orange_centroid(bgr, anchor=t, max_distance=self.W["tray"]["px_radius"])
+        if o is None: raise ResetFailed("no orange inside the tray")
         dx, dy = np.array(o) - tc; r = self.W["tray"]["px_radius"] * 0.35
         key = "centre" if np.hypot(dx, dy) < r else ("left" if abs(dx) > abs(dy) and dx < 0 else "right" if abs(dx) > abs(dy) else "near" if dy > 0 else "far")
         self.log({"event": "reset_look", "orange_px": [float(o[0]), float(o[1])], "tray_px": [float(t[0]), float(t[1])], "descent": key})
@@ -145,7 +155,8 @@ class Reset:
         pl = np.array(slot["place"], dtype=np.float32); pl[5] = held; self.move(pl, "R7_lower")                   # R7
         self.move(pl, "R7_open", grip_override=45); time.sleep(0.5)
         self.move(sh, "R8_retreat", grip_override=45); self.move(W["start"], "R8_to_start", grip_override=45)     # R8
-        bgr = self.snap("verify"); o = orange_centroid(bgr); t = tray_centre(bgr)                                 # R9
+        bgr = self.snap("verify"); t = tray_centre(bgr)                                                         # R9
+        o = orange_centroid(bgr, anchor=slot["px"], max_distance=3.0 * self.px_per_cm)
         ok_slot = o is not None and np.hypot(*(np.array(o) - np.array(slot["px"]))) <= 3.0 * self.px_per_cm
         ok_tray = t is not None and np.hypot(*(np.array(t) - np.array(W["tray"]["px_centre"]))) <= 1.0 * self.px_per_cm
         ok_arm = np.abs(self.q()[:5] - np.array(W["start"][:5])).max() <= 2.0 and self.q()[5] >= 40

@@ -1,0 +1,123 @@
+#!/usr/bin/env python3
+"""Guarded SO-101 jog server for vision-assisted waypoint calibration.
+
+The server never executes a command left by an earlier session.  Commands are
+written to ~/vision_calib_jog_cmd and state is reported in
+~/vision_calib_jog_state.json.  Every move is clamped and restricted to the
+motion envelope observed in the 169 demonstrations.
+"""
+
+import json
+import pathlib
+import time
+
+import numpy as np
+
+try:
+    from lerobot.robots.so_follower import SO101Follower, SO101FollowerConfig
+except ImportError:
+    from lerobot.robots.so101_follower import SO101Follower, SO101FollowerConfig
+
+
+HOME = pathlib.Path.home()
+CMD = HOME / "vision_calib_jog_cmd"
+STATE = HOME / "vision_calib_jog_state.json"
+SAVED = HOME / "vision_calib_jog_saved.json"
+JOINTS = ["shoulder_pan", "shoulder_lift", "elbow_flex", "wrist_flex", "wrist_roll", "gripper"]
+JI = {"pan": 0, "lift": 1, "elbow": 2, "wflex": 3, "wroll": 4, "grip": 5}
+ENV_MIN = np.array([-111.4, -104.9, -92.0, -99.6, -75.3, 1.6]) - 5
+ENV_MAX = np.array([84.0, 82.9, 97.3, 103.1, 90.9, 88.2]) + 5
+PROTECTIONS = {"Max_Torque_Limit": 500, "Protection_Current": 250, "Overload_Torque": 25}
+
+
+robot = SO101Follower(SO101FollowerConfig(port="/dev/ttyACM0", id="my_so101_follower", cameras={}))
+
+
+def q():
+    obs = robot.get_observation()
+    return np.array([float(obs[f"{joint}.pos"]) for joint in JOINTS], dtype=np.float32)
+
+
+def write_state(message=""):
+    STATE.write_text(json.dumps({"q": q().round(1).tolist(), "msg": message, "t": time.time()}))
+
+
+def move(target, max_s=30.0):
+    target = np.asarray(target, dtype=np.float32)
+    if np.any(target < ENV_MIN) or np.any(target > ENV_MAX):
+        return f"REFUSED outside envelope {target.round(1).tolist()}"
+    current = q()
+    limit = np.array([0.6] * 5 + [1.5], dtype=np.float32)
+    started = time.time()
+    while time.time() - started < max_s:
+        delta = target - current
+        if np.abs(delta).max() < 0.5:
+            break
+        current = current + np.clip(delta, -limit, limit)
+        robot.send_action({f"{joint}.pos": float(value) for joint, value in zip(JOINTS, current)})
+        time.sleep(1 / 30)
+    time.sleep(0.3)
+    reached = q()
+    if np.abs(reached - target).max() >= 2.0:
+        return f"STOPPED short, target {target.round(1).tolist()}, at {reached.round(1).tolist()}"
+    return f"at {reached.round(1).tolist()}"
+
+
+try:
+    robot.connect(calibrate=False)
+    for register, value in PROTECTIONS.items():
+        robot.bus.write(register, "gripper", value, normalize=False)
+    got = {register: int(robot.bus.read(register, "gripper", normalize=False)) for register in PROTECTIONS}
+    if got != PROTECTIONS:
+        raise RuntimeError(f"gripper protection mismatch: {got}")
+
+    # Ignore any command left from an earlier invocation.
+    last = CMD.read_text().strip() if CMD.exists() else ""
+    write_state(f"ready; protections {got}")
+    print("vision calibration jog server ready", flush=True)
+
+    while True:
+        text = CMD.read_text().strip() if CMD.exists() else ""
+        if not text or text == last:
+            time.sleep(0.1)
+            continue
+        last = text
+        parts = text.split()
+        command = parts[0]
+        current = q()
+        try:
+            if command == "goto":
+                message = move([float(value) for value in parts[1].split(",")])
+            elif command == "delta":
+                joint, value = parts[1].split(",")
+                target = current.copy()
+                target[JI[joint]] += float(value)
+                message = move(target)
+            elif command == "grip":
+                target = current.copy()
+                target[5] = float(parts[1])
+                message = move(target)
+            elif command == "read":
+                message = f"q {current.round(1).tolist()}"
+            elif command == "save":
+                saved = json.loads(SAVED.read_text()) if SAVED.exists() else {}
+                saved[parts[1]] = current.round(1).tolist()
+                SAVED.write_text(json.dumps(saved, indent=2))
+                message = f"saved {parts[1]} = {saved[parts[1]]}"
+            elif command == "off":
+                robot.bus.disable_torque()
+                message = "TORQUE OFF"
+            elif command == "quit":
+                write_state("quit")
+                break
+            else:
+                message = f"unknown command {command}"
+        except Exception as error:
+            message = f"ERROR {type(error).__name__}: {error}"
+        write_state(message)
+        print(message, flush=True)
+finally:
+    try:
+        robot.disconnect()
+    except Exception:
+        pass

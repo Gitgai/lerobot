@@ -1,37 +1,37 @@
 {
- "date": "2026-10-28",
+ "date": "2026-11-04",
  "derived_from": "slots: September demos (joint space, 3 nearest by September pixel; grasp = open->closed transition away from rest); tray hover: Sunday releases; tray descend: UNVERIFIED estimate; slot verify pixels: self-recorded at the first successful place (null until then)",
  "px_per_cm": 8.0,
  "start": [
-  0,
-  -99,
-  97,
-  75,
-  2,
-  41
+  0.4,
+  -104.4,
+  96.5,
+  78.3,
+  -8.2,
+  45.0
  ],
  "tray": {
   "px_centre": [
-   518.9,
-   200.0
+   150.0,
+   143.5
   ],
-  "px_radius": 80.0,
+  "px_radius": 90.0,
   "hover": [
-   -61.9,
-   -7.0,
-   33.9,
-   60.0,
-   -13.1,
+   77.2,
+   -68.4,
+   86.8,
+   42.4,
+   0.0,
    45.0
   ],
   "descend": {
    "centre": [
-    -61.9,
-    21.0,
+    79.9,
+    -64.6,
+    83.2,
+    40.8,
     -0.2,
-    57.1,
-    -13.1,
-    45.0
+    37.0
    ],
    "left": [
     -69.9,
@@ -65,6 +65,47 @@
     -13.1,
     45.0
    ]
+  },
+  "calibration_20261104": {
+   "status": "VERIFIED for orange at tray centre only",
+   "approach_open37": [
+    79.9,
+    -64.6,
+    83.2,
+    40.8,
+    -0.2,
+    36.8
+   ],
+   "grasp_hold22": [
+    79.9,
+    -64.6,
+    82.1,
+    40.7,
+    -0.2,
+    22.2
+   ],
+   "lifted_hold22": [
+    77.2,
+    -68.4,
+    86.8,
+    42.4,
+    0.0,
+    22.2
+   ],
+   "verified_checks": [
+    "orange centred using closed-jaw midpoint",
+    "symmetric jaw contact",
+    "lift",
+    "2.6 degree horizontal carry",
+    "release into tray"
+   ],
+   "unverified_descents": [
+    "left",
+    "right",
+    "near",
+    "far"
+   ],
+   "camera_note": "C270 emits about 25-30 blank startup frames; acquire at least 45 frames when opening a fresh capture process."
   }
  },
  "slots": [
@@ -448,5 +489,5 @@
   ],
   "margin_deg": 5
  },
- "status": "UNVERIFIED DRAFT 2026-10-28 \u2014 derived from data; slot poses have 30-70 deg donor spread and must be re-recorded at the bench before any live reset; do not run --reset-between on this file"
+ "status": "PARTIAL LIVE CALIBRATION 2026-11-04 \u2014 tray-centre pickup verified; ten table slots and off-centre tray descents remain unverified; do not run --reset-between yet"
 }
