@@ -1,8 +1,11 @@
 # SO-101 bench auto-reset live calibration record and runbook
 
-Dates: 2026-11-04 and 2026-11-05  
-Branch: `codex/record-row-n-20261030`  
-Design plan: [`so101_bench_auto_reset_plan_20261028.md`](so101_bench_auto_reset_plan_20261028.md)  
+Dates: 2026-11-04 and 2026-11-05
+
+Branch: `codex/record-row-n-20261030`
+
+Design plan: [`so101_bench_auto_reset_plan_20261028.md`](so101_bench_auto_reset_plan_20261028.md)
+
 Authoritative waypoints: `results/so101_bench_20261019/reset/reset_waypoints.json`
 
 ## Outcome
