@@ -235,25 +235,28 @@
   },
   {
    "slot": 2,
-   "px": null,
+   "px": [
+    591.7,
+    410.9
+   ],
    "px_september": [
     156.0,
     311.5
    ],
    "hover": [
-    49.6,
-    9.3,
-    18.9,
-    50.1,
-    -9.6,
+    -49.5,
+    14.0,
+    20.0,
+    34.0,
+    -17.0,
     45.0
    ],
    "place": [
-    49.9,
-    9.3,
-    18.9,
-    49.2,
-    -9.4,
+    -49.5,
+    23.0,
+    20.0,
+    21.0,
+    -17.0,
     45.0
    ],
    "n_demos": 3,
@@ -351,6 +354,65 @@
      "arm retreated home collision-free"
     ],
     "acceptance_blocker": "released fruit settles too close to verified slot 0; compensate release target and retest"
+   },
+   "compensated_release_20261105": {
+    "status": "VERIFIED orange placement and pickup; accepted as slot 2",
+    "pickup_start_px": [
+     500.8,
+     382.8
+    ],
+    "pickup_place_target": [
+     -45.0,
+     24.0,
+     20.0,
+     21.0,
+     -15.0,
+     45.0
+    ],
+    "pickup_grasp_command": 15.0,
+    "pickup_grasp_stall": 17.6,
+    "first_compensated_release_target_rejected": [
+     -57.0,
+     23.0,
+     20.0,
+     21.0,
+     -19.0,
+     45.0
+    ],
+    "first_compensated_release_result": "rejected because the orange settled at the far-right camera boundary",
+    "accepted_hover_target": [
+     -49.5,
+     14.0,
+     20.0,
+     34.0,
+     -17.0,
+     45.0
+    ],
+    "accepted_place_target": [
+     -49.5,
+     23.0,
+     20.0,
+     21.0,
+     -17.0,
+     45.0
+    ],
+    "released_px": [
+     591.7,
+     410.9
+    ],
+    "distance_from_slot0_px": 121.4,
+    "distance_from_slot1_px": 196.1,
+    "measurement_note": "HSV centroid; orange reaches the right camera boundary but remains on the table and inside the verified arm workspace",
+    "verified_checks": [
+     "orange centred between both jaws",
+     "gripper stalled against orange at 17.6",
+     "orange visibly followed the sideways carry and the original position became empty",
+     "far-right overshoot was rejected rather than accepted",
+     "orange was recovered from the overshoot",
+     "accepted release settled more than 75 pixels from verified slots 0 and 1",
+     "arm retreated home collision-free"
+    ],
+    "evidence_dir": "calibration_evidence/slot2_compensated_20261105"
    }
   },
   {
@@ -625,5 +687,5 @@
   ],
   "margin_deg": 5
  },
- "status": "PARTIAL LIVE CALIBRATION 2026-11-04 \u2014 tray-centre pickup and table slots 0-1 verified; slot 2 grasp/carry verified but release overlaps slot 0 and is not accepted; slots 2-9 and off-centre tray descents remain unverified; do not run --reset-between yet"
+ "status": "PARTIAL LIVE CALIBRATION 2026-11-04/05 \u2014 tray-centre pickup and table slots 0-2 verified; slots 3-9 and off-centre tray descents remain unverified; do not run --reset-between yet"
 }
