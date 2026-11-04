@@ -1052,25 +1052,28 @@
   },
   {
    "slot": 9,
-   "px": null,
+   "px": [
+    152.8,
+    333.0
+   ],
    "px_september": [
     505.8,
     385.5
    ],
    "hover": [
-    34.4,
-    22.5,
-    15.4,
-    31.0,
-    1.0,
+    25.0,
+    -10.0,
+    50.0,
+    40.0,
+    -18.0,
     45.0
    ],
    "place": [
-    34.5,
-    23.6,
-    15.4,
-    30.5,
-    1.1,
+    25.0,
+    0.0,
+    40.0,
+    30.0,
+    -18.0,
     45.0
    ],
    "n_demos": 3,
@@ -1084,7 +1087,73 @@
     "new315",
     "reco7",
     "reco2"
-   ]
+   ],
+   "calibration_20261105": {
+    "status": "VERIFIED orange placement and pickup; accepted as slot 9",
+    "pickup_source_slot": 8,
+    "pickup_alignment_target": [
+     10.0,
+     -30.0,
+     66.0,
+     34.0,
+     -18.0,
+     45.0
+    ],
+    "pickup_grasp_command": 15.0,
+    "pickup_grasp_stall": 17.5,
+    "pickup_grasp_proof": "orange visibly followed lift and five-degree sideways base carry while remaining between both jaws",
+    "accepted_hover_target": [
+     25.0,
+     -10.0,
+     50.0,
+     40.0,
+     -18.0,
+     45.0
+    ],
+    "accepted_place_target": [
+     25.0,
+     0.0,
+     40.0,
+     30.0,
+     -18.0,
+     45.0
+    ],
+    "accepted_release_actual_q": [
+     24.5,
+     -0.4,
+     41.4,
+     31.0,
+     -18.2,
+     44.4
+    ],
+    "held_release_px": [
+     143.8,
+     352.1
+    ],
+    "released_px": [
+     152.8,
+     333.0
+    ],
+    "distance_from_slot0_px": 324.7,
+    "distance_from_slot1_px": 254.6,
+    "distance_from_slot2_px": 445.8,
+    "distance_from_slot3_px": 327.2,
+    "distance_from_slot4_px": 370.9,
+    "distance_from_slot5_px": 453.2,
+    "distance_from_slot6_px": 161.3,
+    "distance_from_slot7_px": 158.6,
+    "distance_from_slot8_px": 89.0,
+    "measurement_note": "tight HSV centroid in clean top-camera frame after arm returned home; orange rolled about 21 pixels during retreat and final settled location remains above spacing threshold",
+    "verified_checks": [
+     "pickup aligned deep between both jaws",
+     "gripper stalled against orange at 17.5",
+     "pickup proven by lift and sideways carry",
+     "release remained fully inside camera and arm workspace",
+     "final settled position is more than 75 pixels from verified slots 0-8",
+     "arm returned to standard home collision-free"
+    ],
+    "evidence_dir": "calibration_evidence/slot9_20261105"
+   }
   }
  ],
  "envelope": {
@@ -1106,5 +1175,5 @@
   ],
   "margin_deg": 5
  },
- "status": "PARTIAL LIVE CALIBRATION 2026-11-04/05 \u2014 tray-centre pickup and table slots 0-8 verified; slot 9 and off-centre tray descents remain unverified; do not run --reset-between yet"
+ "status": "PARTIAL LIVE CALIBRATION 2026-11-04/05 \u2014 tray-centre pickup and table slots 0-9 verified; off-centre tray descents remain unverified; do not run --reset-between yet"
 }
