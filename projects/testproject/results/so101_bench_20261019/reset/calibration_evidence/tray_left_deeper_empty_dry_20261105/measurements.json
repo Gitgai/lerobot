@@ -1,0 +1,38 @@
+{
+  "path_file": "reset/kinematics/tray_left_deeper_path.json",
+  "tray_present": true,
+  "orange_removed_from_tray": true,
+  "gripper_open": 37.0,
+  "tested_depths_mm": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "result": "all candidates completed with no visible tray contact or shift",
+  "close_attempted": false,
+  "deepest_candidate_q": [
+    57.7,
+    -63.5184,
+    85.8777,
+    36.4823,
+    0.0,
+    37.0
+  ],
+  "deepest_tool_xyz_mm": [
+    116.033,
+    -122.134,
+    5.004
+  ],
+  "height_above_centre_hover_tool_z_mm": 1.425,
+  "reverse_path_verified": true,
+  "guarded_pan_away_verified": true,
+  "arm_home": true,
+  "torque_off": true,
+  "server_exited": true,
+  "approved_for_grasp_attempt": true,
+  "auto_reset_approved": false
+}

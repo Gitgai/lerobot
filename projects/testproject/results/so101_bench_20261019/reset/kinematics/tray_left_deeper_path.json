@@ -1,0 +1,190 @@
+{
+  "schema_version": 1,
+  "generated_by": "generate_tray_left_deeper_path.py",
+  "urdf": "reset/kinematics/so101_new_calib.urdf",
+  "safety_status": "EMPTY_TRAY_DRY_RUNS_PASSED_WATCHED_GRASP_REJECTED",
+  "approved_for_tray_use": false,
+  "source_attempt": "calibration_evidence/tray_left_guarded_hold_miss_20261105",
+  "start_q": [
+    57.7,
+    -64.6,
+    83.2,
+    40.8,
+    0.0
+  ],
+  "start_xyz_mm": [
+    116.033,
+    -122.134,
+    11.003
+  ],
+  "centre_hover_tool_z_mm": 3.578,
+  "maximum_candidate_depth_mm": 6,
+  "candidates": [
+    {
+      "depth_below_rejected_final_mm": 0,
+      "q": [
+        57.7,
+        -64.6,
+        83.2,
+        40.8,
+        0.0
+      ],
+      "xyz_mm": [
+        116.033,
+        -122.134,
+        11.003
+      ],
+      "xy_drift_mm": 0.0,
+      "joint_step_max_deg": 0.0,
+      "height_above_centre_hover_tool_z_mm": 7.425
+    },
+    {
+      "depth_below_rejected_final_mm": 1,
+      "q": [
+        57.7,
+        -64.4196,
+        83.6295,
+        40.1169,
+        0.0
+      ],
+      "xyz_mm": [
+        116.033,
+        -122.134,
+        10.004
+      ],
+      "xy_drift_mm": 0.001,
+      "joint_step_max_deg": 0.683,
+      "height_above_centre_hover_tool_z_mm": 6.425
+    },
+    {
+      "depth_below_rejected_final_mm": 2,
+      "q": [
+        57.7,
+        -64.2392,
+        84.0654,
+        39.4197,
+        0.0
+      ],
+      "xyz_mm": [
+        116.033,
+        -122.133,
+        9.004
+      ],
+      "xy_drift_mm": 0.001,
+      "joint_step_max_deg": 0.697,
+      "height_above_centre_hover_tool_z_mm": 5.426
+    },
+    {
+      "depth_below_rejected_final_mm": 3,
+      "q": [
+        57.7,
+        -64.0587,
+        84.5079,
+        38.7079,
+        0.0
+      ],
+      "xyz_mm": [
+        116.033,
+        -122.134,
+        8.004
+      ],
+      "xy_drift_mm": 0.0,
+      "joint_step_max_deg": 0.712,
+      "height_above_centre_hover_tool_z_mm": 4.425
+    },
+    {
+      "depth_below_rejected_final_mm": 4,
+      "q": [
+        57.7,
+        -63.8784,
+        84.9571,
+        37.9819,
+        0.0
+      ],
+      "xyz_mm": [
+        116.033,
+        -122.134,
+        7.004
+      ],
+      "xy_drift_mm": 0.001,
+      "joint_step_max_deg": 0.726,
+      "height_above_centre_hover_tool_z_mm": 3.425
+    },
+    {
+      "depth_below_rejected_final_mm": 5,
+      "q": [
+        57.7,
+        -63.6983,
+        85.4135,
+        37.2404,
+        0.0
+      ],
+      "xyz_mm": [
+        116.033,
+        -122.133,
+        6.004
+      ],
+      "xy_drift_mm": 0.001,
+      "joint_step_max_deg": 0.741,
+      "height_above_centre_hover_tool_z_mm": 2.426
+    },
+    {
+      "depth_below_rejected_final_mm": 6,
+      "q": [
+        57.7,
+        -63.5184,
+        85.8777,
+        36.4823,
+        0.0
+      ],
+      "xyz_mm": [
+        116.033,
+        -122.134,
+        5.004
+      ],
+      "xy_drift_mm": 0.0,
+      "joint_step_max_deg": 0.758,
+      "height_above_centre_hover_tool_z_mm": 1.425
+    }
+  ],
+  "constraints": {
+    "pan_and_roll_fixed": true,
+    "horizontal_target_fixed": true,
+    "candidate_spacing_mm": 1,
+    "maximum_joint_step_deg": 1.0,
+    "maximum_horizontal_fk_drift_mm": 0.05,
+    "must_remain_inside_demo_motion_envelope_plus_5_deg": true
+  },
+  "dry_run_requirements": {
+    "remove_orange_from_tray": true,
+    "keep_tray_in_taped_position": true,
+    "gripper_open": 37.0,
+    "advance_one_candidate_at_a_time": true,
+    "inspect_top_and_wrist_images_after_every_1mm_step": true,
+    "stop_on_any_tray_contact_or_shift": true,
+    "no_close_command": true,
+    "reverse_same_candidates_to_retreat": true
+  },
+  "physical_validation": {
+    "empty_tray_runs": [
+      {
+        "pan_deg": 57.7,
+        "result": "passed all 0-6 mm candidates without visible tray contact or shift",
+        "evidence": "calibration_evidence/tray_left_deeper_empty_dry_20261105"
+      },
+      {
+        "pan_deg": 60.7,
+        "result": "passed all 0-6 mm candidates without visible tray contact or shift",
+        "evidence": "calibration_evidence/tray_left_pan607_deeper_empty_dry_20261105"
+      }
+    ],
+    "watched_grasp": {
+      "pan_deg": 60.7,
+      "stall": 5.9,
+      "maximum_arm_drift_deg": 0.7,
+      "result": "rejected miss; orange shifted about 35 pixels",
+      "evidence": "calibration_evidence/tray_left_pan607_deeper_hold_miss_20261105"
+    }
+  },
+  "blocker": "watched grasp missed; no tray-left operational waypoint is approved"
+}

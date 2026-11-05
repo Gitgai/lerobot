@@ -392,6 +392,26 @@ Another pan correction cannot solve it. The next attempt requires an offline-gen
 left-specific approach below the current centre-derived final pose; no deeper live probing is allowed. Evidence is
 under `reset/calibration_evidence/tray_left_guarded_hold_miss_20261105/`.
 
+The deeper path was then generated offline from the rejected left endpoint. It preserved Cartesian x/y and pan,
+lowered tool z in six 1 mm steps, limited the largest commanded joint change to 0.758 degrees, and kept the deepest
+tool point 1.425 mm above the verified centre-hover tool z. Empty-tray watched runs at pan 57.7 and 60.7 degrees
+completed every depth step, reversed the same path, and produced no visible tray contact or shift. These checks did
+not approve the path for automatic reset; they only authorized one watched grasp at the matching 60.7-degree
+placement.
+
+In that watched grasp, both the 20 mm checkpoint and deepest wrist frame showed the orange between the open black
+finger tips. The close controller held arm drift to 0.7 degrees, but the gripper reached 5.9, below the accepted
+16--26 hold range. The fingers passed beside the orange and shifted it from approximately `(139,143)` to
+`(142,178)` in the top camera. The arm reopened immediately, reversed all six depth steps and every verified
+Cartesian waypoint, panned away above the 33.5 mm guard, returned home, disabled torque, and disconnected.
+
+This rejects additional vertical depth as the next solution. Six more millimetres were mechanically safe at this
+placement but did not create a hold. The next candidate must be a small lateral Cartesian correction derived from
+the deepest wrist image, generated offline and checked first with an empty tray. Tray-left and automatic reset remain
+unapproved. Evidence is under
+`reset/calibration_evidence/tray_left_pan607_deeper_hold_miss_20261105/`; the generated path is
+`reset/kinematics/tray_left_deeper_path.json`.
+
 ## Lessons that changed the procedure
 
 1. **A stall reading is supporting evidence, not grasp proof.** The fingers can close beside or behind an orange
@@ -450,10 +470,11 @@ f40b66b28  Calibrate compensated table slot two
 
 ### 1. Calibrate all off-centre tray descents
 
-The 2026-11-05 left retry established that pan alignment alone is insufficient. At pan 57.7 degrees the final
-wrist view matched the centre-grasp alignment, and the corrected close held arm drift to 1.3 degrees, but the
-gripper still shut to 2.1 and pushed the orange about 23 pixels. Generate and collision-check a deeper
-left-specific Cartesian endpoint before the next physical attempt; do not probe lower by joint-space guessing.
+The 2026-11-05 left retries established that pan alignment and vertical depth alone are insufficient. The generated
+six-millimetre deeper path passed empty-tray checks at pan 57.7 and 60.7 degrees, but the watched 60.7-degree close
+still reached only 5.9 and shifted the orange about 35 pixels. Derive a small lateral correction from the deepest
+wrist frame, generate it offline, and collision-check it in the empty tray before another physical attempt. Do not
+probe laterally or lower by joint-space guessing.
 
 Place the orange in the tray at `left`, `right`, `near`, and `far`. For each position:
 

@@ -1,0 +1,48 @@
+{
+  "placement": {
+    "start_top_px_approx": [139.0, 143.0],
+    "end_top_px_approx": [142.0, 178.0],
+    "shift_px_approx": 35.1,
+    "classifier": "left"
+  },
+  "path": {
+    "pan_deg": 60.7,
+    "high_offset_mm": 40,
+    "minimum_absolute_tool_z_during_pan_mm": 33.5,
+    "waypoint_spacing_mm": 5,
+    "extra_depth_mm": 6,
+    "extra_depth_step_mm": 1,
+    "joint_tolerance_deg": 0.5,
+    "empty_tray_dry_run_passed": true
+  },
+  "alignment": {
+    "z20_result": "orange fully between open fingers",
+    "deepest_open_result": "black finger tips visible on opposite sides of orange",
+    "deepest_candidate_q": [60.7, -63.5184, 85.8777, 36.4823, 0.0, 37.0]
+  },
+  "grasp": {
+    "method": "close_on_stall with locked arm joints",
+    "stall": 5.9,
+    "accepted_hold_range": [16.0, 26.0],
+    "maximum_arm_drift_deg": 0.7,
+    "bias_deg": [-1.1, 0.9, -1.1, 0.2, 0.0],
+    "result": "miss; fingers closed beside the orange and shifted it about 35 pixels toward the near side of the tray",
+    "grasp_verified": false
+  },
+  "recovery": {
+    "reopened": true,
+    "reverse_depth_path_verified": true,
+    "reverse_cartesian_path_verified": true,
+    "guarded_pan_away_verified": true,
+    "arm_home": true,
+    "torque_off": true,
+    "server_exited": true
+  },
+  "decision": {
+    "tray_left_verified": false,
+    "auto_reset_approved": false,
+    "deeper_vertical_path_rejected_as_solution": true,
+    "finding": "six additional vertical millimetres were collision-free but did not create a hold; the remaining error is lateral/finger geometry at closure, not insufficient vertical depth",
+    "next_required_change": "derive a small lateral Cartesian correction from the deepest wrist image, generate it offline, and collision-check it in the empty tray before another grasp"
+  }
+}

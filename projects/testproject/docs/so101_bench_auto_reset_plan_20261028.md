@@ -209,7 +209,11 @@ nobody watching unattended resets               → motion envelope from the tra
             retry, and a compensated release before acceptance.
 2026-11-05  table slots 3-9 calibrated live. All ten slots now have accepted hover/place targets, settled pixel
             centroids, spacing checks and evidence. See the detailed calibration record linked above.
-NEXT        calibrate tray descents left/right/near/far with the same grasp-proof procedure, then run V1-V3.
+2026-11-05  tray-left vertical-depth hypothesis tested. Offline-generated 0-6 mm path passed empty-tray runs at
+            pan 57.7 and 60.7 degrees, but the watched grasp closed to 5.9 and shifted the orange about 35 pixels.
+            Vertical depth is rejected as the next correction; tray-left remains unapproved.
+NEXT        derive and empty-tray-check a small lateral Cartesian correction for tray-left, then prove grasp/lift/
+            carry. Calibrate tray right/near/far with the same procedure, then run V1-V3.
             Only after V3 passes may the first integrated V4 row use --reset-between.
 ```
 
