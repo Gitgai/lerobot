@@ -1,0 +1,33 @@
+{
+  "date": "2026-11-06",
+  "result": "PASS: final-depth pan and 16.422 mm radial correction cleared the empty tray outbound and in reverse",
+  "tray_empty_confirmed": true,
+  "branch_start_q": [63.8976, -50.3310, 78.6639, 31.0672, 0.0, 37.0],
+  "branch_endpoint_q": [56.0806, -68.9440, 85.1290, 43.2151, 0.0, 37.0],
+  "correction": {
+    "pan_delta_deg": -7.817,
+    "radial_delta_mm": -16.422,
+    "tool_z_mm": 9.49,
+    "shoulder_elbow_wrist_sum_deg": 59.4,
+    "pan_step_deg": 1.0,
+    "radial_step_mm": 2.0
+  },
+  "inspection": {
+    "top_frame_after_every_step": true,
+    "wrist_frames_at_pan_endpoint_radial_8mm_and_final": true,
+    "tray_floor_contact_observed": false,
+    "tray_rim_contact_observed": false
+  },
+  "camera_motion": {
+    "whole_image_shifted_between_sessions": true,
+    "current_target_px_after_global_compensation": [157.56, 141.78],
+    "within_run_global_shift_removed": true
+  },
+  "maximum_tray_relative_shift_after_global_compensation_px": 1.52,
+  "accepted_previous_limit_px": 1.581,
+  "return_path_completed": true,
+  "arm_returned_home": true,
+  "torque_disabled": true,
+  "close_attempted": false,
+  "next_step": "Restore the orange at the current compensated top-camera target, replay the cleared approach and correction branch, then require a fresh wrist gate pass before close."
+}

@@ -1,0 +1,29 @@
+{
+  "orange_area_in_tray_roi_px": 0.0,
+  "tray_empty_pass": true,
+  "left": {
+    "shift_px": [
+      5.363,
+      -5.825
+    ],
+    "magnitude_px": 7.918,
+    "response": 0.8178
+  },
+  "bottom": {
+    "shift_px": [
+      5.491,
+      -5.326
+    ],
+    "magnitude_px": 7.649,
+    "response": 0.8718
+  },
+  "right": {
+    "shift_px": [
+      6.171,
+      -6.036
+    ],
+    "magnitude_px": 8.632,
+    "response": 0.8195
+  },
+  "maximum_tray_shift_px": 8.632
+}
