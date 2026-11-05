@@ -582,3 +582,7 @@ After the orange was manually returned to the tray, the previously validated com
 ### Bounded runtime correction envelope
 
 A final empty-tray validation sampled 48 open-gripper poses across pan 69.5–79.5 degrees and radial offsets -4 to +4 mm, using 1-degree and 1 mm boundary steps. The radial solutions held tool z and pitch fixed. Camera-frame jitter was removed using the stationary orange on the table; tray patches with phase-response below 0.3 were ignored. Across 67 valid patch observations, maximum tray-relative movement was 1.581 pixels and no contact was observed. The arm returned home with torque off. This envelope is approved for runtime open-gripper correction after a fresh baseline image; closing still requires a fresh wrist gate pass.
+
+### Adaptive correction rejected outside the local envelope
+
+On the next fresh placement, the centre baseline measured `[-75.89,+0.41]` pixels. The best solution inside the cleared ±5-degree/±4 mm envelope still predicted `[-44.17,+21.96]`; the unconstrained linear solve requested about -23.0 degrees pan and -8.5 mm radial travel, which is invalid for a local model and unsafe at tray-floor height. No correction or close occurred, and the arm returned home with torque off. This establishes that the cleared envelope is a final-refinement region, not a whole-tray acquisition controller. The next implementation must coarse-align at a raised collision-safe pose using overhead and wrist vision, then descend vertically and apply the local gate/refinement.
