@@ -212,8 +212,11 @@ nobody watching unattended resets               → motion envelope from the tra
 2026-11-05  tray-left vertical-depth hypothesis tested. Offline-generated 0-6 mm path passed empty-tray runs at
             pan 57.7 and 60.7 degrees, but the watched grasp closed to 5.9 and shifted the orange about 35 pixels.
             Vertical depth is rejected as the next correction; tray-left remains unapproved.
-NEXT        derive and empty-tray-check a small lateral Cartesian correction for tray-left, then prove grasp/lift/
-            carry. Calibrate tray right/near/far with the same procedure, then run V1-V3.
+2026-11-05  tray-left lateral arc tested. The 60.7-65.2 degree empty-tray sweep passed; the watched grasp selected
+            measured pan 63.0 with about 3 pixels lateral error, but closed to 7.4 and shifted the orange 28 pixels.
+            Lateral centring is resolved; the remaining error is the front/back closing plane.
+NEXT        derive and empty-tray-check a bounded front/back Cartesian correction for tray-left, then prove
+            grasp/lift/carry. Calibrate tray right/near/far with the same procedure, then run V1-V3.
             Only after V3 passes may the first integrated V4 row use --reset-between.
 ```
 

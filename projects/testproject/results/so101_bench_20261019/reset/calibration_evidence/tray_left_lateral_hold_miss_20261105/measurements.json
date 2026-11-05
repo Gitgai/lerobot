@@ -1,0 +1,42 @@
+{
+  "placement": {
+    "start_top_px_approx": [137.0, 150.0],
+    "end_top_px_approx": [137.0, 178.0],
+    "shift_px_approx": 28.0,
+    "classifier": "left"
+  },
+  "alignment": {
+    "deep_start_pan_deg": 60.7,
+    "deep_start_wrist_offset_px_approx": 25.0,
+    "selected_commanded_pan_deg": 63.2,
+    "selected_measured_pan_deg": 63.0,
+    "selected_wrist_offset_px_approx": -3.0,
+    "result": "symmetric left/right finger clearance before close"
+  },
+  "grasp": {
+    "method": "close_on_stall with locked arm joints",
+    "stall": 7.4,
+    "accepted_hold_range": [16.0, 26.0],
+    "maximum_arm_drift_deg": 1.4,
+    "bias_deg": [-0.7, -0.4, -1.1, 0.0, 0.1],
+    "result": "miss; lateral alignment was corrected but fingers still closed outside the usable front/back grasp plane",
+    "grasp_verified": false
+  },
+  "recovery": {
+    "reopened": true,
+    "reverse_lateral_path_verified": true,
+    "reverse_depth_path_verified": true,
+    "reverse_cartesian_path_verified": true,
+    "guarded_pan_away_verified": true,
+    "arm_home": true,
+    "torque_off": true,
+    "server_exited": true
+  },
+  "decision": {
+    "tray_left_verified": false,
+    "auto_reset_approved": false,
+    "lateral_alignment_hypothesis_resolved": true,
+    "finding": "pan 63.0 degrees centred the orange but did not create a hold; the remaining error is front/back position of the closing plane",
+    "next_required_change": "derive a bounded front/back Cartesian translation from the wrist y-offset, generate it offline, and collision-check it in the empty tray before another grasp"
+  }
+}

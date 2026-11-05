@@ -237,6 +237,30 @@
    "operational_waypoint_change": false,
    "auto_reset_approved": false,
    "blocker": "vertical depth is no longer the leading error; derive and empty-tray-check a lateral Cartesian correction from the deepest wrist view"
+  },
+  "calibration_20261105_guarded_cartesian_left_lateral_retry": {
+   "status": "REJECTED grasp; lateral arc was collision-free and centred orange, but front/back closing plane still missed",
+   "start_top_px_approx": [137.0, 150.0],
+   "end_top_px_approx": [137.0, 178.0],
+   "orange_shift_px_approx": 28.0,
+   "deep_start_pan_deg": 60.7,
+   "selected_commanded_pan_deg": 63.2,
+   "selected_measured_pan_deg": 63.0,
+   "selected_wrist_offset_px_approx": -3.0,
+   "deepest_approach_q": [63.2, -63.5184, 85.8777, 36.4823, 0.0, 37.0],
+   "empty_tray_lateral_dry_run_passed": true,
+   "maximum_dry_run_commanded_pan_deg": 65.2,
+   "grasp_stall": 7.4,
+   "accepted_hold_range": [16.0, 26.0],
+   "maximum_arm_drift_during_close_deg": 1.4,
+   "close_hold_controller_validated": true,
+   "grasp_verified": false,
+   "arm_returned_home": true,
+   "torque_disabled": true,
+   "evidence_dir": "calibration_evidence/tray_left_lateral_hold_miss_20261105",
+   "operational_waypoint_change": false,
+   "auto_reset_approved": false,
+   "blocker": "lateral alignment is resolved; derive and empty-tray-check a bounded front/back Cartesian translation"
   }
  },
  "slots": [
@@ -1306,5 +1330,5 @@
   ],
   "margin_deg": 5
  },
- "status": "PARTIAL LIVE CALIBRATION 2026-11-04/05 \u2014 tray-centre pickup and table slots 0-9 verified; tray-left deeper retry rejected and off-centre tray descents remain unverified; do not run --reset-between yet"
+ "status": "PARTIAL LIVE CALIBRATION 2026-11-04/05 \u2014 tray-centre pickup and table slots 0-9 verified; tray-left lateral retry rejected and off-centre tray descents remain unverified; do not run --reset-between yet"
 }

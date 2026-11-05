@@ -1,0 +1,20 @@
+{
+  "tray_empty": true,
+  "orange_outside_motion_area": true,
+  "gripper_open": 37.0,
+  "start_pan_deg": 60.7,
+  "commanded_pan_candidates_deg": [61.2, 61.7, 62.2, 62.7, 63.2, 63.7, 64.2, 64.7, 65.2],
+  "maximum_measured_pan_deg": 64.8,
+  "maximum_predicted_horizontal_shift_mm": 11.345,
+  "result": "all lateral candidates completed with no visible tray contact or shift",
+  "close_attempted": false,
+  "reverse_lateral_path_verified": true,
+  "reverse_depth_path_verified": true,
+  "reverse_cartesian_path_verified": true,
+  "guarded_pan_away_verified": true,
+  "arm_home": true,
+  "torque_off": true,
+  "server_exited": true,
+  "approved_for_watched_grasp_at_matching_placement": true,
+  "auto_reset_approved": false
+}

@@ -1,0 +1,253 @@
+{
+  "schema_version": 1,
+  "generated_by": "generate_tray_left_lateral_path.py",
+  "urdf": "reset/kinematics/so101_new_calib.urdf",
+  "safety_status": "EMPTY_TRAY_DRY_RUN_PASSED_WATCHED_GRASP_REJECTED",
+  "approved_for_tray_use": false,
+  "source_attempt": "calibration_evidence/tray_left_pan607_deeper_hold_miss_20261105",
+  "source_pan_response": {
+    "evidence": "calibration_evidence/tray_left_guarded_alignment_miss_20261105",
+    "observed_pixels_per_pan_degree": -12.5
+  },
+  "offset_model": {
+    "observed_offset_px": 45.0,
+    "target_offset_px": -5.0,
+    "estimated_correction_deg": 4.0,
+    "estimated_pan_deg": 64.7
+  },
+  "start_q": [
+    60.7,
+    -63.5184,
+    85.8777,
+    36.4823,
+    0.0
+  ],
+  "candidate_step_deg": 0.5,
+  "candidates": [
+    {
+      "pan_deg": 60.7,
+      "q": [
+        60.7,
+        -63.5184,
+        85.8777,
+        36.4823,
+        0.0
+      ],
+      "xyz_mm": [
+        109.535,
+        -126.006,
+        5.004
+      ],
+      "horizontal_shift_from_start_mm": 0.0,
+      "tool_z_change_from_start_mm": 0.0,
+      "joint_step_max_deg": 0.0,
+      "predicted_wrist_offset_px": 45.0
+    },
+    {
+      "pan_deg": 61.2,
+      "q": [
+        61.2,
+        -63.5184,
+        85.8777,
+        36.4823,
+        0.0
+      ],
+      "xyz_mm": [
+        108.433,
+        -126.619,
+        5.004
+      ],
+      "horizontal_shift_from_start_mm": 1.261,
+      "tool_z_change_from_start_mm": -0.0,
+      "joint_step_max_deg": 0.5,
+      "predicted_wrist_offset_px": 38.75
+    },
+    {
+      "pan_deg": 61.7,
+      "q": [
+        61.7,
+        -63.5184,
+        85.8777,
+        36.4823,
+        0.0
+      ],
+      "xyz_mm": [
+        107.325,
+        -127.221,
+        5.004
+      ],
+      "horizontal_shift_from_start_mm": 2.522,
+      "tool_z_change_from_start_mm": -0.0,
+      "joint_step_max_deg": 0.5,
+      "predicted_wrist_offset_px": 32.5
+    },
+    {
+      "pan_deg": 62.2,
+      "q": [
+        62.2,
+        -63.5184,
+        85.8777,
+        36.4823,
+        0.0
+      ],
+      "xyz_mm": [
+        106.213,
+        -127.814,
+        5.004
+      ],
+      "horizontal_shift_from_start_mm": 3.783,
+      "tool_z_change_from_start_mm": -0.0,
+      "joint_step_max_deg": 0.5,
+      "predicted_wrist_offset_px": 26.25
+    },
+    {
+      "pan_deg": 62.7,
+      "q": [
+        62.7,
+        -63.5184,
+        85.8777,
+        36.4823,
+        0.0
+      ],
+      "xyz_mm": [
+        105.095,
+        -128.397,
+        5.004
+      ],
+      "horizontal_shift_from_start_mm": 5.043,
+      "tool_z_change_from_start_mm": -0.0,
+      "joint_step_max_deg": 0.5,
+      "predicted_wrist_offset_px": 20.0
+    },
+    {
+      "pan_deg": 63.2,
+      "q": [
+        63.2,
+        -63.5184,
+        85.8777,
+        36.4823,
+        0.0
+      ],
+      "xyz_mm": [
+        103.972,
+        -128.97,
+        5.004
+      ],
+      "horizontal_shift_from_start_mm": 6.304,
+      "tool_z_change_from_start_mm": -0.0,
+      "joint_step_max_deg": 0.5,
+      "predicted_wrist_offset_px": 13.75
+    },
+    {
+      "pan_deg": 63.7,
+      "q": [
+        63.7,
+        -63.5184,
+        85.8777,
+        36.4823,
+        0.0
+      ],
+      "xyz_mm": [
+        102.844,
+        -129.534,
+        5.004
+      ],
+      "horizontal_shift_from_start_mm": 7.564,
+      "tool_z_change_from_start_mm": -0.0,
+      "joint_step_max_deg": 0.5,
+      "predicted_wrist_offset_px": 7.5
+    },
+    {
+      "pan_deg": 64.2,
+      "q": [
+        64.2,
+        -63.5184,
+        85.8777,
+        36.4823,
+        0.0
+      ],
+      "xyz_mm": [
+        101.711,
+        -130.088,
+        5.004
+      ],
+      "horizontal_shift_from_start_mm": 8.825,
+      "tool_z_change_from_start_mm": -0.0,
+      "joint_step_max_deg": 0.5,
+      "predicted_wrist_offset_px": 1.25
+    },
+    {
+      "pan_deg": 64.7,
+      "q": [
+        64.7,
+        -63.5184,
+        85.8777,
+        36.4823,
+        0.0
+      ],
+      "xyz_mm": [
+        100.573,
+        -130.631,
+        5.004
+      ],
+      "horizontal_shift_from_start_mm": 10.085,
+      "tool_z_change_from_start_mm": -0.0,
+      "joint_step_max_deg": 0.5,
+      "predicted_wrist_offset_px": -5.0
+    },
+    {
+      "pan_deg": 65.2,
+      "q": [
+        65.2,
+        -63.5184,
+        85.8777,
+        36.4823,
+        0.0
+      ],
+      "xyz_mm": [
+        99.431,
+        -131.165,
+        5.004
+      ],
+      "horizontal_shift_from_start_mm": 11.345,
+      "tool_z_change_from_start_mm": -0.0,
+      "joint_step_max_deg": 0.5,
+      "predicted_wrist_offset_px": -11.25
+    }
+  ],
+  "constraints": {
+    "lift_elbow_wrist_flex_roll_fixed": true,
+    "maximum_joint_step_deg": 0.5,
+    "maximum_tool_z_change_mm": 0.05,
+    "must_remain_inside_demo_motion_envelope_plus_5_deg": true
+  },
+  "dry_run_requirements": {
+    "remove_orange_from_tray": true,
+    "keep_tray_in_taped_position": true,
+    "gripper_open": 37.0,
+    "reach_deep_start_through_verified_vertical_path": true,
+    "advance_one_candidate_at_a_time": true,
+    "inspect_top_and_wrist_images_after_every_step": true,
+    "stop_on_any_tray_contact_or_shift": true,
+    "no_close_command": true,
+    "reverse_same_candidates_to_retreat": true
+  },
+  "physical_validation": {
+    "empty_tray_run": {
+      "result": "passed all candidates without visible tray contact or shift",
+      "maximum_commanded_pan_deg": 65.2,
+      "maximum_measured_pan_deg": 64.8,
+      "evidence": "calibration_evidence/tray_left_lateral_empty_dry_20261105"
+    },
+    "watched_grasp": {
+      "selected_commanded_pan_deg": 63.2,
+      "selected_measured_pan_deg": 63.0,
+      "selected_wrist_offset_px": -3.0,
+      "stall": 7.4,
+      "maximum_arm_drift_deg": 1.4,
+      "result": "rejected miss; lateral alignment corrected but front/back closing plane remained wrong",
+      "evidence": "calibration_evidence/tray_left_lateral_hold_miss_20261105"
+    }
+  },
+  "blocker": "watched grasp missed; front/back Cartesian correction remains unverified"
+}

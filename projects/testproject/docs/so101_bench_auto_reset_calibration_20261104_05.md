@@ -412,6 +412,28 @@ unapproved. Evidence is under
 `reset/calibration_evidence/tray_left_pan607_deeper_hold_miss_20261105/`; the generated path is
 `reset/kinematics/tray_left_deeper_path.json`.
 
+The next offline generator used the measured wrist response from the earlier 57--59 degree bracket: increasing pan
+by 2 degrees moved the orange about 25 wrist pixels left. From the deeper miss it generated a bounded 60.7--65.2
+degree lateral arc in 0.5 degree steps. The largest predicted horizontal tool translation was 11.345 mm and tool z
+remained constant. A watched empty-tray run completed the full arc and reverse with the gripper open, no visible
+contact, and no tray shift.
+
+For the matching watched grasp, the orange started near `(137,150)`. At the deepest 60.7-degree pose it was about
+25 pixels toward the fixed finger; the measured response selected a 63.2-degree command. The arm settled at 63.0
+degrees and the wrist image showed approximately 3 pixels of offset with symmetric finger clearance. Despite this
+corrected lateral alignment, `close_stall` reached only 7.4 with 1.4 degrees maximum arm drift. The fingers again
+missed the usable grasp plane and shifted the orange about 28 pixels toward the near side of the tray. The arm
+reopened, reversed the lateral and vertical paths, used the guarded pan away, returned home, disabled torque, and
+disconnected.
+
+This resolves lateral centring as the leading error. Pan 63.0 degrees centred the orange, but the fruit remained
+about 48 wrist pixels away from the vertical location seen in the verified centre grasp. The next candidate must
+translate the gripper in the front/back Cartesian direction while retaining the verified depth and pan. It must be
+generated offline and pass an empty-tray clearance run before another grasp. Evidence is under
+`reset/calibration_evidence/tray_left_lateral_empty_dry_20261105/` and
+`reset/calibration_evidence/tray_left_lateral_hold_miss_20261105/`; the generated lateral path is
+`reset/kinematics/tray_left_lateral_path.json`.
+
 ## Lessons that changed the procedure
 
 1. **A stall reading is supporting evidence, not grasp proof.** The fingers can close beside or behind an orange
@@ -471,10 +493,10 @@ f40b66b28  Calibrate compensated table slot two
 ### 1. Calibrate all off-centre tray descents
 
 The 2026-11-05 left retries established that pan alignment and vertical depth alone are insufficient. The generated
-six-millimetre deeper path passed empty-tray checks at pan 57.7 and 60.7 degrees, but the watched 60.7-degree close
-still reached only 5.9 and shifted the orange about 35 pixels. Derive a small lateral correction from the deepest
-wrist frame, generate it offline, and collision-check it in the empty tray before another physical attempt. Do not
-probe laterally or lower by joint-space guessing.
+lateral arc passed its empty-tray check, and pan 63.0 degrees centred the orange to about 3 wrist pixels, but the
+watched close still reached only 7.4 and shifted the fruit about 28 pixels. Lateral centring is now resolved. Derive
+a bounded front/back Cartesian correction from the remaining wrist y-offset, generate it offline, and
+collision-check it in the empty tray before another physical attempt. Do not probe by joint-space guessing.
 
 Place the orange in the tray at `left`, `right`, `near`, and `far`. For each position:
 
