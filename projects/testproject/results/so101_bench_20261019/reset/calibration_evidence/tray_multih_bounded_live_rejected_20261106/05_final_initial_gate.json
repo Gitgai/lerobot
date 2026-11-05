@@ -1,0 +1,59 @@
+{
+  "result": "REJECT",
+  "safe_to_close": false,
+  "provisional_single_success_reference": true,
+  "tolerance_each_axis_px": 14.0,
+  "finger_frame_error_px": [
+    19.6,
+    28.49
+  ],
+  "live": {
+    "orange_px": [
+      345.98,
+      173.57
+    ],
+    "orange_area_px": 25060.5,
+    "left_tip_px": [
+      188.74,
+      187.41
+    ],
+    "right_tip_px": [
+      508.02,
+      110.89
+    ],
+    "tip_midpoint_px": [
+      348.38,
+      149.15
+    ],
+    "tip_span_px": 328.33,
+    "orange_in_finger_frame_px": [
+      -8.02,
+      23.19
+    ]
+  },
+  "reference": {
+    "orange_px": [
+      325.08,
+      165.89
+    ],
+    "orange_area_px": 26947.0,
+    "left_tip_px": [
+      196.87,
+      199.92
+    ],
+    "right_tip_px": [
+      509.51,
+      130.2
+    ],
+    "tip_midpoint_px": [
+      353.19,
+      165.06
+    ],
+    "tip_span_px": 320.32,
+    "orange_in_finger_frame_px": [
+      -27.62,
+      -5.3
+    ]
+  },
+  "note": "PASS is necessary but still requires watched close, stall, lift and carry proof."
+}

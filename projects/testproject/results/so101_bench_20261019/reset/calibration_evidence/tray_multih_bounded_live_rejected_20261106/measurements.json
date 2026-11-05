@@ -1,0 +1,39 @@
+{
+  "date": "2026-11-06",
+  "result": "REJECTED by final wrist gate; no close attempted",
+  "camera_stability_px": {"minimum": 0.02, "maximum": 0.09},
+  "empty_tray_envelopes": {
+    "heights_mm": [43.578, 33.181, 22.985, 13.029, 9.490],
+    "pan_deg": [-1.0, 1.0],
+    "radial_mm": [-2.0, 2.0],
+    "contact_observed": false,
+    "tray_stationary": true
+  },
+  "placement": {
+    "before_px": [163.30, 146.28],
+    "after_px": [162.85, 146.35],
+    "movement_px": 0.46,
+    "distance_from_compensated_target_px": 7.30
+  },
+  "intermediate_errors_px": {
+    "h44": [-4.71, -15.26],
+    "h33": [0.89, -12.20],
+    "h23": [9.29, -9.33],
+    "h13_radial_plus2": [14.13, -5.04]
+  },
+  "final_gate": {
+    "initial_error_px": [19.60, 28.49],
+    "radial_minus2_error_px": [22.62, 9.17],
+    "tolerance_each_axis_px": 14.0,
+    "safe_to_close": false
+  },
+  "safety": {
+    "close_attempted": false,
+    "orange_contact_observed": false,
+    "path_reversed": true,
+    "arm_returned_home": true,
+    "torque_disabled": true
+  },
+  "finding": "Bounded radial feedback corrected final depth but left a lateral residual requiring about +5 degrees more pan, outside the newly cleared envelope.",
+  "next_step": "Empty-tray clear the additional final pan corridor or replace the approach seed with overhead-camera table-coordinate localization before another live attempt."
+}
