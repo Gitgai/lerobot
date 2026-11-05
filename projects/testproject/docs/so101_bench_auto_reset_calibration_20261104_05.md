@@ -554,3 +554,7 @@ Repeat the relevant calibration if any of these changes:
 
 This waypoint set is for the single orange used in the calibration. Tomato, capsicum, pen and other objects require
 separate pickup height, hold-range and placement validation.
+
+### Watched centre-path replay gate rejection
+
+The next live replay correctly selected the verified centre path for a centre-class overhead placement at `(137.2,137.5)`. At the final open pose, however, the wrist orange centre was `(267.6,144.5)` compared with the successful reference `(325.2,165.8)`. The `(-57.6,-21.3)` pixel error put the fruit too close to the left jaw. The pre-close gate rejected the attempt before contact; the orange and tray remained fixed, and the arm returned home with torque off. Therefore the centre path is now an approach seed rather than unconditional close permission. A wrist-relative two-axis correction is required for centre and off-centre placements alike.

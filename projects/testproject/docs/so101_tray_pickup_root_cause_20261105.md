@@ -172,3 +172,9 @@ For a true left-path development test, first place the orange near `(115,143)`
 in the top image, remove it for one fixed-orientation rectangular dry run, then
 perform one watched two-axis visual-servo grasp. Do not resume the sequential
 pan-then-front/back procedure.
+
+## Watched centre replay: the pre-close gate prevented a miss
+
+A watched replay used the verified centre transit and final pose on the live orange at overhead pixel `(137.2,137.5)`. The arm reached actual joint state `[74.4,-64.4,83.6,40.4,-0.3,37.0]` without tray contact. In the wrist image, the orange centre was `(267.6,144.5)`, versus `(325.2,165.8)` in the verified successful grasp: an error of `(-57.6,-21.3)` pixels. The fruit was visibly too close to the left finger. The pre-close gate rejected the attempt, no close was issued, the orange did not move, and the arm returned home with torque off.
+
+This falsifies the earlier assumption that all placements inside the 31.5-pixel overhead centre radius can close at one fixed pose. The verified centre path remains a safe starting approach, but every placement now requires a wrist-relative acceptance gate and, when outside it, a bounded fixed-orientation two-axis correction. Evidence is under `reset/calibration_evidence/tray_centre_replay_gate_rejected_20261105/`.

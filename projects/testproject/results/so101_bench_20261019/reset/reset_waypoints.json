@@ -312,6 +312,23 @@
    "operational_waypoint_change": false,
    "auto_reset_approved": false,
    "blocker": "replace sequential scalar corrections with coupled fixed-orientation two-axis visual alignment"
+  },
+  "calibration_20261105_centre_replay_gate_rejected": {
+   "status": "REJECTED BY PRE-CLOSE WRIST GATE; no close attempted",
+   "placement_top_px": [137.2, 137.5],
+   "classifier_region": "centre",
+   "final_actual_q": [74.4, -64.4, 83.6, 40.4, -0.3, 37.0],
+   "live_wrist_orange_px": [267.6, 144.5],
+   "successful_wrist_reference_px": [325.2, 165.8],
+   "wrist_error_px": [-57.6, -21.3],
+   "close_attempted": false,
+   "orange_displaced": false,
+   "arm_returned_home": true,
+   "torque_disabled": true,
+   "evidence_dir": "calibration_evidence/tray_centre_replay_gate_rejected_20261105",
+   "operational_waypoint_change": false,
+   "auto_reset_approved": false,
+   "blocker": "fixed centre pose needs wrist-relative two-axis correction even for centre-class placements"
   }
  },
  "slots": [
@@ -1381,5 +1398,5 @@
   ],
   "margin_deg": 5
  },
- "status": "PARTIAL LIVE CALIBRATION 2026-11-04/05 \u2014 tray-centre pickup and table slots 0-9 verified; sequential tray-left correction model rejected, off-centre tray descents and live tray detector remain unverified; do not run --reset-between yet"
+ "status": "PARTIAL LIVE CALIBRATION 2026-11-04/05 \u2014 tray-centre starting path and table slots 0-9 verified; centre replay proved wrist gating/correction is required before every close; off-centre alignment, detector repair and V1-V4 remain; do not run --reset-between yet"
 }

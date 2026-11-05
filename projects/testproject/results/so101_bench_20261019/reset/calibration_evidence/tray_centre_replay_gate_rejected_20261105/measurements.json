@@ -1,0 +1,42 @@
+{
+  "date": "2026-11-05",
+  "result": "REJECTED BY PRE-CLOSE WRIST GATE; no close attempted",
+  "placement_top_px": [
+    137.2,
+    137.5
+  ],
+  "calibrated_tray_centre_px": [
+    150.0,
+    143.5
+  ],
+  "centre_classifier_radius_px": 31.5,
+  "classifier_region": "centre",
+  "verified_centre_path_pan_deg": 74.5,
+  "final_actual_q": [
+    74.4,
+    -64.4,
+    83.6,
+    40.4,
+    -0.3,
+    37.0
+  ],
+  "live_wrist_orange_px": [
+    267.6,
+    144.5
+  ],
+  "successful_wrist_reference_px": [
+    325.2,
+    165.8
+  ],
+  "wrist_error_px": [
+    -57.6,
+    -21.3
+  ],
+  "close_attempted": false,
+  "orange_displaced": false,
+  "tray_contact_observed": false,
+  "arm_returned_home": true,
+  "torque_disabled": true,
+  "finding": "The overhead centre classifier is too broad to guarantee the fixed centre path. Every pickup requires a wrist-relative pre-close gate and two-axis correction.",
+  "next_step": "Build fixed-orientation two-axis wrist alignment; keep centre path as the starting pose, not unconditional close approval."
+}
