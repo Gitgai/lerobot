@@ -117,7 +117,9 @@ Each accepted slot followed the same evidence chain:
 
 1. **Start safely.** Confirm the arm at the standard start pose, gripper open, orange stationary, cameras fresh.
 2. **Approach above the source.** Move through the known collision-free home/intermediate path, then to the source
-   slot hover and low pickup pose.
+   slot hover and low pickup pose. Over the tray, make every sideways pan or wrist-roll move at least 1 cm above
+   the normal hover path, then descend vertically only after alignment. This clearance rule was added after the
+   wrist brushed the tray and displaced it during the tray-left calibration on 2026-11-05.
 3. **Align with the wrist image.** Adjust pan or reach in small increments until the orange is between both marked
    fingers. Being visually close in the top camera was insufficient.
 4. **Close without crushing.** Command gripper 15. A stall around 17-19 supported a hold but did not prove one.
@@ -330,7 +332,8 @@ f40b66b28  Calibrate compensated table slot two
 
 Place the orange in the tray at `left`, `right`, `near`, and `far`. For each position:
 
-1. approach from the verified tray hover with gripper open;
+1. approach at least 1 cm above the verified tray-hover path with the gripper open, complete lateral pan/roll
+   alignment at that raised height, then descend vertically to the hover;
 2. align using both cameras and the black finger marks;
 3. close on the orange and record the stall;
 4. prove the grasp with a lift and small sideways carry;

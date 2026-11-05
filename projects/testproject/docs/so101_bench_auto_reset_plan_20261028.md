@@ -61,7 +61,11 @@ R0b LOOK FIRST      grab a front frame; detect the tray outline and the orange c
                     detector from the September recovery work); map the orange's pixel offset from the tray
                     centre to one of 5 calibrated descent poses (centre, near, far, left, right of the tray centre).
                     No orange found in the tray → RESET FAILED (nothing to reset; the operator places).
-R1  above tray      hover ~8 cm above the chosen descent pose, gripper 45
+R0c raised transit  before any sideways pan or wrist-roll motion over the tray, raise the wrist at least 1 cm above
+                    the normal tray-hover path, gripper 45. Complete the lateral alignment at this raised height.
+                    This prevents the wrist or fingers from brushing the tray and moving it off its calibration.
+R1  above tray      after lateral alignment, descend vertically to the normal hover ~8 cm above the chosen descent
+                    pose, gripper 45. Do not combine this descent with sideways pan or wrist-roll motion.
 R1b correct         re-read joints; if any joint is > 2° off the waypoint, one short correcting move (the
                     return-to-start was seen to stop 3–5° short on 2026-10-19/20 — a height error at R2)
 R2  descend         to the chosen descent pose (tray floor height minus the orange radius); R1b again
@@ -70,8 +74,8 @@ R3  close           close in 2-unit steps at 30 Hz and STOP when the reading sto
                     HOLD if the stall reading is 16–30, MISS if < 12 (shut on air) or > 34 (blocked)
 R4  retry on MISS   open, lift 3 cm, LOOK again (R0b: the miss may have moved the orange), descend to the new
                     pose; at most 2 retries; still MISS → open, go to start, RESET FAILED, stop the row
-R5  lift            lift/elbow back to the R1 hover with the gripper held
-R6  carry           pan to the chosen table slot (see grid), hover height
+R5  lift            lift/elbow through R1 and then to the R0c raised-transit height with the gripper held
+R6  carry           pan to the chosen table slot (see grid) at raised-transit height
 R7  lower + open    descend to table height + orange radius, gripper → 45, dwell 0.5 s
 R8  retreat         lift 5 cm, return to start pose; re-read: gripper ≥ 40, joints within 2° of start
 R9  verify          grab a front frame: (a) the orange centroid is within ±3 cm (in calibrated pixels) of the chosen
