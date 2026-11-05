@@ -61,11 +61,14 @@ R0b LOOK FIRST      grab a front frame; detect the tray outline and the orange c
                     detector from the September recovery work); map the orange's pixel offset from the tray
                     centre to one of 5 calibrated descent poses (centre, near, far, left, right of the tray centre).
                     No orange found in the tray → RESET FAILED (nothing to reset; the operator places).
-R0c raised transit  before any sideways pan or wrist-roll motion over the tray, raise the wrist at least 1 cm above
-                    the normal tray-hover path, gripper 45. Complete the lateral alignment at this raised height.
-                    This prevents the wrist or fingers from brushing the tray and moving it off its calibration.
-R1  above tray      after lateral alignment, descend vertically to the normal hover ~8 cm above the chosen descent
-                    pose, gripper 45. Do not combine this descent with sideways pan or wrist-roll motion.
+R0c raised transit  BLOCKED pending swept-path calibration. The 2026-11-05 joint-space estimate intended to raise
+                    the wrist by 1 cm still brushed the tray. Joint offsets do not define Cartesian clearance, and
+                    simultaneous joint interpolation does not produce a vertical tool path. Remove the tray, measure
+                    the end-effector path in Cartesian space, and validate the complete swept volume with at least
+                    3 cm margin before restoring the tray.
+R1  above tray      after the validated raised transit and lateral alignment, follow a separately validated descent
+                    path to the normal hover ~8 cm above the chosen descent pose, gripper 45. Do not use the old
+                    multi-joint interpolation as a vertical descent.
 R1b correct         re-read joints; if any joint is > 2° off the waypoint, one short correcting move (the
                     return-to-start was seen to stop 3–5° short on 2026-10-19/20 — a height error at R2)
 R2  descend         to the chosen descent pose (tray floor height minus the orange radius); R1b again

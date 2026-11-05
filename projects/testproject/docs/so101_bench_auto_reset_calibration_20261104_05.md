@@ -117,9 +117,10 @@ Each accepted slot followed the same evidence chain:
 
 1. **Start safely.** Confirm the arm at the standard start pose, gripper open, orange stationary, cameras fresh.
 2. **Approach above the source.** Move through the known collision-free home/intermediate path, then to the source
-   slot hover and low pickup pose. Over the tray, make every sideways pan or wrist-roll move at least 1 cm above
-   the normal hover path, then descend vertically only after alignment. This clearance rule was added after the
-   wrist brushed the tray and displaced it during the tray-left calibration on 2026-11-05.
+   slot hover and low pickup pose. The proposed 1 cm raised tray transit is blocked: its joint-space estimate still
+   brushed and moved the tray on 2026-11-05. Before any further tray approach, remove the tray and validate the full
+   end-effector swept path in Cartesian space with at least 3 cm clearance. Simultaneous joint interpolation must
+   not be described or used as a vertical descent.
 3. **Align with the wrist image.** Adjust pan or reach in small increments until the orange is between both marked
    fingers. Being visually close in the top camera was insufficient.
 4. **Close without crushing.** Command gripper 15. A stall around 17-19 supported a hold but did not prove one.
@@ -272,6 +273,12 @@ The next tray-left attempt should first use the empty tray to establish the deep
 slope. The orange should then be approached from above that path with the fingers below its widest section before
 closing. This avoids repeating lateral pan corrections when the real failure is insufficient grasp depth.
 
+A later raised-transit retry also failed. The arm moved from a proposed raised centre pose near
+`[76.9,-72.0,93.1,43.5,-0.2,44.8]` toward the verified centre hover. Although this was intended as a 1 cm higher,
+vertical-only approach, it was only a joint-space estimate. The interpolated path brushed the tray and displaced
+its centre by approximately 23 pixels left and 40 pixels upward. Motion stopped immediately; torque was disabled
+at the current pose and the server exited without a return move. This path is rejected and must not be replayed.
+
 ## Lessons that changed the procedure
 
 1. **A stall reading is supporting evidence, not grasp proof.** The fingers can close beside or behind an orange
@@ -332,8 +339,8 @@ f40b66b28  Calibrate compensated table slot two
 
 Place the orange in the tray at `left`, `right`, `near`, and `far`. For each position:
 
-1. approach at least 1 cm above the verified tray-hover path with the gripper open, complete lateral pan/roll
-   alignment at that raised height, then descend vertically to the hover;
+1. keep tray approaches blocked until a Cartesian/swept-volume path has been measured with the tray removed and
+   verified with at least 3 cm clearance; the failed 1 cm joint-space estimate must not be reused;
 2. align using both cameras and the black finger marks;
 3. close on the orange and record the stall;
 4. prove the grasp with a lift and small sideways carry;
