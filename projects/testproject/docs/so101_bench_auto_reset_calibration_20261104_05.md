@@ -558,3 +558,7 @@ separate pickup height, hold-range and placement validation.
 ### Watched centre-path replay gate rejection
 
 The next live replay correctly selected the verified centre path for a centre-class overhead placement at `(137.2,137.5)`. At the final open pose, however, the wrist orange centre was `(267.6,144.5)` compared with the successful reference `(325.2,165.8)`. The `(-57.6,-21.3)` pixel error put the fruit too close to the left jaw. The pre-close gate rejected the attempt before contact; the orange and tray remained fixed, and the arm returned home with torque off. Therefore the centre path is now an approach seed rather than unconditional close permission. A wrist-relative two-axis correction is required for centre and off-centre placements alike.
+
+### Reusable wrist-relative pre-close gate
+
+`results/so101_bench_20261019/wrist_grasp_gate.py` now detects the orange and both black fingertip marks, expresses the orange in the coordinate frame formed by the two marks, and compares that measurement with the verified successful centre grasp. It does not connect to or move the robot. With the provisional 14-pixel per-axis acceptance window, it passes the verified success at `[0.0,0.0]`, rejects the watched centre replay at `[-51.92,-31.01]`, and rejects a known close-beside frame. `test_wrist_grasp_gate.py` preserves those three regression cases. This gate is necessary before a close but does not replace stall, lift and sideways-carry proof.
