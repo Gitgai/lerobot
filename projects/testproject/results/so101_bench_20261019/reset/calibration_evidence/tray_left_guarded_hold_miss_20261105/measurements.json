@@ -1,0 +1,64 @@
+{
+  "placement": {
+    "start_top_px_approx": [
+      128.0,
+      168.0
+    ],
+    "end_top_px_approx": [
+      127.0,
+      191.0
+    ],
+    "shift_px_approx": 23.0,
+    "classifier": "left"
+  },
+  "path": {
+    "high_offset_mm": 40,
+    "minimum_absolute_tool_z_during_pan_mm": 33.5,
+    "waypoint_spacing_mm": 5,
+    "joint_tolerance_deg": 0.5
+  },
+  "alignment": {
+    "pan59_20mm_wrist_offset_px_approx": -47,
+    "selected_pan_deg": 57.7,
+    "selected_20mm_wrist_offset_px_approx": -32,
+    "selected_final_wrist_offset_px_approx": -15,
+    "final_approach_q": [
+      57.7,
+      -64.6,
+      83.2,
+      40.8,
+      0.0,
+      37.0
+    ]
+  },
+  "grasp": {
+    "method": "close_on_stall with locked arm joints",
+    "stall": 2.1,
+    "accepted_hold_range": [
+      16.0,
+      26.0
+    ],
+    "maximum_arm_drift_deg": 1.3,
+    "bias_deg": [
+      -0.2,
+      0.0,
+      -1.1,
+      0.0,
+      0.0
+    ],
+    "result": "miss; close passed below/along fruit and pushed it deeper in tray",
+    "grasp_verified": false
+  },
+  "recovery": {
+    "reopened": true,
+    "arm_home": true,
+    "torque_off": true,
+    "server_exited": true
+  },
+  "decision": {
+    "tray_left_verified": false,
+    "auto_reset_approved": false,
+    "finding": "closing-control drift is fixed; remaining failure is grasp depth/front-to-back geometry at the left tray slope",
+    "next_required_change": "generate and collision-check a deeper left-specific Cartesian approach before another physical attempt"
+  }
+}

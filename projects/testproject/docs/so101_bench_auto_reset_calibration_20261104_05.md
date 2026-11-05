@@ -361,6 +361,37 @@ automatic reset: `left`, `right`, `near`, and `far` descents remain unverified, 
 execute this Cartesian/closed-loop path. The generated JSON therefore retains `"approved_for_tray_use": false`.
 Proof frames and measurements are in `reset/calibration_evidence/tray_closed_loop_success_20261105/`.
 
+The guarded tray-left retry placed the orange near top-camera coordinate `(128,165)` and reused the verified
+40 mm high path. The initial 62.3 degree pan left the fruit about 56 pixels toward one finger in the final wrist
+view. Watched probes at the 20 mm checkpoint bracketed the alignment: 57 degrees over-corrected at the final
+approach, while interpolation to 59 degrees placed the orange within about 5 pixels of the jaw midpoint. This
+matched the successful centre reference within measurement error, and neither the tray nor fruit moved during the
+descent.
+
+The close was rejected. `close_on_stall` reached 2.2 instead of the accepted 16--26 hold range, and the fruit was
+not retained. More importantly, the elbow reading changed from 83.6 to 93.9 degrees during the close. The current
+routine copies each newly measured arm pose into the next gripper command, so it follows arm drift rather than
+holding the five approach joints. The arm reopened, recovered to the known approach pose, reversed every 5 mm
+waypoint, passed the 33.5 mm guarded pan away, returned home, disabled torque and disconnected. Tray-left remains
+unverified. Before another physical retry, the close routine must lock the original five arm-joint targets while
+stepping the gripper; only then can the remaining grasp-depth error be measured. The jog server now implements
+that hold with bounded feedback compensation and a 5 degree drift abort/reopen, but it still requires a home-pose
+physical check before another tray approach. Evidence is under
+`reset/calibration_evidence/tray_left_guarded_alignment_miss_20261105/`.
+
+The revised close first passed a home-pose no-object test: it reached 2.2 with 0.0 degree arm drift, reopened to
+44.6, then powered off normally. A watched left retry then repeated the guarded 40 mm path. Because the orange had
+settled slightly deeper in the tray, the 20 mm wrist checkpoint selected pan 57.7 degrees; the final open view was
+within about 15 pixels of the successful centre alignment. The corrected close held the arm to 1.3 degrees maximum
+drift, proving that the controller defect was fixed, but it still closed to 2.1 and did not retain the fruit. The
+fingers passed below or along the fruit and shifted it about 23 pixels deeper in the tray. The arm reopened, reversed
+the measured path, used the guarded pan away, returned home and powered off.
+
+This isolates the remaining tray-left failure to grasp depth/front-to-back geometry on the sloped tray surface.
+Another pan correction cannot solve it. The next attempt requires an offline-generated, collision-checked
+left-specific approach below the current centre-derived final pose; no deeper live probing is allowed. Evidence is
+under `reset/calibration_evidence/tray_left_guarded_hold_miss_20261105/`.
+
 ## Lessons that changed the procedure
 
 1. **A stall reading is supporting evidence, not grasp proof.** The fingers can close beside or behind an orange
@@ -418,6 +449,11 @@ f40b66b28  Calibrate compensated table slot two
 ## Remaining plan
 
 ### 1. Calibrate all off-centre tray descents
+
+The 2026-11-05 left retry established that pan alignment alone is insufficient. At pan 57.7 degrees the final
+wrist view matched the centre-grasp alignment, and the corrected close held arm drift to 1.3 degrees, but the
+gripper still shut to 2.1 and pushed the orange about 23 pixels. Generate and collision-check a deeper
+left-specific Cartesian endpoint before the next physical attempt; do not probe lower by joint-space guessing.
 
 Place the orange in the tray at `left`, `right`, `near`, and `far`. For each position:
 

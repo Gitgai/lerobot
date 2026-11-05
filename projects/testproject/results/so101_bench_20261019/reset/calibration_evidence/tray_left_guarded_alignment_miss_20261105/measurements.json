@@ -1,0 +1,68 @@
+{
+  "placement": {
+    "requested_top_px": [
+      122.0,
+      160.0
+    ],
+    "observed_top_px_approx": [
+      128.0,
+      165.0
+    ],
+    "classifier": "left"
+  },
+  "path": {
+    "high_offset_mm": 40,
+    "minimum_absolute_tool_z_during_pan_mm": 33.5,
+    "waypoint_spacing_mm": 5,
+    "joint_tolerance_deg": 0.5
+  },
+  "alignment": {
+    "initial_pan_deg": 62.3,
+    "pan57_final_wrist_offset_px_approx": 24,
+    "selected_pan_deg": 59.0,
+    "selected_final_wrist_offset_px_approx": -5,
+    "reference_centre_success_offset_px_approx": -8,
+    "final_approach_q": [
+      59.0,
+      -64.6,
+      83.2,
+      40.8,
+      0.0,
+      37.0
+    ]
+  },
+  "grasp": {
+    "method": "close_on_stall",
+    "stall": 2.2,
+    "accepted_hold_range": [
+      16.0,
+      26.0
+    ],
+    "result": "miss; gripper closed below/around fruit without retention",
+    "elbow_before_close_deg": 83.6,
+    "elbow_after_close_deg": 93.9,
+    "arm_joint_drift_during_close_deg": 10.3,
+    "grasp_verified": false
+  },
+  "recovery": {
+    "orange_retained": false,
+    "orange_displaced_materially": false,
+    "arm_home": true,
+    "torque_off": true,
+    "server_exited": true
+  },
+  "decision": {
+    "tray_left_verified": false,
+    "auto_reset_approved": false,
+    "next_required_change": "repeat the watched 59 degree left approach with the validated arm-joint-holding close; accept only stall 16-26 plus lift and sideways carry proof"
+  },
+  "close_hold_fix_validation": {
+    "pose": "home, no object",
+    "close_result": 2.2,
+    "maximum_arm_drift_deg": 0.0,
+    "reopened_to": 44.6,
+    "torque_off": true,
+    "server_exited": true,
+    "result": "passed no-load physical check"
+  }
+}

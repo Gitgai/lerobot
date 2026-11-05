@@ -78,9 +78,11 @@ R1  above tray      after the validated raised transit and lateral alignment, fo
 R1b correct         re-read joints; if any joint is > 2° off the waypoint, one short correcting move (the
                     return-to-start was seen to stop 3–5° short on 2026-10-19/20 — a height error at R2)
 R2  descend         to the chosen descent pose (tray floor height minus the orange radius); R1b again
-R3  close           close in 2-unit steps at 30 Hz and STOP when the reading stops changing for 5 steps (never
-                    drive to a fixed target — a held orange stops the jaws at 16–26, driving on bruises it);
-                    HOLD if the stall reading is 16–30, MISS if < 12 (shut on air) or > 34 (blocked)
+R3  close           lock the five measured arm joints, then close in 2-unit steps and STOP when the gripper
+                    reading stops changing for 5 steps. Bounded feedback may compensate up to 5 degrees; above
+                    that, abort and reopen. Never drive the gripper to a fixed target — a held orange stops the
+                    jaws at 16–26, driving on bruises it. HOLD if the stall reading is 16–30, MISS if < 12
+                    (shut on air) or > 34 (blocked)
 R4  retry on MISS   open, lift 3 cm, LOOK again (R0b: the miss may have moved the orange), descend to the new
                     pose; at most 2 retries; still MISS → open, go to start, RESET FAILED, stop the row
 R5  lift            lift/elbow through R1 and then to the R0c raised-transit height with the gripper held

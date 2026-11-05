@@ -7,6 +7,8 @@ written to ~/vision_calib_jog_cmd and state is reported in
 motion envelope observed in the 169 demonstrations.  ``goto_zguard Z Q``
 also stops a move if live FK tool height falls below Z millimetres, while
 ``goto_closed Q`` uses measured-joint feedback to reach a 0.5 degree tolerance.
+``close_stall`` locks the five measured arm joints while closing and reopens if
+arm drift exceeds 5 degrees.
 """
 
 import json
@@ -108,11 +110,37 @@ def move_closed_loop(target, max_s=30.0, tolerance_deg=0.5):
 
 def close_on_stall():
     measured = q()
-    last = float(measured[5])
+    arm_target = measured[:5].copy()
+    open_grip = float(measured[5])
+    grip_target = open_grip
+    bias = np.zeros(5, dtype=np.float32)
+    max_arm_drift = 0.0
+    last = open_grip
     unchanged = 0
     while measured[5] > 2.0:
-        command = measured.copy()
-        command[5] = max(2.0, float(command[5]) - 2.0)
+        arm_error = arm_target - measured[:5]
+        max_arm_drift = max(max_arm_drift, float(np.abs(arm_error).max()))
+        if np.abs(arm_error).max() > 5.0:
+            command = np.concatenate((arm_target + bias, [open_grip])).astype(np.float32)
+            robot.send_action({f"{joint}.pos": float(value) for joint, value in zip(JOINTS, command)})
+            time.sleep(0.3)
+            reached = q()
+            return (
+                f"STOPPED close arm drift {max_arm_drift:.1f} deg; reopened to {reached[5]:.1f}, "
+                f"q {reached.round(1).tolist()}"
+            )
+        bias += np.clip(arm_error, -0.05, 0.05)
+        if np.abs(bias).max() > 5.0:
+            command = np.concatenate((arm_target, [open_grip])).astype(np.float32)
+            robot.send_action({f"{joint}.pos": float(value) for joint, value in zip(JOINTS, command)})
+            time.sleep(0.3)
+            reached = q()
+            return (
+                f"STOPPED close compensation exceeded 5 deg; reopened to {reached[5]:.1f}, "
+                f"q {reached.round(1).tolist()}"
+            )
+        grip_target = max(2.0, grip_target - 2.0)
+        command = np.concatenate((arm_target + bias, [grip_target])).astype(np.float32)
         robot.send_action({f"{joint}.pos": float(value) for joint, value in zip(JOINTS, command)})
         time.sleep(1 / 15)
         measured = q()
@@ -122,7 +150,11 @@ def close_on_stall():
             break
     time.sleep(0.3)
     reached = q()
-    return f"close-on-stall at {reached[5]:.1f}, q {reached.round(1).tolist()}"
+    max_arm_drift = max(max_arm_drift, float(np.abs(arm_target - reached[:5]).max()))
+    return (
+        f"close-on-stall-hold at {reached[5]:.1f}, max arm drift {max_arm_drift:.1f} deg, "
+        f"bias {bias.round(1).tolist()}, q {reached.round(1).tolist()}"
+    )
 
 
 try:

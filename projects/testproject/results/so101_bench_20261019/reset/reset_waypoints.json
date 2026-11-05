@@ -141,6 +141,81 @@
     "near",
     "far"
    ]
+  },
+  "calibration_20261105_guarded_cartesian_left_retry": {
+   "status": "REJECTED grasp; high path and 59 degree visual alignment passed, close drifted elbow and missed",
+   "placement_top_px_approx": [
+    128.0,
+    165.0
+   ],
+   "high_offset_mm": 40,
+   "minimum_absolute_tool_z_during_pan_mm": 33.5,
+   "selected_pan_deg": 59.0,
+   "final_approach_q": [
+    59.0,
+    -64.6,
+    83.2,
+    40.8,
+    0.0,
+    37.0
+   ],
+   "final_wrist_alignment_offset_px_approx": -5,
+   "grasp_stall": 2.2,
+   "accepted_hold_range": [
+    16.0,
+    26.0
+   ],
+   "elbow_drift_during_close_deg": 10.3,
+   "grasp_verified": false,
+   "arm_returned_home": true,
+   "torque_disabled": true,
+   "evidence_dir": "calibration_evidence/tray_left_guarded_alignment_miss_20261105",
+   "operational_waypoint_change": false,
+   "auto_reset_approved": false,
+   "blocker": "corrected close passed a no-load home test but the watched left grasp, lift and carry still require verification",
+   "close_hold_fix_implemented": "vision_calib_jog_server.py now locks the initial five arm joints, adds bounded compensation, and aborts/reopens above 5 degrees drift",
+   "close_hold_fix_validation": {
+    "home_no_load_passed": true,
+    "maximum_arm_drift_deg": 0.0,
+    "close_result": 2.2,
+    "reopened": true,
+    "torque_disabled": true
+   }
+  },
+  "calibration_20261105_guarded_cartesian_left_hold_retry": {
+   "status": "REJECTED grasp; corrected close held arm but left-specific approach remained too shallow",
+   "start_top_px_approx": [
+    128.0,
+    168.0
+   ],
+   "end_top_px_approx": [
+    127.0,
+    191.0
+   ],
+   "orange_shift_px_approx": 23.0,
+   "selected_pan_deg": 57.7,
+   "final_approach_q": [
+    57.7,
+    -64.6,
+    83.2,
+    40.8,
+    0.0,
+    37.0
+   ],
+   "grasp_stall": 2.1,
+   "accepted_hold_range": [
+    16.0,
+    26.0
+   ],
+   "maximum_arm_drift_during_close_deg": 1.3,
+   "close_hold_controller_validated": true,
+   "grasp_verified": false,
+   "arm_returned_home": true,
+   "torque_disabled": true,
+   "evidence_dir": "calibration_evidence/tray_left_guarded_hold_miss_20261105",
+   "operational_waypoint_change": false,
+   "auto_reset_approved": false,
+   "blocker": "left tray surface requires a deeper/front-to-back corrected Cartesian approach that has not been collision-checked"
   }
  },
  "slots": [
