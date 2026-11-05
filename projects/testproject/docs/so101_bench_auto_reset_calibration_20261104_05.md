@@ -574,3 +574,7 @@ With the orange returned to the tray, the centre baseline measured `[-23.63,+8.9
 ### Empty-tray combined correction validation
 
 The minimum predicted gate correction `[-1.84 degrees pan,+0.69 mm radial]` was tested as one fixed-pitch, fixed-z move from the centre baseline. The candidate joint pose was `[72.66,-63.7444,82.9341,40.2103,0.0,37.0]`. Unoccluded tray-border patches shifted at most 0.46 pixel, and no contact occurred. The arm returned home with torque off. This pose is approved for one watched open-gripper orange alignment check; a close remains conditional on a fresh wrist gate pass.
+
+### Fixed combined correction rejected on the next placement
+
+After the orange was manually returned to the tray, the previously validated combined pose measured `[-34.31,-0.27]` pixels and failed the ±14-pixel wrist gate. No close occurred; the arm returned home with torque off. The orange's new physical placement differed enough that the correction computed from the prior baseline was stale. This rules out storing one corrected centre endpoint. Runtime alignment must capture a fresh baseline for each placement, solve a bounded correction using the measured Jacobian, and operate inside a separately cleared correction envelope.

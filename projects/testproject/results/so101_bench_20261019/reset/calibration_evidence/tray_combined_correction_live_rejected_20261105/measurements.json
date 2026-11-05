@@ -1,0 +1,24 @@
+{
+  "date": "2026-11-05",
+  "result": "REJECTED by fresh wrist gate; no close attempted",
+  "candidate_q": [
+    72.66,
+    -63.7444,
+    82.9341,
+    40.2103,
+    0.0,
+    37.0
+  ],
+  "gate_result": "REJECT",
+  "finger_frame_error_px": [
+    -34.31,
+    -0.27
+  ],
+  "tolerance_each_axis_px": 14.0,
+  "close_attempted": false,
+  "orange_displaced": false,
+  "arm_returned_home": true,
+  "torque_disabled": true,
+  "finding": "manual re-placement changed the baseline alignment; a fixed correction computed for a previous placement is not reusable",
+  "required_design_change": "capture a fresh baseline for every placement, solve a bounded correction from the measured Jacobian, and validate a correction envelope rather than one fixed endpoint"
+}
