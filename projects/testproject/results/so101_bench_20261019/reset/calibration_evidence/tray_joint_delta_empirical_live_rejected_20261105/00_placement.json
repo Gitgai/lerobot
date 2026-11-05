@@ -1,0 +1,17 @@
+{
+  "orange_top_px": [
+    151.94,
+    147.59
+  ],
+  "target_px": [
+    154.0,
+    150.0
+  ],
+  "error_px": [
+    -2.06,
+    -2.41
+  ],
+  "distance_px": 3.17,
+  "area_px": 2738.5,
+  "placement_pass": true
+}

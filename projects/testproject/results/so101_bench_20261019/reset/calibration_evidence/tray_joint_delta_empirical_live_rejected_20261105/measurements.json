@@ -1,0 +1,38 @@
+{
+  "date": "2026-11-05",
+  "result": "REJECTED by final wrist gate; no close attempted",
+  "placement": {
+    "orange_top_px": [151.94, 147.59],
+    "calibrated_target_px": [154.0, 150.0],
+    "placement_error_px": [-2.06, -2.41],
+    "placement_distance_px": 3.17
+  },
+  "final_commanded_q": [63.8976, -50.3310, 78.6639, 31.0672, 0.0, 37.0],
+  "final_gate": {
+    "result": "REJECT",
+    "finger_frame_error_px": [9.48, 50.21],
+    "live_relative_px": [-18.14, 44.91],
+    "reference_relative_px": [-27.62, -5.30],
+    "tolerance_each_axis_px": 14.0
+  },
+  "local_jacobian_solution": {
+    "pan_delta_deg": -7.817,
+    "radial_delta_mm": -16.422,
+    "rejected": "outside cleared final correction envelope"
+  },
+  "best_cleared_envelope_prediction": {
+    "pan_delta_deg": 5.0,
+    "radial_delta_mm": -4.0,
+    "predicted_error_px": [-22.24, 28.66],
+    "still_fails_gate": true
+  },
+  "safety": {
+    "close_attempted": false,
+    "orange_displaced": false,
+    "path_reversed": true,
+    "arm_returned_home": true,
+    "torque_disabled": true
+  },
+  "finding": "Raised-to-final image transfer is not stable enough to authorize closing, even when overhead placement is within 3.2 pixels.",
+  "next_step": "Generate and empty-tray validate a bounded final-depth branch from this exact cleared endpoint, then use multi-height wrist feedback instead of one raised transfer assumption."
+}

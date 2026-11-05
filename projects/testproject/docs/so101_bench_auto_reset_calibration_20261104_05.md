@@ -604,3 +604,9 @@ This validates the raised image target but does not validate its floor endpoint.
 With the orange removed and the tray left fixed, the gripper replayed the complete empirically corrected path open at 37. Top frames were captured at every descent waypoint; wrist frames were checked at modeled tool heights of 18, 13, 8, 3.4 and 9.5 mm. Neither jaw nor the wrist body contacted the tray floor or rim. The exact path then reversed to the raised pose and returned home.
 
 Before/after home-view phase correlation measured tray-rim movement of 0.076 pixels on the left, 0.085 pixels on the bottom and 0.039 pixels on the right, all with responses above 0.92. The tray therefore remained stationary. This exact open-gripper path is cleared for one watched orange replay. Closing still requires a fresh wrist gate pass followed by accepted stall, lift and sideways-carry proof.
+
+### Empirical path live replay rejected at the final gate
+
+The orange was restored to `(151.94,147.59)`, only 3.17 top-camera pixels from the calibrated `(154,150)` target. The arm replayed the exact empty-tray-cleared path with the gripper open. At the final endpoint, the wrist gate measured `[+9.48,+50.21]` pixels relative to the verified grasp and rejected the close. The local Jacobian would require approximately -7.82 degrees pan and -16.42 mm radial movement; the best point inside the cleared ±5-degree/±4 mm envelope still predicts `[-22.24,+28.66]` and fails the gate. No close or contact occurred, the orange remained fixed, and the arm reversed the cleared path and returned home with torque off.
+
+This rules out a constant raised-to-final image transfer even when overhead placement is tightly controlled. The next correction must be measured at multiple heights. A new final-depth branch from this exact cleared endpoint must first pass an empty-tray clearance test; only then may multi-height wrist feedback use it with the fruit.
