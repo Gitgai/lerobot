@@ -1,0 +1,19 @@
+{
+  "date": "2026-11-06",
+  "result": "PASS: additional final pan corridor cleared with empty tray",
+  "approach": "multi-height +1 degree pan, +2 mm radial route; final radial scan to -2 mm",
+  "final_pan_corridor_deg": [64.8976, 70.1976],
+  "pan_step_max_deg": 1.0,
+  "gripper": "open at 37 throughout",
+  "contact_observed": false,
+  "endpoint_tray_relative_shift_px": 0.43,
+  "unobstructed_after_return_tray_relative_shift_px": {
+    "tray_left": 0.314,
+    "tray_bottom": 0.199,
+    "tray_interior": 0.296
+  },
+  "path_reversed": true,
+  "arm_returned_home": true,
+  "torque_disabled": true,
+  "approved_next_step": "One watched live final pan scan with a fresh wrist gate after every step; close only on real final gate pass."
+}
