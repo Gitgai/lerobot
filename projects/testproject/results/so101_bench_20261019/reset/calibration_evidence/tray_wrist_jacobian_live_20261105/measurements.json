@@ -1,0 +1,60 @@
+{
+  "date": "2026-11-05",
+  "result": "two-column live wrist-image Jacobian measured; close remained blocked",
+  "baseline_error_px": [
+    -23.63,
+    8.96
+  ],
+  "pan_plus_1_error_px": [
+    -27.89,
+    7.61
+  ],
+  "radial_plus_2mm_error_px": [
+    -18.42,
+    16.36
+  ],
+  "jacobian_px_per_unit": {
+    "columns": [
+      "pan_deg",
+      "radial_mm"
+    ],
+    "matrix": [
+      [
+        -4.26,
+        2.605
+      ],
+      [
+        -1.35,
+        3.7
+      ]
+    ]
+  },
+  "unbounded_zero_error_solution": {
+    "pan_deg": -9.046,
+    "radial_mm": -5.722,
+    "rejected": "too large for local model and outside dry-run bounds"
+  },
+  "minimum_gate_candidate": {
+    "pan_deg": -1.84,
+    "radial_mm": 0.69,
+    "predicted_error_px": [
+      -13.994,
+      13.997
+    ],
+    "q": [
+      72.66,
+      -63.7444,
+      82.9341,
+      40.2103,
+      0.0,
+      37.0
+    ]
+  },
+  "candidate_tool_z_change_mm": 0.0,
+  "candidate_pitch_change_deg": 0.0,
+  "close_attempted": false,
+  "orange_displaced": false,
+  "arm_returned_home": true,
+  "torque_disabled": true,
+  "next_step": "remove orange, empty-tray validate the combined minimum-gate candidate, then repeat with orange and require a fresh gate pass before closing"
+}

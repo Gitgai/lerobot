@@ -566,3 +566,7 @@ The next live replay correctly selected the verified centre path for a centre-cl
 ### Empty-tray two-axis wrist Jacobian probe
 
 The open gripper replayed the verified centre path and tested two independent local movements: a 1-degree pan probe (about 2.8 mm lateral travel) and a 2 mm radial probe. The radial probe preserved tool z and pitch exactly by holding the shoulder-lift, elbow-flex and wrist-flex sum at 59.4 degrees. Both probes returned to the baseline pose. Two unoccluded tray-border patches measured less than 0.6 pixel displacement, and no contact occurred. The arm returned home with torque off. These movements are approved only for the live open-gripper image-response measurement; closing remains blocked until the wrist gate passes.
+
+### Live two-axis wrist response
+
+With the orange returned to the tray, the centre baseline measured `[-23.63,+8.96]` pixels relative to the verified grasp. A +1-degree pan probe measured `[-27.89,+7.61]`; a +2 mm fixed-pitch radial probe measured `[-18.42,+16.36]`. This yields the local Jacobian columns `[-4.26,-1.35]` pixels/degree and `[+2.605,+3.70]` pixels/mm. The unconstrained zero-error solve was rejected as too large for a local model. The smallest grid candidate that reaches the provisional ±14-pixel gate is approximately -1.84 degrees pan plus +0.69 mm radial, predicting `[-13.994,+13.997]`. Because the negative-pan endpoint was outside the completed empty-tray test, the arm retreated without closing. The candidate must pass one empty-tray combined-path check before use with the fruit.
