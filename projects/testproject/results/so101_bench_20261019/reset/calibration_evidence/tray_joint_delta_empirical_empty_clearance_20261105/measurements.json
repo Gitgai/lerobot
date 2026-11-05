@@ -1,0 +1,26 @@
+{
+  "date": "2026-11-05",
+  "result": "PASS: complete empirical joint-delta path cleared the empty tray outbound and in reverse",
+  "gripper": "open at 37 throughout",
+  "candidate_source": "../tray_joint_delta_empirical_high_20261105/candidate_path.json",
+  "commanded_final_q": [63.8976, -50.3310, 78.6639, 31.0672, 0.0, 37.0],
+  "commanded_lowest_tool_z_mm": 3.379,
+  "commanded_final_tool_z_mm": 9.491,
+  "inspection": {
+    "top_frames_captured_each_waypoint": true,
+    "wrist_frames_captured_at_18mm_13mm_8mm_lowest_and_final": true,
+    "tray_contact_observed": false,
+    "rim_contact_observed": false
+  },
+  "tray_shift_phase_correlation": {
+    "left_rim": {"shift_px": [-0.076, -0.008], "magnitude_px": 0.076, "response": 0.9570},
+    "bottom_rim": {"shift_px": [0.059, -0.062], "magnitude_px": 0.085, "response": 0.9246},
+    "right_rim": {"shift_px": [0.036, 0.015], "magnitude_px": 0.039, "response": 0.9617}
+  },
+  "maximum_measured_tray_shift_px": 0.085,
+  "return_path_completed": true,
+  "arm_returned_home": true,
+  "torque_disabled": true,
+  "close_attempted": false,
+  "next_step": "Restore the orange to the same tray placement, replay this cleared path, require a fresh wrist gate pass, then perform watched close, stall, lift and carry proof."
+}

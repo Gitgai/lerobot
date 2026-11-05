@@ -1,0 +1,26 @@
+{
+  "left_rim": {
+    "shift_px": [
+      -0.076,
+      -0.008
+    ],
+    "magnitude_px": 0.076,
+    "response": 0.957
+  },
+  "bottom_rim": {
+    "shift_px": [
+      0.059,
+      -0.062
+    ],
+    "magnitude_px": 0.085,
+    "response": 0.9246
+  },
+  "right_rim": {
+    "shift_px": [
+      0.036,
+      0.015
+    ],
+    "magnitude_px": 0.039,
+    "response": 0.9617
+  }
+}

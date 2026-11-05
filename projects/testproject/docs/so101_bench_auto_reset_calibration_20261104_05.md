@@ -598,3 +598,9 @@ This proves that one raised image target plus an assumed descent transform is in
 The joint-delta probe's measured high-to-final transfer implied a new raised finger-frame target of `[-21.05,-30.71]` pixels. A watched high-only correction moved radially outward 13.56 mm at 43.58 mm tool height while preserving wrist pitch, then applied -2.87 degrees of additional pan. The final raised measurement was `[-25.48,-37.07]`, only `[-4.43,-6.36]` pixels from the requested target. The gripper stayed open, no descent or close occurred, the orange stayed fixed, and the arm returned home with torque off.
 
 This validates the raised image target but does not validate its floor endpoint. The generated joint-delta endpoint lies outside the cleared final ±4 mm correction region. Before using it with the orange, remove the orange while keeping the tray fixed and replay the complete path open-gripper, inspecting clearance at every waypoint. Only after that empty-tray pass may the orange be restored for a gated grasp attempt.
+
+### Empirical joint-delta path empty-tray clearance pass
+
+With the orange removed and the tray left fixed, the gripper replayed the complete empirically corrected path open at 37. Top frames were captured at every descent waypoint; wrist frames were checked at modeled tool heights of 18, 13, 8, 3.4 and 9.5 mm. Neither jaw nor the wrist body contacted the tray floor or rim. The exact path then reversed to the raised pose and returned home.
+
+Before/after home-view phase correlation measured tray-rim movement of 0.076 pixels on the left, 0.085 pixels on the bottom and 0.039 pixels on the right, all with responses above 0.92. The tray therefore remained stationary. This exact open-gripper path is cleared for one watched orange replay. Closing still requires a fresh wrist gate pass followed by accepted stall, lift and sideways-carry proof.
