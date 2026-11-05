@@ -261,6 +261,35 @@
    "operational_waypoint_change": false,
    "auto_reset_approved": false,
    "blocker": "lateral alignment is resolved; derive and empty-tray-check a bounded front/back Cartesian translation"
+  },
+  "calibration_20261105_guarded_cartesian_left_front_back_empty_dry": {
+   "status": "PASSED empty-tray clearance for both bounded front/back branches; watched orange alignment remains",
+   "start_q": [
+    63.2,
+    -63.5184,
+    85.8777,
+    36.4823,
+    0.0,
+    37.0
+   ],
+   "positive_branch_tested_mm": [
+    0,
+    12
+   ],
+   "negative_branch_tested_mm": [
+    -12,
+    0
+   ],
+   "candidate_step_mm": 1,
+   "top_and_wrist_inspected_each_outbound_step": true,
+   "tray_contact_observed": false,
+   "tray_shift_observed": false,
+   "arm_returned_home": true,
+   "torque_disabled": true,
+   "evidence_dir": "calibration_evidence/tray_left_front_back_empty_dry_20261105",
+   "operational_waypoint_change": false,
+   "auto_reset_approved": false,
+   "blocker": "watched orange alignment and grasp/lift proof have not been completed"
   }
  },
  "slots": [
@@ -1330,5 +1359,5 @@
   ],
   "margin_deg": 5
  },
- "status": "PARTIAL LIVE CALIBRATION 2026-11-04/05 \u2014 tray-centre pickup and table slots 0-9 verified; tray-left lateral retry rejected and off-centre tray descents remain unverified; do not run --reset-between yet"
+ "status": "PARTIAL LIVE CALIBRATION 2026-11-04/05 \u2014 tray-centre pickup and table slots 0-9 verified; tray-left front/back empty-tray clearance passed, watched orange grasp and off-centre tray descents remain unverified; do not run --reset-between yet"
 }

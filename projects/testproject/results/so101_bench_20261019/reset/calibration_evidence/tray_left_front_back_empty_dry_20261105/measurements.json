@@ -1,0 +1,285 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-05",
+  "purpose": "Physical empty-tray clearance validation of the bounded tray-left front/back correction path.",
+  "path_file": "reset/kinematics/tray_left_front_back_path.json",
+  "start_commanded_q": [
+    63.2,
+    -63.5184,
+    85.8777,
+    36.4823,
+    0.0,
+    37.0
+  ],
+  "conditions": {
+    "tray_empty": true,
+    "tray_kept_in_taped_position": true,
+    "gripper_open": 37.0,
+    "step_mm": 1,
+    "no_close_command": true
+  },
+  "positive_branch": {
+    "tested_offsets_mm": [
+      0,
+      12
+    ],
+    "outbound_images_each_mm": true,
+    "returned_over_exact_candidates": true,
+    "maximum_return_error_deg": 0.5,
+    "tray_contact": false,
+    "tray_shift": false,
+    "result": "pass"
+  },
+  "negative_branch": {
+    "tested_offsets_mm": [
+      -12,
+      0
+    ],
+    "outbound_images_each_mm": true,
+    "returned_over_exact_candidates": true,
+    "maximum_return_error_deg": 0.495,
+    "tray_contact": false,
+    "tray_shift": false,
+    "result": "pass"
+  },
+  "retreat": {
+    "verified_exit_corridor_steps": 23,
+    "maximum_closed_loop_error_deg": 0.522,
+    "guarded_pan_min_tool_z_mm": 33.5,
+    "guarded_pan_required_closed_loop_correction": true,
+    "arm_returned_home": true,
+    "torque_disabled": true
+  },
+  "conclusion": "Both branches are collision-clear with the gripper open through 12 mm. This validates clearance only; it does not select an offset or prove a grasp.",
+  "blocker": "Watched orange alignment and grasp/lift proof are still required before any operational tray-left waypoint or automatic reset is approved.",
+  "images": [
+    {
+      "file": "fb_neg_10_top.jpg",
+      "sha256": "02379a90cb118c0c170235d5212077bacd1243890c475f103ea588f299d8aa86"
+    },
+    {
+      "file": "fb_neg_10_wrist.jpg",
+      "sha256": "412083d68c51885b857e197670da19f31b2d624174cf68368c7e9705ad8c26bb"
+    },
+    {
+      "file": "fb_neg_11_top.jpg",
+      "sha256": "0ffc6987d99b3e9fafa620a5c5282f3e045ffdc0131c75d23959f5fcb305818e"
+    },
+    {
+      "file": "fb_neg_11_wrist.jpg",
+      "sha256": "0afdc28c2659c0b9b42b05777de66ace924b27de9c2406b9ecbd7336c16406b8"
+    },
+    {
+      "file": "fb_neg_12_top.jpg",
+      "sha256": "dbf92e973d4ca564530c01dffb8488b04966bd97134c0df435da5e24877cbf1a"
+    },
+    {
+      "file": "fb_neg_12_wrist.jpg",
+      "sha256": "416ab3d0592f984684ed04d846303b25dd426d7482d8616dcf819f50dd01deb1"
+    },
+    {
+      "file": "fb_neg_1_top.jpg",
+      "sha256": "c2ab343badd315bde38c81a68fa3805f88d1a20cec2cd6b7fec5b6a009c0ba18"
+    },
+    {
+      "file": "fb_neg_1_wrist.jpg",
+      "sha256": "eca495b62b9cba28b330a61ac74aaa7b622ca0e95363ed3649d79cdd84d508c8"
+    },
+    {
+      "file": "fb_neg_2_top.jpg",
+      "sha256": "fac30f5e550663663d1d3b93966ad8ce3eedc435a64f99eabd34a546966a2db3"
+    },
+    {
+      "file": "fb_neg_2_wrist.jpg",
+      "sha256": "e5adb9db746523860dde1622ff1fb7bf93b66873dd54c4d03626a3eca22ed9f6"
+    },
+    {
+      "file": "fb_neg_3_top.jpg",
+      "sha256": "6a22b711217006875ca3f465a9d4fa2065e001c6406d71a297b6cd5ac9181bd1"
+    },
+    {
+      "file": "fb_neg_3_wrist.jpg",
+      "sha256": "90224943232c1133ce882d718b9b73429786792fc1af25060ab9339f94d884e0"
+    },
+    {
+      "file": "fb_neg_4_top.jpg",
+      "sha256": "2c649a1f1f2f330c469bb4ef754d275aeea26c9e23b850b265c4a16a51cdde51"
+    },
+    {
+      "file": "fb_neg_4_wrist.jpg",
+      "sha256": "b0b3caaa80af01818161ab8c144c4b2cd4f322c059ca623dcaa9bbe89167eeca"
+    },
+    {
+      "file": "fb_neg_5_top.jpg",
+      "sha256": "4858869688f7ebafaa38303c2694472134d3c3a7453b40aeb5347ae911cf5a5c"
+    },
+    {
+      "file": "fb_neg_5_wrist.jpg",
+      "sha256": "ae97228a12f9e6f89f46992e52bbca9e9bb0704d3c82022bbd40d96caf962012"
+    },
+    {
+      "file": "fb_neg_6_top.jpg",
+      "sha256": "935a46d0638b4dbfa5b0591d722259b222124450b23db61016725233a66255e6"
+    },
+    {
+      "file": "fb_neg_6_wrist.jpg",
+      "sha256": "2b690f740bafccf9f691f092e0ee90dc45ab2a1c19f19d77b6e28f5c0b574cc1"
+    },
+    {
+      "file": "fb_neg_7_top.jpg",
+      "sha256": "ae966ab1e0740027111dbc23f8f3627b1df40ca491836c9599f088b5acef95f8"
+    },
+    {
+      "file": "fb_neg_7_wrist.jpg",
+      "sha256": "7f77deac9b9edbc20a1ed01de9c3642f3b88c18332a22e46c0cd0666f9526250"
+    },
+    {
+      "file": "fb_neg_8_top.jpg",
+      "sha256": "d0b035e5c2f081a872ecd5db439199a5bc6c3f7fe8b72e39211d60434d70f41c"
+    },
+    {
+      "file": "fb_neg_8_wrist.jpg",
+      "sha256": "4b1a8ad254ee3fe9dea6feb83a5c0bc39a0b33e1e607be17e73924e616482d6c"
+    },
+    {
+      "file": "fb_neg_9_top.jpg",
+      "sha256": "ba700e24487838f25a1c9a94dfc7547c14117663f4ecbff8759185c7e4d89dd2"
+    },
+    {
+      "file": "fb_neg_9_wrist.jpg",
+      "sha256": "c8ddcc35c4be3e0e93bc59ce1b9af65b0a6a09b0863a5d7aad1d132559f02a34"
+    },
+    {
+      "file": "fb_neg_return_origin_top.jpg",
+      "sha256": "47bd6f5a5d2d1d59d19cf45b0a4007364f630fdf3240152b356da7a6612ecc54"
+    },
+    {
+      "file": "fb_neg_return_origin_wrist.jpg",
+      "sha256": "6b8b20f15ef4ee27e3412e9a7ab8cd2fe001a242548977e5d627a45ae4338853"
+    },
+    {
+      "file": "fb_pos_10_top.jpg",
+      "sha256": "66b6a714cc1638fdd4389cd16b8f098a4e3f6fd5815ffd19f529e58d6998ed05"
+    },
+    {
+      "file": "fb_pos_10_wrist.jpg",
+      "sha256": "e9d4eda5f3ef0c7123d89edc5c802129652675ddba80cfcdc9c53ba939773812"
+    },
+    {
+      "file": "fb_pos_11_top.jpg",
+      "sha256": "bfc60df51b5b392c858c3bfee4544b42ae3936ab2cf112bb0710db18e8f02a61"
+    },
+    {
+      "file": "fb_pos_11_wrist.jpg",
+      "sha256": "ca9b8ff46974af61c927122fc0babe416c5c0ac1e86427b22129813fad537fdb"
+    },
+    {
+      "file": "fb_pos_12_top.jpg",
+      "sha256": "4fbd165a49f5a894e586be913fee59f53eba69d89ec1bec19396dc3034059d81"
+    },
+    {
+      "file": "fb_pos_12_wrist.jpg",
+      "sha256": "679260ac9932956f2503fa207d4e2da9a72cb697e5f82621a426734b9748d6a5"
+    },
+    {
+      "file": "fb_pos_1_top.jpg",
+      "sha256": "3be640b3b19ec97387f1c19a93faf57d107859e15ca40c64145138fe79333406"
+    },
+    {
+      "file": "fb_pos_1_wrist.jpg",
+      "sha256": "5773381a84325ea736b68f7b1d305ec358d45d1ba11f06d4f0167d39b371e85a"
+    },
+    {
+      "file": "fb_pos_2_top.jpg",
+      "sha256": "4f524d06a231b595e1c516584193c10e3f921ad35569bc3990673744c16ea19d"
+    },
+    {
+      "file": "fb_pos_2_wrist.jpg",
+      "sha256": "70e753150fa3cc4ba742b871f0c14fe547e9b001b3c9bf3d3640d19cfabd28c1"
+    },
+    {
+      "file": "fb_pos_3_top.jpg",
+      "sha256": "296f581185271090d2abb8ac0f21a275ae47f68960bb171c9a7d2a9cd988ca1e"
+    },
+    {
+      "file": "fb_pos_3_wrist.jpg",
+      "sha256": "569878502476d475c76af1f2b9988ffdf6856385009097d727728fdc8f1b163f"
+    },
+    {
+      "file": "fb_pos_4_top.jpg",
+      "sha256": "90f4d840ee577068ec84875426d7eb829ccb3626c5e09422bb16b50542fdac51"
+    },
+    {
+      "file": "fb_pos_4_wrist.jpg",
+      "sha256": "9e41103ce8f18359ab32fa5db1608ee917e9782060e6eb8cc73d9a9b92f55f6d"
+    },
+    {
+      "file": "fb_pos_5_top.jpg",
+      "sha256": "8d1af8a96febfa47b4d187e2c2c1e83043152881822b985e9ce1742387dce6db"
+    },
+    {
+      "file": "fb_pos_5_wrist.jpg",
+      "sha256": "a2e93fe15bd321df8e32eb6bf93a12125f8290df6bdb70a71fd8b718e5513553"
+    },
+    {
+      "file": "fb_pos_6_top.jpg",
+      "sha256": "a2f38c61a4a0d850ecb3097b118107cfe9d8f09602f443943590104c6f6c645e"
+    },
+    {
+      "file": "fb_pos_6_wrist.jpg",
+      "sha256": "ded803831ab4684264781a085d1f4d620d24a29cf3dd87cee55e6c7a8cffbc88"
+    },
+    {
+      "file": "fb_pos_7_top.jpg",
+      "sha256": "206c181682595c0099326972b430982cd9135c676834d3b9a68676056f6b9d16"
+    },
+    {
+      "file": "fb_pos_7_wrist.jpg",
+      "sha256": "892f888bf8a72d8e51e00ee0bf61235c31083880ee7887c992c0ca20cebae487"
+    },
+    {
+      "file": "fb_pos_8_top.jpg",
+      "sha256": "48297a869c66542265a7aa9b41e7d1f423b3c643a33dbd0667b3b71e6f340028"
+    },
+    {
+      "file": "fb_pos_8_wrist.jpg",
+      "sha256": "7504cb2b21bf9a782b12d954ad701f8613f16dde37e4441040bc53b7565e0b61"
+    },
+    {
+      "file": "fb_pos_9_top.jpg",
+      "sha256": "d8cb39f621344448852d71f4221daf5cb1e01b4be718d3ad8a877ecaf16edb86"
+    },
+    {
+      "file": "fb_pos_9_wrist.jpg",
+      "sha256": "b5fbc263f2801e30bfd9d6e3537ae7a4072b9baa1871f795e850d0d403b6a3aa"
+    },
+    {
+      "file": "fb_pos_return_origin_top.jpg",
+      "sha256": "cf11fb4e75e1f5f52a87fae387ee2a733da56784ec2b46e9f423761a1ecef113"
+    },
+    {
+      "file": "fb_pos_return_origin_wrist.jpg",
+      "sha256": "0a3709aab39baa4c0a88465510046ebc2f755b600c32b68761a14541cfb8530c"
+    },
+    {
+      "file": "frontback_empty_start.jpg",
+      "sha256": "9cd90da20d4239fa99b4dd983f97122dad70121ce3b94de98ca078bd40028736"
+    },
+    {
+      "file": "frontback_origin_top.jpg",
+      "sha256": "4e39b18b795f17ac3010d531391736c4e3f4a4fbe92191bd7cb1828a81fcfd5c"
+    },
+    {
+      "file": "frontback_origin_wrist.jpg",
+      "sha256": "545c191fec14f2efc7dd3671a2cb160fc521700f5d2c1ed42f7e21da984ee173"
+    },
+    {
+      "file": "frontback_z20_top.jpg",
+      "sha256": "1fd7d0488a35844c10d757a79dd27db6858709ff03f7025c3c5659f42ae60115"
+    },
+    {
+      "file": "frontback_z20_wrist.jpg",
+      "sha256": "89093013a55d644ee289f2ac8a9168fb6f1ff3c8811569df4a1f83676d9f9f30"
+    }
+  ]
+}

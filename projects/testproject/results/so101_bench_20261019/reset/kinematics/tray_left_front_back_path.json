@@ -1,0 +1,550 @@
+{
+  "schema_version": 1,
+  "generated_by": "generate_tray_left_front_back_path.py",
+  "urdf": "reset/kinematics/so101_new_calib.urdf",
+  "safety_status": "PHYSICAL_EMPTY_TRAY_DRY_RUN_PASSED_WATCHED_ORANGE_ALIGNMENT_REQUIRED",
+  "approved_for_tray_use": false,
+  "source_attempt": "calibration_evidence/tray_left_lateral_hold_miss_20261105",
+  "start_q": [
+    63.2,
+    -63.5184,
+    85.8777,
+    36.4823,
+    0.0
+  ],
+  "start_xyz_mm": [
+    103.972,
+    -128.97,
+    5.004
+  ],
+  "front_back_unit_xy": [
+    -0.450882,
+    0.892584
+  ],
+  "candidate_step_mm": 1,
+  "maximum_offset_mm": 12,
+  "branches": {
+    "positive_local_front_back": [
+      {
+        "offset_mm": 0,
+        "q": [
+          63.2,
+          -63.5184,
+          85.8777,
+          36.4823,
+          0.0
+        ],
+        "xyz_mm": [
+          103.972,
+          -128.97,
+          5.004
+        ],
+        "horizontal_error_mm": 0.0,
+        "tool_z_change_mm": 0.0,
+        "joint_step_max_deg": 0.0
+      },
+      {
+        "offset_mm": 1,
+        "q": [
+          63.2,
+          -63.5837,
+          85.6139,
+          37.2915,
+          0.0
+        ],
+        "xyz_mm": [
+          103.521,
+          -128.078,
+          5.003
+        ],
+        "horizontal_error_mm": 0.001,
+        "tool_z_change_mm": -0.001,
+        "joint_step_max_deg": 0.809
+      },
+      {
+        "offset_mm": 2,
+        "q": [
+          63.2,
+          -63.6426,
+          85.355,
+          38.0858,
+          0.0
+        ],
+        "xyz_mm": [
+          103.07,
+          -127.186,
+          5.003
+        ],
+        "horizontal_error_mm": 0.001,
+        "tool_z_change_mm": -0.001,
+        "joint_step_max_deg": 0.794
+      },
+      {
+        "offset_mm": 3,
+        "q": [
+          63.2,
+          -63.6955,
+          85.1015,
+          38.8647,
+          0.0
+        ],
+        "xyz_mm": [
+          102.619,
+          -126.293,
+          5.003
+        ],
+        "horizontal_error_mm": 0.0,
+        "tool_z_change_mm": -0.0,
+        "joint_step_max_deg": 0.779
+      },
+      {
+        "offset_mm": 4,
+        "q": [
+          63.2,
+          -63.7426,
+          84.8534,
+          39.6285,
+          0.0
+        ],
+        "xyz_mm": [
+          102.168,
+          -125.401,
+          5.003
+        ],
+        "horizontal_error_mm": 0.001,
+        "tool_z_change_mm": -0.001,
+        "joint_step_max_deg": 0.764
+      },
+      {
+        "offset_mm": 5,
+        "q": [
+          63.2,
+          -63.7845,
+          84.6102,
+          40.3787,
+          0.0
+        ],
+        "xyz_mm": [
+          101.718,
+          -124.508,
+          5.003
+        ],
+        "horizontal_error_mm": 0.001,
+        "tool_z_change_mm": -0.001,
+        "joint_step_max_deg": 0.75
+      },
+      {
+        "offset_mm": 6,
+        "q": [
+          63.2,
+          -63.8214,
+          84.372,
+          41.1155,
+          0.0
+        ],
+        "xyz_mm": [
+          101.267,
+          -123.615,
+          5.003
+        ],
+        "horizontal_error_mm": 0.0,
+        "tool_z_change_mm": -0.001,
+        "joint_step_max_deg": 0.737
+      },
+      {
+        "offset_mm": 7,
+        "q": [
+          63.2,
+          -63.8536,
+          84.1386,
+          41.8395,
+          0.0
+        ],
+        "xyz_mm": [
+          100.816,
+          -122.723,
+          5.003
+        ],
+        "horizontal_error_mm": 0.0,
+        "tool_z_change_mm": -0.0,
+        "joint_step_max_deg": 0.724
+      },
+      {
+        "offset_mm": 8,
+        "q": [
+          63.2,
+          -63.8812,
+          83.9102,
+          42.5507,
+          0.0
+        ],
+        "xyz_mm": [
+          100.365,
+          -121.83,
+          5.003
+        ],
+        "horizontal_error_mm": 0.001,
+        "tool_z_change_mm": -0.001,
+        "joint_step_max_deg": 0.711
+      },
+      {
+        "offset_mm": 9,
+        "q": [
+          63.2,
+          -63.9047,
+          83.6862,
+          43.2506,
+          0.0
+        ],
+        "xyz_mm": [
+          99.914,
+          -120.938,
+          5.003
+        ],
+        "horizontal_error_mm": 0.001,
+        "tool_z_change_mm": -0.001,
+        "joint_step_max_deg": 0.7
+      },
+      {
+        "offset_mm": 10,
+        "q": [
+          63.2,
+          -63.9241,
+          83.4667,
+          43.9391,
+          0.0
+        ],
+        "xyz_mm": [
+          99.463,
+          -120.045,
+          5.003
+        ],
+        "horizontal_error_mm": 0.0,
+        "tool_z_change_mm": -0.001,
+        "joint_step_max_deg": 0.688
+      },
+      {
+        "offset_mm": 11,
+        "q": [
+          63.2,
+          -63.9397,
+          83.2516,
+          44.6166,
+          0.0
+        ],
+        "xyz_mm": [
+          99.012,
+          -119.152,
+          5.003
+        ],
+        "horizontal_error_mm": 0.0,
+        "tool_z_change_mm": -0.0,
+        "joint_step_max_deg": 0.678
+      },
+      {
+        "offset_mm": 12,
+        "q": [
+          63.2,
+          -63.9516,
+          83.0409,
+          45.2836,
+          0.0
+        ],
+        "xyz_mm": [
+          98.561,
+          -118.26,
+          5.003
+        ],
+        "horizontal_error_mm": 0.0,
+        "tool_z_change_mm": -0.0,
+        "joint_step_max_deg": 0.667
+      }
+    ],
+    "negative_local_front_back": [
+      {
+        "offset_mm": 0,
+        "q": [
+          63.2,
+          -63.5184,
+          85.8777,
+          36.4823,
+          0.0
+        ],
+        "xyz_mm": [
+          103.972,
+          -128.97,
+          5.004
+        ],
+        "horizontal_error_mm": 0.0,
+        "tool_z_change_mm": 0.0,
+        "joint_step_max_deg": 0.0
+      },
+      {
+        "offset_mm": -1,
+        "q": [
+          63.2,
+          -63.4456,
+          86.147,
+          35.6559,
+          0.0
+        ],
+        "xyz_mm": [
+          104.422,
+          -129.863,
+          5.004
+        ],
+        "horizontal_error_mm": 0.001,
+        "tool_z_change_mm": 0.001,
+        "joint_step_max_deg": 0.826
+      },
+      {
+        "offset_mm": -2,
+        "q": [
+          63.2,
+          -63.365,
+          86.4223,
+          34.8108,
+          0.0
+        ],
+        "xyz_mm": [
+          104.873,
+          -130.755,
+          5.005
+        ],
+        "horizontal_error_mm": 0.001,
+        "tool_z_change_mm": 0.001,
+        "joint_step_max_deg": 0.845
+      },
+      {
+        "offset_mm": -3,
+        "q": [
+          63.2,
+          -63.2762,
+          86.7038,
+          33.9463,
+          0.0
+        ],
+        "xyz_mm": [
+          105.324,
+          -131.648,
+          5.004
+        ],
+        "horizontal_error_mm": 0.001,
+        "tool_z_change_mm": 0.001,
+        "joint_step_max_deg": 0.864
+      },
+      {
+        "offset_mm": -4,
+        "q": [
+          63.2,
+          -63.1786,
+          86.9913,
+          33.0623,
+          0.0
+        ],
+        "xyz_mm": [
+          105.775,
+          -132.54,
+          5.005
+        ],
+        "horizontal_error_mm": 0.001,
+        "tool_z_change_mm": 0.001,
+        "joint_step_max_deg": 0.884
+      },
+      {
+        "offset_mm": -5,
+        "q": [
+          63.2,
+          -63.0711,
+          87.2851,
+          32.1564,
+          0.0
+        ],
+        "xyz_mm": [
+          106.226,
+          -133.433,
+          5.004
+        ],
+        "horizontal_error_mm": 0.001,
+        "tool_z_change_mm": 0.001,
+        "joint_step_max_deg": 0.906
+      },
+      {
+        "offset_mm": -6,
+        "q": [
+          63.2,
+          -62.9529,
+          87.5851,
+          31.2283,
+          0.0
+        ],
+        "xyz_mm": [
+          106.677,
+          -134.325,
+          5.005
+        ],
+        "horizontal_error_mm": 0.001,
+        "tool_z_change_mm": 0.001,
+        "joint_step_max_deg": 0.928
+      },
+      {
+        "offset_mm": -7,
+        "q": [
+          63.2,
+          -62.8229,
+          87.8919,
+          30.2755,
+          0.0
+        ],
+        "xyz_mm": [
+          107.128,
+          -135.218,
+          5.004
+        ],
+        "horizontal_error_mm": 0.001,
+        "tool_z_change_mm": 0.001,
+        "joint_step_max_deg": 0.953
+      },
+      {
+        "offset_mm": -8,
+        "q": [
+          63.2,
+          -62.6798,
+          88.2053,
+          29.2969,
+          0.0
+        ],
+        "xyz_mm": [
+          107.579,
+          -136.111,
+          5.004
+        ],
+        "horizontal_error_mm": 0.001,
+        "tool_z_change_mm": 0.001,
+        "joint_step_max_deg": 0.979
+      },
+      {
+        "offset_mm": -9,
+        "q": [
+          63.2,
+          -62.5221,
+          88.5255,
+          28.2905,
+          0.0
+        ],
+        "xyz_mm": [
+          108.029,
+          -137.003,
+          5.004
+        ],
+        "horizontal_error_mm": 0.001,
+        "tool_z_change_mm": 0.001,
+        "joint_step_max_deg": 1.006
+      },
+      {
+        "offset_mm": -10,
+        "q": [
+          63.2,
+          -62.348,
+          88.8522,
+          27.2546,
+          0.0
+        ],
+        "xyz_mm": [
+          108.48,
+          -137.896,
+          5.005
+        ],
+        "horizontal_error_mm": 0.001,
+        "tool_z_change_mm": 0.001,
+        "joint_step_max_deg": 1.036
+      },
+      {
+        "offset_mm": -11,
+        "q": [
+          63.2,
+          -62.1553,
+          89.1858,
+          26.1859,
+          0.0
+        ],
+        "xyz_mm": [
+          108.931,
+          -138.788,
+          5.005
+        ],
+        "horizontal_error_mm": 0.001,
+        "tool_z_change_mm": 0.001,
+        "joint_step_max_deg": 1.069
+      },
+      {
+        "offset_mm": -12,
+        "q": [
+          63.2,
+          -61.9414,
+          89.5261,
+          25.082,
+          0.0
+        ],
+        "xyz_mm": [
+          109.382,
+          -139.681,
+          5.004
+        ],
+        "horizontal_error_mm": 0.001,
+        "tool_z_change_mm": 0.001,
+        "joint_step_max_deg": 1.104
+      }
+    ]
+  },
+  "constraints": {
+    "pan_and_roll_fixed": true,
+    "tool_z_fixed": true,
+    "maximum_joint_step_deg": 2.0,
+    "maximum_horizontal_ik_error_mm": 0.05,
+    "maximum_tool_z_error_mm": 0.05,
+    "must_remain_inside_demo_motion_envelope_plus_5_deg": true
+  },
+  "dry_run_requirements": {
+    "remove_orange_from_tray": true,
+    "keep_tray_in_taped_position": true,
+    "gripper_open": 37.0,
+    "reach_selected_lateral_start_through_verified_paths": true,
+    "test_positive_branch_then_reverse_to_start": true,
+    "test_negative_branch_then_reverse_to_start": true,
+    "advance_one_candidate_at_a_time": true,
+    "inspect_top_and_wrist_images_after_every_step": true,
+    "stop_on_any_tray_contact_or_shift": true,
+    "no_close_command": true
+  },
+  "watched_alignment_plan": {
+    "start_at_offset_mm": 0,
+    "measure_orange_wrist_y_at_each_safe_candidate": true,
+    "select_direction_only_if_wrist_y_moves_toward_verified_centre_reference": true,
+    "close_only_after_symmetric_finger_clearance_and_improved_wrist_y": true
+  },
+  "physical_validation": {
+    "date": "2026-11-05",
+    "evidence_dir": "calibration_evidence/tray_left_front_back_empty_dry_20261105",
+    "tray_empty": true,
+    "gripper_open": 37.0,
+    "candidate_spacing_mm": 1,
+    "positive_branch_tested_mm": [
+      0,
+      12
+    ],
+    "negative_branch_tested_mm": [
+      -12,
+      0
+    ],
+    "top_and_wrist_images_inspected_after_every_outbound_step": true,
+    "positive_branch_returned_to_start": true,
+    "negative_branch_returned_to_start": true,
+    "tray_contact_observed": false,
+    "tray_shift_observed": false,
+    "arm_returned_home": true,
+    "torque_disabled": true,
+    "result": "pass for open-gripper clearance only"
+  },
+  "blocker": "watched orange alignment and grasp/lift proof have not been completed"
+}
