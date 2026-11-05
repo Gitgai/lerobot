@@ -1,0 +1,32 @@
+{
+  "orange_px": [
+    301.64,
+    156.33
+  ],
+  "orange_area_px": 18156.0,
+  "left_tip_px": [
+    200.55,
+    205.74
+  ],
+  "right_tip_px": [
+    511.41,
+    138.82
+  ],
+  "tip_midpoint_px": [
+    355.98,
+    172.28
+  ],
+  "tip_span_px": 317.98,
+  "orange_in_finger_frame_px": [
+    -49.77,
+    -27.03
+  ],
+  "raised_target_px": [
+    -21.05,
+    -30.71
+  ],
+  "raised_target_error_px": [
+    -28.72,
+    3.68
+  ]
+}

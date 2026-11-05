@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-05",
+  "result": "PASS at raised pose only; floor descent remains blocked pending empty-tray clearance",
+  "source_failed_transfer": "../tray_high_coarse_descent_rejected_20261105",
+  "empirical_raised_target_px": [-21.05, -30.71],
+  "initial_corrected_measurement": {
+    "q_commanded": [66.7677, -59.4805, 66.7648, 53.1260, 0.0, 37.0],
+    "relative_px": [-49.77, -27.03],
+    "target_error_px": [-28.72, 3.68]
+  },
+  "final_raised_measurement": {
+    "q_commanded": [63.8976, -59.4805, 66.7648, 53.1260, 0.0, 37.0],
+    "relative_px": [-25.48, -37.07],
+    "target_error_px": [-4.43, -6.36],
+    "tip_span_px": 317.98
+  },
+  "motion": {
+    "tool_height_mm": 43.578,
+    "radial_correction_mm": 13.5576,
+    "additional_pan_correction_deg": -2.8701,
+    "gripper_open": true,
+    "descent_attempted": false,
+    "close_attempted": false
+  },
+  "safety": {
+    "orange_displaced": false,
+    "arm_returned_home": true,
+    "torque_disabled": true
+  },
+  "next_step": "Remove the orange while keeping the tray fixed, then replay the exact candidate descent open-gripper and inspect tray clearance at every waypoint before restoring the orange."
+}
