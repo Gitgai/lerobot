@@ -246,6 +246,30 @@ Slot 9 used a pose interpolated between the verified Slot 8 and Slot 6 reach geo
 lower-left region. The orange was held near `(143.8,352.1)`, then rolled about 21 pixels during retreat and settled
 at `(152.8,333.0)`. We stored the settled point. It remained 89.0 pixels from Slot 8, so it passed.
 
+### Tray-left descent attempt
+
+The first off-centre tray calibration used an orange at top-camera coordinate `(122.0,160.0)`, 28 pixels left
+and 16.5 pixels below the verified tray centre. The reset classifier labelled this placement `left`.
+
+The verified centre hover was used as the safe entry pose. Pan probes found the orange near the jaw midpoint, but
+two early closes at approximately `[69.0,-64.6,86.4,41.5,-0.2,37.1]` and
+`[59.4,-64.6,86.6,41.5,-0.1,37.1]` closed beside the fruit and pushed it. Both were rejected.
+
+The retry tested wrist roll at -15 and +15 degrees. Roll changed the overhead approach orientation but did not fix
+the front-to-back contact mismatch seen by the wrist camera. Reducing wrist flex from about 42 to 31 degrees moved
+the fixed fingertip farther down the orange's side. At pan 62.3, shoulder -63.4, elbow 96.5, wrist flex 31.8 and
+roll 14.8, both marked fingertips appeared on opposite sides of the fruit. The gripper still closed to 10.1 rather
+than stalling in the known orange hold range. A larger lift and a 3.3-degree sideways carry left the orange at the
+same tray coordinate, proving that the fingers had slipped around the upper surface rather than grasped it.
+
+No tray-left waypoint was accepted. The arm returned through the raised tray pose, centre hover and folded-pan
+retreat to standard home, after which torque was disabled. `left` remains in `unverified_descents`, and
+`--reset-between` remains blocked.
+
+The next tray-left attempt should first use the empty tray to establish the deepest collision-free path at the left
+slope. The orange should then be approached from above that path with the fingers below its widest section before
+closing. This avoids repeating lateral pan corrections when the real failure is insufficient grasp depth.
+
 ## Lessons that changed the procedure
 
 1. **A stall reading is supporting evidence, not grasp proof.** The fingers can close beside or behind an orange
@@ -264,6 +288,9 @@ at `(152.8,333.0)`. We stored the settled point. It remained 89.0 pixels from Sl
    starting points but differed substantially from the current camera and table geometry.
 8. **Keep a recoverable audit trail.** Every risky correction preserved the previous JSON, evidence images and a
    separate commit. Failed endpoints were recorded instead of silently overwritten.
+9. **Tray-wall slope changes grasp depth.** A fruit can appear centred between the marked tips and still slip out
+   during lift if the fingers contact above its widest section. Off-centre tray pickup needs a verified depth path,
+   not only pan and roll alignment.
 
 ## Evidence and commit trail
 
@@ -274,6 +301,7 @@ results/so101_bench_20261019/reset/calibration_evidence/slot2_compensated_202611
 results/so101_bench_20261019/reset/calibration_evidence/slot3_20261105/
 ...
 results/so101_bench_20261019/reset/calibration_evidence/slot9_20261105/
+results/so101_bench_20261019/reset/calibration_evidence/tray_left_failed_20261105/
 ```
 
 Each directory contains some or all of: start frame, aligned top/wrist frames, carry proof, held target, released
