@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-05",
+  "purpose": "two independent local probes for wrist-relative orange alignment",
+  "approved_for_close": false,
+  "baseline_q": [74.5, -64.6, 83.2, 40.8, 0.0, 37.0],
+  "probes": {
+    "pan_plus_1_deg": {
+      "q": [75.5, -64.6, 83.2, 40.8, 0.0, 37.0],
+      "approximately_lateral_travel_mm": 2.8
+    },
+    "radial_plus_2_mm_fixed_pitch": {
+      "q": [74.5, -62.1529, 82.4246, 39.1284, 0.0, 37.0],
+      "radial_travel_mm": 2.0,
+      "tool_z_change_mm": 0.0,
+      "tool_orientation_change_deg": 0.0,
+      "shoulder_elbow_wrist_sum_deg": 59.4
+    }
+  },
+  "empty_tray_validation": {
+    "result": "passed",
+    "maximum_tray_border_shift_px": 0.6,
+    "tray_contact_observed": false,
+    "evidence_dir": "calibration_evidence/tray_wrist_jacobian_empty_dry_20261105"
+  },
+  "live_probe_rules": {
+    "gripper_open": 37.0,
+    "capture_baseline_and_each_probe": true,
+    "return_to_baseline_after_each_probe": true,
+    "no_close_during_jacobian_measurement": true,
+    "maximum_correction_iterations": 2,
+    "require_wrist_grasp_gate_pass_before_close": true
+  }
+}

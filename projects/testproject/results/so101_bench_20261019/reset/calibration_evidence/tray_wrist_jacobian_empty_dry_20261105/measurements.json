@@ -1,0 +1,23 @@
+{
+  "date": "2026-11-05",
+  "result": "PASS: open-gripper empty-tray clearance for two local Jacobian probes",
+  "baseline_q_commanded": [74.5, -64.6, 83.2, 40.8, 0.0, 37.0],
+  "pan_probe": {
+    "commanded_q": [75.5, -64.6, 83.2, 40.8, 0.0, 37.0],
+    "approximately_lateral_travel_mm": 2.8
+  },
+  "radial_probe": {
+    "commanded_q": [74.5, -62.1529, 82.4246, 39.1284, 0.0, 37.0],
+    "radial_travel_mm": 2.0,
+    "tool_z_change_mm": 0.0,
+    "tool_orientation_change_deg": 0.0
+  },
+  "maximum_measured_tray_border_shift_px": 0.6,
+  "tray_contact_observed": false,
+  "close_attempted": false,
+  "arm_returned_home": true,
+  "torque_disabled": true,
+  "approved_for_live_open_gripper_probe": true,
+  "approved_for_close": false,
+  "next_step": "repeat the two probes with the orange in the tray, measure the two-column wrist-image Jacobian, solve one bounded correction, then apply the wrist gate before any close"
+}
