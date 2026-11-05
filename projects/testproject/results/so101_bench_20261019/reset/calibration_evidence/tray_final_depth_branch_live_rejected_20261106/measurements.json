@@ -1,0 +1,32 @@
+{
+  "date": "2026-11-06",
+  "result": "REJECTED by final wrist gate; large local-Jacobian extrapolation invalid",
+  "placement": {
+    "orange_top_px": [159.74, 147.14],
+    "compensated_target_px": [157.56, 141.78],
+    "placement_error_px": [2.18, 5.36],
+    "placement_distance_px": 5.78
+  },
+  "cleared_correction_replayed": {
+    "pan_delta_deg": -7.817,
+    "radial_delta_mm": -16.422,
+    "endpoint_q": [56.0806, -68.9440, 85.1290, 43.2151, 0.0, 37.0]
+  },
+  "final_gate": {
+    "result": "REJECT",
+    "finger_frame_error_px": [101.64, -41.56],
+    "live_relative_px": [74.02, -46.86],
+    "reference_relative_px": [-27.62, -5.30],
+    "tolerance_each_axis_px": 14.0
+  },
+  "safety": {
+    "close_attempted": false,
+    "orange_displaced": false,
+    "complete_path_reversed": true,
+    "arm_returned_home": true,
+    "torque_disabled": true
+  },
+  "finding": "The two-column wrist Jacobian is only local. Extrapolating it to -7.817 degrees and -16.422 mm changed both image axes nonlinearly and overshot the orange.",
+  "blocked_method": "single large final correction derived from one local linear Jacobian",
+  "required_design_change": "Use small bounded visual-servo corrections with a fresh wrist measurement at several descent heights; never extrapolate the local Jacobian beyond its cleared envelope."
+}
