@@ -1,0 +1,17 @@
+{
+  "date": "2026-11-05",
+  "result": "PASS: combined minimum-gate correction cleared the empty tray",
+  "baseline_q": [74.5, -64.6, 83.2, 40.8, 0.0, 37.0],
+  "candidate_q": [72.66, -63.7444, 82.9341, 40.2103, 0.0, 37.0],
+  "correction": {"pan_deg": -1.84, "radial_mm": 0.69},
+  "tool_z_change_mm": 0.0,
+  "tool_pitch_change_deg": 0.0,
+  "maximum_measured_tray_border_shift_px": 0.46,
+  "tray_contact_observed": false,
+  "close_attempted": false,
+  "arm_returned_home": true,
+  "torque_disabled": true,
+  "approved_for_watched_open_gripper_alignment": true,
+  "approved_for_close": false,
+  "next_step": "place orange back in tray, move to candidate, capture wrist image, and close only if wrist_grasp_gate.py passes"
+}

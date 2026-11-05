@@ -570,3 +570,7 @@ The open gripper replayed the verified centre path and tested two independent lo
 ### Live two-axis wrist response
 
 With the orange returned to the tray, the centre baseline measured `[-23.63,+8.96]` pixels relative to the verified grasp. A +1-degree pan probe measured `[-27.89,+7.61]`; a +2 mm fixed-pitch radial probe measured `[-18.42,+16.36]`. This yields the local Jacobian columns `[-4.26,-1.35]` pixels/degree and `[+2.605,+3.70]` pixels/mm. The unconstrained zero-error solve was rejected as too large for a local model. The smallest grid candidate that reaches the provisional ±14-pixel gate is approximately -1.84 degrees pan plus +0.69 mm radial, predicting `[-13.994,+13.997]`. Because the negative-pan endpoint was outside the completed empty-tray test, the arm retreated without closing. The candidate must pass one empty-tray combined-path check before use with the fruit.
+
+### Empty-tray combined correction validation
+
+The minimum predicted gate correction `[-1.84 degrees pan,+0.69 mm radial]` was tested as one fixed-pitch, fixed-z move from the centre baseline. The candidate joint pose was `[72.66,-63.7444,82.9341,40.2103,0.0,37.0]`. Unoccluded tray-border patches shifted at most 0.46 pixel, and no contact occurred. The arm returned home with torque off. This pose is approved for one watched open-gripper orange alignment check; a close remains conditional on a fresh wrist gate pass.
