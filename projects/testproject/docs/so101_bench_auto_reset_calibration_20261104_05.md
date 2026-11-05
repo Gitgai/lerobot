@@ -578,3 +578,7 @@ The minimum predicted gate correction `[-1.84 degrees pan,+0.69 mm radial]` was 
 ### Fixed combined correction rejected on the next placement
 
 After the orange was manually returned to the tray, the previously validated combined pose measured `[-34.31,-0.27]` pixels and failed the ±14-pixel wrist gate. No close occurred; the arm returned home with torque off. The orange's new physical placement differed enough that the correction computed from the prior baseline was stale. This rules out storing one corrected centre endpoint. Runtime alignment must capture a fresh baseline for each placement, solve a bounded correction using the measured Jacobian, and operate inside a separately cleared correction envelope.
+
+### Bounded runtime correction envelope
+
+A final empty-tray validation sampled 48 open-gripper poses across pan 69.5–79.5 degrees and radial offsets -4 to +4 mm, using 1-degree and 1 mm boundary steps. The radial solutions held tool z and pitch fixed. Camera-frame jitter was removed using the stationary orange on the table; tray patches with phase-response below 0.3 were ignored. Across 67 valid patch observations, maximum tray-relative movement was 1.581 pixels and no contact was observed. The arm returned home with torque off. This envelope is approved for runtime open-gripper correction after a fresh baseline image; closing still requires a fresh wrist gate pass.

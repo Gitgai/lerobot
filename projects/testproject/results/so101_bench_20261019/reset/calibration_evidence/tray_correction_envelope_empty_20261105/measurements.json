@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-05",
+  "result": "PASS: bounded fixed-pitch correction envelope cleared with empty tray",
+  "pan_range_deg": [
+    69.5,
+    79.5
+  ],
+  "pan_delta_from_baseline_deg": [
+    -5.0,
+    5.0
+  ],
+  "radial_range_mm": [
+    -4.0,
+    4.0
+  ],
+  "radial_step_mm": 1.0,
+  "pan_step_deg": 1.0,
+  "sample_count": 48,
+  "unique_named_samples": 40,
+  "valid_patch_observations": 67,
+  "maximum_valid_relative_tray_shift_px": 1.581,
+  "global_camera_jitter_removed_using_stationary_orange": true,
+  "minimum_patch_phase_response": 0.3,
+  "tray_contact_observed": false,
+  "close_attempted": false,
+  "arm_returned_home": true,
+  "torque_disabled": true,
+  "approved_for_runtime_open_gripper_correction": true,
+  "approved_for_unconditional_close": false,
+  "close_condition": "fresh wrist_grasp_gate.py PASS inside this envelope"
+}
