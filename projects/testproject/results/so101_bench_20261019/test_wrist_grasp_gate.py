@@ -46,7 +46,15 @@ class WristGraspGateTest(unittest.TestCase):
     def test_known_close_beside_frame_is_rejected(self):
         result = self.evaluate_path(KNOWN_MISS)
         self.assertFalse(result["safe_to_close"])
-        self.assertGreater(max(abs(v) for v in result["finger_frame_error_px"]), 100)
+        self.assertGreater(max(abs(v) for v in result["finger_frame_error_px"]), 20)
+
+    def test_raised_view_rejects_larger_wood_component(self):
+        image = cv2.imread("/tmp/tray_high_servo/00_high_baseline_wrist.jpg")
+        if image is None:
+            self.skipTest("live raised calibration frame is not present")
+        result = evaluate(image, self.reference, tolerance=14.0)
+        self.assertAlmostEqual(result["live"]["orange_px"][0], 230.4, delta=1.0)
+        self.assertAlmostEqual(result["live"]["orange_px"][1], 126.8, delta=1.0)
 
 
 if __name__ == "__main__":

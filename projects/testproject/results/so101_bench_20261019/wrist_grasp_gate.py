@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 from pathlib import Path
 
 import cv2
@@ -34,7 +35,21 @@ def orange_blob(image: np.ndarray) -> tuple[np.ndarray, float]:
     mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8))
     mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, np.ones((7, 7), np.uint8))
     contours = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[0]
-    candidates = [c for c in contours if cv2.contourArea(c) >= 1000]
+    candidates = []
+    for contour in contours:
+        area = cv2.contourArea(contour)
+        if area < 1000:
+            continue
+        _, _, width, height = cv2.boundingRect(contour)
+        perimeter = cv2.arcLength(contour, True)
+        aspect = min(width, height) / max(width, height)
+        fill = area / (width * height)
+        circularity = 4 * math.pi * area / (perimeter * perimeter) if perimeter else 0
+        # At the raised tray pose, orange-coloured wood can touch an image edge
+        # and form a component larger than the fruit.  The real orange remains
+        # compact and nearly round in both raised and final approach views.
+        if aspect >= 0.65 and fill >= 0.5 and circularity >= 0.45:
+            candidates.append(contour)
     if not candidates:
         raise DetectionError("orange not found")
     contour = max(candidates, key=cv2.contourArea)
