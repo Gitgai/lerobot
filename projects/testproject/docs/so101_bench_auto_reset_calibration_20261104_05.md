@@ -279,6 +279,43 @@ vertical-only approach, it was only a joint-space estimate. The interpolated pat
 its centre by approximately 23 pixels left and 40 pixels upward. Motion stopped immediately; torque was disabled
 at the current pose and the server exited without a return move. This path is rejected and must not be replayed.
 
+### Cartesian centre-path test with the tray removed
+
+After the contact, the operator moved the tray and orange clear of the original approach area. The arm was manually
+lifted while torque was off, its actual pose was read, and it was folded home without crossing the tray. We then
+used the official SO-101 URDF to solve a Cartesian vertical path from the verified centre hover. The path contains
+seven poses at 5 mm increments from 0 to 30 mm. Its nominal horizontal drift is below 0.01 mm. This also quantified
+why the rejected joint-space estimate was unsafe: it raised the tool by only about 4.7 mm, then the next interpolated
+move swept about 9 mm sideways.
+
+The replacement approach was tested in empty workspace:
+
+1. unfold at pan 0 to the 30 mm raised joint shape;
+2. rotate pan to 77.2 degrees only at full clearance;
+3. descend through the 5 mm Cartesian waypoints;
+4. reverse the waypoints to ascend;
+5. rotate pan back to 0 at full clearance and fold home.
+
+The physical descent completed without reversal or a large lateral sweep. Horizontal FK error stayed below 4.8 mm
+on descent and 2.56 mm on ascent. Load-dependent elbow lag was about 1 to 3.3 degrees, so the lowest measured pose
+remained about 6.7 mm above the verified hover. The arm then returned home, torque was disabled, and the jog server
+exited.
+
+The reproducible solver is `results/so101_bench_20261019/generate_tray_cartesian_path.py`; its official URDF and
+generated record are under `reset/kinematics/`. The JSON deliberately contains
+`"approved_for_tray_use": false`. This test validates the path shape in empty workspace; it does not validate the
+tray rim clearance, a contact-height descent, or an orange grasp. `--reset-between` therefore remains disabled.
+
+The first tray-present high pass started at an absolute URDF tool z of 31.39 mm, which is 27.81 mm above the
+verified hover z of 3.58 mm. The pan rotation completed without contact, and the measured tray centre changed by only 0.5 pixel, from
+`(152.5,129.5)` to `(152.0,129.5)`. However, the elbow relaxed during rotation and reduced tool height to 26.4 mm.
+That is only 22.82 mm above hover and violates the 30 mm clearance requirement, so no descent was attempted. The arm reversed the same pan path,
+folded home, powered off and disconnected. The guarded jog server now provides `goto_zguard MIN_Z_MM q0,...,q5`,
+which reads the live joints during the move and stops as soon as FK tool height falls below the specified minimum.
+The next high pass must use an absolute-z guard of 33.5 mm and maintain about 30 mm above hover for the complete
+rotation. Its before, raised, over-tray and after frames plus measurements are stored under
+`reset/calibration_evidence/tray_high_clearance_20261105/`.
+
 ## Lessons that changed the procedure
 
 1. **A stall reading is supporting evidence, not grasp proof.** The fingers can close beside or behind an orange
@@ -339,8 +376,9 @@ f40b66b28  Calibrate compensated table slot two
 
 Place the orange in the tray at `left`, `right`, `near`, and `far`. For each position:
 
-1. keep tray approaches blocked until a Cartesian/swept-volume path has been measured with the tray removed and
-   verified with at least 3 cm clearance; the failed 1 cm joint-space estimate must not be reused;
+1. use the recorded Cartesian path only for a watched, high-clearance tray dry run; stop at the 30 mm raised pose
+   first and confirm the complete swept volume before any descent; the failed 1 cm joint-space estimate must not
+   be reused;
 2. align using both cameras and the black finger marks;
 3. close on the orange and record the stall;
 4. prove the grasp with a lift and small sideways carry;

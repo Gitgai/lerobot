@@ -61,11 +61,12 @@ R0b LOOK FIRST      grab a front frame; detect the tray outline and the orange c
                     detector from the September recovery work); map the orange's pixel offset from the tray
                     centre to one of 5 calibrated descent poses (centre, near, far, left, right of the tray centre).
                     No orange found in the tray → RESET FAILED (nothing to reset; the operator places).
-R0c raised transit  BLOCKED pending swept-path calibration. The 2026-11-05 joint-space estimate intended to raise
-                    the wrist by 1 cm still brushed the tray. Joint offsets do not define Cartesian clearance, and
-                    simultaneous joint interpolation does not produce a vertical tool path. Remove the tray, measure
-                    the end-effector path in Cartesian space, and validate the complete swept volume with at least
-                    3 cm margin before restoring the tray.
+R0c raised transit  EMPTY-WORKSPACE PATH RECORDED, STILL BLOCKED FOR TRAY USE. The 2026-11-05 joint-space estimate
+                    intended to raise the wrist by 1 cm still brushed the tray. Its replacement is a URDF-solved
+                    seven-pose Cartesian path from 0 to 30 mm in 5 mm increments. With the tray removed, physical
+                    horizontal error stayed below 4.8 mm on descent and 2.56 mm on ascent. The lowest actual pose
+                    remained 6.7 mm above hover because of motor lag. Run a watched high-clearance tray test before
+                    approving any descent; do not replay the rejected joint-space estimate.
 R1  above tray      after the validated raised transit and lateral alignment, follow a separately validated descent
                     path to the normal hover ~8 cm above the chosen descent pose, gripper 45. Do not use the old
                     multi-joint interpolation as a vertical descent.
@@ -159,6 +160,20 @@ V4  one 5-trial fine-tune-3 orange row with --reset-between  trial results agree
                                                            logged; zero void trials
 ```
 Then the 20-trial rows: fine-tune 3 first, then the base (both at 75 chunks), then rows 1/2 if wanted.
+
+The centre-path generator and its guarded, unapproved output are:
+
+```text
+results/so101_bench_20261019/generate_tray_cartesian_path.py
+results/so101_bench_20261019/reset/kinematics/tray_center_cartesian_path.json
+```
+
+Regenerate with the official bench virtual environment. This is offline and does not connect to the arm:
+
+```bash
+/home/gaikwad-prakash/Documents/ChatGPT/Lerobot/.venv-official-client-061/bin/python \
+  results/so101_bench_20261019/generate_tray_cartesian_path.py
+```
 
 ## Gaps found on review (2026-10-28) and how the plan now covers them
 ```text

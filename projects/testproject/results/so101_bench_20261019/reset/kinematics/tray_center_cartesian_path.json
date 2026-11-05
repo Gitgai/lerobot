@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "generated_by": "generate_tray_cartesian_path.py",
+  "urdf": "reset/kinematics/so101_new_calib.urdf",
+  "urdf_source": "https://github.com/TheRobotStudio/SO-ARM100/blob/main/Simulation/SO101/so101_new_calib.urdf",
+  "safety_status": "EMPTY_WORKSPACE_TEST_ONLY",
+  "approved_for_tray_use": false,
+  "hover_q": [
+    77.2,
+    -68.4,
+    86.8,
+    42.4,
+    0.0
+  ],
+  "hover_xyz_mm": [
+    69.06,
+    -133.081,
+    3.578
+  ],
+  "direction": "waypoints ascend from verified centre hover; reverse them to descend",
+  "waypoints": [
+    {
+      "z_offset_mm": 0,
+      "q": [
+        77.2,
+        -68.4,
+        86.8,
+        42.4,
+        0.0
+      ],
+      "xyz_mm": [
+        69.06,
+        -133.081,
+        3.578
+      ],
+      "xy_drift_mm": 0.0
+    },
+    {
+      "z_offset_mm": 5,
+      "q": [
+        77.2,
+        -68.8556,
+        84.4861,
+        45.6234,
+        0.0
+      ],
+      "xyz_mm": [
+        69.06,
+        -133.082,
+        8.578
+      ],
+      "xy_drift_mm": 0.0
+    },
+    {
+      "z_offset_mm": 10,
+      "q": [
+        77.2,
+        -69.4067,
+        82.3229,
+        48.6167,
+        0.0
+      ],
+      "xyz_mm": [
+        69.06,
+        -133.082,
+        13.578
+      ],
+      "xy_drift_mm": 0.0
+    },
+    {
+      "z_offset_mm": 15,
+      "q": [
+        77.2,
+        -70.0276,
+        80.2811,
+        51.4048,
+        0.0
+      ],
+      "xyz_mm": [
+        69.06,
+        -133.082,
+        18.578
+      ],
+      "xy_drift_mm": 0.0
+    },
+    {
+      "z_offset_mm": 20,
+      "q": [
+        77.2,
+        -70.7023,
+        78.3393,
+        54.0082,
+        0.0
+      ],
+      "xyz_mm": [
+        69.06,
+        -133.082,
+        23.578
+      ],
+      "xy_drift_mm": 0.001
+    },
+    {
+      "z_offset_mm": 25,
+      "q": [
+        77.2,
+        -71.4195,
+        76.4812,
+        56.4439,
+        0.0
+      ],
+      "xyz_mm": [
+        69.06,
+        -133.081,
+        28.578
+      ],
+      "xy_drift_mm": 0.0
+    },
+    {
+      "z_offset_mm": 30,
+      "q": [
+        77.2,
+        -72.1706,
+        74.695,
+        58.724,
+        0.0
+      ],
+      "xyz_mm": [
+        69.06,
+        -133.082,
+        33.578
+      ],
+      "xy_drift_mm": 0.001
+    }
+  ],
+  "runtime_guard_requirements": {
+    "max_joint_tracking_error_deg": 3.5,
+    "max_horizontal_fk_error_mm": 5.0,
+    "minimum_tool_z_during_tray_pan_mm": 33.5,
+    "minimum_height_above_verified_hover_mm": 29.9,
+    "require_live_fk_clearance_guard_during_tray_pan": true,
+    "stop_on_error": true,
+    "require_operator_watch": true,
+    "do_not_use_bench_reset_yet": true
+  },
+  "empty_workspace_test_20261105": {
+    "result": "passed without reversal or large lateral sweep",
+    "tray_present": false,
+    "maximum_descent_horizontal_error_mm": 4.8,
+    "maximum_ascent_horizontal_error_mm": 2.56,
+    "lowest_actual_height_above_verified_hover_mm": 6.7,
+    "raised_actual_q": [
+      77.1,
+      -71.6,
+      75.1,
+      58.6,
+      -0.2,
+      44.8
+    ],
+    "raised_actual_xyz_mm": [
+      68.97,
+      -131.5,
+      31.24
+    ],
+    "note": "Elbow lag was load-dependent (about 1 to 3.3 deg); the path still needs a watched high-clearance tray dry run."
+  },
+  "high_clearance_tray_test_20261105": {
+    "result": "no contact, but rejected for insufficient maintained clearance",
+    "descent_attempted": false,
+    "tool_z_before_pan_mm": 31.39,
+    "height_above_verified_hover_before_pan_mm": 27.81,
+    "tool_z_after_pan_mm": 26.4,
+    "height_above_verified_hover_after_pan_mm": 22.82,
+    "tray_centre_before_px": [
+      152.5,
+      129.5
+    ],
+    "tray_centre_after_px": [
+      152.0,
+      129.5
+    ],
+    "tray_shift_px": 0.5,
+    "approved_for_descent": false,
+    "blocker": "the pass started below the 33.5 mm absolute-z guard (about 30 mm above hover), then elbow relaxation reduced height further"
+  }
+}

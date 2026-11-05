@@ -1,0 +1,11 @@
+{
+  "tray_centre_before_px": [152.5, 129.5],
+  "tray_centre_after_px": [152.0, 129.5],
+  "tray_shift_px": 0.5,
+  "tool_z_before_pan_mm": 31.39,
+  "height_above_verified_hover_before_pan_mm": 27.81,
+  "tool_z_after_pan_mm": 26.4,
+  "height_above_verified_hover_after_pan_mm": 22.82,
+  "descent_attempted": false,
+  "result": "no contact; rejected because 30 mm clearance above hover was not maintained"
+}

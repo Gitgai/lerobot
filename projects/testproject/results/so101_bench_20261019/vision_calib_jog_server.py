@@ -4,7 +4,8 @@
 The server never executes a command left by an earlier session.  Commands are
 written to ~/vision_calib_jog_cmd and state is reported in
 ~/vision_calib_jog_state.json.  Every move is clamped and restricted to the
-motion envelope observed in the 169 demonstrations.
+motion envelope observed in the 169 demonstrations.  ``goto_zguard Z Q``
+also stops a move if live FK tool height falls below Z millimetres.
 """
 
 import json
@@ -12,6 +13,8 @@ import pathlib
 import time
 
 import numpy as np
+
+from generate_tray_cartesian_path import DEFAULT_URDF, Kinematics
 
 try:
     from lerobot.robots.so_follower import SO101Follower, SO101FollowerConfig
@@ -28,6 +31,7 @@ JI = {"pan": 0, "lift": 1, "elbow": 2, "wflex": 3, "wroll": 4, "grip": 5}
 ENV_MIN = np.array([-111.4, -104.9, -92.0, -99.6, -75.3, 1.6]) - 5
 ENV_MAX = np.array([84.0, 82.9, 97.3, 103.1, 90.9, 88.2]) + 5
 PROTECTIONS = {"Max_Torque_Limit": 500, "Protection_Current": 250, "Overload_Torque": 25}
+KINEMATICS = Kinematics(DEFAULT_URDF)
 
 
 robot = SO101Follower(SO101FollowerConfig(port="/dev/ttyACM0", id="my_so101_follower", cameras={}))
@@ -42,11 +46,17 @@ def write_state(message=""):
     STATE.write_text(json.dumps({"q": q().round(1).tolist(), "msg": message, "t": time.time()}))
 
 
-def move(target, max_s=30.0):
+def tool_z_mm(joints):
+    return float(KINEMATICS.fk(np.asarray(joints[:5], dtype=float))[:3, 3][2] * 1000)
+
+
+def move(target, max_s=30.0, min_tool_z_mm=None):
     target = np.asarray(target, dtype=np.float32)
     if np.any(target < ENV_MIN) or np.any(target > ENV_MAX):
         return f"REFUSED outside envelope {target.round(1).tolist()}"
     current = q()
+    if min_tool_z_mm is not None and tool_z_mm(current) < min_tool_z_mm:
+        return f"REFUSED tool z {tool_z_mm(current):.1f} mm below {min_tool_z_mm:.1f} mm guard"
     limit = np.array([0.6] * 5 + [1.5], dtype=np.float32)
     started = time.time()
     while time.time() - started < max_s:
@@ -56,6 +66,11 @@ def move(target, max_s=30.0):
         current = current + np.clip(delta, -limit, limit)
         robot.send_action({f"{joint}.pos": float(value) for joint, value in zip(JOINTS, current)})
         time.sleep(1 / 30)
+        if min_tool_z_mm is not None:
+            measured = q()
+            measured_z_mm = tool_z_mm(measured)
+            if measured_z_mm < min_tool_z_mm:
+                return f"STOPPED clearance, tool z {measured_z_mm:.1f} mm below {min_tool_z_mm:.1f} mm guard"
     time.sleep(0.3)
     reached = q()
     if np.abs(reached - target).max() >= 2.0:
@@ -88,6 +103,11 @@ try:
         try:
             if command == "goto":
                 message = move([float(value) for value in parts[1].split(",")])
+            elif command == "goto_zguard":
+                message = move(
+                    [float(value) for value in parts[2].split(",")],
+                    min_tool_z_mm=float(parts[1]),
+                )
             elif command == "delta":
                 joint, value = parts[1].split(",")
                 target = current.copy()
