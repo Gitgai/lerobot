@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-05",
+  "close_attempted": false,
+  "placement": {
+    "top_orange_centre_px": [
+      135.7,
+      137.2
+    ],
+    "calibrated_tray_centre_px": [
+      150.0,
+      143.5
+    ],
+    "offset_px": [
+      -14.3,
+      -6.3
+    ],
+    "distance_from_centre_px": 15.6,
+    "centre_classifier_radius_px": 31.5,
+    "correct_reset_classifier_region": "centre",
+    "finding": "the marked target was not a tray-left placement"
+  },
+  "wrist_measurements": {
+    "successful_reference_orange_centre_px": [
+      325.2,
+      165.9
+    ],
+    "offset_0_orange_centre_px": [
+      385.0,
+      118.7
+    ],
+    "offset_minus_4_orange_centre_px": [
+      389.5,
+      125.5
+    ],
+    "offset_minus_8_orange_centre_px": [
+      387.4,
+      142.2
+    ],
+    "offset_minus_12_orange_centre_px": [
+      393.5,
+      149.1
+    ],
+    "remaining_error_at_minus_12_px": [
+      68.3,
+      -16.8
+    ]
+  },
+  "kinematics": {
+    "offset_0_q": [
+      63.2,
+      -63.5184,
+      85.8777,
+      36.4823,
+      0.0,
+      37.0
+    ],
+    "offset_minus_12_q": [
+      63.2,
+      -61.9414,
+      89.5261,
+      25.082,
+      0.0,
+      37.0
+    ],
+    "wrist_flex_change_deg": -11.4,
+    "finding": "position-only IK changed camera and jaw orientation while attempting a front/back translation"
+  },
+  "detector_check": {
+    "tray_centre_on_live_placement_frame": null,
+    "orange_on_live_placement_frame": null,
+    "finding": "current HSV tray detector fails under this lighting; the tray mask fragments below its 12000-pixel contour threshold"
+  },
+  "decision": {
+    "result": "rejected before close",
+    "reason": "orange remained strongly right-biased relative to the successful wrist reference; closing would likely push it",
+    "arm_returned_home": true,
+    "torque_disabled": true,
+    "server_exited": true,
+    "auto_reset_approved": false,
+    "next_required_change": "use the verified centre path for centre-class placements; replace scalar sequential corrections with fixed-orientation coupled two-axis visual alignment for true off-centre placements"
+  },
+  "images": [
+    {
+      "file": "frontback_orange_placed_top.jpg",
+      "sha256": "20a22f013eb543d3a76bc2ea657dcc09fed4674ff31c9dea406f72a73bd1396a"
+    },
+    {
+      "file": "frontback_orange_placed_wrist.jpg",
+      "sha256": "c03ebf6ae34dc8a6686b18ad4aac182be74646238c028615f84989c21b28cb7e"
+    },
+    {
+      "file": "frontback_orange_origin_top_warm.jpg",
+      "sha256": "29967cb4b45b39427f73b92b55202770baab65e85adae1942a30ab135ecec5c1"
+    },
+    {
+      "file": "frontback_orange_origin_wrist_warm.jpg",
+      "sha256": "d7575e742236447e747c06d49bad37e81b9092dad203f67ec7dd74cccf158d20"
+    },
+    {
+      "file": "frontback_orange_neg4_top.jpg",
+      "sha256": "84367b586bc634c6899146b387c05de9c72acd1f98a32c7c00ece136a674b3be"
+    },
+    {
+      "file": "frontback_orange_neg4_wrist.jpg",
+      "sha256": "c95007a53149de37723337a0c7c9122b3c3b47b4ed09a554dc43dddedd3d6580"
+    },
+    {
+      "file": "frontback_orange_neg8_top.jpg",
+      "sha256": "37d921acfaa5e2f1b4a1cfdf1d5cd88dd199bc7c0c3899f30958f24b400a95e6"
+    },
+    {
+      "file": "frontback_orange_neg8_wrist.jpg",
+      "sha256": "29b0e5b94f60f5e46e1caaec123faf65bbc25bcbb5d2128f67804a9cf9248b61"
+    },
+    {
+      "file": "frontback_orange_neg12_top.jpg",
+      "sha256": "6e12096b7ee51dd151e702a1650a58596cf04eec22035c1ae334fe78dc932fe7"
+    },
+    {
+      "file": "frontback_orange_neg12_wrist.jpg",
+      "sha256": "6f27e020d1df1d83e224707533c78e73f983f77758b0f2ef194838b0df1857de"
+    }
+  ],
+  "clearance_verification": {
+    "verified_centre_success_z_mm": {
+      "wrist_link_origin": 152.1,
+      "gripper_body_origin": 99.5,
+      "jaw_tip_frame": 11.0
+    },
+    "offset_zero_z_mm": {
+      "wrist_link_origin": 145.4,
+      "gripper_body_origin": 93.1,
+      "jaw_tip_frame": 5.0
+    },
+    "offset_minus_12_z_mm": {
+      "wrist_link_origin": 136.4,
+      "gripper_body_origin": 87.8,
+      "jaw_tip_frame": 5.0
+    },
+    "requested_wrist_body_clearance_mm": 20.0,
+    "wrist_body_clearance_satisfied": true,
+    "maximum_observed_tray_border_shift_px": 1.3,
+    "tray_displacement_observed": false,
+    "finding": "the two-centimetre wrist-body clearance was satisfied and was not the alignment blocker"
+  },
+  "root_cause_doc": "../../../../../docs/so101_tray_pickup_root_cause_20261105.md"
+}

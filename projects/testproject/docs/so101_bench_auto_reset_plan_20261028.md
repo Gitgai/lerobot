@@ -215,8 +215,12 @@ nobody watching unattended resets               → motion envelope from the tra
 2026-11-05  tray-left lateral arc tested. The 60.7-65.2 degree empty-tray sweep passed; the watched grasp selected
             measured pan 63.0 with about 3 pixels lateral error, but closed to 7.4 and shifted the orange 28 pixels.
             Lateral centring is resolved; the remaining error is the front/back closing plane.
-NEXT        derive and empty-tray-check a bounded front/back Cartesian correction for tray-left, then prove
-            grasp/lift/carry. Calibrate tray right/near/far with the same procedure, then run V1-V3.
+2026-11-05  front/back clearance sweep passed, but its watched alignment was rejected before close. The marked
+            placement was centre-class, not left, and position-only IK rotated wrist flex by 11.4 degrees. The
+            orange remained 68 pixels from the successful wrist-x reference. Wrist-body clearance exceeded 20 mm
+            and the tray did not move, so contact was not the blocker. The live HSV tray detector also failed.
+NEXT        use the verified centre path for centre-class placements. Build fixed-orientation, coupled two-axis
+            wrist visual alignment for true off-centre placements and repair the tray detector, then run V1-V3.
             Only after V3 passes may the first integrated V4 row use --reset-between.
 ```
 

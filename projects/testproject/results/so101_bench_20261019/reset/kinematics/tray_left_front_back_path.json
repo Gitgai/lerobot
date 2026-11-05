@@ -2,7 +2,7 @@
   "schema_version": 1,
   "generated_by": "generate_tray_left_front_back_path.py",
   "urdf": "reset/kinematics/so101_new_calib.urdf",
-  "safety_status": "PHYSICAL_EMPTY_TRAY_DRY_RUN_PASSED_WATCHED_ORANGE_ALIGNMENT_REQUIRED",
+  "safety_status": "PHYSICAL_CLEARANCE_PASSED_ALIGNMENT_MODEL_REJECTED",
   "approved_for_tray_use": false,
   "source_attempt": "calibration_evidence/tray_left_lateral_hold_miss_20261105",
   "start_q": [
@@ -544,7 +544,41 @@
     "tray_shift_observed": false,
     "arm_returned_home": true,
     "torque_disabled": true,
-    "result": "pass for open-gripper clearance only"
+    "result": "pass for open-gripper clearance only",
+    "watched_alignment_20261105": {
+      "placement_top_px": [
+        135.7,
+        137.2
+      ],
+      "calibrated_tray_centre_px": [
+        150.0,
+        143.5
+      ],
+      "reset_classifier_region": "centre",
+      "wrist_orange_centre_at_offset_0_px": [
+        385.0,
+        118.7
+      ],
+      "wrist_orange_centre_at_offset_minus_12_px": [
+        393.5,
+        149.1
+      ],
+      "successful_reference_px": [
+        325.2,
+        165.9
+      ],
+      "wrist_flex_change_deg": -11.4,
+      "wrist_link_origin_z_at_minus_12_mm": 136.4,
+      "gripper_body_origin_z_at_minus_12_mm": 87.8,
+      "jaw_tip_frame_z_at_minus_12_mm": 5.0,
+      "maximum_observed_tray_border_shift_px": 1.3,
+      "two_cm_wrist_clearance_satisfied": true,
+      "close_attempted": false,
+      "result": "rejected: corrected wrist y but worsened wrist x and changed gripper orientation",
+      "arm_returned_home": true,
+      "torque_disabled": true,
+      "evidence_dir": "calibration_evidence/tray_left_front_back_alignment_rejected_20261105"
+    }
   },
-  "blocker": "watched orange alignment and grasp/lift proof have not been completed"
+  "blocker": "position-only IK changes gripper orientation; replace with coupled two-axis fixed-orientation visual alignment"
 }

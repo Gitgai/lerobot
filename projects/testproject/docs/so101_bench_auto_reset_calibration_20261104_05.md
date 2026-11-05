@@ -434,6 +434,22 @@ generated offline and pass an empty-tray clearance run before another grasp. Evi
 `reset/calibration_evidence/tray_left_lateral_hold_miss_20261105/`; the generated lateral path is
 `reset/kinematics/tray_left_lateral_path.json`.
 
+The proposed front/back path then passed an empty-tray open-gripper sweep from -12 to +12 mm, but its watched
+alignment exposed two design errors before any close was issued. First, the marked orange position
+`(135.7,137.2)` was only 15.6 pixels from the calibrated tray centre, inside the reset script's 31.5-pixel
+`centre` region; it should have used the already verified centre path rather than a left path. Second, the
+position-only IK changed wrist flex by -11.4 degrees over the -12 mm branch, rotating the camera and jaws. Wrist y
+improved from 118.7 to 149.1 pixels, but wrist x ended 68.3 pixels away from the successful reference. The arm
+retreated without closing, returned home and disabled torque.
+
+The user's 20 mm wrist-body clearance was satisfied in this attempt. At the lowest candidate, the wrist-link and
+gripper-body origins were approximately 136.4 and 87.8 mm above the table frame; only the jaw-tip frame descended
+to 5 mm. Fixed tray-border patches shifted by less than 1.3 pixels, so wrist/tray contact was not the alignment
+failure. The current HSV tray detector nevertheless returned no tray under the live lighting because its mask
+fragmented below the configured contour area. Full measurements and the replacement design are in
+`docs/so101_tray_pickup_root_cause_20261105.md` and
+`reset/calibration_evidence/tray_left_front_back_alignment_rejected_20261105/`.
+
 ## Lessons that changed the procedure
 
 1. **A stall reading is supporting evidence, not grasp proof.** The fingers can close beside or behind an orange
@@ -492,11 +508,11 @@ f40b66b28  Calibrate compensated table slot two
 
 ### 1. Calibrate all off-centre tray descents
 
-The 2026-11-05 left retries established that pan alignment and vertical depth alone are insufficient. The generated
-lateral arc passed its empty-tray check, and pan 63.0 degrees centred the orange to about 3 wrist pixels, but the
-watched close still reached only 7.4 and shifted the fruit about 28 pixels. Lateral centring is now resolved. Derive
-a bounded front/back Cartesian correction from the remaining wrist y-offset, generate it offline, and
-collision-check it in the empty tray before another physical attempt. Do not probe by joint-space guessing.
+The 2026-11-05 left retries established that sequential pan, vertical-depth and front/back corrections do not form
+a repeatable grasp controller. Do not continue the position-only front/back path. Keep the verified centre pickup
+for placements inside the centre classifier radius. For true off-centre placements, preserve tool orientation and
+solve both wrist-image axes together using a local two-axis Cartesian image Jacobian. The pre-close gate must use
+the orange relative to both black finger marks. Repair and validate the live tray detector before any reset test.
 
 Place the orange in the tray at `left`, `right`, `near`, and `far`. For each position:
 

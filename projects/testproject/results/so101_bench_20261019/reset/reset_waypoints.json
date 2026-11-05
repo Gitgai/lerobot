@@ -290,6 +290,28 @@
    "operational_waypoint_change": false,
    "auto_reset_approved": false,
    "blocker": "watched orange alignment and grasp/lift proof have not been completed"
+  },
+  "calibration_20261105_front_back_alignment_rejected": {
+   "status": "REJECTED before close; placement was centre-class and position-only IK changed jaw orientation",
+   "placement_top_px": [135.7, 137.2],
+   "calibrated_tray_centre_px": [150.0, 143.5],
+   "placement_distance_from_centre_px": 15.6,
+   "centre_classifier_radius_px": 31.5,
+   "correct_classifier_region": "centre",
+   "wrist_orange_offset_zero_px": [385.0, 118.7],
+   "wrist_orange_offset_minus_12_px": [393.5, 149.1],
+   "successful_wrist_reference_px": [325.2, 165.9],
+   "remaining_error_at_minus_12_px": [68.3, -16.8],
+   "wrist_flex_change_deg": -11.4,
+   "close_attempted": false,
+   "orange_displaced": false,
+   "arm_returned_home": true,
+   "torque_disabled": true,
+   "evidence_dir": "calibration_evidence/tray_left_front_back_alignment_rejected_20261105",
+   "root_cause_doc": "../../../docs/so101_tray_pickup_root_cause_20261105.md",
+   "operational_waypoint_change": false,
+   "auto_reset_approved": false,
+   "blocker": "replace sequential scalar corrections with coupled fixed-orientation two-axis visual alignment"
   }
  },
  "slots": [
@@ -1359,5 +1381,5 @@
   ],
   "margin_deg": 5
  },
- "status": "PARTIAL LIVE CALIBRATION 2026-11-04/05 \u2014 tray-centre pickup and table slots 0-9 verified; tray-left front/back empty-tray clearance passed, watched orange grasp and off-centre tray descents remain unverified; do not run --reset-between yet"
+ "status": "PARTIAL LIVE CALIBRATION 2026-11-04/05 \u2014 tray-centre pickup and table slots 0-9 verified; sequential tray-left correction model rejected, off-centre tray descents and live tray detector remain unverified; do not run --reset-between yet"
 }
