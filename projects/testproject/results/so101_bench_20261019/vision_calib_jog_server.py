@@ -5,7 +5,8 @@ The server never executes a command left by an earlier session.  Commands are
 written to ~/vision_calib_jog_cmd and state is reported in
 ~/vision_calib_jog_state.json.  Every move is clamped and restricted to the
 motion envelope observed in the 169 demonstrations.  ``goto_zguard Z Q``
-also stops a move if live FK tool height falls below Z millimetres.
+also stops a move if live FK tool height falls below Z millimetres, while
+``goto_closed Q`` uses measured-joint feedback to reach a 0.5 degree tolerance.
 """
 
 import json
@@ -78,6 +79,52 @@ def move(target, max_s=30.0, min_tool_z_mm=None):
     return f"at {reached.round(1).tolist()}"
 
 
+def move_closed_loop(target, max_s=30.0, tolerance_deg=0.5):
+    target = np.asarray(target, dtype=np.float32)
+    if np.any(target < ENV_MIN) or np.any(target > ENV_MAX):
+        return f"REFUSED outside envelope {target.round(1).tolist()}"
+    initial = q()
+    if np.abs((target - initial)[:5]).max() > 5.0:
+        return f"REFUSED closed-loop correction over 5 deg, at {initial.round(1).tolist()}"
+    bias = np.zeros(6, dtype=np.float32)
+    started = time.time()
+    while time.time() - started < max_s:
+        measured = q()
+        delta = target - measured
+        if np.abs(delta[:5]).max() < tolerance_deg and abs(delta[5]) < 1.0:
+            return f"at {measured.round(1).tolist()} closed-loop, bias {bias.round(1).tolist()}"
+        bias[:5] += np.clip(delta[:5], -0.05, 0.05)
+        if np.abs(bias[:5]).max() > 5.0:
+            return f"STOPPED closed-loop compensation exceeded 5 deg, at {measured.round(1).tolist()}"
+        command = target + bias
+        command[5] = target[5]
+        if np.any(command < ENV_MIN) or np.any(command > ENV_MAX):
+            return f"STOPPED closed-loop command outside envelope {command.round(1).tolist()}"
+        robot.send_action({f"{joint}.pos": float(value) for joint, value in zip(JOINTS, command)})
+        time.sleep(1 / 30)
+    reached = q()
+    return f"STOPPED closed-loop timeout, target {target.round(1).tolist()}, at {reached.round(1).tolist()}"
+
+
+def close_on_stall():
+    measured = q()
+    last = float(measured[5])
+    unchanged = 0
+    while measured[5] > 2.0:
+        command = measured.copy()
+        command[5] = max(2.0, float(command[5]) - 2.0)
+        robot.send_action({f"{joint}.pos": float(value) for joint, value in zip(JOINTS, command)})
+        time.sleep(1 / 15)
+        measured = q()
+        unchanged = unchanged + 1 if abs(float(measured[5]) - last) < 0.8 else 0
+        last = float(measured[5])
+        if unchanged >= 5:
+            break
+    time.sleep(0.3)
+    reached = q()
+    return f"close-on-stall at {reached[5]:.1f}, q {reached.round(1).tolist()}"
+
+
 try:
     robot.connect(calibrate=False)
     for register, value in PROTECTIONS.items():
@@ -108,6 +155,8 @@ try:
                     [float(value) for value in parts[2].split(",")],
                     min_tool_z_mm=float(parts[1]),
                 )
+            elif command == "goto_closed":
+                message = move_closed_loop([float(value) for value in parts[1].split(",")])
             elif command == "delta":
                 joint, value = parts[1].split(",")
                 target = current.copy()
@@ -117,6 +166,8 @@ try:
                 target = current.copy()
                 target[5] = float(parts[1])
                 message = move(target)
+            elif command == "close_stall":
+                message = close_on_stall()
             elif command == "read":
                 message = f"q {current.round(1).tolist()}"
             elif command == "save":

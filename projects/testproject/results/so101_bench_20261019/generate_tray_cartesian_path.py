@@ -111,7 +111,7 @@ def generate(urdf: Path) -> dict:
     hover_xyz = model.fk(HOVER_Q)[:3, 3]
     seed = HOVER_Q.copy()
     waypoints = []
-    for offset_mm in range(0, 31, 5):
+    for offset_mm in range(0, 41, 5):
         seed = model.solve_position(seed, hover_xyz + np.array([0.0, 0.0, offset_mm / 1000]))
         xyz = model.fk(seed)[:3, 3]
         waypoints.append(
@@ -166,12 +166,59 @@ def generate(urdf: Path) -> dict:
             "approved_for_descent": False,
             "blocker": "the pass started below the 33.5 mm absolute-z guard (about 30 mm above hover), then elbow relaxation reduced height further",
         },
+        "guarded_40mm_tray_test_20261105": {
+            "high_pan_result": "passed live 33.5 mm absolute-z guard without tray contact",
+            "tool_z_before_pan_mm": 44.73,
+            "height_above_verified_hover_before_pan_mm": 41.15,
+            "tool_z_after_pan_mm": 40.33,
+            "height_above_verified_hover_after_pan_mm": 36.75,
+            "descent_result": "stopped and rejected at nominal 20 mm waypoint",
+            "actual_stop_xyz_mm": [68.37, -127.87, 18.6],
+            "actual_height_above_verified_hover_mm": 15.02,
+            "horizontal_fk_error_mm": 5.25,
+            "gripper_close_attempted": False,
+            "tray_contour_centroid_shift_px": 0.2,
+            "orange_shift_px": 13.6,
+            "approved_for_descent": False,
+            "blocker": "open-loop joint tracking error exceeded the 5 mm horizontal limit and the open gripper shifted the fruit",
+        },
+        "closed_loop_descent_test_20261105": {
+            "control_result": "reduced horizontal error at nominal 20 mm from 5.25 mm to 0.76 mm",
+            "open_finger_alignment_pan_deg": 70.0,
+            "alignment_note": "79.9 deg moved the fixed finger farther into the orange image; 70 deg centred this shifted fruit while open",
+            "approach_method": "four measured substeps from hover to the prior centre approach geometry",
+            "close_command": 15.0,
+            "close_actual": 15.1,
+            "close_result": "miss; one finger against fruit and opposite finger clear",
+            "orange_shift_px": 9.2,
+            "tray_detector_shift_px": 6.7,
+            "grasp_verified": False,
+            "approved_for_descent": False,
+            "blocker": "open-finger visual centring did not predict the jaw centre after closure",
+        },
+        "closed_loop_centre_success_20261105": {
+            "centre_path_verified": True,
+            "pan_deg": 74.5,
+            "final_approach_q": [74.5, -64.6, 83.2, 40.8, 0.0, 37.0],
+            "close_method": "2-unit close-on-stall steps",
+            "grasp_stall": 21.9,
+            "accepted_hold_range": [16.0, 26.0],
+            "lift_verified": True,
+            "sideways_carry_deg": 3.0,
+            "carry_verified": True,
+            "release_into_tray_verified": True,
+            "arm_returned_home": True,
+            "torque_disabled": True,
+            "evidence_dir": "reset/calibration_evidence/tray_closed_loop_success_20261105",
+            "auto_reset_approved": False,
+            "remaining_blocker": "left, right, near and far tray descents remain unverified",
+        },
     }
 
 
 def verify(data: dict) -> None:
     offsets = [row["z_offset_mm"] for row in data["waypoints"]]
-    if offsets != list(range(0, 31, 5)):
+    if offsets != list(range(0, 41, 5)):
         raise ValueError(f"unexpected offsets: {offsets}")
     max_drift = max(row["xy_drift_mm"] for row in data["waypoints"])
     if max_drift > 0.05:

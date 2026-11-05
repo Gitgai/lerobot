@@ -106,6 +106,41 @@
     "far"
    ],
    "camera_note": "C270 emits about 25-30 blank startup frames; acquire at least 45 frames when opening a fresh capture process."
+  },
+  "calibration_20261105_guarded_cartesian_center": {
+   "status": "VERIFIED watched centre pickup, lift, 3 degree carry and release; not enabled in bench_reset",
+   "safe_path_file": "kinematics/tray_center_cartesian_path.json",
+   "high_offset_mm": 40,
+   "minimum_absolute_tool_z_during_pan_mm": 33.5,
+   "waypoint_spacing_mm": 5,
+   "closed_loop_joint_tolerance_deg": 0.5,
+   "pan_deg": 74.5,
+   "final_approach_q": [
+    74.5,
+    -64.6,
+    83.2,
+    40.8,
+    0.0,
+    37.0
+   ],
+   "grasp_stall": 21.9,
+   "accepted_hold_range": [
+    16.0,
+    26.0
+   ],
+   "lift_verified": true,
+   "sideways_carry_deg": 3.0,
+   "carry_verified": true,
+   "release_verified": true,
+   "evidence_dir": "calibration_evidence/tray_closed_loop_success_20261105",
+   "operational_waypoint_change": false,
+   "auto_reset_approved": false,
+   "remaining_unverified_descents": [
+    "left",
+    "right",
+    "near",
+    "far"
+   ]
   }
  },
  "slots": [

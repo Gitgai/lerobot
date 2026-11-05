@@ -1,0 +1,23 @@
+{
+  "high_pan": {
+    "tool_z_before_pan_mm": 44.73,
+    "height_above_verified_hover_before_pan_mm": 41.15,
+    "tool_z_after_pan_mm": 40.33,
+    "height_above_verified_hover_after_pan_mm": 36.75,
+    "guard_absolute_z_mm": 33.5,
+    "result": "passed"
+  },
+  "descent_stop": {
+    "nominal_waypoint_mm": 20,
+    "actual_q": [77.0, -70.7, 79.5, 54.8, -0.2, 44.8],
+    "actual_xyz_mm": [68.37, -127.87, 18.6],
+    "height_above_verified_hover_mm": 15.02,
+    "horizontal_fk_error_mm": 5.25,
+    "result": "stopped and rejected"
+  },
+  "tray_contour_centroid_shift_px": 0.2,
+  "orange_before_px": [160.0, 116.0],
+  "orange_after_px": [156.0, 129.0],
+  "orange_shift_px": 13.6,
+  "gripper_close_attempted": false
+}

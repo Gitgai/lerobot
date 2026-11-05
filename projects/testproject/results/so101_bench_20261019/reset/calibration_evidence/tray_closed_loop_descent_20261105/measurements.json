@@ -1,0 +1,28 @@
+{
+  "closed_loop_20mm": {
+    "actual_q": [77.5, -70.6, 78.6, 53.7, 0.3, 44.8],
+    "actual_xyz_mm": [68.3, -133.14, 22.83],
+    "height_above_verified_hover_mm": 19.26,
+    "horizontal_fk_error_mm": 0.76,
+    "previous_open_loop_error_mm": 5.25
+  },
+  "pan_alignment": {
+    "79.9_deg": "rejected; fixed finger moved farther into orange image",
+    "74.5_deg": "improved",
+    "70.0_deg": "accepted for this attempt; orange visibly centred while open"
+  },
+  "close": {
+    "command": 15.0,
+    "actual": 15.1,
+    "accepted_hold_range": [16.0, 26.0],
+    "result": "miss; one finger against fruit and opposite gap; immediately reopened"
+  },
+  "orange_before_px": [156.0, 129.0],
+  "orange_after_px": [151.0, 121.5],
+  "orange_shift_px": 9.2,
+  "tray_component_before_px": [138.8, 103.6],
+  "tray_component_after_px": [143.7, 99.0],
+  "tray_detector_shift_px": 6.7,
+  "grasp_verified": false,
+  "descent_approved": false
+}

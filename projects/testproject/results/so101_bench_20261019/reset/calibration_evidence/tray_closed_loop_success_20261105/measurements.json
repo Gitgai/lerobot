@@ -1,0 +1,27 @@
+{
+  "path": {
+    "high_offset_mm": 40,
+    "pan_deg": 74.5,
+    "waypoint_spacing_mm": 5,
+    "joint_tolerance_deg": 0.5,
+    "final_approach_q": [74.5, -64.6, 83.2, 40.8, 0.0, 37.0]
+  },
+  "grasp": {
+    "method": "close_on_stall",
+    "stall": 21.9,
+    "accepted_hold_range": [16.0, 26.0],
+    "lift_verified": true,
+    "sideways_carry_deg": 3.0,
+    "carry_verified": true
+  },
+  "release_verified": true,
+  "orange_before_px": [151.0, 121.5],
+  "orange_after_px": [141.5, 127.5],
+  "tray_component_before_px": [143.7, 99.0],
+  "tray_component_after_px": [149.4, 99.2],
+  "arm_home": true,
+  "torque_off": true,
+  "centre_path_verified": true,
+  "auto_reset_approved": false,
+  "remaining_blocker": "left, right, near and far tray descents remain unverified"
+}

@@ -316,6 +316,51 @@ The next high pass must use an absolute-z guard of 33.5 mm and maintain about 30
 rotation. Its before, raised, over-tray and after frames plus measurements are stored under
 `reset/calibration_evidence/tray_high_clearance_20261105/`.
 
+The next run extended the nominal path to 40 mm. Elbow compensation at pan 0 produced an actual absolute tool z
+of 44.73 mm, or 41.15 mm above verified hover. The guarded pan completed at 40.33 mm absolute z, maintaining
+36.75 mm above hover and passing the 33.5 mm live guard. This validates the high lateral pan path.
+
+The open gripper then descended through the Cartesian waypoints. At the nominal 20 mm waypoint, measured joints
+placed the tool at `[68.37,-127.87,18.60]` mm: 15.02 mm above hover with 5.25 mm horizontal error. The descent was
+stopped because it exceeded the 5 mm limit. No close was attempted. The tray contour centroid remained stable to
+0.2 pixel, but the orange shifted about 13.6 pixels while the open gripper was near it. The descent is therefore
+rejected even though the 40 mm high pan passed.
+
+The error exposed an open-loop limitation in the jog mover: it advanced an internal commanded position and allowed
+the measured joints to finish as much as 2 degrees away. The server now has `goto_closed`, which reads the real
+joints after every step, adds bounded load compensation, and requires every arm joint to be within 0.5 degree. It
+refuses initial corrections over 5 degrees and stops if compensation exceeds 5 degrees. It passed a no-motion
+home-pose test and correctly refused an oversized test correction.
+The next descent must use `goto_closed` for every waypoint and retain the 5 mm horizontal FK stop rule. Evidence is
+stored under `reset/calibration_evidence/tray_guarded_40mm_20261105/`.
+
+The closed-loop tray-present retry reduced horizontal error at the nominal 20 mm waypoint from 5.25 mm to 0.76 mm.
+At the nominal 10 mm waypoint with pan 77.2 degrees, horizontal error was 0.25 mm, but the wrist view showed the
+fixed fingertip touching or nearly touching the orange. The arm retreated to 20 mm before lateral alignment.
+Pan 79.9 degrees moved the fixed finger farther into the fruit image, while pan 70 degrees visually centred the
+shifted orange between both open fingers. The arm then descended in 5 mm Cartesian steps and split the final prior
+centre-approach move into four measured substeps.
+
+The final open approach looked symmetric, but a close command of 15 reached 15.1 rather than stalling in the
+accepted 16–26 orange hold range. The wrist image showed one finger against the orange and a gap to the opposite
+finger. The miss was reopened immediately and the arm reversed every waypoint, passed the height-guarded pan away,
+returned home, powered off and disconnected. The orange shifted about 9.2 pixels during the attempt. No grasp was
+accepted and the descent remains blocked. This shows that the midpoint between open fingertips is not the jaw
+centre after closure; closing kinematics or a measured closed-jaw midpoint offset must be included in alignment.
+Evidence is under `reset/calibration_evidence/tray_closed_loop_descent_20261105/`.
+
+A final watched retry used pan 74.5 degrees so the orange began closer to the fixed fingertip, plus a 40 mm guarded
+high pan, 5 mm Cartesian descent waypoints, 0.5-degree measured-joint tolerance, and the four approach substeps.
+The close-on-stall routine stopped at 21.9, inside the accepted 16–26 orange hold range. Both black fingertip marks
+were visibly on opposite sides of the orange. The orange then followed a lift and a 3-degree sideways carry, proving
+the grasp. The arm returned along the same measured path, released the orange inside the tray, ascended through all
+5 mm waypoints, passed the 33.5 mm height-guarded pan away, folded home, disabled torque and disconnected.
+
+This verifies the guarded Cartesian centre path for the orange position used in that attempt. It does not approve
+automatic reset: `left`, `right`, `near`, and `far` descents remain unverified, and `bench_reset.py` does not yet
+execute this Cartesian/closed-loop path. The generated JSON therefore retains `"approved_for_tray_use": false`.
+Proof frames and measurements are in `reset/calibration_evidence/tray_closed_loop_success_20261105/`.
+
 ## Lessons that changed the procedure
 
 1. **A stall reading is supporting evidence, not grasp proof.** The fingers can close beside or behind an orange
@@ -376,9 +421,8 @@ f40b66b28  Calibrate compensated table slot two
 
 Place the orange in the tray at `left`, `right`, `near`, and `far`. For each position:
 
-1. use the recorded Cartesian path only for a watched, high-clearance tray dry run; stop at the 30 mm raised pose
-   first and confirm the complete swept volume before any descent; the failed 1 cm joint-space estimate must not
-   be reused;
+1. reuse the verified 40 mm high transit, 33.5 mm live height guard, 5 mm Cartesian waypoint spacing and
+   closed-loop joint correction; the failed 1 cm joint-space estimate and open-loop descent must not be reused;
 2. align using both cameras and the black finger marks;
 3. close on the orange and record the stall;
 4. prove the grasp with a lift and small sideways carry;

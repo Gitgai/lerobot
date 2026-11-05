@@ -61,12 +61,17 @@ R0b LOOK FIRST      grab a front frame; detect the tray outline and the orange c
                     detector from the September recovery work); map the orange's pixel offset from the tray
                     centre to one of 5 calibrated descent poses (centre, near, far, left, right of the tray centre).
                     No orange found in the tray → RESET FAILED (nothing to reset; the operator places).
-R0c raised transit  EMPTY-WORKSPACE PATH RECORDED, STILL BLOCKED FOR TRAY USE. The 2026-11-05 joint-space estimate
+R0c raised transit  GUARDED 40 MM CENTRE PATH VERIFIED; OFF-CENTRE DESCENTS STILL BLOCKED. The 2026-11-05 joint-space estimate
                     intended to raise the wrist by 1 cm still brushed the tray. Its replacement is a URDF-solved
-                    seven-pose Cartesian path from 0 to 30 mm in 5 mm increments. With the tray removed, physical
+                    nine-pose Cartesian path from 0 to 40 mm in 5 mm increments. With the tray removed, physical
                     horizontal error stayed below 4.8 mm on descent and 2.56 mm on ascent. The lowest actual pose
-                    remained 6.7 mm above hover because of motor lag. Run a watched high-clearance tray test before
-                    approving any descent; do not replay the rejected joint-space estimate.
+                    remained 6.7 mm above hover because of motor lag. A tray-present pan maintained 36.75 mm above
+                    hover without moving the tray. A later open-loop descent exceeded the 5 mm horizontal limit and
+                    shifted the orange. Closed-loop control reduced that error to 0.76 mm. A first close at pan 70
+                    still missed because the open-finger midpoint did not match the closing-jaw centre. A compensated
+                    retry at pan 74.5 stalled at 21.9, passed lift and sideways-carry proof, and released back into the
+                    tray. Reuse this guarded path while separately calibrating left, right, near and far; do not replay
+                    the rejected joint-space estimate or open-loop descent.
 R1  above tray      after the validated raised transit and lateral alignment, follow a separately validated descent
                     path to the normal hover ~8 cm above the chosen descent pose, gripper 45. Do not use the old
                     multi-joint interpolation as a vertical descent.
