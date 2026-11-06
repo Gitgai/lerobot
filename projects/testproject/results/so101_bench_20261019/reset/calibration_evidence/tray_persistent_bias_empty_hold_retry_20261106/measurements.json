@@ -1,0 +1,36 @@
+{
+  "result": "FAILED_QUALIFICATION_WITHOUT_CLOSE",
+  "tray_empty": true,
+  "close_commands_executed": 0,
+  "attempts": [
+    {
+      "test": 1,
+      "result": "PASS",
+      "cartesian_distance_mm": 1.279,
+      "max_joint_error_deg": 0.308,
+      "retained_bias_deg": [0.14, 0.20, -4.10, -0.97, -0.12]
+    },
+    {
+      "test": 2,
+      "result": "PASS",
+      "cartesian_distance_mm": 0.404,
+      "max_joint_error_deg": 0.220,
+      "retained_bias_deg": [-0.15, 0.24, -4.61, 0.13, -0.08]
+    },
+    {
+      "test": 3,
+      "result": "REJECT",
+      "reason": "pose-hold compensation exceeded 5 degrees"
+    }
+  ],
+  "tests_4_and_5_run": false,
+  "contact_observed": false,
+  "final_state": {
+    "arm_home": true,
+    "torque_off": true,
+    "controller_disconnected": true,
+    "live_close_approved": false
+  },
+  "measured_cause": "The cross-command memory worked, but integrating repeated encoder-scale residuals drove elbow bias from -4.10 to -4.61 degrees and then into the 5 degree safety limit.",
+  "implemented_next_fix": "Apply a 0.15 degree encoder deadband before integrating bias; keep the 5 degree safety limit unchanged."
+}

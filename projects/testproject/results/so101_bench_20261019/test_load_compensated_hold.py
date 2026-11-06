@@ -49,3 +49,14 @@ def test_state_retains_bias_across_separate_capture_commands():
 def test_invalid_joint_vector_is_rejected():
     with pytest.raises(ValueError):
         compensated_arm_command(np.zeros(4), np.zeros(5), np.zeros(5))
+
+
+def test_encoder_scale_error_inside_deadband_does_not_wind_up_bias():
+    target = np.zeros(5, dtype=np.float32)
+    measured = np.full(5, 0.1, dtype=np.float32)
+    bias = np.array([0.0, 0.0, -4.6, 0.0, 0.0], dtype=np.float32)
+
+    for _ in range(100):
+        _, bias, _ = compensated_arm_command(target, measured, bias)
+
+    assert bias.tolist() == pytest.approx([0.0, 0.0, -4.6, 0.0, 0.0])

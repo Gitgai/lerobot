@@ -35,6 +35,7 @@ def compensated_arm_command(
     bias: np.ndarray,
     *,
     step_deg: float = 0.05,
+    deadband_deg: float = 0.15,
     max_bias_deg: float = 5.0,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Return the next command while preserving the caller-owned learned bias."""
@@ -44,7 +45,8 @@ def compensated_arm_command(
     if target_arm.shape != (5,) or measured_arm.shape != (5,) or bias.shape != (5,):
         raise ValueError("target_arm, measured_arm and bias must each contain five joints")
     error = target_arm - measured_arm
-    next_bias = bias + np.clip(error, -step_deg, step_deg)
+    correction_error = np.where(np.abs(error) > deadband_deg, error, 0.0)
+    next_bias = bias + np.clip(correction_error, -step_deg, step_deg)
     if float(np.abs(next_bias).max()) > max_bias_deg:
         raise CompensationLimitError(f"pose-hold compensation exceeded {max_bias_deg:.1f} deg")
     return target_arm + next_bias, next_bias, error
