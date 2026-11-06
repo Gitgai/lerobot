@@ -1,0 +1,29 @@
+{
+  "result": "REJECTED_NO_FRUIT_AT_FINAL",
+  "manual_mark": "black cross at solved tray target",
+  "pre_motion_placement": {
+    "ready": true,
+    "orange_px": [176.84, 116.92],
+    "target_px": [177.7967, 115.3657],
+    "distance_px": 1.83
+  },
+  "final_pose": {
+    "q": [74.5, -64.6, 83.6, 40.8, 0.0, 37.0],
+    "gripper_open": true
+  },
+  "wrist_gate": {
+    "result": "REJECT",
+    "reason": "No orange was present between the fingers; the only tray target visible was the black cross. The fallback orange-coloured table component produced an impossible [-303.79, 179.77] pixel error."
+  },
+  "after_motion_observation": "Orange was on the lower-left table outside the tray.",
+  "close_commands_executed": 0,
+  "grasp_attempted": false,
+  "inference": "The orange was verified at the target before motion and absent at final depth, so the open-gripper approach displaced it and it rolled out of the tray.",
+  "final_state": {
+    "arm_home": true,
+    "torque_off": true,
+    "controller_disconnected": true,
+    "one_shot_close_consumed": true
+  },
+  "next_requirement": "Install a shallow mechanical locator that prevents rolling, then repeat overhead placement verification and the one-shot guarded approach."
+}
