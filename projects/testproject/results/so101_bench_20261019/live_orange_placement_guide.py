@@ -5,15 +5,14 @@ from __future__ import annotations
 
 import argparse
 import json
-from pathlib import Path
 import signal
 import time
+from pathlib import Path
 
 import cv2
 import numpy as np
 import rerun as rr
 import rerun.blueprint as rb
-
 from wrist_grasp_gate import DetectionError, orange_blob
 
 
@@ -74,14 +73,30 @@ def main() -> int:
             if frame_index < 45:
                 continue
             annotated = frame.copy()
-            cv2.circle(annotated, tuple(np.rint(target).astype(int)), 9, (0, 255, 0), 3)
+            target_px = tuple(np.rint(target).astype(int))
+            # The small black dot is the physical pen mark. The larger green
+            # ring shows the approximate orange footprint when centred on it.
+            cv2.circle(annotated, target_px, 31, (0, 255, 0), 2)
+            cv2.circle(annotated, target_px, 5, (0, 0, 0), -1)
+            cv2.circle(annotated, target_px, 7, (255, 255, 255), 2)
             cv2.drawMarker(
                 annotated,
-                tuple(np.rint(target).astype(int)),
-                (0, 255, 0),
+                target_px,
+                (255, 0, 255),
                 cv2.MARKER_CROSS,
                 25,
                 3,
+            )
+            label_xy = (max(10, target_px[0] + 38), max(25, target_px[1] - 22))
+            cv2.putText(
+                annotated,
+                "BLACK PEN DOT HERE",
+                label_xy,
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.55,
+                (255, 0, 255),
+                2,
+                cv2.LINE_AA,
             )
             record = {"ready": False, "target_px": target.tolist(), "time": time.time()}
             try:
@@ -99,7 +114,9 @@ def main() -> int:
                     3,
                     tipLength=0.25,
                 )
-                label = "READY - HANDS CLEAR" if ready else f"move dx={-error[0]:+.1f}, dy={-error[1]:+.1f} px"
+                label = (
+                    "READY - HANDS CLEAR" if ready else f"move dx={-error[0]:+.1f}, dy={-error[1]:+.1f} px"
+                )
                 cv2.putText(annotated, label, (15, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.8, colour, 2, cv2.LINE_AA)
                 record.update(
                     ready=ready,
@@ -117,11 +134,15 @@ def main() -> int:
                     f"Target: `{target[0]:.2f}, {target[1]:.2f}` px  \n"
                     f"Error: `{error[0]:+.2f}, {error[1]:+.2f}` px  \n"
                     f"Distance: **{distance:.2f} px** (ready at <= {args.tolerance_px:.1f} px)\n\n"
+                    "Black pen mark: small dot at the magenta target cross.  \n"
+                    "Orange placement: centre the orange over that dot, inside the green footprint.\n\n"
                     "Camera only. The robot is disconnected."
                 )
             except DetectionError as error:
                 status = f"Orange detection error: `{error}`\n\nCamera only. The robot is disconnected."
-                cv2.putText(annotated, "ORANGE NOT DETECTED", (15, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2)
+                cv2.putText(
+                    annotated, "ORANGE NOT DETECTED", (15, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2
+                )
                 record["error"] = str(error)
 
             ok, encoded = cv2.imencode(".jpg", annotated, [cv2.IMWRITE_JPEG_QUALITY, 90])
