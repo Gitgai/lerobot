@@ -1,0 +1,55 @@
+{
+  "tray": {
+    "shift_px": [
+      -0.027,
+      0.036
+    ],
+    "response": 0.9803
+  },
+  "table_mid": {
+    "shift_px": [
+      -0.298,
+      0.018
+    ],
+    "response": 1.0452
+  },
+  "table_low": {
+    "shift_px": [
+      0.027,
+      0.093
+    ],
+    "response": 0.9202
+  },
+  "tray_relative_to_table_px": [
+    0.108,
+    -0.02
+  ],
+  "result": "PASS",
+  "tray_empty": true,
+  "gripper_open": 37.0,
+  "close_command_sent": false,
+  "high_pan": {
+    "minimum_guard_z_mm": 33.5,
+    "measured_tool_z_mm": 38.44,
+    "result": "PASS"
+  },
+  "final_measured_q": [
+    74.3,
+    -64.6,
+    83.6,
+    41.0,
+    0.0,
+    37.0
+  ],
+  "final_pose_guard": {
+    "result": "PASS",
+    "cartesian_distance_mm": 2.473,
+    "max_joint_error_deg": 0.4
+  },
+  "contact_observed": false,
+  "route_reversed": true,
+  "arm_home": true,
+  "torque_off": true,
+  "next_permitted_test": "one watched centre-orange grasp with fresh-image and 3-D pose gates",
+  "auto_reset_approved": false
+}
