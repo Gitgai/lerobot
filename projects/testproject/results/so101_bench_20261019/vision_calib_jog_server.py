@@ -7,17 +7,23 @@ written to ~/vision_calib_jog_cmd and state is reported in
 motion envelope observed in the 169 demonstrations.  ``goto_zguard Z Q``
 also stops a move if live FK tool height falls below Z millimetres, while
 ``goto_closed Q`` uses measured-joint feedback to reach a 0.5 degree tolerance.
-``close_stall`` locks the five measured arm joints while closing and reopens if
-arm drift exceeds 5 degrees.
+``close_stall_guarded IMAGE`` is the only tray-close command.  It requires the
+measured arm to be near the verified successful 3-D pose and IMAGE to pass the
+tight wrist-camera gate before it locks the arm joints and closes.  The legacy
+``close_stall`` command is disabled so a 2-D image match cannot bypass the pose
+guard.
 """
 
 import json
 import pathlib
 import time
 
+import cv2
 import numpy as np
 
 from generate_tray_cartesian_path import DEFAULT_URDF, Kinematics
+from tray_grasp_pose_guard import evaluate_pose
+from wrist_grasp_gate import DEFAULT_REFERENCE, DEFAULT_TOLERANCE_PX, evaluate
 
 try:
     from lerobot.robots.so_follower import SO101Follower, SO101FollowerConfig
@@ -35,6 +41,10 @@ ENV_MIN = np.array([-111.4, -104.9, -92.0, -99.6, -75.3, 1.6]) - 5
 ENV_MAX = np.array([84.0, 82.9, 97.3, 103.1, 90.9, 88.2]) + 5
 PROTECTIONS = {"Max_Torque_Limit": 500, "Protection_Current": 250, "Overload_Torque": 25}
 KINEMATICS = Kinematics(DEFAULT_URDF)
+MAX_WRIST_IMAGE_AGE_S = 5.0
+WRIST_REFERENCE = cv2.imread(str(DEFAULT_REFERENCE))
+if WRIST_REFERENCE is None:
+    raise RuntimeError(f"missing wrist grasp reference: {DEFAULT_REFERENCE}")
 
 
 robot = SO101Follower(SO101FollowerConfig(port="/dev/ttyACM0", id="my_so101_follower", cameras={}))
@@ -157,6 +167,51 @@ def close_on_stall():
     )
 
 
+def guarded_close(image_path):
+    """Close only when independent measured-pose and wrist-image gates pass."""
+    if not image_path.is_absolute():
+        return "REFUSED close: wrist image path must be absolute"
+    try:
+        image_age_s = time.time() - image_path.stat().st_mtime
+    except FileNotFoundError:
+        return f"REFUSED close: wrist image does not exist {image_path}"
+    if image_age_s < 0 or image_age_s > MAX_WRIST_IMAGE_AGE_S:
+        return (
+            f"REFUSED close: wrist image is {image_age_s:.1f} s old "
+            f"(limit {MAX_WRIST_IMAGE_AGE_S:.1f} s)"
+        )
+    measured = q()
+    pose = evaluate_pose(measured)
+    if not pose.safe_pose_for_close:
+        return (
+            "REFUSED close: 3-D pose gate rejected; "
+            f"distance {pose.cartesian_distance_mm:.3f} mm "
+            f"(limit {pose.cartesian_tolerance_mm:.1f}), "
+            f"max joint error {pose.max_joint_error_deg:.3f} deg "
+            f"(limit {pose.joint_tolerance_deg:.1f})"
+        )
+    image = cv2.imread(str(image_path))
+    if image is None:
+        return f"REFUSED close: could not read wrist image {image_path}"
+    vision = evaluate(image, WRIST_REFERENCE, tolerance=DEFAULT_TOLERANCE_PX)
+    if not vision["safe_to_close"]:
+        return (
+            "REFUSED close: wrist image gate rejected; "
+            f"error {vision['finger_frame_error_px']} px "
+            f"(limit +/-{DEFAULT_TOLERANCE_PX:.1f} each axis)"
+        )
+    # Re-read after vision processing so motion during the image check cannot
+    # carry stale pose permission into the close.
+    final_pose = evaluate_pose(q())
+    if not final_pose.safe_pose_for_close:
+        return (
+            "REFUSED close: 3-D pose changed after image gate; "
+            f"distance {final_pose.cartesian_distance_mm:.3f} mm, "
+            f"max joint error {final_pose.max_joint_error_deg:.3f} deg"
+        )
+    return close_on_stall()
+
+
 try:
     robot.connect(calibrate=False)
     for register, value in PROTECTIONS.items():
@@ -198,8 +253,13 @@ try:
                 target = current.copy()
                 target[5] = float(parts[1])
                 message = move(target)
+            elif command == "close_stall_guarded":
+                if len(parts) != 2:
+                    message = "REFUSED close: usage close_stall_guarded /absolute/wrist_image.jpg"
+                else:
+                    message = guarded_close(pathlib.Path(parts[1]))
             elif command == "close_stall":
-                message = close_on_stall()
+                message = "REFUSED close: use close_stall_guarded with a fresh wrist image"
             elif command == "read":
                 message = f"q {current.round(1).tolist()}"
             elif command == "save":
