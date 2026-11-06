@@ -1,0 +1,32 @@
+{
+  "date": "2026-11-06",
+  "result": "FAIL: tight 2D wrist gate passed but 3D grasp geometry missed",
+  "placement_px": [159.37, 138.81],
+  "placement_distance_from_target_px": 3.47,
+  "final_image_gate": {
+    "pan_deg": 68.2476,
+    "radial_mm": -2.0,
+    "error_px": [1.84, 4.63],
+    "tolerance_each_axis_px": 5.0,
+    "result": "PASS"
+  },
+  "close": {
+    "stall": 2.2,
+    "accepted_hold_range": [16.0, 26.0],
+    "result": "empty close; right jaw contacted fruit, left jaw clear"
+  },
+  "verified_success_pose": {
+    "q": [74.5, -64.6, 83.2, 40.8, 0.0],
+    "xyz_mm": [77.438, -139.234, 11.003],
+    "pitch_sum_deg": 59.4
+  },
+  "failed_image_matched_pose": {
+    "q": [68.2476, -52.3275, 79.5066, 32.221, 0.0],
+    "xyz_mm": [96.284, -144.006, 9.490],
+    "pitch_sum_deg": 59.4001
+  },
+  "failed_minus_success_xyz_mm": [18.846, -4.772, -1.513],
+  "arm_returned_home": true,
+  "torque_disabled": true,
+  "decision": "Block further closes from the joint-delta/multi-height endpoint family. Require successful-pose Cartesian/joint guard plus tightened image gate."
+}
