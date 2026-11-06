@@ -1,0 +1,104 @@
+{
+  "result": "SAFE_REJECT",
+  "start_orange_px": [
+    160.58,
+    144.17
+  ],
+  "end_orange_px": [
+    163.39,
+    142.76
+  ],
+  "orange_shift_px": 3.141,
+  "final_measured_q": [
+    74.5,
+    -64.6,
+    83.3,
+    41.0,
+    -0.4,
+    37.0
+  ],
+  "pose_gate": {
+    "result": "PASS",
+    "cartesian_distance_mm": 1.013,
+    "max_joint_error_deg": 0.4
+  },
+  "wrist_gate": {
+    "result": "REJECT",
+    "safe_to_close": false,
+    "provisional_single_success_reference": true,
+    "tolerance_each_axis_px": 5.0,
+    "finger_frame_error_px": [
+      -88.72,
+      -37.81
+    ],
+    "live": {
+      "orange_px": [
+        232.48,
+        144.93
+      ],
+      "orange_area_px": 29379.5,
+      "left_tip_px": [
+        197.58,
+        196.78
+      ],
+      "right_tip_px": [
+        513.19,
+        127.14
+      ],
+      "tip_midpoint_px": [
+        355.38,
+        161.96
+      ],
+      "tip_span_px": 323.2,
+      "orange_in_finger_frame_px": [
+        -116.34,
+        -43.11
+      ]
+    },
+    "reference": {
+      "orange_px": [
+        325.08,
+        165.89
+      ],
+      "orange_area_px": 26947.0,
+      "left_tip_px": [
+        196.87,
+        199.92
+      ],
+      "right_tip_px": [
+        509.51,
+        130.2
+      ],
+      "tip_midpoint_px": [
+        353.19,
+        165.06
+      ],
+      "tip_span_px": 320.32,
+      "orange_in_finger_frame_px": [
+        -27.62,
+        -5.3
+      ]
+    },
+    "note": "PASS is necessary but still requires watched close, stall, lift and carry proof."
+  },
+  "close_command_sent": false,
+  "grasp_attempted": false,
+  "tray_roi_shift_px": [
+    1.492,
+    -0.547
+  ],
+  "tray_roi_phase_response": 0.5109,
+  "route_reversed": true,
+  "arm_home": true,
+  "torque_off": true,
+  "invalidated_overhead_target_px": [
+    158,
+    142
+  ],
+  "next_tray_relative_target_px": [
+    173,
+    116
+  ],
+  "next_target_basis": "map verified successful orange [151,121.5] through old/current clear tray bounding boxes",
+  "auto_reset_approved": false
+}
