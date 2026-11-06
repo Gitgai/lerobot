@@ -1,0 +1,40 @@
+{
+  "result": "BLOCKED_WITHOUT_CLOSE",
+  "final_placement": {
+    "orange_px": [178.53, 115.63],
+    "target_px": [177.7967, 115.3657],
+    "distance_px": 0.78
+  },
+  "corrected_wrist_gate": {
+    "result": "PASS",
+    "finger_frame_error_px": [-0.37, 4.99]
+  },
+  "pose_hold_refusals": [
+    {
+      "mode": "external_fresh_frame",
+      "cartesian_error_mm": 6.740
+    },
+    {
+      "mode": "synchronized_capture",
+      "cartesian_error_mm": 5.622,
+      "max_joint_error_deg": 1.240
+    },
+    {
+      "mode": "post_warmup_realignment",
+      "cartesian_error_mm": 5.915,
+      "max_joint_error_deg": 1.064
+    }
+  ],
+  "close_commands_executed": 0,
+  "final_state": {
+    "arm_home": true,
+    "torque_off": true,
+    "live_close_approved": false
+  },
+  "measured_cause": "The loaded elbow settles about one degree away from the successful reference because the camera capture loop does not preserve the measured-joint alignment load-compensation bias.",
+  "requirements_before_reenable": [
+    "Retain learned load compensation through synchronized capture.",
+    "Pass five repeated empty-tray pose-hold captures below 3 mm Cartesian error.",
+    "Use a shallow physical orange locator at the solved tray-relative target."
+  ]
+}

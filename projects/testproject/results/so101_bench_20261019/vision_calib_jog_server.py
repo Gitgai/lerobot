@@ -45,6 +45,7 @@ MAX_WRIST_IMAGE_AGE_S = 5.0
 WRIST_CAMERA = "/dev/video6"
 WRIST_WARMUP_FRAMES = 45
 WRIST_SYNC_FRAMES = 10
+LIVE_CLOSE_APPROVED = False
 WRIST_REFERENCE = cv2.imread(str(DEFAULT_REFERENCE))
 if WRIST_REFERENCE is None:
     raise RuntimeError(f"missing wrist grasp reference: {DEFAULT_REFERENCE}")
@@ -334,7 +335,12 @@ try:
                 else:
                     message = guarded_close(pathlib.Path(parts[1]))
             elif command == "close_stall_live":
-                if len(parts) != 2:
+                if not LIVE_CLOSE_APPROVED:
+                    message = (
+                        "REFUSED live close: blocked after repeated loaded-pose hold failures; "
+                        "preserve learned compensation and empty-test before enabling"
+                    )
+                elif len(parts) != 2:
                     message = "REFUSED live close: usage close_stall_live /absolute/wrist_image.jpg"
                 else:
                     message = capture_holding_successful_pose(pathlib.Path(parts[1]))
