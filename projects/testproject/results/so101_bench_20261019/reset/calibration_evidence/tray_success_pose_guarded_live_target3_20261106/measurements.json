@@ -1,0 +1,93 @@
+{
+  "result": "SAFE_REJECT",
+  "start_orange_px": [
+    172.85,
+    122.77
+  ],
+  "end_orange_px": [
+    173.02,
+    122.78
+  ],
+  "orange_shift_px": 0.177,
+  "placement_target_px": [
+    173,
+    116
+  ],
+  "start_target_error_px": [
+    -0.15,
+    6.77
+  ],
+  "pose_gate": {
+    "result": "PASS",
+    "cartesian_distance_mm": 1.372,
+    "max_joint_error_deg": 0.5
+  },
+  "wrist_gate": {
+    "result": "REJECT",
+    "safe_to_close": false,
+    "provisional_single_success_reference": true,
+    "tolerance_each_axis_px": 5.0,
+    "finger_frame_error_px": [
+      -22.16,
+      -12.9
+    ],
+    "live": {
+      "orange_px": [
+        303.24,
+        153.13
+      ],
+      "orange_area_px": 28331.5,
+      "left_tip_px": [
+        197.64,
+        194.94
+      ],
+      "right_tip_px": [
+        513.89,
+        125.54
+      ],
+      "tip_midpoint_px": [
+        355.77,
+        160.24
+      ],
+      "tip_span_px": 323.77,
+      "orange_in_finger_frame_px": [
+        -49.78,
+        -18.2
+      ]
+    },
+    "reference": {
+      "orange_px": [
+        325.08,
+        165.89
+      ],
+      "orange_area_px": 26947.0,
+      "left_tip_px": [
+        196.87,
+        199.92
+      ],
+      "right_tip_px": [
+        509.51,
+        130.2
+      ],
+      "tip_midpoint_px": [
+        353.19,
+        165.06
+      ],
+      "tip_span_px": 320.32,
+      "orange_in_finger_frame_px": [
+        -27.62,
+        -5.3
+      ]
+    },
+    "note": "PASS is necessary but still requires watched close, stall, lift and carry proof."
+  },
+  "close_command_sent": false,
+  "route_reversed": true,
+  "arm_home": true,
+  "torque_off": true,
+  "next_adjustment_from_end_px": [
+    -0.02,
+    -6.78
+  ],
+  "auto_reset_approved": false
+}
