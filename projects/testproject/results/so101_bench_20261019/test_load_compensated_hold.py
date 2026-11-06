@@ -2,7 +2,11 @@
 
 import numpy as np
 import pytest
-from load_compensated_hold import CompensationLimitError, compensated_arm_command
+from load_compensated_hold import (
+    CompensationLimitError,
+    LoadCompensationState,
+    compensated_arm_command,
+)
 
 
 def test_bias_is_retained_across_alignment_and_capture_phases():
@@ -26,6 +30,20 @@ def test_compensation_limit_refuses_before_command_is_returned():
             np.full(5, -1.0),
             np.full(5, 4.99),
         )
+
+
+def test_state_retains_bias_across_separate_capture_commands():
+    state = LoadCompensationState()
+    target = np.zeros(5, dtype=np.float32)
+    measured = np.array([0.0, 0.0, -1.0, 0.0, 0.0], dtype=np.float32)
+
+    for _ in range(20):
+        state.command(target, measured)
+    first_capture_bias = state.bias.copy()
+    state.command(target, measured)
+
+    assert first_capture_bias[2] == pytest.approx(1.0)
+    assert state.bias[2] == pytest.approx(1.05)
 
 
 def test_invalid_joint_vector_is_rejected():

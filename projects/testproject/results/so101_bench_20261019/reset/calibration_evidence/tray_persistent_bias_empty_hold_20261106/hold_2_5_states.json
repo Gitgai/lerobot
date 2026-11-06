@@ -1,0 +1,17 @@
+[
+  {
+    "test": 2,
+    "state": {
+      "q": [
+        74.19999694824219,
+        -65.0,
+        82.9000015258789,
+        40.400001525878906,
+        -0.4000000059604645,
+        37.0
+      ],
+      "msg": "REFUSED live close: synchronized pose gate rejected; distance 3.271 mm, max joint error 0.396 deg, max hold error 1.240 deg",
+      "t": 1793947006.644892
+    }
+  }
+]

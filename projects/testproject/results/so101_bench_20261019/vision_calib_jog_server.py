@@ -22,7 +22,11 @@ import time
 import cv2
 import numpy as np
 from generate_tray_cartesian_path import DEFAULT_URDF, Kinematics
-from load_compensated_hold import CompensationLimitError, compensated_arm_command
+from load_compensated_hold import (
+    CompensationLimitError,
+    LoadCompensationState,
+    compensated_arm_command,
+)
 from tray_grasp_pose_guard import SUCCESSFUL_GRASP_Q, evaluate_pose
 from wrist_grasp_gate import DEFAULT_REFERENCE, DEFAULT_TOLERANCE_PX, evaluate
 
@@ -46,7 +50,9 @@ MAX_WRIST_IMAGE_AGE_S = 5.0
 WRIST_CAMERA = "/dev/video6"
 WRIST_WARMUP_FRAMES = 45
 WRIST_SYNC_FRAMES = 10
+WRIST_MAX_SETTLE_FRAMES = 40
 LIVE_CLOSE_APPROVED = False
+SUCCESSFUL_POSE_COMPENSATION = LoadCompensationState()
 WRIST_REFERENCE = cv2.imread(str(DEFAULT_REFERENCE))
 if WRIST_REFERENCE is None:
     raise RuntimeError(f"missing wrist grasp reference: {DEFAULT_REFERENCE}")
@@ -236,7 +242,12 @@ def capture_holding_successful_pose(image_path, *, close_after_capture):
     if not image_path.is_absolute():
         return "REFUSED live close: wrist image path must be absolute"
     target = np.concatenate((SUCCESSFUL_GRASP_Q, [37.0])).astype(np.float32)
-    alignment, bias = align_closed_loop(target)
+    alignment, bias = align_closed_loop(
+        target,
+        tolerance_deg=0.25,
+        initial_bias=SUCCESSFUL_POSE_COMPENSATION.bias,
+    )
+    SUCCESSFUL_POSE_COMPENSATION.replace(bias)
     if alignment.startswith(("REFUSED", "STOPPED")):
         return f"REFUSED live close: could not align pose; {alignment}"
 
@@ -255,7 +266,7 @@ def capture_holding_successful_pose(image_path, *, close_after_capture):
         for _ in range(WRIST_WARMUP_FRAMES):
             measured = q()
             try:
-                arm_command, bias, error = compensated_arm_command(SUCCESSFUL_GRASP_Q, measured[:5], bias)
+                arm_command, error = SUCCESSFUL_POSE_COMPENSATION.command(SUCCESSFUL_GRASP_Q, measured[:5])
             except CompensationLimitError:
                 return "REFUSED live close: pose-hold compensation exceeded 5 deg"
             max_error = max(max_error, float(np.abs(error).max()))
@@ -267,14 +278,20 @@ def capture_holding_successful_pose(image_path, *, close_after_capture):
         # Camera startup takes long enough for load-dependent elbow drift. With
         # the device now warm and its one-frame buffer active, restore the pose
         # using measured feedback, then capture only post-correction frames.
-        realignment, bias = align_closed_loop(target, initial_bias=bias)
+        realignment, bias = align_closed_loop(
+            target,
+            tolerance_deg=0.25,
+            initial_bias=SUCCESSFUL_POSE_COMPENSATION.bias,
+        )
+        SUCCESSFUL_POSE_COMPENSATION.replace(bias)
         if realignment.startswith(("REFUSED", "STOPPED")):
             return f"REFUSED live close: post-warmup alignment failed; {realignment}"
         frame = None
-        for _ in range(WRIST_SYNC_FRAMES):
+        synchronized_pose = None
+        for frame_index in range(WRIST_MAX_SETTLE_FRAMES):
             measured = q()
             try:
-                arm_command, bias, error = compensated_arm_command(SUCCESSFUL_GRASP_Q, measured[:5], bias)
+                arm_command, error = SUCCESSFUL_POSE_COMPENSATION.command(SUCCESSFUL_GRASP_Q, measured[:5])
             except CompensationLimitError:
                 return "REFUSED live close: pose-hold compensation exceeded 5 deg"
             max_error = max(max_error, float(np.abs(error).max()))
@@ -284,6 +301,10 @@ def capture_holding_successful_pose(image_path, *, close_after_capture):
             ok, candidate = cap.read()
             if ok and candidate is not None:
                 frame = candidate
+            if frame_index + 1 >= WRIST_SYNC_FRAMES:
+                synchronized_pose = evaluate_pose(q())
+                if synchronized_pose.safe_pose_for_close:
+                    break
     finally:
         cap.release()
     if frame is None:
@@ -292,7 +313,7 @@ def capture_holding_successful_pose(image_path, *, close_after_capture):
     image_path.parent.mkdir(parents=True, exist_ok=True)
     if not cv2.imwrite(str(image_path), frame):
         return f"REFUSED live close: could not save wrist frame {image_path}"
-    pose = evaluate_pose(q())
+    pose = synchronized_pose if synchronized_pose is not None else evaluate_pose(q())
     if not pose.safe_pose_for_close:
         return (
             "REFUSED live close: synchronized pose gate rejected; "
@@ -305,7 +326,7 @@ def capture_holding_successful_pose(image_path, *, close_after_capture):
             "hold-capture PASS without close; "
             f"distance {pose.cartesian_distance_mm:.3f} mm, "
             f"max joint error {pose.max_joint_error_deg:.3f} deg, "
-            f"retained bias {bias.round(2).tolist()}"
+            f"retained bias {SUCCESSFUL_POSE_COMPENSATION.bias.round(2).tolist()}"
         )
     return guarded_close(image_path)
 

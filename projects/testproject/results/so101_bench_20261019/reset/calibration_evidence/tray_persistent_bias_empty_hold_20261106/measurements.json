@@ -1,0 +1,41 @@
+{
+  "result": "FAILED_QUALIFICATION_WITHOUT_CLOSE",
+  "tray_empty": true,
+  "close_commands_executed": 0,
+  "attempts": [
+    {
+      "test": 1,
+      "result": "PASS",
+      "cartesian_distance_mm": 0.991,
+      "max_joint_error_deg": 0.279,
+      "retained_bias_deg": [-0.20, -0.93, -3.90, -0.77, 0.09]
+    },
+    {
+      "test": 2,
+      "result": "REJECT",
+      "cartesian_distance_mm": 3.271,
+      "max_joint_error_deg": 0.396,
+      "max_hold_error_deg": 1.240
+    }
+  ],
+  "tests_3_to_5_run": false,
+  "failure_policy": "Stop on first failure and reset the five-pass count.",
+  "tray_shift_px": [-0.072, -0.155],
+  "table_reference_shifts_px": {
+    "mid": [-0.044, 0.519],
+    "right": [0.020, -0.025]
+  },
+  "contact_observed": false,
+  "final_state": {
+    "arm_home": true,
+    "torque_off": true,
+    "controller_disconnected": true,
+    "live_close_approved": false
+  },
+  "measured_cause": "Compensation persisted within one capture but reset to zero at the start of each new hold_capture_test command; the 0.5 degree alignment exit condition was also looser than the 3 mm Cartesian gate.",
+  "implemented_next_fix": [
+    "Retain successful-pose compensation across repeated capture commands.",
+    "Tighten capture alignment tolerance from 0.5 to 0.25 degree.",
+    "Continue synchronized settling for up to 40 frames and stop only when the 3 mm Cartesian gate passes."
+  ]
+}

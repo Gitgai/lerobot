@@ -1,0 +1,23 @@
+{
+  "tray": {
+    "shift_px": [
+      -0.072,
+      -0.155
+    ],
+    "response": 0.671
+  },
+  "table_mid": {
+    "shift_px": [
+      -0.044,
+      0.519
+    ],
+    "response": 0.838
+  },
+  "table_right": {
+    "shift_px": [
+      0.02,
+      -0.025
+    ],
+    "response": 0.8845
+  }
+}

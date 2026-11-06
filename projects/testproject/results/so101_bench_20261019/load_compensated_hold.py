@@ -3,11 +3,30 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass, field
+
 import numpy as np
 
 
 class CompensationLimitError(RuntimeError):
     """Raised before a load-compensated command exceeds its allowed bias."""
+
+
+@dataclass
+class LoadCompensationState:
+    """Retain learned motor-command bias across alignment and capture calls."""
+
+    bias: np.ndarray = field(default_factory=lambda: np.zeros(5, dtype=np.float32))
+
+    def replace(self, bias: np.ndarray) -> None:
+        bias = np.asarray(bias, dtype=np.float32)
+        if bias.shape != (5,):
+            raise ValueError("bias must contain five joints")
+        self.bias = bias.copy()
+
+    def command(self, target_arm: np.ndarray, measured_arm: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+        command, self.bias, error = compensated_arm_command(target_arm, measured_arm, self.bias)
+        return command, error
 
 
 def compensated_arm_command(
