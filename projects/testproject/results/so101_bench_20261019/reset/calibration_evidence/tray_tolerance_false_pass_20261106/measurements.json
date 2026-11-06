@@ -1,0 +1,22 @@
+{
+  "date": "2026-11-06",
+  "result": "FAIL: old 14-pixel wrist gate false positive; gripper closed on empty space",
+  "placement_before_px": [159.62, 142.79],
+  "old_gate": {
+    "pan_deg": 65.8976,
+    "radial_mm": -2.0,
+    "error_px": [13.17, -0.07],
+    "tolerance_each_axis_px": 14.0,
+    "result": "PASS"
+  },
+  "close": {
+    "stall": 2.1,
+    "accepted_hold_range": [16.0, 26.0],
+    "result": "empty close"
+  },
+  "orange_after_px": [163.22, 111.40],
+  "orange_displacement_px": 31.60,
+  "arm_returned_home": true,
+  "torque_disabled": true,
+  "fix": "Tighten final gate to 5 pixels per axis and select fingertip components by proximity to verified marks."
+}

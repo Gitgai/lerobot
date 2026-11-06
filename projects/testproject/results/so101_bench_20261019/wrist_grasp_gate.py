@@ -19,6 +19,9 @@ import numpy as np
 
 LEFT_TIP_ROI = (80, 50, 300, 310)
 RIGHT_TIP_ROI = (360, 30, 620, 300)
+LEFT_TIP_EXPECTED_PX = np.array([197.0, 200.0])
+RIGHT_TIP_EXPECTED_PX = np.array([510.0, 130.0])
+DEFAULT_TOLERANCE_PX = 5.0
 DEFAULT_REFERENCE = Path(__file__).parent / (
     "reset/calibration_evidence/tray_closed_loop_success_20261105/"
     "01_final_open_wrist.jpg"
@@ -63,7 +66,11 @@ def orange_blob(image: np.ndarray) -> tuple[np.ndarray, float]:
     return centre, float(cv2.contourArea(contour))
 
 
-def black_tip(image: np.ndarray, roi: tuple[int, int, int, int]) -> np.ndarray:
+def black_tip(
+    image: np.ndarray,
+    roi: tuple[int, int, int, int],
+    expected_px: np.ndarray,
+) -> np.ndarray:
     x0, y0, x1, y1 = roi
     hsv = cv2.cvtColor(image[y0:y1, x0:x1], cv2.COLOR_BGR2HSV)
     mask = cv2.inRange(hsv, np.array([0, 0, 0]), np.array([179, 255, 105]))
@@ -72,17 +79,24 @@ def black_tip(image: np.ndarray, roi: tuple[int, int, int, int]) -> np.ndarray:
     candidates = []
     for index in range(1, count):
         x, y, width, height, area = stats[index]
-        if 250 <= area <= 1000 and 15 <= width <= 40 and 15 <= height <= 45:
+        if 250 <= area <= 1000 and 15 <= width <= 40 and 15 <= height <= 90:
             candidates.append((int(area), centres[index] + [x0, y0]))
     if not candidates:
         raise DetectionError(f"marked fingertip not found in ROI {roi}")
-    return max(candidates, key=lambda item: item[0])[1].astype(float)
+    # At low tray poses, black wrist hardware can enter the fingertip ROIs and
+    # be slightly larger than the painted tip.  The camera and fingertip marks
+    # are fixed, so select the plausible component nearest the verified tip
+    # location instead of selecting by area alone.
+    return min(
+        candidates,
+        key=lambda item: np.linalg.norm(item[1] - expected_px),
+    )[1].astype(float)
 
 
 def measure(image: np.ndarray) -> dict:
     orange, orange_area = orange_blob(image)
-    left = black_tip(image, LEFT_TIP_ROI)
-    right = black_tip(image, RIGHT_TIP_ROI)
+    left = black_tip(image, LEFT_TIP_ROI, LEFT_TIP_EXPECTED_PX)
+    right = black_tip(image, RIGHT_TIP_ROI, RIGHT_TIP_EXPECTED_PX)
     span = float(np.linalg.norm(right - left))
     if not 250 <= span <= 400:
         raise DetectionError(f"implausible fingertip span {span:.1f}px")
@@ -151,7 +165,7 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("image", type=Path)
     parser.add_argument("--reference", type=Path, default=DEFAULT_REFERENCE)
-    parser.add_argument("--tolerance", type=float, default=14.0)
+    parser.add_argument("--tolerance", type=float, default=DEFAULT_TOLERANCE_PX)
     parser.add_argument("--json", type=Path)
     parser.add_argument("--annotated", type=Path)
     args = parser.parse_args()

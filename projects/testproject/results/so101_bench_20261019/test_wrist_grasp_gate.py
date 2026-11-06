@@ -6,7 +6,7 @@ import unittest
 
 import cv2
 
-from wrist_grasp_gate import DEFAULT_REFERENCE, evaluate
+from wrist_grasp_gate import DEFAULT_REFERENCE, DEFAULT_TOLERANCE_PX, evaluate
 
 
 HERE = Path(__file__).resolve().parent
@@ -17,6 +17,10 @@ REJECTED = (
 KNOWN_MISS = (
     HERE
     / "reset/calibration_evidence/tray_left_guarded_hold_miss_20261105/04_final_open_wrist.jpg"
+)
+FALSE_PASS = (
+    HERE
+    / "reset/calibration_evidence/tray_tolerance_false_pass_20261106/01_open_wrist.jpg"
 )
 
 
@@ -30,7 +34,7 @@ class WristGraspGateTest(unittest.TestCase):
     def evaluate_path(self, path: Path) -> dict:
         image = cv2.imread(str(path))
         self.assertIsNotNone(image, path)
-        return evaluate(image, self.reference, tolerance=14.0)
+        return evaluate(image, self.reference, tolerance=DEFAULT_TOLERANCE_PX)
 
     def test_verified_grasp_alignment_passes(self):
         result = self.evaluate_path(DEFAULT_REFERENCE)
@@ -48,11 +52,17 @@ class WristGraspGateTest(unittest.TestCase):
         self.assertFalse(result["safe_to_close"])
         self.assertGreater(max(abs(v) for v in result["finger_frame_error_px"]), 20)
 
+    def test_old_fourteen_pixel_gate_false_positive_is_rejected(self):
+        result = self.evaluate_path(FALSE_PASS)
+        self.assertFalse(result["safe_to_close"])
+        self.assertGreater(result["finger_frame_error_px"][0], 10)
+        self.assertLess(abs(result["finger_frame_error_px"][1]), 1)
+
     def test_raised_view_rejects_larger_wood_component(self):
         image = cv2.imread("/tmp/tray_high_servo/00_high_baseline_wrist.jpg")
         if image is None:
             self.skipTest("live raised calibration frame is not present")
-        result = evaluate(image, self.reference, tolerance=14.0)
+        result = evaluate(image, self.reference, tolerance=DEFAULT_TOLERANCE_PX)
         self.assertAlmostEqual(result["live"]["orange_px"][0], 230.4, delta=1.0)
         self.assertAlmostEqual(result["live"]["orange_px"][1], 126.8, delta=1.0)
 
