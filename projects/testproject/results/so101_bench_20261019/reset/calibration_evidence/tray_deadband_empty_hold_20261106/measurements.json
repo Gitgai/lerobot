@@ -1,0 +1,45 @@
+{
+  "result": "PASS_5_OF_5_WITHOUT_CLOSE",
+  "tray_empty": true,
+  "close_commands_executed": 0,
+  "attempts": [
+    {
+      "test": 1,
+      "cartesian_distance_mm": 1.229,
+      "max_joint_error_deg": 0.273
+    },
+    {
+      "test": 2,
+      "cartesian_distance_mm": 1.229,
+      "max_joint_error_deg": 0.273
+    },
+    {
+      "test": 3,
+      "cartesian_distance_mm": 1.645,
+      "max_joint_error_deg": 0.360
+    },
+    {
+      "test": 4,
+      "cartesian_distance_mm": 1.229,
+      "max_joint_error_deg": 0.273
+    },
+    {
+      "test": 5,
+      "cartesian_distance_mm": 0.083,
+      "max_joint_error_deg": 0.132
+    }
+  ],
+  "maximum_cartesian_distance_mm": 1.645,
+  "acceptance_limit_mm": 3.0,
+  "tray_relative_to_table_shift_px": [0.112, -0.094],
+  "contact_observed": false,
+  "route_reversed": true,
+  "final_state": {
+    "arm_home": true,
+    "torque_off": true,
+    "controller_disconnected": true,
+    "live_close_approved": false
+  },
+  "controller_requirement_satisfied": true,
+  "remaining_requirement": "Install and verify a shallow physical orange locator at the solved tray-relative target before any fruit close."
+}
