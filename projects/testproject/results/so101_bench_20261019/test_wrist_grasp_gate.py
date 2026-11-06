@@ -22,6 +22,10 @@ FALSE_PASS = (
     HERE
     / "reset/calibration_evidence/tray_tolerance_false_pass_20261106/01_open_wrist.jpg"
 )
+EDGE_WOOD_FALSE_BLOB = (
+    HERE
+    / "reset/calibration_evidence/tray_success_pose_guarded_live_target5_20261106/01_final_open_wrist.jpg"
+)
 
 
 class WristGraspGateTest(unittest.TestCase):
@@ -65,6 +69,13 @@ class WristGraspGateTest(unittest.TestCase):
         result = evaluate(image, self.reference, tolerance=DEFAULT_TOLERANCE_PX)
         self.assertAlmostEqual(result["live"]["orange_px"][0], 230.4, delta=1.0)
         self.assertAlmostEqual(result["live"]["orange_px"][1], 126.8, delta=1.0)
+
+    def test_final_view_selects_fruit_instead_of_larger_edge_wood(self):
+        result = self.evaluate_path(EDGE_WOOD_FALSE_BLOB)
+        self.assertAlmostEqual(result["live"]["orange_px"][0], 328.5, delta=1.0)
+        self.assertAlmostEqual(result["live"]["orange_px"][1], 167.1, delta=1.0)
+        self.assertLess(max(abs(value) for value in result["finger_frame_error_px"]), 5.0)
+        self.assertTrue(result["safe_to_close"])
 
 
 if __name__ == "__main__":

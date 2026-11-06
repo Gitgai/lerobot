@@ -21,6 +21,7 @@ LEFT_TIP_ROI = (80, 50, 300, 310)
 RIGHT_TIP_ROI = (360, 30, 620, 300)
 LEFT_TIP_EXPECTED_PX = np.array([197.0, 200.0])
 RIGHT_TIP_EXPECTED_PX = np.array([510.0, 130.0])
+ORANGE_EXPECTED_PX = np.array([325.0, 166.0])
 DEFAULT_TOLERANCE_PX = 5.0
 DEFAULT_REFERENCE = Path(__file__).parent / (
     "reset/calibration_evidence/tray_closed_loop_success_20261105/"
@@ -32,7 +33,10 @@ class DetectionError(RuntimeError):
     pass
 
 
-def orange_blob(image: np.ndarray) -> tuple[np.ndarray, float]:
+def orange_blob(
+    image: np.ndarray,
+    expected_px: np.ndarray | None = None,
+) -> tuple[np.ndarray, float]:
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     mask = cv2.inRange(hsv, np.array([3, 100, 70]), np.array([28, 255, 255]))
     mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8))
@@ -52,17 +56,27 @@ def orange_blob(image: np.ndarray) -> tuple[np.ndarray, float]:
         # and form a component larger than the fruit.  The real orange remains
         # compact and nearly round in both raised and final approach views.
         if aspect >= 0.65 and fill >= 0.5 and circularity >= 0.45:
-            candidates.append(contour)
+            moments = cv2.moments(contour)
+            if moments["m00"]:
+                centre = np.array(
+                    [moments["m10"] / moments["m00"], moments["m01"] / moments["m00"]],
+                    dtype=float,
+                )
+                candidates.append((contour, centre))
     if not candidates:
         raise DetectionError("orange not found")
-    contour = max(candidates, key=cv2.contourArea)
-    moments = cv2.moments(contour)
-    if moments["m00"] == 0:
-        raise DetectionError("orange contour has zero area")
-    centre = np.array(
-        [moments["m10"] / moments["m00"], moments["m01"] / moments["m00"]],
-        dtype=float,
-    )
+    if expected_px is None:
+        contour, centre = max(candidates, key=lambda item: cv2.contourArea(item[0]))
+    else:
+        # At the final tray pose an orange-coloured table patch can enter at an
+        # image edge and be marginally larger than the fruit.  Wrist geometry
+        # is fixed by the independent 3-D pose guard, so select the compact
+        # candidate nearest the verified fruit location.  Top-camera callers
+        # omit expected_px and retain largest-blob behaviour.
+        contour, centre = min(
+            candidates,
+            key=lambda item: np.linalg.norm(item[1] - expected_px),
+        )
     return centre, float(cv2.contourArea(contour))
 
 
@@ -94,7 +108,7 @@ def black_tip(
 
 
 def measure(image: np.ndarray) -> dict:
-    orange, orange_area = orange_blob(image)
+    orange, orange_area = orange_blob(image, ORANGE_EXPECTED_PX)
     left = black_tip(image, LEFT_TIP_ROI, LEFT_TIP_EXPECTED_PX)
     right = black_tip(image, RIGHT_TIP_ROI, RIGHT_TIP_EXPECTED_PX)
     span = float(np.linalg.norm(right - left))
