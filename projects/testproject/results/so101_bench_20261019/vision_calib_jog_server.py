@@ -11,7 +11,8 @@ also stops a move if live FK tool height falls below Z millimetres, while
 wrist frame, then applies both gates before closing. ``close_stall_guarded
 IMAGE`` remains available for an externally synchronized frame. The legacy
 ``close_stall`` command is disabled so a 2-D image match cannot bypass the pose
-guard.
+guard. ``hold_capture_test IMAGE`` runs the same synchronized pose hold and
+camera capture but never closes the gripper.
 """
 
 import json
@@ -20,8 +21,8 @@ import time
 
 import cv2
 import numpy as np
-
 from generate_tray_cartesian_path import DEFAULT_URDF, Kinematics
+from load_compensated_hold import CompensationLimitError, compensated_arm_command
 from tray_grasp_pose_guard import SUCCESSFUL_GRASP_Q, evaluate_pose
 from wrist_grasp_gate import DEFAULT_REFERENCE, DEFAULT_TOLERANCE_PX, evaluate
 
@@ -95,31 +96,48 @@ def move(target, max_s=30.0, min_tool_z_mm=None):
     return f"at {reached.round(1).tolist()}"
 
 
-def move_closed_loop(target, max_s=30.0, tolerance_deg=0.5):
+def align_closed_loop(target, max_s=30.0, tolerance_deg=0.5, initial_bias=None):
     target = np.asarray(target, dtype=np.float32)
     if np.any(target < ENV_MIN) or np.any(target > ENV_MAX):
-        return f"REFUSED outside envelope {target.round(1).tolist()}"
+        return f"REFUSED outside envelope {target.round(1).tolist()}", np.zeros(5, dtype=np.float32)
     initial = q()
     if np.abs((target - initial)[:5]).max() > 5.0:
-        return f"REFUSED closed-loop correction over 5 deg, at {initial.round(1).tolist()}"
-    bias = np.zeros(6, dtype=np.float32)
+        return f"REFUSED closed-loop correction over 5 deg, at {initial.round(1).tolist()}", np.zeros(
+            5, dtype=np.float32
+        )
+    bias = (
+        np.zeros(5, dtype=np.float32)
+        if initial_bias is None
+        else np.asarray(initial_bias, dtype=np.float32).copy()
+    )
+    if bias.shape != (5,) or np.abs(bias).max() > 5.0:
+        return "REFUSED invalid initial closed-loop compensation", np.zeros(5, dtype=np.float32)
     started = time.time()
     while time.time() - started < max_s:
         measured = q()
         delta = target - measured
         if np.abs(delta[:5]).max() < tolerance_deg and abs(delta[5]) < 1.0:
-            return f"at {measured.round(1).tolist()} closed-loop, bias {bias.round(1).tolist()}"
-        bias[:5] += np.clip(delta[:5], -0.05, 0.05)
-        if np.abs(bias[:5]).max() > 5.0:
-            return f"STOPPED closed-loop compensation exceeded 5 deg, at {measured.round(1).tolist()}"
-        command = target + bias
+            return f"at {measured.round(1).tolist()} closed-loop, bias {bias.round(1).tolist()}", bias
+        try:
+            arm_command, bias, _ = compensated_arm_command(target[:5], measured[:5], bias)
+        except CompensationLimitError:
+            return f"STOPPED closed-loop compensation exceeded 5 deg, at {measured.round(1).tolist()}", bias
+        command = np.concatenate((arm_command, [target[5]])).astype(np.float32)
         command[5] = target[5]
         if np.any(command < ENV_MIN) or np.any(command > ENV_MAX):
-            return f"STOPPED closed-loop command outside envelope {command.round(1).tolist()}"
+            return f"STOPPED closed-loop command outside envelope {command.round(1).tolist()}", bias
         robot.send_action({f"{joint}.pos": float(value) for joint, value in zip(JOINTS, command)})
         time.sleep(1 / 30)
     reached = q()
-    return f"STOPPED closed-loop timeout, target {target.round(1).tolist()}, at {reached.round(1).tolist()}"
+    return (
+        f"STOPPED closed-loop timeout, target {target.round(1).tolist()}, at {reached.round(1).tolist()}",
+        bias,
+    )
+
+
+def move_closed_loop(target, max_s=30.0, tolerance_deg=0.5):
+    message, _ = align_closed_loop(target, max_s=max_s, tolerance_deg=tolerance_deg)
+    return message
 
 
 def close_on_stall():
@@ -180,10 +198,7 @@ def guarded_close(image_path):
     except FileNotFoundError:
         return f"REFUSED close: wrist image does not exist {image_path}"
     if image_age_s < 0 or image_age_s > MAX_WRIST_IMAGE_AGE_S:
-        return (
-            f"REFUSED close: wrist image is {image_age_s:.1f} s old "
-            f"(limit {MAX_WRIST_IMAGE_AGE_S:.1f} s)"
-        )
+        return f"REFUSED close: wrist image is {image_age_s:.1f} s old (limit {MAX_WRIST_IMAGE_AGE_S:.1f} s)"
     measured = q()
     pose = evaluate_pose(measured)
     if not pose.safe_pose_for_close:
@@ -216,12 +231,12 @@ def guarded_close(image_path):
     return close_on_stall()
 
 
-def capture_holding_successful_pose(image_path):
-    """Capture a wrist frame while actively compensating load-dependent drift."""
+def capture_holding_successful_pose(image_path, *, close_after_capture):
+    """Capture while retaining one load-compensation state through every phase."""
     if not image_path.is_absolute():
         return "REFUSED live close: wrist image path must be absolute"
     target = np.concatenate((SUCCESSFUL_GRASP_Q, [37.0])).astype(np.float32)
-    alignment = move_closed_loop(target)
+    alignment, bias = align_closed_loop(target)
     if alignment.startswith(("REFUSED", "STOPPED")):
         return f"REFUSED live close: could not align pose; {alignment}"
 
@@ -234,18 +249,17 @@ def capture_holding_successful_pose(image_path):
     if not cap.isOpened():
         return f"REFUSED live close: could not open wrist camera {WRIST_CAMERA}"
 
-    bias = np.zeros(5, dtype=np.float32)
     frame = None
     max_error = 0.0
     try:
         for _ in range(WRIST_WARMUP_FRAMES):
             measured = q()
-            error = SUCCESSFUL_GRASP_Q.astype(np.float32) - measured[:5]
-            max_error = max(max_error, float(np.abs(error).max()))
-            bias += np.clip(error, -0.05, 0.05)
-            if np.abs(bias).max() > 5.0:
+            try:
+                arm_command, bias, error = compensated_arm_command(SUCCESSFUL_GRASP_Q, measured[:5], bias)
+            except CompensationLimitError:
                 return "REFUSED live close: pose-hold compensation exceeded 5 deg"
-            command = np.concatenate((SUCCESSFUL_GRASP_Q + bias, [37.0])).astype(np.float32)
+            max_error = max(max_error, float(np.abs(error).max()))
+            command = np.concatenate((arm_command, [37.0])).astype(np.float32)
             robot.send_action({f"{joint}.pos": float(value) for joint, value in zip(JOINTS, command)})
             ok, candidate = cap.read()
             if ok and candidate is not None:
@@ -253,17 +267,18 @@ def capture_holding_successful_pose(image_path):
         # Camera startup takes long enough for load-dependent elbow drift. With
         # the device now warm and its one-frame buffer active, restore the pose
         # using measured feedback, then capture only post-correction frames.
-        realignment = move_closed_loop(target)
+        realignment, bias = align_closed_loop(target, initial_bias=bias)
         if realignment.startswith(("REFUSED", "STOPPED")):
             return f"REFUSED live close: post-warmup alignment failed; {realignment}"
-        bias.fill(0.0)
         frame = None
         for _ in range(WRIST_SYNC_FRAMES):
             measured = q()
-            error = SUCCESSFUL_GRASP_Q.astype(np.float32) - measured[:5]
+            try:
+                arm_command, bias, error = compensated_arm_command(SUCCESSFUL_GRASP_Q, measured[:5], bias)
+            except CompensationLimitError:
+                return "REFUSED live close: pose-hold compensation exceeded 5 deg"
             max_error = max(max_error, float(np.abs(error).max()))
-            bias += np.clip(error, -0.05, 0.05)
-            command = np.concatenate((SUCCESSFUL_GRASP_Q + bias, [37.0])).astype(np.float32)
+            command = np.concatenate((arm_command, [37.0])).astype(np.float32)
             robot.send_action({f"{joint}.pos": float(value) for joint, value in zip(JOINTS, command)})
             time.sleep(1 / 30)
             ok, candidate = cap.read()
@@ -284,6 +299,13 @@ def capture_holding_successful_pose(image_path):
             f"distance {pose.cartesian_distance_mm:.3f} mm, "
             f"max joint error {pose.max_joint_error_deg:.3f} deg, "
             f"max hold error {max_error:.3f} deg"
+        )
+    if not close_after_capture:
+        return (
+            "hold-capture PASS without close; "
+            f"distance {pose.cartesian_distance_mm:.3f} mm, "
+            f"max joint error {pose.max_joint_error_deg:.3f} deg, "
+            f"retained bias {bias.round(2).tolist()}"
         )
     return guarded_close(image_path)
 
@@ -343,7 +365,16 @@ try:
                 elif len(parts) != 2:
                     message = "REFUSED live close: usage close_stall_live /absolute/wrist_image.jpg"
                 else:
-                    message = capture_holding_successful_pose(pathlib.Path(parts[1]))
+                    message = capture_holding_successful_pose(
+                        pathlib.Path(parts[1]), close_after_capture=True
+                    )
+            elif command == "hold_capture_test":
+                if len(parts) != 2:
+                    message = "REFUSED hold test: usage hold_capture_test /absolute/wrist_image.jpg"
+                else:
+                    message = capture_holding_successful_pose(
+                        pathlib.Path(parts[1]), close_after_capture=False
+                    )
             elif command == "close_stall":
                 message = "REFUSED close: use close_stall_live with a synchronized wrist image"
             elif command == "read":
