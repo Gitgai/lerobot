@@ -44,6 +44,7 @@ KINEMATICS = Kinematics(DEFAULT_URDF)
 MAX_WRIST_IMAGE_AGE_S = 5.0
 WRIST_CAMERA = "/dev/video6"
 WRIST_WARMUP_FRAMES = 45
+WRIST_SYNC_FRAMES = 10
 WRIST_REFERENCE = cv2.imread(str(DEFAULT_REFERENCE))
 if WRIST_REFERENCE is None:
     raise RuntimeError(f"missing wrist grasp reference: {DEFAULT_REFERENCE}")
@@ -245,6 +246,25 @@ def capture_holding_successful_pose(image_path):
                 return "REFUSED live close: pose-hold compensation exceeded 5 deg"
             command = np.concatenate((SUCCESSFUL_GRASP_Q + bias, [37.0])).astype(np.float32)
             robot.send_action({f"{joint}.pos": float(value) for joint, value in zip(JOINTS, command)})
+            ok, candidate = cap.read()
+            if ok and candidate is not None:
+                frame = candidate
+        # Camera startup takes long enough for load-dependent elbow drift. With
+        # the device now warm and its one-frame buffer active, restore the pose
+        # using measured feedback, then capture only post-correction frames.
+        realignment = move_closed_loop(target)
+        if realignment.startswith(("REFUSED", "STOPPED")):
+            return f"REFUSED live close: post-warmup alignment failed; {realignment}"
+        bias.fill(0.0)
+        frame = None
+        for _ in range(WRIST_SYNC_FRAMES):
+            measured = q()
+            error = SUCCESSFUL_GRASP_Q.astype(np.float32) - measured[:5]
+            max_error = max(max_error, float(np.abs(error).max()))
+            bias += np.clip(error, -0.05, 0.05)
+            command = np.concatenate((SUCCESSFUL_GRASP_Q + bias, [37.0])).astype(np.float32)
+            robot.send_action({f"{joint}.pos": float(value) for joint, value in zip(JOINTS, command)})
+            time.sleep(1 / 30)
             ok, candidate = cap.read()
             if ok and candidate is not None:
                 frame = candidate
