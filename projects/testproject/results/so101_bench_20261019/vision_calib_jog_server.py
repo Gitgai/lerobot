@@ -7,9 +7,9 @@ written to ~/vision_calib_jog_cmd and state is reported in
 motion envelope observed in the 169 demonstrations.  ``goto_zguard Z Q``
 also stops a move if live FK tool height falls below Z millimetres, while
 ``goto_closed Q`` uses measured-joint feedback to reach a 0.5 degree tolerance.
-``close_stall_guarded IMAGE`` is the only tray-close command.  It requires the
-measured arm to be near the verified successful 3-D pose and IMAGE to pass the
-tight wrist-camera gate before it locks the arm joints and closes.  The legacy
+``close_stall_live IMAGE`` actively holds the verified pose while capturing the
+wrist frame, then applies both gates before closing. ``close_stall_guarded
+IMAGE`` remains available for an externally synchronized frame. The legacy
 ``close_stall`` command is disabled so a 2-D image match cannot bypass the pose
 guard.
 """
@@ -22,7 +22,7 @@ import cv2
 import numpy as np
 
 from generate_tray_cartesian_path import DEFAULT_URDF, Kinematics
-from tray_grasp_pose_guard import evaluate_pose
+from tray_grasp_pose_guard import SUCCESSFUL_GRASP_Q, evaluate_pose
 from wrist_grasp_gate import DEFAULT_REFERENCE, DEFAULT_TOLERANCE_PX, evaluate
 
 try:
@@ -42,6 +42,8 @@ ENV_MAX = np.array([84.0, 82.9, 97.3, 103.1, 90.9, 88.2]) + 5
 PROTECTIONS = {"Max_Torque_Limit": 500, "Protection_Current": 250, "Overload_Torque": 25}
 KINEMATICS = Kinematics(DEFAULT_URDF)
 MAX_WRIST_IMAGE_AGE_S = 5.0
+WRIST_CAMERA = "/dev/video6"
+WRIST_WARMUP_FRAMES = 45
 WRIST_REFERENCE = cv2.imread(str(DEFAULT_REFERENCE))
 if WRIST_REFERENCE is None:
     raise RuntimeError(f"missing wrist grasp reference: {DEFAULT_REFERENCE}")
@@ -212,6 +214,59 @@ def guarded_close(image_path):
     return close_on_stall()
 
 
+def capture_holding_successful_pose(image_path):
+    """Capture a wrist frame while actively compensating load-dependent drift."""
+    if not image_path.is_absolute():
+        return "REFUSED live close: wrist image path must be absolute"
+    target = np.concatenate((SUCCESSFUL_GRASP_Q, [37.0])).astype(np.float32)
+    alignment = move_closed_loop(target)
+    if alignment.startswith(("REFUSED", "STOPPED")):
+        return f"REFUSED live close: could not align pose; {alignment}"
+
+    cap = cv2.VideoCapture(WRIST_CAMERA)
+    cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG"))
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+    cap.set(cv2.CAP_PROP_FPS, 30)
+    cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+    if not cap.isOpened():
+        return f"REFUSED live close: could not open wrist camera {WRIST_CAMERA}"
+
+    bias = np.zeros(5, dtype=np.float32)
+    frame = None
+    max_error = 0.0
+    try:
+        for _ in range(WRIST_WARMUP_FRAMES):
+            measured = q()
+            error = SUCCESSFUL_GRASP_Q.astype(np.float32) - measured[:5]
+            max_error = max(max_error, float(np.abs(error).max()))
+            bias += np.clip(error, -0.05, 0.05)
+            if np.abs(bias).max() > 5.0:
+                return "REFUSED live close: pose-hold compensation exceeded 5 deg"
+            command = np.concatenate((SUCCESSFUL_GRASP_Q + bias, [37.0])).astype(np.float32)
+            robot.send_action({f"{joint}.pos": float(value) for joint, value in zip(JOINTS, command)})
+            ok, candidate = cap.read()
+            if ok and candidate is not None:
+                frame = candidate
+    finally:
+        cap.release()
+    if frame is None:
+        return "REFUSED live close: wrist camera returned no frame"
+
+    image_path.parent.mkdir(parents=True, exist_ok=True)
+    if not cv2.imwrite(str(image_path), frame):
+        return f"REFUSED live close: could not save wrist frame {image_path}"
+    pose = evaluate_pose(q())
+    if not pose.safe_pose_for_close:
+        return (
+            "REFUSED live close: synchronized pose gate rejected; "
+            f"distance {pose.cartesian_distance_mm:.3f} mm, "
+            f"max joint error {pose.max_joint_error_deg:.3f} deg, "
+            f"max hold error {max_error:.3f} deg"
+        )
+    return guarded_close(image_path)
+
+
 try:
     robot.connect(calibrate=False)
     for register, value in PROTECTIONS.items():
@@ -258,8 +313,13 @@ try:
                     message = "REFUSED close: usage close_stall_guarded /absolute/wrist_image.jpg"
                 else:
                     message = guarded_close(pathlib.Path(parts[1]))
+            elif command == "close_stall_live":
+                if len(parts) != 2:
+                    message = "REFUSED live close: usage close_stall_live /absolute/wrist_image.jpg"
+                else:
+                    message = capture_holding_successful_pose(pathlib.Path(parts[1]))
             elif command == "close_stall":
-                message = "REFUSED close: use close_stall_guarded with a fresh wrist image"
+                message = "REFUSED close: use close_stall_live with a synchronized wrist image"
             elif command == "read":
                 message = f"q {current.round(1).tolist()}"
             elif command == "save":
