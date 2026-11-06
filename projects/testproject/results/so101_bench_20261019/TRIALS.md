@@ -3,7 +3,7 @@
 Source: `trials.csv` (hand-kept, one row per trial). `trials_full.csv` adds the numbers computed from each trial's log. Regenerate with `python3 scripts/bench_trials_table.py`.
 **Frames, browsable:** `results/bench_frames_by_trial/<date>_<day>_row<X>_<model>_<fruit>/trial<N>_<RESULT>/` (front_chunkNNN.jpg + wrist_chunkNNN.jpg + WHAT_HAPPENED.txt; built by `scripts/sort_bench_frames.py`). Raw dump behind it: every policy call's overhead + wrist JPEG, named `<prefix>_call<N>_{front,wrist}.jpg`; fine-tune 3 rows in `results/so101_lora_on_top_20261019/bench_frames_row3_010000/` (prefix per row in the `frames` column, e.g. row I = c08, row H = c07, row E = c05), public-base rows in `results/so101_bench_20261019/frames/`. Trial N of a row covers calls (N-1)*cap+1 … N*cap. Narrative per trial: `bench_runs.md`. VOID = not a trial (camera fault, stop, wrong launch, fruit not re-placed); excluded from every count.
 
-Trials: 132 recorded, 114 valid, 18 void.
+Trials: 138 recorded, 120 valid, 18 void.
 
 ### By model / fruit
 
@@ -14,7 +14,7 @@ Trials: 132 recorded, 114 valid, 18 void.
 | base / orange | 11 | 0 | 0 | 11 | 0/11 |
 | base / tomato | 5 | 0 | 0 | 5 | 0/5 |
 | fine-tune 3 / tomato | 40 | 8 | 0 | 32 | 8/40 |
-| fine-tune 3 / orange | 42 | 14 | 0 | 28 | 14/42 |
+| fine-tune 3 / orange | 48 | 14 | 0 | 34 | 14/48 |
 | fine-tune 3 / 3 oranges (multi-fruit experiment) | 2 | 0 | 0 | 2 | 0/2 |
 | fine-tune 3 / pen (off-protocol) | 6 | 1 | 0 | 5 | 1/6 |
 | fine-tune 3 / blue box (off-protocol) | 1 | 0 | 0 | 1 | 0/1 |
@@ -45,6 +45,7 @@ Trials: 132 recorded, 114 valid, 18 void.
 | 2026-11-01 / fine-tune 3 / hippo cell / cylindrical battery (off-protocol) | 1 | 0 | 0 | 1 | 0/1 |
 | 2026-11-01 / fine-tune 3 / black rubber ring (off-protocol) | 1 | 0 | 0 | 1 | 0/1 |
 | 2026-11-02 / fine-tune 3 / pen (off-protocol) | 5 | 1 | 0 | 4 | 1/5 |
+| 2026-11-06 / fine-tune 3 / orange | 6 | 0 | 0 | 6 | 0/6 |
 
 ### By model / fruit / cap
 
@@ -56,7 +57,7 @@ Trials: 132 recorded, 114 valid, 18 void.
 | base / tomato / cap 45 | 5 | 0 | 0 | 5 | 0/5 |
 | fine-tune 3 / tomato / cap 45 | 5 | 1 | 0 | 4 | 1/5 |
 | fine-tune 3 / tomato / cap 75 | 35 | 7 | 0 | 28 | 7/35 |
-| fine-tune 3 / orange / cap 75 | 42 | 14 | 0 | 28 | 14/42 |
+| fine-tune 3 / orange / cap 75 | 48 | 14 | 0 | 34 | 14/48 |
 | fine-tune 3 / 3 oranges (multi-fruit experiment) / cap 120 | 2 | 0 | 0 | 2 | 0/2 |
 | fine-tune 3 / pen (off-protocol) / cap 75 | 6 | 1 | 0 | 5 | 1/6 |
 | fine-tune 3 / blue box (off-protocol) / cap 75 | 1 | 0 | 0 | 1 | 0/1 |
@@ -67,7 +68,7 @@ Trials: 132 recorded, 114 valid, 18 void.
 
 | failure mode | count |
 |---|---|
-| close-beside | 39 |
+| close-beside | 45 |
 | close-above | 7 |
 | no-close | 6 |
 | close-short | 6 |
@@ -373,3 +374,9 @@ Trials: 132 recorded, 114 valid, 18 void.
 | 2026-11-03 | AG | 3 | **FAIL** | overreach, empty close | stayed near home through c33, reached past the unchanged forward-right capsicum, and closed to 2 on empty table by c72; fruit remained untouched and bowl empty through c75 | 34 | 2 (72) | 8 | 75 | 173.0 | 1.232 | OFF-PROTOCOL capsicum-to-bowl row; isolated scene; same forward-right placement; exclude from controlled orange/tomato rates; JPEG quality 85; RTC disabled | bench_ft3_jpeg_no_rtc_row_ag_capsicum_to_bowl_20261103 ep3; results/so101_lora_on_top_20261019/bench_trace_ft3_jpeg_no_rtc_row_ag_capsicum_to_bowl_20261103 |
 | 2026-11-03 | AG | 4 | **FAIL** | overreach, repeated empty close | fast reach began c7; arm passed left of the unchanged forward-right capsicum and repeatedly closed to 1 on empty table from c28 onward; fruit remained untouched and bowl empty through c75 | 7 | 1 (55) | 10 | 75 | 175.0 | 1.206 | OFF-PROTOCOL capsicum-to-bowl row; isolated scene; same forward-right placement; exclude from controlled orange/tomato rates; JPEG quality 85; RTC disabled | bench_ft3_jpeg_no_rtc_row_ag_capsicum_to_bowl_20261103 ep4; results/so101_lora_on_top_20261019/bench_trace_ft3_jpeg_no_rtc_row_ag_capsicum_to_bowl_20261103 |
 | 2026-11-03 | AG | 5 | **FAIL** | wrong object delivered; capsicum dropped beside bowl | orange distractor added lower-center while capsicum stayed forward-right; grasped orange by c32 and released it inside bowl by c43; then grasped capsicum by c53 and carried toward bowl, but opened around c67 and dropped it on table beside bowl; at c75 orange was inside and capsicum outside | 22 | 8 (65) | 14 | 75 | 172.0 | 1.217 | OFF-PROTOCOL multi-object capsicum-to-bowl trial; requested final state not achieved; exclude from controlled orange/tomato rates; JPEG quality 85; RTC disabled | bench_ft3_jpeg_no_rtc_row_ag_capsicum_to_bowl_20261103 ep5; results/so101_lora_on_top_20261019/bench_trace_ft3_jpeg_no_rtc_row_ag_capsicum_to_bowl_20261103 |
+| 2026-11-06 | AH | 1 | **FAIL** | close-beside | late reach; orange remained outside the left jaw during the close; no sustained hold, lift, carry, or tray delivery | 22 | 37 (32) | 46 | 75 | 210.5 | 1.162 | controlled orange trial; lower-right top-camera placement around (464,366); JPEG quality 85; RTC disabled | bench_ft3_jpeg_no_rtc_row_ah_orange_20261106_retry ep1; /home/gaikwad-prakash/bench_trace_ft3_jpeg_no_rtc_row_ah_orange_20261106_retry |
+| 2026-11-06 | AH | 2 | **FAIL** | close-beside | reached the orange with it outside the left jaw; gripper reopened after the miss and the arm moved away; no lift or delivery | 26 | 35 (71) | 13 | 75 | 260.4 | 1.596 | controlled orange trial; same lower-right placement; JPEG quality 85; RTC disabled | bench_ft3_jpeg_no_rtc_row_ah_orange_20261106_retry ep2; /home/gaikwad-prakash/bench_trace_ft3_jpeg_no_rtc_row_ah_orange_20261106_retry |
+| 2026-11-06 | AH | 3 | **FAIL** | close-beside | initial close landed beside the orange; policy reopened, searched beside it, and made later empty closes; fruit never lifted | 7 | 24 (57) | 20 | 75 | 246.4 | 1.532 | controlled orange trial; same lower-right placement; JPEG quality 85; RTC disabled | bench_ft3_jpeg_no_rtc_row_ah_orange_20261106_retry ep3; /home/gaikwad-prakash/bench_trace_ft3_jpeg_no_rtc_row_ah_orange_20261106_retry |
+| 2026-11-06 | AH | 4 | **FAIL** | close-beside | closed repeatedly over empty table to the left of the stationary orange; no contact, hold, lift, or delivery | 4 | 8 (57) | 45 | 75 | 251.7 | 1.539 | controlled orange trial; same lower-right placement; JPEG quality 85; RTC disabled | bench_ft3_jpeg_no_rtc_row_ah_orange_20261106_retry ep4; /home/gaikwad-prakash/bench_trace_ft3_jpeg_no_rtc_row_ah_orange_20261106_retry |
+| 2026-11-06 | AH | 5 | **FAIL** | close-beside | idled through c37; reached with the orange outside the right jaw, closed and reopened without a hold, then searched beside it | 25 | 30 (70) | 38 | 75 | 287.2 | 2.122 | controlled orange trial; same lower-right placement; JPEG quality 85; RTC disabled | bench_ft3_jpeg_no_rtc_row_ah_orange_20261106_retry ep5; /home/gaikwad-prakash/bench_trace_ft3_jpeg_no_rtc_row_ah_orange_20261106_retry |
+| 2026-11-06 | AH | 6 | **FAIL** | close-beside | different far-left placement; orange appeared between the open fingers c18-c22 but remained offset toward one jaw; strong close to 8 at c30 pinned or pushed it outside the jaw; no sustained hold, lift, carry, or delivery | 5 | 8 (30) | 33 | 75 | 248.6 | 1.343 | controlled placement-variation trial around top-camera (184,356); JPEG quality 85; RTC disabled | bench_ft3_jpeg_no_rtc_row_ah6_orange_20261106 ep1; /home/gaikwad-prakash/bench_trace_ft3_jpeg_no_rtc_row_ah6_orange_20261106 |

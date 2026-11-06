@@ -897,3 +897,31 @@ power cycle before the row restored the gripper's 1000/500/80 defaults; the benc
 audited 500/250/25 limits before enabling torque. Post-run checks passed: torque and status were zero on all six
 motors, protections remained 500/250/25, voltage was 7.5 V, and gripper temperature was 34 °C. The GPU server was
 stopped. Row AG is excluded from the controlled orange 14/42 and tomato 8/40 totals.
+
+### 2026-11-06 — ROW AH: ORANGE TO TRAY ×6, JPEG without RTC — 0/6
+Six controlled single-orange trials used fine-tune 3 on AI90 GPU 0, the only GPU enumerated on the host (RTX 5090).
+All trials used the instruction `Grab oranges and place into plate.`, 75 chunks, 20 actions per chunk at 30 Hz, a
+30 s manual-placement countdown, JPEG quality 85, RTC disabled, scripted return to the recorded start pose, and the
+full read-only Rerun trace.
+
+AH1-AH5 placed the orange in the same lower-right top-camera cluster, centred at approximately (464, 366). Each trial
+reached the fruit but placed it against or outside one gripper finger. AH1 closed beside it after a late reach. AH2
+reopened after the miss and moved away. AH3 and AH4 searched and made repeated empty closes. AH5 idled through c37,
+then reached and closed beside the orange. None established a sustained hold or lift. Outcomes: **five acquisition
+failures**.
+
+AH6 deliberately tested a different placement at approximately (184, 356), farther left in the top-camera image.
+The orange appeared between the open fingers in the wrist view at c18-c22, but it was offset toward one finger. The
+gripper closed strongly to 8 at c30 with the fruit against the outside of a jaw, reopened, and continued pushing and
+following it without a hold. No lift, trayward carry, or release occurred. Outcome: **FAIL — close-beside and push**.
+
+Row outcome: **0/6**. The changed AH6 placement improved the initial visual enclosure but did not correct the lateral
+grasp-centre error, so manual placement precision alone is not the limiting fault. Per-trial wall times were 210.5,
+260.4, 246.4, 251.7, 287.2, and 248.6 s; median request latencies were 1.162, 1.596, 1.532, 1.539, 2.122, and 1.343 s.
+All 450 front and 450 wrist policy-input frames were fresh and unique. The initial launch before AH1 aborted before
+countdown or motion because the gated PaliGemma metadata was not cached; it is a setup abort and not a trial. The
+relaunch used the recovered local cache in offline mode.
+
+The scripted return restored the start pose after every trial. Final checks passed: torque and status were zero on
+all six motors, protections remained 500/250/25, voltage was 7.1-7.2 V, and gripper temperature was 33 °C. The policy
+server was stopped. Controlled fine-tune 3 orange performance is now **14/48**; tomato remains **8/40**.
