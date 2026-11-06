@@ -1,6 +1,6 @@
 # Bench auto-reset: the arm puts the orange back on the table between trials (scripted, not the policy)
 
-Date: 2026-10-28. Status updated 2026-11-05: **BUILT; tray-centre pickup and all ten table slots are live-calibrated. Off-centre tray descents and V1–V4 remain, so `--reset-between` is still blocked.** Operator's idea (2026-10-28): "pick the orange from the plate and
+Date: 2026-10-28. Status updated 2026-11-07: **PAUSED while orange grasp reliability is the primary workstream. BUILT; tray-centre pickup and all ten table slots are live-calibrated. Off-centre tray descents and V1–V4 remain, so `--reset-between` is still blocked.** The current policy-improvement plan is [`so101_orange_reliable_grasp_plan_20261107.md`](so101_orange_reliable_grasp_plan_20261107.md). Operator's idea (2026-10-28): "pick the orange from the plate and
 put it back on the table at a different location so we can perform the next trial."
 Parent: R3/R5 bench protocol (pi05_so101_real_base_audit_plan_20261019.md, pi05_so101_lora_on_top_plan_20261019.md);
 record: results/so101_bench_20261019/bench_runs.md. Client: results/so101_bench_20261019/bench_client.py.

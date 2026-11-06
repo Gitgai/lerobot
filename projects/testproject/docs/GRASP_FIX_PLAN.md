@@ -2,6 +2,9 @@
 
 _Last updated: 2026-07-07_
 
+> Historical ACT plan. The current Pi05/fine-tune 3 orange-to-tray plan is
+> [`so101_orange_reliable_grasp_plan_20261107.md`](so101_orange_reliable_grasp_plan_20261107.md).
+
 ## The diagnosis (evidence-based)
 
 The pick fails **not** because of the model or the data, but because of **how the policy is deployed**:
