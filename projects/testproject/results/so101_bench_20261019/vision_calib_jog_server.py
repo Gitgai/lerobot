@@ -16,6 +16,7 @@ camera capture but never closes the gripper.
 """
 
 import json
+import os
 import pathlib
 import time
 
@@ -51,7 +52,7 @@ WRIST_CAMERA = "/dev/video6"
 WRIST_WARMUP_FRAMES = 45
 WRIST_SYNC_FRAMES = 10
 WRIST_MAX_SETTLE_FRAMES = 40
-LIVE_CLOSE_APPROVED = False
+LIVE_CLOSE_USES_REMAINING = 1 if os.environ.get("SO101_ENABLE_ONE_LIVE_CLOSE") == "1" else 0
 SUCCESSFUL_POSE_COMPENSATION = LoadCompensationState()
 WRIST_REFERENCE = cv2.imread(str(DEFAULT_REFERENCE))
 if WRIST_REFERENCE is None:
@@ -378,14 +379,15 @@ try:
                 else:
                     message = guarded_close(pathlib.Path(parts[1]))
             elif command == "close_stall_live":
-                if not LIVE_CLOSE_APPROVED:
+                if LIVE_CLOSE_USES_REMAINING <= 0:
                     message = (
-                        "REFUSED live close: blocked after repeated loaded-pose hold failures; "
-                        "preserve learned compensation and empty-test before enabling"
+                        "REFUSED live close: no one-shot close authorization remains; "
+                        "restart explicitly with SO101_ENABLE_ONE_LIVE_CLOSE=1"
                     )
                 elif len(parts) != 2:
                     message = "REFUSED live close: usage close_stall_live /absolute/wrist_image.jpg"
                 else:
+                    LIVE_CLOSE_USES_REMAINING -= 1
                     message = capture_holding_successful_pose(
                         pathlib.Path(parts[1]), close_after_capture=True
                     )
