@@ -1,0 +1,21 @@
+{
+  "attempt": "single secured-orange diagnostic guarded grasp",
+  "top_target_px": [177.7967, 115.3657],
+  "top_before": {
+    "orange_px": [176.43, 114.72],
+    "distance_to_target_px": 1.51,
+    "ready": true
+  },
+  "final_measured_q": [74.4, -64.6, 82.9, 40.9, 0.0, 37.0],
+  "wrist_gate": {
+    "result": "REJECT",
+    "finger_frame_error_px": [-22.53, -17.57],
+    "tolerance_each_axis_px": 5.0,
+    "close_executed": false
+  },
+  "top_after": {
+    "orange_px": [176.47, 115.09],
+    "distance_to_target_px": 1.36
+  },
+  "outcome": "The secured orange did not move during the approach, but the top-camera target did not reproduce the verified wrist-frame grasp alignment. The guarded close was refused; the gripper stayed open and the arm returned home with torque off."
+}
