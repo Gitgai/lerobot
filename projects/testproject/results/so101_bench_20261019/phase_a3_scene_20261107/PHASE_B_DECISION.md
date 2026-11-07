@@ -22,3 +22,17 @@ The prewritten Decision B rule assigns 0/3 or 1/3 acquisition to the “restored
 No more blind repetitions should be run with this checkpoint. The next evidence-bearing step is to run the existing
 read-only lateral-and-depth diagnostic on these held-out traces, label its close windows, then collect centred and
 corrective/recovery demonstrations for a new checkpoint.
+
+## Operator-requested extension
+
+Two more repetitions were run on the unchanged scene after this decision:
+
+| Trial | Result | Acquisition behaviour |
+|---|---|---|
+| B4 | fail | delayed near the start until chunk 42; orange remained outside the left finger during the approach; no lift |
+| B5 | fail | delayed until the late 20s; orange again remained outside the left finger; no lift |
+
+B4 and B5 each completed 75 chunks with 1,500 sent actions, zero client clamps and a successful scripted return.
+The controlled result is now **1/5 acquisition and 1/5 end-to-end**. Fine-tune 3's heterogeneous orange total is
+**15/54 (27.8%)**. The additional failures reinforce the existing decision to stop blind repetitions and collect
+corrective data.

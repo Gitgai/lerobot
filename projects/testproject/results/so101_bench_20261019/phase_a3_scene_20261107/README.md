@@ -21,3 +21,9 @@ The third unchanged repetition also failed acquisition: three closes occurred wi
 finger and the fruit never moved. Phase B is complete at **1/3 acquisition and 1/3 end-to-end**. This meets the
 prewritten stop branch for 0/3 or 1/3 acquisition: restored geometry is insufficient, so blind repetitions stop and
 the work moves to read-only pre-close diagnosis and corrective demonstrations.
+
+Two operator-requested extensions were then run without changing the scene. B4 delayed near the start until chunk
+42, approached with the orange outside the left finger around chunks 47-50, and never lifted it. B5 delayed until
+the late 20s, approached with the orange outside the left finger around chunks 34-38, and also never lifted it.
+Both completed 75 chunks with zero client clamps and returned to the recorded start. The five-trial controlled
+result is therefore **1/5 acquisition and 1/5 end-to-end**.

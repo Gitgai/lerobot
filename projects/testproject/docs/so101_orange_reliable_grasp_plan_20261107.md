@@ -25,7 +25,7 @@ target is at least **90 successes in a fresh 100-trial blind evaluation**, with 
 stage-specific failure counts reported. A 200-trial blind evaluation may be used later for a tighter confidence
 interval.
 
-The current heterogeneous fine-tune 3 orange record after all three Phase B repetitions is **15/52 (28.8%)**.
+The current heterogeneous fine-tune 3 orange record after five controlled Phase B repetitions is **15/54 (27.8%)**.
 Before Phase B it was 14/49. Row AH was **0/6**; all six trials failed
 while acquiring the orange. The immediate objective is therefore repeatable acquisition, not more unstructured
 end-to-end trials.
@@ -95,6 +95,10 @@ returned to the recorded start. B2 had one gripper-delta clamp at chunk 43; the 
 outside the left finger; the orange never moved or lifted. B3 had zero clamps. Phase B is therefore **1/3
 acquisition and 1/3 end-to-end**. Decision B is now fixed: restoring geometry is insufficient. Stop blind policy
 trials and proceed to the read-only Phase C diagnostic and corrective-data work.
+
+At the operator's request, two additional unchanged repetitions were subsequently run as B4 and B5. Both failed
+acquisition with the orange outside the left finger, making the controlled result **1/5 acquisition and 1/5
+end-to-end**. These extensions strengthen the stop decision; they do not reopen Decision B.
 
 ## 2. What this plan is and is not
 
