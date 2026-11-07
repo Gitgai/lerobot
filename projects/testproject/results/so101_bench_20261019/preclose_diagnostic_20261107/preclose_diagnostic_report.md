@@ -89,3 +89,14 @@ Do not enable an action gate yet. Before motor commands can depend on this diagn
 This detector can prevent a visibly bad close. It cannot generate the missing correction that moves the gripper
 from a bad depth to a good one. Corrective demonstrations and a new fine-tuned checkpoint remain necessary if
 hold-and-replan does not produce an eligible pose.
+
+## Held-out Phase B check
+
+After the thresholds were fixed, six separate frames from controlled trials BCTRL1-BCTRL3 were reviewed under
+`heldout_phase_b/`. The gate agreed with all six physical outcomes: B2 c43, the sole close that produced a stable
+lift and delivery, was `eligible`; one failed close was `ineligible`; and four failed, partly occluded edge views were
+`unknown`. Because `unknown` blocks closing, all five failed closes would have been stopped.
+
+This small selected-frame result supports continuing to shadow mode, but it does not justify action gating. It has
+only one positive example and does not establish prospective or consecutive-frame reliability. See
+`heldout_phase_b/README.md` and `heldout_phase_b/annotated_montage.jpg`.

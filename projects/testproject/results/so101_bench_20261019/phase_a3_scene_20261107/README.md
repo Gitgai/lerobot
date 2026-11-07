@@ -17,5 +17,7 @@ are:
 - `/home/gaikwad-prakash/bench_trace_ft3_phaseb2_orange_20261107`: success; lift by chunk 46 and release inside the
   tray by chunk 56.
 
-Phase B currently stands at 1/2 acquisition and 1/2 end-to-end. A third unchanged repetition is required. B2 left
-the orange in the tray, so the operator must return it to the same accepted table location before B3.
+The third unchanged repetition also failed acquisition: three closes occurred with the orange outside the left
+finger and the fruit never moved. Phase B is complete at **1/3 acquisition and 1/3 end-to-end**. This meets the
+prewritten stop branch for 0/3 or 1/3 acquisition: restored geometry is insufficient, so blind repetitions stop and
+the work moves to read-only pre-close diagnosis and corrective demonstrations.

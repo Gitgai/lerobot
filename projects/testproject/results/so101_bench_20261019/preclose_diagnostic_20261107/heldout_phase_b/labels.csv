@@ -1,0 +1,7 @@
+sample,image_path,expected_eligible,reason
+B1_c46,samples/B1_c46_fail.jpg,0,close did not secure or lift orange
+B1_c61,samples/B1_c61_fail.jpg,0,recovery close did not secure or lift orange
+B2_c43,samples/B2_c43_success.jpg,1,close led to stable lift and delivery
+B3_c21,samples/B3_c21_fail.jpg,0,orange outside left finger
+B3_c39,samples/B3_c39_fail.jpg,0,orange outside left finger
+B3_c66,samples/B3_c66_fail.jpg,0,orange outside left finger

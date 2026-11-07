@@ -1,7 +1,7 @@
 # SO-101 orange-to-tray reliability plan
 
 Date: 2026-11-07  
-Status: active; Phases A1-A2 complete, initial Phase C calibration prototype complete, action gating remains disabled
+Status: active; Phases A1-B complete, initial Phase C calibration and held-out selected-frame check complete, action gating remains disabled
 Primary policy: fine-tune 3, `row3_all169_conservative_010000`  
 Primary diagnostic: [`../results/so101_bench_20261019/ROW_AH_OFFLINE_DIAGNOSIS.md`](../results/so101_bench_20261019/ROW_AH_OFFLINE_DIAGNOSIS.md)  
 Auto-reset status: paused; manual orange placement is used during this plan
@@ -25,7 +25,7 @@ target is at least **90 successes in a fresh 100-trial blind evaluation**, with 
 stage-specific failure counts reported. A 200-trial blind evaluation may be used later for a tighter confidence
 interval.
 
-The current heterogeneous fine-tune 3 orange record after the first two Phase B repetitions is **15/51 (29.4%)**.
+The current heterogeneous fine-tune 3 orange record after all three Phase B repetitions is **15/52 (28.8%)**.
 Before Phase B it was 14/49. Row AH was **0/6**; all six trials failed
 while acquiring the orange. The immediate objective is therefore repeatable acquisition, not more unstructured
 end-to-end trials.
@@ -87,13 +87,14 @@ registration, overlays and start-pose checks are under
 `results/so101_bench_20261019/phase_a3_scene_20261107/`. It is a controlled repeatability scene, but its orange
 placement must not be described as an exact reproduction of U1.
 
-The first two Phase B repetitions used that unchanged scene. B1 failed acquisition: it idled through chunk 28,
+The three Phase B repetitions used that unchanged scene. B1 failed acquisition: it idled through chunk 28,
 made two close attempts, reached a minimum sent gripper target of 4.8, and left the orange on the table. B2 began
 reaching immediately, acquired and lifted the same orange by chunk 46, released it inside the tray by chunk 56 and
 returned to the recorded start. B2 had one gripper-delta clamp at chunk 43; the clamp limited a predicted close from
-12.88 to 17.19 and the subsequent grasp still succeeded. Phase B is therefore 1/2 acquisition and 1/2 end-to-end.
-The third unchanged repetition remains required for Decision B; manual placement is required because B2 left the
-orange in the tray.
+12.88 to 17.19 and the subsequent grasp still succeeded. B3 reached quickly but made three closes with the orange
+outside the left finger; the orange never moved or lifted. B3 had zero clamps. Phase B is therefore **1/3
+acquisition and 1/3 end-to-end**. Decision B is now fixed: restoring geometry is insufficient. Stop blind policy
+trials and proceed to the read-only Phase C diagnostic and corrective-data work.
 
 ## 2. What this plan is and is not
 
@@ -298,6 +299,18 @@ Initial diagnostic acceptance criteria:
 - process a frame fast enough to run before the close without starving the 30 Hz action loop.
 
 This phase is strictly read-only. It logs `eligible`, `ineligible` or `unknown`; it does not modify actions.
+
+### C4. Current evidence, 2026-11-07
+
+The fixed calibration detector was applied without retuning to six selected Phase B frames. It allowed B2 c43, the
+only close that produced a stable lift and delivery, and blocked all five failed closes. One failed close was
+`ineligible`; four partly visible edge cases were `unknown`, which is also blocking. The artifacts are under
+`results/so101_bench_20261019/preclose_diagnostic_20261107/heldout_phase_b/`.
+
+This is enough to proceed to shadow-mode logging, but not enough to enable an action gate. There is only one
+held-out positive, the frames were selected retrospectively, and consecutive-frame reliability has not been tested.
+No further blind trials should be run with the current checkpoint; the next physical data collection should produce
+expert centred grasps and corrective examples while recording the detector in shadow mode.
 
 ## 8. Phase D — shadow validation, then a bounded close gate
 

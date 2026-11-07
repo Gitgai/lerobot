@@ -1,0 +1,7 @@
+sample,image_path,expected_eligible,reason,detector_status,correct_for_gate,x,y,radius,saturation,value,detector_reason
+B1_c46,samples/B1_c46_fail.jpg,0,close did not secure or lift orange,unknown,1,,,,,,no confident fruit circle
+B1_c61,samples/B1_c61_fail.jpg,0,recovery close did not secure or lift orange,ineligible,1,295.8,408.6,65.6,110.1,195.4,outside reviewed grasp band
+B2_c43,samples/B2_c43_success.jpg,1,close led to stable lift and delivery,eligible,1,292.2,168.6,174.0,113.9,208.6,inside reviewed grasp band
+B3_c21,samples/B3_c21_fail.jpg,0,orange outside left finger,unknown,1,,,,,,no confident fruit circle
+B3_c39,samples/B3_c39_fail.jpg,0,orange outside left finger,unknown,1,,,,,,no confident fruit circle
+B3_c66,samples/B3_c66_fail.jpg,0,orange outside left finger,unknown,1,,,,,,no confident fruit circle
