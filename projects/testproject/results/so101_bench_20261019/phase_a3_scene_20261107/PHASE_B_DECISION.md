@@ -33,6 +33,7 @@ Two more repetitions were run on the unchanged scene after this decision:
 | B5 | fail | delayed until the late 20s; orange again remained outside the left finger; no lift |
 
 B4 and B5 each completed 75 chunks with 1,500 sent actions, zero client clamps and a successful scripted return.
-The controlled result is now **1/5 acquisition and 1/5 end-to-end**. Fine-tune 3's heterogeneous orange total is
-**15/54 (27.8%)**. The additional failures reinforce the existing decision to stop blind repetitions and collect
-corrective data.
+The controlled result is now **1/5 acquisition and 1/5 end-to-end**. Two later exploratory whole-episode 10-action
+trials also failed, moving fine-tune 3's heterogeneous orange total to **15/56 (26.8%)**. Those trials used shifted
+camera geometry and different orange placements, so they do not change the controlled Phase B result. The
+additional failures reinforce the existing decision to stop blind repetitions and collect corrective data.

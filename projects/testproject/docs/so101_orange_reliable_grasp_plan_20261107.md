@@ -25,7 +25,8 @@ target is at least **90 successes in a fresh 100-trial blind evaluation**, with 
 stage-specific failure counts reported. A 200-trial blind evaluation may be used later for a tighter confidence
 interval.
 
-The current heterogeneous fine-tune 3 orange record after five controlled Phase B repetitions is **15/54 (27.8%)**.
+The current heterogeneous fine-tune 3 orange record after five controlled Phase B repetitions and two exploratory
+10-action trials is **15/56 (26.8%)**.
 Before Phase B it was 14/49. Row AH was **0/6**; all six trials failed
 while acquiring the orange. The immediate objective is therefore repeatable acquisition, not more unstructured
 end-to-end trials.
@@ -99,6 +100,15 @@ trials and proceed to the read-only Phase C diagnostic and corrective-data work.
 At the operator's request, two additional unchanged repetitions were subsequently run as B4 and B5. Both failed
 acquisition with the orange outside the left finger, making the controlled result **1/5 acquisition and 1/5
 end-to-end**. These extensions strengthen the stop decision; they do not reopen Decision B.
+
+On 2026-11-08, two operator-requested trials executed exactly 10 actions per request for the entire episode, with
+no adaptive 3-5-action mode. The cap was increased from 75 to 150 requests to preserve the same 1,500-action
+maximum. Both failed acquisition: the orange remained outside the left finger during the initial approach and
+later closes were empty. The second run's prolonged search accumulated approximately 116 degrees of measured wrist
+roll before the cap, despite zero client delta clamps. Both scripted returns and torque-off checks passed. The
+camera geometry had shifted and the orange placement changed between the two trials, so these are exploratory
+results rather than a controlled 10-versus-20 comparison. Ten actions alone did not solve alignment, and a
+150-request cap should not be reused without an absolute joint envelope and an earlier acquisition timeout.
 
 ## 2. What this plan is and is not
 
