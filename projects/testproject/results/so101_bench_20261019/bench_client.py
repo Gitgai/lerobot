@@ -147,6 +147,7 @@ def main():
     ap.add_argument("--front", required=True); ap.add_argument("--wrist", required=True)
     ap.add_argument("--task", default="Grab oranges and place into plate."); ap.add_argument("--fps", type=float, default=30.0)
     ap.add_argument("--actions-per-chunk", type=int, default=20); ap.add_argument("--max-chunks", type=int, default=90, help="per episode (90 x 20 steps at 30 fps = 60 s of motion)")
+    ap.add_argument("--near-actions", type=int, default=0, help="after pressing n, execute only this many actions from each prediction; 0 disables adaptive execution")
     ap.add_argument("--episodes", type=int, default=1); ap.add_argument("--max-delta-deg", type=float, default=8.0); ap.add_argument("--max-delta-grip", type=float, default=15.0)
     ap.add_argument("--out", default="bench_log.jsonl"); ap.add_argument("--dry-run", action="store_true", help="read cameras + arm, query the policy, do NOT send actions")
     ap.add_argument("--trace-dir", default="", help="fresh directory for full live-view trace (images, full predictions, sends, timing and status)")
@@ -160,11 +161,14 @@ def main():
     ap.add_argument("--slots", default="", help="slot order for the resets, e.g. 5,0,8,2,...; default = all slots shuffled with seed 0, repeated")
     ap.add_argument("--reset-dry-run", action="store_true", help="auto-reset with the gripper held open and no close: moves only, nothing touched")
     a = ap.parse_args()
+    if a.near_actions < 0 or a.near_actions > a.actions_per_chunk:
+        ap.error("--near-actions must be between 0 and --actions-per-chunk")
     if a.no_robot: a.dry_run = True
     trace = TraceWriter(a.trace_dir) if a.trace_dir else None
     if trace:
         trace.event("session_config", server=a.server, task=a.task, fps=a.fps,
                     actions_per_chunk=a.actions_per_chunk, max_chunks=a.max_chunks,
+                    near_actions=a.near_actions,
                     episodes=a.episodes, pause_between=a.pause_between,
                     return_start=a.return_start, dry_run=a.dry_run, no_robot=a.no_robot)
 
@@ -233,6 +237,8 @@ def main():
             if robot is not None: robot.disconnect()
             return
 
+    execution_mode = {"near": False}
+
     def key_watch():
         try:
             import termios, tty
@@ -240,6 +246,14 @@ def main():
             while not stop["flag"]:
                 c = sys.stdin.read(1)
                 if c in ("\x1b", "q"): stop["flag"] = True; print("\n[STOP requested]", flush=True)
+                elif c == "n" and a.near_actions:
+                    execution_mode["near"] = True
+                    print(f"\n[NEAR mode: executing {a.near_actions} of {a.actions_per_chunk} predicted actions]", flush=True)
+                    if trace: trace.event("execution_mode_changed", mode="near", execute_actions=a.near_actions)
+                elif c == "f" and a.near_actions:
+                    execution_mode["near"] = False
+                    print(f"\n[FAR mode: executing all {a.actions_per_chunk} predicted actions]", flush=True)
+                    if trace: trace.event("execution_mode_changed", mode="far", execute_actions=a.actions_per_chunk)
             termios.tcsetattr(fd, termios.TCSADRAIN, old)
         except Exception: pass
     threading.Thread(target=key_watch, daemon=True).start()
@@ -265,12 +279,13 @@ def main():
                 t0 = time.time(); chunk = act(f, w, q, a.task); dt = time.time() - t0; lat.append(dt)
                 if trace: trace.event("action_chunk_received", ep=ep + 1, chunk=ci + 1,
                                       latency_s=dt, actions=chunk.round(4).tolist())
-                rec = {"ep": ep + 1, "chunk": ci + 1, "latency_s": round(dt, 3), "state": q.round(1).tolist(), "a0": chunk[0].round(1).tolist(), "max_a0_minus_state": float(np.abs(chunk[0] - q).max())}
+                execute_n = a.near_actions if execution_mode["near"] and a.near_actions else len(chunk)
+                rec = {"ep": ep + 1, "chunk": ci + 1, "latency_s": round(dt, 3), "state": q.round(1).tolist(), "a0": chunk[0].round(1).tolist(), "max_a0_minus_state": float(np.abs(chunk[0] - q).max()), "execution_mode": "near" if execution_mode["near"] else "far", "actions_executed": execute_n}
                 out.write(json.dumps(rec) + "\n"); out.flush()
-                print(f"chunk {ci+1:3d}  {1000*dt:5.0f} ms  state {q.round(0).tolist()}  a0 {chunk[0].round(0).tolist()}", flush=True)
+                print(f"chunk {ci+1:3d}  {1000*dt:5.0f} ms  exec {execute_n:2d}  state {q.round(0).tolist()}  a0 {chunk[0].round(0).tolist()}", flush=True)
                 if a.dry_run: continue
                 prev = q.copy()
-                for action_index, act_vec in enumerate(chunk):
+                for action_index, act_vec in enumerate(chunk[:execute_n]):
                     if stop["flag"]: break
                     tgt = act_vec.copy()
                     d = tgt - prev; lim = np.array([a.max_delta_deg] * 5 + [a.max_delta_grip], dtype=np.float32)

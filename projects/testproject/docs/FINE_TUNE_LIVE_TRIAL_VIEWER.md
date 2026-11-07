@@ -12,7 +12,15 @@ The dashboard shows:
 - request latency and episode/chunk plots;
 - measured, predicted, and sent values for all six joints.
 
-The implementation is custom project instrumentation, not a built-in LeRobot client default. It does not change the policy request, action chunk size, 30 Hz execution, clamps, episode cap, or return-to-start behavior.
+The implementation is custom project instrumentation, not a built-in LeRobot client default. By default it does not change the policy request, action chunk size, 30 Hz execution, clamps, episode cap, or return-to-start behavior.
+
+For controlled adaptive-horizon experiments, add `--near-actions 5` while keeping
+`--actions-per-chunk 20`. The server still predicts 20 actions on every request.
+The operator can press `n` to execute only the first five actions of each prediction
+when the gripper reaches the object, and `f` to resume all 20 actions for coarse
+reaching, recovery, or transport. Pressing `q` or Escape retains the existing safe
+stop and return-to-start behavior. The selected mode and executed-action count are
+written to both the compact JSONL log and full trace.
 
 ## Files
 
