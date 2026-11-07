@@ -6,7 +6,7 @@ Policy motion: none
 
 ## Result
 
-**Interim pass; physical fingertip comparison remains pending.**
+**Failed mount-stability acceptance; robot motion remains paused.**
 
 The orange and tray were removed before capture. Both cameras produced fresh, changing 640x480 frames. All six
 motors were readable with torque disabled, zero reported load, 7.2-7.3 V supply and 32-33 C temperature. The
@@ -48,4 +48,25 @@ additional viewpoint or a safe inspection pose is needed if exact tip-height and
 required; do not alter the fixed policy cameras merely to obtain that view. Do not restore the U1 start pose until
 the mount and cable check passes.
 
-Machine-readable readings are in `camera_report.json` and `motor_report.json`.
+## Post-touch check
+
+After the operator lightly checked the camera mounts and wrist cable, fresh frames were captured. Both black
+fingertip marks were visible in the new wrist frame, confirming that the gripper was open and separated. The front
+camera's stable table regions moved consistently by approximately 1-2 pixels horizontally and 2 pixels vertically:
+
+| Front-camera region | X shift | Y shift | Phase response |
+|---|---:|---:|---:|
+| lower table | -2.17 px | -1.90 px | 0.83 |
+| left table | -0.90 px | -2.22 px | 0.92 |
+| lower-left table | -1.92 px | -2.18 px | 0.83 |
+
+A second settled capture reproduced the same displacement, so this was not temporary vibration. A persistent
+2-pixel shift is material for the 3-5-pixel visual tolerances used by the placement and grasp gates. The front
+camera mount must be secured before selecting the new reference image.
+
+The unpowered arm also drifted during the touch check: raw shoulder lift changed by -50 counts, wrist roll by +75,
+shoulder pan by +19 and wrist flex by +11. The gripper changed by only -4 counts. Because the wrist camera moves
+with the arm, the wrist-mount comparison is inconclusive and is not classified as a mount failure.
+
+Machine-readable readings are in `camera_report.json`, `motor_report.json`, `mount_stability_report.json`, and
+`motor_report_post_touch.json`.

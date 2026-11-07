@@ -1,0 +1,18 @@
+{
+  "front": {
+    "device": "/dev/v4l/by-id/usb-046d_C270_HD_WEBCAM_FC7A6780-video-index0",
+    "post_touch_path": "/home/gaikwad-prakash/empty_workspace_check_20261107/front_post_touch.jpg",
+    "phase_shift_x_px": -3.8310531237900136,
+    "phase_shift_y_px": -5.555932409883923,
+    "phase_response": 0.22310163358847301,
+    "mean_absolute_difference": 9.798480033874512
+  },
+  "wrist": {
+    "device": "/dev/v4l/by-id/usb-SunplusIT_Inc_AK-Camera_JV-video-index0",
+    "post_touch_path": "/home/gaikwad-prakash/empty_workspace_check_20261107/wrist_post_touch.jpg",
+    "phase_shift_x_px": -38.40350529669871,
+    "phase_shift_y_px": 8.793459537779796,
+    "phase_response": 0.16187493860721588,
+    "mean_absolute_difference": 10.446928977966309
+  }
+}

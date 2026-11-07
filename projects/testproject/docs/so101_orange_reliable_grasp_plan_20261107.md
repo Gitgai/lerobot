@@ -50,8 +50,11 @@ An empty-workspace A1 capture was made on 2026-11-07 after removing the orange a
 communications, torque-off state, voltage, temperature and calibration identity passed. The gripper was visibly
 separated in the top view, but the fixed wrist angle showed only one marked tip clearly, and still images cannot
 prove mount rigidity.
-The check is recorded in `results/so101_bench_20261019/empty_workspace_check_20261107/`; A1 remains incomplete until
-the open-finger and physical mount/cable checks pass.
+The check is recorded in `results/so101_bench_20261019/empty_workspace_check_20261107/`. The open fingers and both
+black marks were subsequently confirmed, but the front view retained an approximately 1-2 pixel horizontal and
+2-pixel vertical displacement after a light mount/cable check. That is material relative to the 3-5-pixel visual
+tolerances. The unpowered arm also drifted, making the wrist-mount comparison inconclusive. A1 therefore fails
+until the front mount is secured and a repeat check passes.
 
 ## 2. What this plan is and is not
 

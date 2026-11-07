@@ -1,0 +1,66 @@
+{
+  "captured_at": "2026-11-07T12:52:45.122026+05:30",
+  "port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114209-if00",
+  "motors": {
+    "shoulder_pan": {
+      "Torque_Enable": 0,
+      "Present_Position": 2072,
+      "Present_Load": 0,
+      "Present_Voltage": 72,
+      "Present_Temperature": 32,
+      "load_magnitude": 0,
+      "voltage_v": 7.2
+    },
+    "shoulder_lift": {
+      "Torque_Enable": 0,
+      "Present_Position": 840,
+      "Present_Load": 0,
+      "Present_Voltage": 72,
+      "Present_Temperature": 33,
+      "load_magnitude": 0,
+      "voltage_v": 7.2
+    },
+    "elbow_flex": {
+      "Torque_Enable": 0,
+      "Present_Position": 3091,
+      "Present_Load": 0,
+      "Present_Voltage": 74,
+      "Present_Temperature": 32,
+      "load_magnitude": 0,
+      "voltage_v": 7.4
+    },
+    "wrist_flex": {
+      "Torque_Enable": 0,
+      "Present_Position": 2902,
+      "Present_Load": 0,
+      "Present_Voltage": 74,
+      "Present_Temperature": 33,
+      "load_magnitude": 0,
+      "voltage_v": 7.4
+    },
+    "wrist_roll": {
+      "Torque_Enable": 0,
+      "Present_Position": 2069,
+      "Present_Load": 0,
+      "Present_Voltage": 74,
+      "Present_Temperature": 32,
+      "load_magnitude": 0,
+      "voltage_v": 7.4
+    },
+    "gripper": {
+      "Torque_Enable": 0,
+      "Present_Position": 2162,
+      "Present_Load": 0,
+      "Present_Voltage": 74,
+      "Present_Temperature": 32,
+      "load_magnitude": 0,
+      "voltage_v": 7.4
+    }
+  },
+  "calibration": {
+    "id": "my_so101_follower",
+    "path": "/home/gaikwad-prakash/.cache/huggingface/lerobot/calibration/robots/so_follower/my_so101_follower.json",
+    "exists": true,
+    "sha256": "1725086fe76be2d71c2e3cda89fcef96cd8692f8c27e117b89ba549b0758acd8"
+  }
+}
