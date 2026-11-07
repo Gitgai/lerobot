@@ -46,6 +46,12 @@ calibration results only. The detector, labels and report are in
 `results/so101_bench_20261019/preclose_diagnostic_20261107/`. Phase A physical-baseline checks and held-out Phase C
 validation remain incomplete, so the detector must not control actions yet.
 
+An empty-workspace A1 capture was made on 2026-11-07 after removing the orange and tray. Camera freshness, motor
+communications, torque-off state, voltage, temperature and calibration identity passed. The gripper was nearly
+closed, so the two marked fingertips could not be visually separated, and still images cannot prove mount rigidity.
+The check is recorded in `results/so101_bench_20261019/empty_workspace_check_20261107/`; A1 remains incomplete until
+the open-finger and physical mount/cable checks pass.
+
 ## 2. What this plan is and is not
 
 This plan improves the policy task. It is separate from the scripted auto-reset system.
