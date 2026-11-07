@@ -12,11 +12,11 @@ The orange and tray were removed before capture. Both cameras produced fresh, ch
 motors were readable with torque disabled, zero reported load, 7.2-7.3 V supply and 32-33 C temperature. The
 `my_so101_follower` calibration file was present and its SHA-256 was recorded.
 
-The top frame shows a clear swept area and no obvious loose arm part. The wrist frame is overexposed around the
-gripper and shows only one black fingertip mark clearly. The top crop also cannot separate the two marks because
-the gripper is nearly closed in the current resting pose. Therefore finger-height equality, parallelism and opening
-symmetry have not yet been demonstrated. Camera-mount rigidity under light cable motion also requires a physical
-check; a still image alone cannot establish it.
+The top frame shows a clear swept area, a visibly separated gripper and no obvious loose arm part. The wrist frame
+is overexposed around the gripper and shows only one black fingertip mark clearly; the other marked tip is outside
+or occluded by the bright edge from this camera angle. Therefore the opening itself is confirmed, but exact
+finger-height equality and parallelism cannot be established from these fixed views. Camera-mount rigidity under
+light cable motion also requires a physical check; a still image alone cannot establish it.
 
 ## Recorded motor state
 
@@ -29,8 +29,8 @@ check; a still image alone cannot establish it.
 | wrist_roll | 1994 | off | 0 | 7.2 V | 33 C |
 | gripper | 2166 | off | 0 | 7.3 V | 32 C |
 
-The gripper calibration range is 1371-2834. Raw position 2166 is approximately +8.7 on the calibrated -100 to
-+100 range, which explains why the fingertips overlap in this view; this is a reading, not a gripper-zero test.
+The gripper calibration range is 1371-2834. Raw position 2166 is the baseline reading for the visibly separated
+configuration shown here. It must not be interpreted as proof that the gripper is closed.
 
 ## Camera identity and current settings
 
@@ -43,8 +43,9 @@ The gripper calibration range is 1371-2834. Raw position 2166 is approximately +
 
 ## Remaining A1 check
 
-With the arm still unpowered and the table empty, open the gripper enough that both marked tips are separated.
-Capture fresh front and wrist frames, compare tip height and finger parallelism, and lightly test both camera mounts
-and the wrist cable for movement. Do not restore the U1 start pose until this check passes.
+Keep the arm unpowered and the table empty. Lightly test both camera mounts and the wrist cable for movement. An
+additional viewpoint or a safe inspection pose is needed if exact tip-height and parallelism measurements are
+required; do not alter the fixed policy cameras merely to obtain that view. Do not restore the U1 start pose until
+the mount and cable check passes.
 
 Machine-readable readings are in `camera_report.json` and `motor_report.json`.
