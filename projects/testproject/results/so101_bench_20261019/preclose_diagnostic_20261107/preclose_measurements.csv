@@ -1,0 +1,13 @@
+sample,image_path,expected_eligible,reason,detector_status,correct_for_gate,x,y,radius,saturation,value,detector_reason
+O1_c23,samples/O1_c23_success.jpg,1,successful sustained grasp,eligible,1,381.0,201.0,136.9,211.8,185.1,inside reviewed grasp band
+R2_c15,samples/R2_c15_success.jpg,1,successful sustained grasp,eligible,1,305.4,223.8,178.0,133.0,230.7,inside reviewed grasp band
+R3_c11,samples/R3_c11_success.jpg,1,successful sustained grasp,eligible,1,298.2,163.8,123.2,159.9,244.2,inside reviewed grasp band
+R5_c14,samples/R5_c14_success.jpg,1,successful sustained grasp,eligible,1,317.4,215.4,113.2,182.1,220.3,inside reviewed grasp band
+U1_c50,samples/U1_c50_success.jpg,1,successful recovery grasp,eligible,1,361.8,177.0,132.2,153.6,229.2,inside reviewed grasp band
+AH1_c34,samples/AH1_c34_fail.jpg,0,orange outside left finger,unknown,1,,,,,,no confident fruit circle
+AH2_c52,samples/AH2_c52_fail.jpg,0,orange outside left finger,unknown,1,,,,,,no confident fruit circle
+AH3_c15,samples/AH3_c15_fail.jpg,0,orange far outside left finger,ineligible,1,174.6,249.0,122.6,106.5,203.3,outside reviewed grasp band
+AH4_c21,samples/AH4_c21_fail.jpg,0,orange outside left finger,unknown,1,,,,,,no confident fruit circle
+AH5_c44,samples/AH5_c44_fail.jpg,0,laterally centred but too shallow or far,ineligible,1,335.4,365.4,100.9,99.6,201.0,outside reviewed grasp band
+AH6_c29,samples/AH6_c29_fail.jpg,0,orange overlaps right finger,unknown,1,,,,,,no confident fruit circle
+AI1_c23,samples/AI1_c23_fail.jpg,0,laterally plausible but too deep toward gripper palm,ineligible,1,335.4,343.8,102.0,102.9,217.2,outside reviewed grasp band

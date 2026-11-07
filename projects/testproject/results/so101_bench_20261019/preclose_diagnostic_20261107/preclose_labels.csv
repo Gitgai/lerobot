@@ -1,0 +1,13 @@
+sample,image_path,expected_eligible,reason
+O1_c23,samples/O1_c23_success.jpg,1,successful sustained grasp
+R2_c15,samples/R2_c15_success.jpg,1,successful sustained grasp
+R3_c11,samples/R3_c11_success.jpg,1,successful sustained grasp
+R5_c14,samples/R5_c14_success.jpg,1,successful sustained grasp
+U1_c50,samples/U1_c50_success.jpg,1,successful recovery grasp
+AH1_c34,samples/AH1_c34_fail.jpg,0,orange outside left finger
+AH2_c52,samples/AH2_c52_fail.jpg,0,orange outside left finger
+AH3_c15,samples/AH3_c15_fail.jpg,0,orange far outside left finger
+AH4_c21,samples/AH4_c21_fail.jpg,0,orange outside left finger
+AH5_c44,samples/AH5_c44_fail.jpg,0,laterally centred but too shallow or far
+AH6_c29,samples/AH6_c29_fail.jpg,0,orange overlaps right finger
+AI1_c23,samples/AI1_c23_fail.jpg,0,laterally plausible but too deep toward gripper palm

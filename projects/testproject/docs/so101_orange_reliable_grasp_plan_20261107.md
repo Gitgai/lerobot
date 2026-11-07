@@ -1,7 +1,7 @@
 # SO-101 orange-to-tray reliability plan
 
 Date: 2026-11-07  
-Status: active plan; physical work has not started  
+Status: active; initial Phase C calibration prototype complete, action gating remains disabled
 Primary policy: fine-tune 3, `row3_all169_conservative_010000`  
 Primary diagnostic: [`../results/so101_bench_20261019/ROW_AH_OFFLINE_DIAGNOSIS.md`](../results/so101_bench_20261019/ROW_AH_OFFLINE_DIAGNOSIS.md)  
 Auto-reset status: paused; manual orange placement is used during this plan
@@ -25,9 +25,26 @@ target is at least **90 successes in a fresh 100-trial blind evaluation**, with 
 stage-specific failure counts reported. A 200-trial blind evaluation may be used later for a tighter confidence
 interval.
 
-The current heterogeneous fine-tune 3 orange record is **14/48 (29.2%)**. Row AH was **0/6**; all six trials failed
+The current heterogeneous fine-tune 3 orange record is **14/49 (28.6%)**. Row AH was **0/6**; all six trials failed
 while acquiring the orange. The immediate objective is therefore repeatable acquisition, not more unstructured
 end-to-end trials.
+
+### 2026-11-07 execution update
+
+Two action-horizon diagnostics were run after this plan was drafted:
+
+- A five-action-only diagnostic repeatedly replayed the policy's near-start prefix and was stopped at chunk 98. It
+  is recorded as void and does not change the success rate.
+- AI1 used 20 actions for coarse motion, five actions near the fruit, then 20 actions for recovery. It failed
+  acquisition and is counted in the 14/49 record. The shorter horizon produced smaller corrections but did not
+  create a secure close.
+
+Offline comparison found AI1's fruit centre near `(335,344)` in the 640×480 wrist frame, below the effective contact
+band seen in successful closes. A read-only circle-and-depth prototype calibrated on five successful and seven
+failed reviewed frames produced 5/5 eligible positives and blocked or returned unknown for 7/7 negatives. These are
+calibration results only. The detector, labels and report are in
+`results/so101_bench_20261019/preclose_diagnostic_20261107/`. Phase A physical-baseline checks and held-out Phase C
+validation remain incomplete, so the detector must not control actions yet.
 
 ## 2. What this plan is and is not
 
