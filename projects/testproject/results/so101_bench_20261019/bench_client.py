@@ -74,19 +74,37 @@ def grpc_client(server, actions_per_chunk):
         ok, buf = cv2.imencode(".jpg", np.ascontiguousarray(img[:, :, ::-1]), [int(cv2.IMWRITE_JPEG_QUALITY), 85]); return buf.tobytes()
 
     def act(front, wrist, joints, task):
-        raw = {"front": jpg(front), "wrist": jpg(wrist), "task": task}
+        total_t0 = time.perf_counter()
+        t0 = time.perf_counter(); front_jpg = jpg(front); front_jpeg_ms = 1000 * (time.perf_counter() - t0)
+        t0 = time.perf_counter(); wrist_jpg = jpg(wrist); wrist_jpeg_ms = 1000 * (time.perf_counter() - t0)
+        raw = {"front": front_jpg, "wrist": wrist_jpg, "task": task}
         for j, v in zip(JOINTS, joints): raw[f"{j}.pos"] = float(v)
         state["t"] += 1
         obs = H.TimedObservation(timestamp=time.time(), observation=raw, timestep=state["t"])
-        stub.SendObservations(send_bytes_in_chunks(pickle.dumps(obs), services_pb2.Observation, log_prefix="[CLIENT] Observation", silent=True))
+        t0 = time.perf_counter(); obs_bytes = pickle.dumps(obs); observation_pickle_ms = 1000 * (time.perf_counter() - t0)
+        t0 = time.perf_counter()
+        stub.SendObservations(send_bytes_in_chunks(obs_bytes, services_pb2.Observation, log_prefix="[CLIENT] Observation", silent=True))
+        observation_rpc_ms = 1000 * (time.perf_counter() - t0)
+        actions_rpc_ms = 0.0; polls = 0
         for _ in range(1200):
+            t0 = time.perf_counter()
             r = stub.GetActions(services_pb2.Empty())
+            actions_rpc_ms += 1000 * (time.perf_counter() - t0); polls += 1
             if len(r.data): break
             time.sleep(0.05)
         else:
             raise RuntimeError("no actions from server within 60 s")
-        chunk = pickle.loads(r.data)
-        return np.stack([np.asarray(a.get_action()) for a in chunk]).astype(np.float32)
+        t0 = time.perf_counter(); chunk = pickle.loads(r.data); actions_unpickle_ms = 1000 * (time.perf_counter() - t0)
+        result = np.stack([np.asarray(a.get_action()) for a in chunk]).astype(np.float32)
+        act.last_timing = {
+            "front_jpeg_ms": front_jpeg_ms, "wrist_jpeg_ms": wrist_jpeg_ms,
+            "observation_pickle_ms": observation_pickle_ms, "observation_rpc_ms": observation_rpc_ms,
+            "actions_rpc_ms": actions_rpc_ms, "actions_unpickle_ms": actions_unpickle_ms,
+            "total_ms": 1000 * (time.perf_counter() - total_t0), "polls": polls,
+            "observation_bytes": len(obs_bytes), "actions_bytes": len(r.data),
+        }
+        return result
+    act.last_timing = {}
     return act
 
 
@@ -278,11 +296,14 @@ def main():
                 if trace: trace.observation(ep + 1, ci + 1, f, w, q, front, wrist)
                 t0 = time.time(); chunk = act(f, w, q, a.task); dt = time.time() - t0; lat.append(dt)
                 if trace: trace.event("action_chunk_received", ep=ep + 1, chunk=ci + 1,
-                                      latency_s=dt, actions=chunk.round(4).tolist())
+                                      latency_s=dt, latency_stages=act.last_timing, actions=chunk.round(4).tolist())
                 execute_n = a.near_actions if execution_mode["near"] and a.near_actions else len(chunk)
-                rec = {"ep": ep + 1, "chunk": ci + 1, "latency_s": round(dt, 3), "state": q.round(1).tolist(), "a0": chunk[0].round(1).tolist(), "max_a0_minus_state": float(np.abs(chunk[0] - q).max()), "execution_mode": "near" if execution_mode["near"] else "far", "actions_executed": execute_n}
+                rec = {"ep": ep + 1, "chunk": ci + 1, "latency_s": round(dt, 3), "latency_stages": act.last_timing, "state": q.round(1).tolist(), "a0": chunk[0].round(1).tolist(), "max_a0_minus_state": float(np.abs(chunk[0] - q).max()), "execution_mode": "near" if execution_mode["near"] else "far", "actions_executed": execute_n}
                 out.write(json.dumps(rec) + "\n"); out.flush()
                 print(f"chunk {ci+1:3d}  {1000*dt:5.0f} ms  exec {execute_n:2d}  state {q.round(0).tolist()}  a0 {chunk[0].round(0).tolist()}", flush=True)
+                if a.dry_run:
+                    s = act.last_timing
+                    print(f"           jpeg {s['front_jpeg_ms'] + s['wrist_jpeg_ms']:.0f} | upload-rpc {s['observation_rpc_ms']:.0f} | action-rpc {s['actions_rpc_ms']:.0f} | decode {s['actions_unpickle_ms']:.1f} ms | {s['observation_bytes']/1024:.0f} KiB", flush=True)
                 if a.dry_run: continue
                 prev = q.copy()
                 for action_index, act_vec in enumerate(chunk[:execute_n]):

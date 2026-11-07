@@ -24,8 +24,8 @@ import numpy as np, torch
 import os
 JOINTS = ["shoulder_pan", "shoulder_lift", "elbow_flex", "wrist_flex", "wrist_roll", "gripper"]
 SLOTS = {"front": "observation.images.base_0_rgb", "wrist": "observation.images.left_wrist_0_rgb"}
-RECORD_DIR = os.environ.get("RECORD_DIR", "")          # if set: JPEG frame pairs every RECORD_EVERY calls + calls.csv
-RECORD_EVERY = int(os.environ.get("RECORD_EVERY", "5"))
+# Recording is deliberately opt-in.  Policy trials should not perform image or CSV disk I/O unless
+# --record-dir is supplied explicitly.
 
 
 def alias_modules():
@@ -55,6 +55,8 @@ def main():
     ap.add_argument("--num-inference-steps", type=int, default=15)
     ap.add_argument("--fps", type=int, default=30); ap.add_argument("--inference-latency", type=float, default=1 / 30)
     ap.add_argument("--obs-queue-timeout", type=float, default=2.0)
+    ap.add_argument("--record-dir", default="", help="opt-in server-side JPEG/CSV recording directory")
+    ap.add_argument("--record-every", type=int, default=5)
     a = ap.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     H = alias_modules()
@@ -116,18 +118,18 @@ def main():
             # per-connection counter for logging; the RECORDING index never resets (a reset made later runs
             # overwrite earlier runs' frames — found 2026-10-19), and each connection gets its own prefix
             self._n = 0
-            if not hasattr(self, "_conn") and RECORD_DIR and os.path.isdir(RECORD_DIR):
+            if not hasattr(self, "_conn") and a.record_dir and os.path.isdir(a.record_dir):
                 # 2026-10-28: the counter lived only in the process, so a server restart began again at c01 and the new
                 # run's frames overwrote the earlier run's (lost: first calls of the 2026-10-26 tomato rows c01–c04).
                 # Continue from the highest prefix already on disk instead.
-                existing = [int(f[1:3]) for f in os.listdir(RECORD_DIR) if f[:1] == "c" and f[1:3].isdigit() and "_call" in f]
+                existing = [int(f[1:3]) for f in os.listdir(a.record_dir) if f[:1] == "c" and f[1:3].isdigit() and "_call" in f]
                 self._conn = max(existing, default=0)
             self._conn = getattr(self, "_conn", 0) + 1
             self._rec = getattr(self, "_rec", 0)
             return services_pb2.Empty()
 
         def _predict_action_chunk(self, observation_t: TimedObservation):
-            raw = observation_t.get_observation(); t0 = time.perf_counter()
+            raw = observation_t.get_observation(); t0 = time.perf_counter(); stage_t0 = t0
             obs = {}
             # camera keys vary per environment: pick the external and the wrist view by name; missing slots are
             # filled with masked dummies by the policy (empty_cameras). Found 2026-10-19: LeIsaac LiftCube sends no
@@ -138,6 +140,7 @@ def main():
                     import cv2
                     bgr = cv2.imdecode(np.frombuffer(v, dtype=np.uint8), cv2.IMREAD_COLOR)
                     if bgr is not None: raw[k] = np.ascontiguousarray(bgr[:, :, ::-1])
+            jpeg_decode_ms = 1000 * (time.perf_counter() - stage_t0); stage_t0 = time.perf_counter()
             img_keys = [k for k, v in raw.items() if hasattr(v, "shape") and getattr(v, "ndim", 0) == 3 and v.shape[-1] == 3]
             is_wrist = lambda k: any(t in k.lower() for t in ("wrist", "handeye", "gripper", "endeff", "hand", "ego"))
             wrist_keys = [k for k in img_keys if is_wrist(k)]; ext_keys = [k for k in img_keys if not is_wrist(k)]
@@ -156,25 +159,32 @@ def main():
             state = torch.tensor([[float(raw[f"{j}.pos"]) for j in JOINTS]], dtype=torch.float32, device="cuda")
             obs["observation.state"] = state
             obs["task"] = str(raw.get("task", ""))
+            preprocess_ms = 1000 * (time.perf_counter() - stage_t0); stage_t0 = time.perf_counter()
             with torch.inference_mode():
                 chunk = self.policy.predict_action_chunk(obs)                                   # (1, n, 6), joint units
+            inference_ms = 1000 * (time.perf_counter() - stage_t0); stage_t0 = time.perf_counter()
             if chunk.ndim == 2: chunk = chunk.unsqueeze(0)
             chunk = chunk[:, : self.actions_per_chunk, :].float().cpu()
             actions = list(chunk.squeeze(0))
+            postprocess_ms = 1000 * (time.perf_counter() - stage_t0)
             dt = time.perf_counter() - t0; self._n += 1
             a0 = actions[0].numpy(); s0 = state[0].cpu().numpy()
-            # optional recording for review: every RECORD_EVERY-th call, the two images as JPEG + a CSV row per call
-            if RECORD_DIR:
+            # Optional review recording: every --record-every call, save both JPEGs and append one CSV row.
+            record_t0 = time.perf_counter()
+            if a.record_dir:
                 import csv, os
                 from PIL import Image
-                os.makedirs(RECORD_DIR, exist_ok=True)
+                os.makedirs(a.record_dir, exist_ok=True)
                 self._rec = getattr(self, "_rec", 0) + 1
-                if self._n % RECORD_EVERY == 1 or RECORD_EVERY == 1:
+                if self._n % a.record_every == 1 or a.record_every == 1:
                     for k in mapping:                                   # only the cameras this client actually sends
                         img = raw[k]; img = img.cpu().numpy() if isinstance(img, torch.Tensor) else np.asarray(img)
-                        Image.fromarray(img.astype(np.uint8)).save(os.path.join(RECORD_DIR, f"c{getattr(self, '_conn', 0):02d}_call{self._n:06d}_{k}.jpg"), quality=85)
-                with open(os.path.join(RECORD_DIR, "calls.csv"), "a", newline="") as f:
+                        Image.fromarray(img.astype(np.uint8)).save(os.path.join(a.record_dir, f"c{getattr(self, '_conn', 0):02d}_call{self._n:06d}_{k}.jpg"), quality=85)
+                with open(os.path.join(a.record_dir, "calls.csv"), "a", newline="") as f:
                     csv.writer(f).writerow([getattr(self, "_conn", 0), self._n, round(time.time(), 3), round(1000 * dt, 1), obs["task"]] + np.round(s0, 2).tolist() + np.round(a0, 2).tolist())
+            recording_ms = 1000 * (time.perf_counter() - record_t0)
+            log.info("LATENCY_STAGE call=%d jpeg_decode_ms=%.1f preprocess_ms=%.1f inference_ms=%.1f postprocess_ms=%.1f recording_ms=%.1f recording=%s",
+                     self._n, jpeg_decode_ms, preprocess_ms, inference_ms, postprocess_ms, recording_ms, bool(a.record_dir))
             if self._n <= 5 or self._n % 50 == 0:
                 log.info("call %d: %.0f ms | task=%r | state=%s | a0=%s | max|a0-s|=%.1f | n=%d",
                          self._n, 1000 * dt, obs["task"][:60], np.round(s0, 1).tolist(), np.round(a0, 1).tolist(),
