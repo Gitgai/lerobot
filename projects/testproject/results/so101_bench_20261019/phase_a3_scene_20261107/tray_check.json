@@ -1,0 +1,16 @@
+{
+  "tray_centre": [
+    192.0,
+    112.0
+  ],
+  "registered_u1_target": [
+    198.8253,
+    157.2526
+  ],
+  "target_minus_current_px": [
+    6.825299999999999,
+    45.2526
+  ],
+  "distance_px": 45.76442424908239,
+  "distance_cm_at_8px_per_cm": 5.720553031135299
+}

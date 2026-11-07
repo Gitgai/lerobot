@@ -1,0 +1,19 @@
+{
+  "table_good_matches": 203,
+  "table_inliers": 183,
+  "table_inlier_ratio": 0.9014778325123153,
+  "table_median_error_px": 0.566665530204773,
+  "current_registered_target": [
+    205.1345672607422,
+    192.0400848388672
+  ],
+  "tracked_tray_centre": [
+    198.80184936523438,
+    141.42715454101562
+  ],
+  "target_minus_tray_px": [
+    6.3327178955078125,
+    50.61293029785156
+  ],
+  "distance_px": 51.00756835293431
+}

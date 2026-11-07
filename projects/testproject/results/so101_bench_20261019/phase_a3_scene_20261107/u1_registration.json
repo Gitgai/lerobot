@@ -1,0 +1,42 @@
+{
+  "old": "/home/gaikwad-prakash/Documents/ChatGPT/Lerobot-rowN-record/projects/testproject/results/so101_lora_on_top_20261019/bench_trace_ft3_jpeg_no_rtc_trial_u1_20261031/frames/ep01_chunk001_front.jpg",
+  "new": "/home/gaikwad-prakash/Documents/ChatGPT/Lerobot-rowN-record/projects/testproject/results/so101_bench_20261019/phase_a3_scene_20261107/front_b.jpg",
+  "keypoints_old": 1494,
+  "keypoints_new": 1637,
+  "good_matches": 116,
+  "inliers": 105,
+  "inlier_ratio": 0.9051724137931034,
+  "median_inlier_error_px": 0.6158500909805298,
+  "max_inlier_error_px": 1.986785650253296,
+  "homography": [
+    [
+      0.9894471362364817,
+      -0.00045289971000787003,
+      36.57801499139587
+    ],
+    [
+      0.006555414152011075,
+      0.9927515368897054,
+      -2.9820854901657587
+    ],
+    [
+      -2.668760884697591e-05,
+      -5.5092335085831895e-06,
+      1.0
+    ]
+  ],
+  "mapped_points": {
+    "u1_tray_centre": [
+      198.8252716064453,
+      157.2525634765625
+    ],
+    "u1_orange_centre": [
+      539.2884521484375,
+      316.7948913574219
+    ]
+  },
+  "current_tray_centre": [
+    193.0,
+    107.0
+  ]
+}

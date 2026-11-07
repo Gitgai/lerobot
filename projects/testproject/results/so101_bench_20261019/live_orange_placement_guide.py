@@ -73,6 +73,7 @@ def main() -> int:
             if frame_index < 45:
                 continue
             annotated = frame.copy()
+            height, width = frame.shape[:2]
             target_px = tuple(np.rint(target).astype(int))
             # The small black dot is the physical pen mark. The larger green
             # ring shows the approximate orange footprint when centred on it.
@@ -87,10 +88,24 @@ def main() -> int:
                 25,
                 3,
             )
-            label_xy = (max(10, target_px[0] + 38), max(25, target_px[1] - 22))
+            # Keep the label visible even when the target is near an image edge,
+            # and add a long arrow that is easy to follow in the live viewer.
+            label_xy = (
+                min(max(10, target_px[0] - 210), width - 220),
+                min(max(30, target_px[1] - 75), height - 20),
+            )
+            arrow_start = (label_xy[0] + 165, label_xy[1] + 10)
+            cv2.arrowedLine(
+                annotated,
+                arrow_start,
+                target_px,
+                (255, 0, 255),
+                5,
+                tipLength=0.22,
+            )
             cv2.putText(
                 annotated,
-                "BLACK PEN DOT HERE",
+                "PUT ORANGE HERE",
                 label_xy,
                 cv2.FONT_HERSHEY_SIMPLEX,
                 0.55,
@@ -147,6 +162,7 @@ def main() -> int:
 
             ok, encoded = cv2.imencode(".jpg", annotated, [cv2.IMWRITE_JPEG_QUALITY, 90])
             if ok:
+                Path("/tmp/so101_orange_placement_latest.jpg").write_bytes(encoded.tobytes())
                 rr.set_time("elapsed", duration=time.monotonic() - started)
                 rr.log("camera/top", rr.EncodedImage(contents=encoded.tobytes(), media_type="image/jpeg"))
                 rr.log("status", rr.TextDocument(status, media_type="text/markdown"))

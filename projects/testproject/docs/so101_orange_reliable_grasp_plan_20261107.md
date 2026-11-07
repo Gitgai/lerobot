@@ -25,7 +25,8 @@ target is at least **90 successes in a fresh 100-trial blind evaluation**, with 
 stage-specific failure counts reported. A 200-trial blind evaluation may be used later for a tighter confidence
 interval.
 
-The current heterogeneous fine-tune 3 orange record is **14/49 (28.6%)**. Row AH was **0/6**; all six trials failed
+The current heterogeneous fine-tune 3 orange record after the first two Phase B repetitions is **15/51 (29.4%)**.
+Before Phase B it was 14/49. Row AH was **0/6**; all six trials failed
 while acquiring the orange. The immediate objective is therefore repeatable acquisition, not more unstructured
 end-to-end trials.
 
@@ -77,6 +78,22 @@ Cartesian displacement with 1.92 mm relative descent. Three returns reached the 
 `[-7.8242,-104.0000,96.7473,78.1538,-1.2747,51.3329]`; maximum arm error was 0.146 degrees and gripper error 0.033.
 Final health was normal and torque-off was independently verified. Evidence is in
 `results/so101_bench_20261019/u1_start_restore_20261107/`. Phase A3 scene restoration is next.
+
+Phase A3 then froze the operator-selected current tray position rather than moving the tray to the historical U1
+position. The current top frame registered to U1 with 140 inliers and 0.53-pixel median reprojection error. The
+transferred U1 orange centre was `(570.65,329.55)` in the current 640x480 view; the operator left the orange slightly
+below that cross and asked to continue without further adjustment. This accepted physical scene, camera controls,
+registration, overlays and start-pose checks are under
+`results/so101_bench_20261019/phase_a3_scene_20261107/`. It is a controlled repeatability scene, but its orange
+placement must not be described as an exact reproduction of U1.
+
+The first two Phase B repetitions used that unchanged scene. B1 failed acquisition: it idled through chunk 28,
+made two close attempts, reached a minimum sent gripper target of 4.8, and left the orange on the table. B2 began
+reaching immediately, acquired and lifted the same orange by chunk 46, released it inside the tray by chunk 56 and
+returned to the recorded start. B2 had one gripper-delta clamp at chunk 43; the clamp limited a predicted close from
+12.88 to 17.19 and the subsequent grasp still succeeded. Phase B is therefore 1/2 acquisition and 1/2 end-to-end.
+The third unchanged repetition remains required for Decision B; manual placement is required because B2 left the
+orange in the tray.
 
 ## 2. What this plan is and is not
 

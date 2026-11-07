@@ -1,0 +1,39 @@
+{
+  "historical_reference": "/home/gaikwad-prakash/Documents/ChatGPT/Lerobot-rowN-record/projects/testproject/results/so101_lora_on_top_20261019/bench_trace_ft3_jpeg_no_rtc_trial_u1_20261031/frames/ep01_chunk001_front.jpg",
+  "current_reference": "/home/gaikwad-prakash/Documents/ChatGPT/Lerobot-rowN-record/projects/testproject/results/so101_bench_20261019/phase_a3_scene_20261107/front_reference_current_tray.jpg",
+  "good_matches": 160,
+  "inliers": 140,
+  "median_inlier_error_px": 0.5264356136322021,
+  "homography": [
+    [
+      0.9764024102057886,
+      -0.03238454213049977,
+      77.0317897722713
+    ],
+    [
+      0.0362534332371805,
+      0.9817808852706148,
+      -6.384529952649893
+    ],
+    [
+      -4.298874028295044e-05,
+      -2.412988538114613e-05,
+      1.0
+    ]
+  ],
+  "placement_marks_px": {
+    "P0": [
+      570.65,
+      329.55
+    ],
+    "P1": [
+      552.65,
+      329.55
+    ],
+    "P2": [
+      588.65,
+      329.55
+    ]
+  },
+  "note": "P0 is registered U1 orange centre; P1/P2 are nearby diagnostic positions and are not used until central repeatability is measured."
+}
