@@ -86,3 +86,14 @@ pixel. A second light-touch test then displaced the front view persistently by 3
 The agreement across independent table regions and the high responses identify a real rigid image translation, not
 auto-exposure noise. Tightening the existing attachment was insufficient. The camera head/hinge and cable require
 rigid restraint and strain relief before another reference is accepted.
+
+## Second repair: front camera accepted
+
+After the camera head/hinge and cable were restrained, the second light-touch test measured approximately -0.21
+pixel horizontally and +1.01 pixels vertically over the whole frame. Independent table regions measured 1.03-1.52
+pixels vertically, with phase responses of 0.80-0.92. A later settled frame differed from the post-touch frame by
+only `[+0.006,+0.003]` pixels with response 0.96.
+
+This is a large improvement over the prior 3.7-4.1 pixel displacement. The settled post-touch frame is accepted as
+the new front-camera reference. It leaves adequate margin inside the 3-5 pixel visual tolerances, provided the
+camera and cable are not disturbed. The wrist-camera mount check remains pending.

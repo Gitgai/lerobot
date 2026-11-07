@@ -61,6 +61,11 @@ touch produced a persistent 3.7-4.1 pixel horizontal translation with strong reg
 the existing attachment did not solve the compliance. The camera head/hinge and cable need rigid restraint plus
 strain relief; no physical trial or transferred pixel target is valid until a repeated touch test passes.
 
+The second repair restrained both the camera head/hinge and cable. Its repeated light-touch test moved the whole
+front view about `[-0.21,+1.01]` pixels; independent table regions peaked at 1.52 pixels. The view then remained
+stable to 0.007 pixel. The settled post-touch frame is accepted as the new front reference. Phase A1 still requires
+the wrist-camera mount check before completion.
+
 ## 2. What this plan is and is not
 
 This plan improves the policy task. It is separate from the scripted auto-reset system.

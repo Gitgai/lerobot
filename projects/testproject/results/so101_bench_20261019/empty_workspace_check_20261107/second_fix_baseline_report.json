@@ -1,0 +1,10 @@
+{
+  "paths": [
+    "/home/gaikwad-prakash/empty_workspace_check_20261107/front_second_fix_pre_touch_a.jpg",
+    "/home/gaikwad-prakash/empty_workspace_check_20261107/front_second_fix_pre_touch_b.jpg"
+  ],
+  "shift_x_px": -0.005796635289755159,
+  "shift_y_px": -0.004208123787037721,
+  "response": 0.9751254589855671,
+  "mean_absolute_difference": 0.6261501312255859
+}
