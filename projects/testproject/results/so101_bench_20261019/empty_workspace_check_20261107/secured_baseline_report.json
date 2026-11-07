@@ -1,0 +1,32 @@
+{
+  "front": {
+    "device": "/dev/v4l/by-id/usb-046d_C270_HD_WEBCAM_FC7A6780-video-index0",
+    "paths": [
+      "/home/gaikwad-prakash/empty_workspace_check_20261107/front_secured_pre_touch_a.jpg",
+      "/home/gaikwad-prakash/empty_workspace_check_20261107/front_secured_pre_touch_b.jpg"
+    ],
+    "consecutive_shift_x_px": 0.001686135952411405,
+    "consecutive_shift_y_px": 0.005535466853586968,
+    "phase_response": 0.9753216693798701,
+    "mean_absolute_difference": 0.6393525004386902,
+    "sha256": [
+      "75d05403a7a053ebc59d4de99aa85c38de111b3cae1d1ad66220239658c2bd62",
+      "75e9baddcf523baabe8e5d3e12ac6a250ecbd3d99d1be838d65ffc35dfd741ce"
+    ]
+  },
+  "wrist": {
+    "device": "/dev/v4l/by-id/usb-SunplusIT_Inc_AK-Camera_JV-video-index0",
+    "paths": [
+      "/home/gaikwad-prakash/empty_workspace_check_20261107/wrist_secured_pre_touch_a.jpg",
+      "/home/gaikwad-prakash/empty_workspace_check_20261107/wrist_secured_pre_touch_b.jpg"
+    ],
+    "consecutive_shift_x_px": 0.0024976314689411083,
+    "consecutive_shift_y_px": 0.0005259227976637249,
+    "phase_response": 0.9977757884562015,
+    "mean_absolute_difference": 0.06068043410778046,
+    "sha256": [
+      "80fcfc6e58c6dc052ec7631eab558f7df946d46060d9d21f1031ec7715e038df",
+      "388994ad73bf07526b9e189570fcbf3f91ed147e6cd12cc1ce8979055f805eeb"
+    ]
+  }
+}

@@ -70,3 +70,19 @@ with the arm, the wrist-mount comparison is inconclusive and is not classified a
 
 Machine-readable readings are in `camera_report.json`, `motor_report.json`, `mount_stability_report.json`, and
 `motor_report_post_touch.json`.
+
+## Secured-mount retest
+
+After the front mount was tightened, two consecutive reference frames were initially stable to less than 0.01
+pixel. A second light-touch test then displaced the front view persistently by 3.7-4.1 pixels horizontally:
+
+| Front-camera region | X shift | Y shift | Phase response |
+|---|---:|---:|---:|
+| whole frame | +4.08 px | -0.08 px | 0.95 |
+| lower table | +3.72 px | +0.14 px | 0.84 |
+| left table | +3.87 px | +0.64 px | 0.83 |
+| lower-left table | +3.67 px | +0.40 px | 0.80 |
+
+The agreement across independent table regions and the high responses identify a real rigid image translation, not
+auto-exposure noise. Tightening the existing attachment was insufficient. The camera head/hinge and cable require
+rigid restraint and strain relief before another reference is accepted.

@@ -1,0 +1,30 @@
+{
+  "reference": "/home/gaikwad-prakash/empty_workspace_check_20261107/front_secured_pre_touch_b.jpg",
+  "post_touch": "/home/gaikwad-prakash/empty_workspace_check_20261107/front_secured_post_touch.jpg",
+  "regions": {
+    "whole_frame": {
+      "shift_x_px": 4.079719354295435,
+      "shift_y_px": -0.07537874928786437,
+      "response": 0.9495359853903452,
+      "mean_absolute_difference": 4.299546241760254
+    },
+    "lower_table": {
+      "shift_x_px": 3.724824106705057,
+      "shift_y_px": 0.1387237231540155,
+      "response": 0.8398127751880222,
+      "mean_absolute_difference": 1.7578622102737427
+    },
+    "left_table": {
+      "shift_x_px": 3.865048774392619,
+      "shift_y_px": 0.6406456567386414,
+      "response": 0.8266219445687754,
+      "mean_absolute_difference": 4.596630573272705
+    },
+    "lower_left_table": {
+      "shift_x_px": 3.670658453977012,
+      "shift_y_px": 0.39525438477241437,
+      "response": 0.8031693338464807,
+      "mean_absolute_difference": 2.7242839336395264
+    }
+  }
+}

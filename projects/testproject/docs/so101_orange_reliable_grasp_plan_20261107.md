@@ -56,6 +56,11 @@ black marks were subsequently confirmed, but the front view retained an approxim
 tolerances. The unpowered arm also drifted, making the wrist-mount comparison inconclusive. A1 therefore fails
 until the front mount is secured and a repeat check passes.
 
+The first secured-mount retest was initially stable below 0.01 pixel between consecutive frames, but a second light
+touch produced a persistent 3.7-4.1 pixel horizontal translation with strong registration confidence. Tightening
+the existing attachment did not solve the compliance. The camera head/hinge and cable need rigid restraint plus
+strain relief; no physical trial or transferred pixel target is valid until a repeated touch test passes.
+
 ## 2. What this plan is and is not
 
 This plan improves the policy task. It is separate from the scripted auto-reset system.
