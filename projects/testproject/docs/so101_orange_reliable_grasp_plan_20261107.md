@@ -1,7 +1,7 @@
 # SO-101 orange-to-tray reliability plan
 
 Date: 2026-11-07  
-Status: active; Phase A1 complete, initial Phase C calibration prototype complete, action gating remains disabled
+Status: active; Phases A1-A2 complete, initial Phase C calibration prototype complete, action gating remains disabled
 Primary policy: fine-tune 3, `row3_all169_conservative_010000`  
 Primary diagnostic: [`../results/so101_bench_20261019/ROW_AH_OFFLINE_DIAGNOSIS.md`](../results/so101_bench_20261019/ROW_AH_OFFLINE_DIAGNOSIS.md)  
 Auto-reset status: paused; manual orange placement is used during this plan
@@ -70,6 +70,13 @@ The wrist check then held every raw motor position exactly constant across the l
 image moved about `[+0.07,+1.10]` pixels; the table and two fingertip regions agreed, and a later frame was stable to
 0.08 pixel. The settled post-touch wrist frame is accepted. Phase A1 is complete; Phase A2 offline path construction
 and envelope verification is next. No robot movement was issued during A1.
+
+Phase A2 then restored the U1 start target with no policy connection. The initial path used 11 waypoints, stayed
+inside the demonstration envelope, moved no arm joint by more than 0.29 degrees per step, and had 5.31 mm modeled
+Cartesian displacement with 1.92 mm relative descent. Three returns reached the identical measured pose
+`[-7.8242,-104.0000,96.7473,78.1538,-1.2747,51.3329]`; maximum arm error was 0.146 degrees and gripper error 0.033.
+Final health was normal and torque-off was independently verified. Evidence is in
+`results/so101_bench_20261019/u1_start_restore_20261107/`. Phase A3 scene restoration is next.
 
 ## 2. What this plan is and is not
 

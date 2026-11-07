@@ -1,0 +1,295 @@
+{
+  "captured_at": "2026-11-07T15:06:49.892774+05:30",
+  "mode": "execute",
+  "port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114209-if00",
+  "calibration_path": "/home/gaikwad-prakash/.cache/huggingface/lerobot/calibration/robots/so_follower/my_so101_follower.json",
+  "calibration_sha256": "1725086fe76be2d71c2e3cda89fcef96cd8692f8c27e117b89ba549b0758acd8",
+  "target": [
+    -7.8,
+    -104.0,
+    96.7,
+    78.3,
+    -1.3,
+    51.3
+  ],
+  "step_limit": [
+    0.3,
+    0.3,
+    0.3,
+    0.3,
+    0.3,
+    0.75
+  ],
+  "events": [
+    {
+      "event": "leg_complete",
+      "label": "return_1",
+      "waypoint_count": 11,
+      "target": [
+        -7.8,
+        -104.0,
+        96.7,
+        78.3,
+        -1.3,
+        51.3
+      ],
+      "reached": [
+        -7.8242,
+        -104.0,
+        96.7473,
+        78.1538,
+        -1.2747,
+        51.3329
+      ],
+      "error": [
+        -0.0242,
+        0.0,
+        0.0473,
+        -0.1462,
+        0.0253,
+        0.0329
+      ]
+    },
+    {
+      "event": "leg_complete",
+      "label": "probe_2",
+      "waypoint_count": 4,
+      "target": [
+        -7.8,
+        -104.0,
+        96.7,
+        78.3,
+        -0.3,
+        51.3
+      ],
+      "reached": [
+        -7.8242,
+        -104.0,
+        96.7473,
+        78.1538,
+        -0.4835,
+        51.3329
+      ],
+      "error": [
+        -0.0242,
+        0.0,
+        0.0473,
+        -0.1462,
+        -0.1835,
+        0.0329
+      ]
+    },
+    {
+      "event": "leg_complete",
+      "label": "return_2",
+      "waypoint_count": 3,
+      "target": [
+        -7.8,
+        -104.0,
+        96.7,
+        78.3,
+        -1.3,
+        51.3
+      ],
+      "reached": [
+        -7.8242,
+        -104.0,
+        96.7473,
+        78.1538,
+        -1.2747,
+        51.3329
+      ],
+      "error": [
+        -0.0242,
+        0.0,
+        0.0473,
+        -0.1462,
+        0.0253,
+        0.0329
+      ]
+    },
+    {
+      "event": "leg_complete",
+      "label": "probe_3",
+      "waypoint_count": 4,
+      "target": [
+        -7.8,
+        -104.0,
+        96.7,
+        78.3,
+        -0.3,
+        51.3
+      ],
+      "reached": [
+        -7.8242,
+        -104.0,
+        96.7473,
+        78.1538,
+        -0.5714,
+        51.3329
+      ],
+      "error": [
+        -0.0242,
+        0.0,
+        0.0473,
+        -0.1462,
+        -0.2714,
+        0.0329
+      ]
+    },
+    {
+      "event": "leg_complete",
+      "label": "return_3",
+      "waypoint_count": 3,
+      "target": [
+        -7.8,
+        -104.0,
+        96.7,
+        78.3,
+        -1.3,
+        51.3
+      ],
+      "reached": [
+        -7.8242,
+        -104.0,
+        96.7473,
+        78.1538,
+        -1.2747,
+        51.3329
+      ],
+      "error": [
+        -0.0242,
+        0.0,
+        0.0473,
+        -0.1462,
+        0.0253,
+        0.0329
+      ]
+    }
+  ],
+  "start": [
+    -7.8242,
+    -105.2308,
+    96.7473,
+    77.4505,
+    1.8901,
+    54.067
+  ],
+  "start_delta_to_target": [
+    0.0242,
+    1.2308,
+    -0.0473,
+    0.8495,
+    -3.1901,
+    -2.767
+  ],
+  "offline": {
+    "initial_waypoint_count": 11,
+    "total_waypoint_count": 27,
+    "envelope_pass": true,
+    "max_cartesian_displacement_from_start_mm": 5.312652227762576,
+    "minimum_relative_z_mm": -1.9233712271661125,
+    "maximum_joint_step": [
+      0.0022,
+      0.1119,
+      0.0043,
+      0.0772,
+      0.29,
+      0.2515
+    ]
+  },
+  "protection_readback": {
+    "Max_Torque_Limit": 500,
+    "Protection_Current": 250,
+    "Overload_Torque": 25
+  },
+  "returns": [
+    [
+      -7.8242,
+      -104.0,
+      96.7473,
+      78.1538,
+      -1.2747,
+      51.3329
+    ],
+    [
+      -7.8242,
+      -104.0,
+      96.7473,
+      78.1538,
+      -1.2747,
+      51.3329
+    ],
+    [
+      -7.8242,
+      -104.0,
+      96.7473,
+      78.1538,
+      -1.2747,
+      51.3329
+    ]
+  ],
+  "return_errors": [
+    [
+      -0.0242,
+      0.0,
+      0.0473,
+      -0.1462,
+      0.0253,
+      0.0329
+    ],
+    [
+      -0.0242,
+      0.0,
+      0.0473,
+      -0.1462,
+      0.0253,
+      0.0329
+    ],
+    [
+      -0.0242,
+      0.0,
+      0.0473,
+      -0.1462,
+      0.0253,
+      0.0329
+    ]
+  ],
+  "max_return_arm_error": 0.14615384615383675,
+  "max_return_gripper_error": 0.032877648667124504,
+  "max_return_spread": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "final_health": {
+    "shoulder_pan": {
+      "temperature_c": 33,
+      "voltage_v": 7.1
+    },
+    "shoulder_lift": {
+      "temperature_c": 33,
+      "voltage_v": 7.1
+    },
+    "elbow_flex": {
+      "temperature_c": 32,
+      "voltage_v": 7.2
+    },
+    "wrist_flex": {
+      "temperature_c": 34,
+      "voltage_v": 7.1
+    },
+    "wrist_roll": {
+      "temperature_c": 33,
+      "voltage_v": 7.2
+    },
+    "gripper": {
+      "temperature_c": 33,
+      "voltage_v": 7.2
+    }
+  },
+  "result": "PASS"
+}
