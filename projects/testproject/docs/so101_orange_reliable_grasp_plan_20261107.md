@@ -1,7 +1,7 @@
 # SO-101 orange-to-tray reliability plan
 
 Date: 2026-11-07  
-Status: active; initial Phase C calibration prototype complete, action gating remains disabled
+Status: active; Phase A1 complete, initial Phase C calibration prototype complete, action gating remains disabled
 Primary policy: fine-tune 3, `row3_all169_conservative_010000`  
 Primary diagnostic: [`../results/so101_bench_20261019/ROW_AH_OFFLINE_DIAGNOSIS.md`](../results/so101_bench_20261019/ROW_AH_OFFLINE_DIAGNOSIS.md)  
 Auto-reset status: paused; manual orange placement is used during this plan
@@ -65,6 +65,11 @@ The second repair restrained both the camera head/hinge and cable. Its repeated 
 front view about `[-0.21,+1.01]` pixels; independent table regions peaked at 1.52 pixels. The view then remained
 stable to 0.007 pixel. The settled post-touch frame is accepted as the new front reference. Phase A1 still requires
 the wrist-camera mount check before completion.
+
+The wrist check then held every raw motor position exactly constant across the light-touch test. The whole wrist
+image moved about `[+0.07,+1.10]` pixels; the table and two fingertip regions agreed, and a later frame was stable to
+0.08 pixel. The settled post-touch wrist frame is accepted. Phase A1 is complete; Phase A2 offline path construction
+and envelope verification is next. No robot movement was issued during A1.
 
 ## 2. What this plan is and is not
 

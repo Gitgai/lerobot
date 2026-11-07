@@ -1,0 +1,29 @@
+{
+  "motor_position_deltas_all_zero": true,
+  "regions": {
+    "whole_frame": {
+      "shift_x_px": 0.06852967752291761,
+      "shift_y_px": 1.0957435799380448,
+      "response": 0.9157506642738978,
+      "mean_absolute_difference": 6.042755126953125
+    },
+    "upper_table": {
+      "shift_x_px": 0.16815886026722637,
+      "shift_y_px": 1.0675528348111527,
+      "response": 0.9507339181303978,
+      "mean_absolute_difference": 3.7395384311676025
+    },
+    "left_tip_region": {
+      "shift_x_px": 0.1521983578543029,
+      "shift_y_px": 0.8447679522208489,
+      "response": 0.9575018968582153,
+      "mean_absolute_difference": 5.386195182800293
+    },
+    "right_tip_region": {
+      "shift_x_px": 0.034494457056226224,
+      "shift_y_px": 1.0851628875599602,
+      "response": 0.8715289692819854,
+      "mean_absolute_difference": 3.094943046569824
+    }
+  }
+}

@@ -6,7 +6,7 @@ Policy motion: none
 
 ## Result
 
-**Failed mount-stability acceptance; robot motion remains paused.**
+**Passed after camera-head and cable restraint; robot motion remained paused throughout the check.**
 
 The orange and tray were removed before capture. Both cameras produced fresh, changing 640x480 frames. All six
 motors were readable with torque disabled, zero reported load, 7.2-7.3 V supply and 32-33 C temperature. The
@@ -41,7 +41,7 @@ configuration shown here. It must not be interpreted as proof that the gripper i
 - Consecutive-frame mean absolute differences were 2.60 for front and 1.80 for wrist; hashes also differed. Both
   streams were fresh during the capture.
 
-## Remaining A1 check
+## Initial remaining A1 check
 
 Keep the arm unpowered and the table empty. Lightly test both camera mounts and the wrist cable for movement. An
 additional viewpoint or a safe inspection pose is needed if exact tip-height and parallelism measurements are
@@ -97,3 +97,14 @@ only `[+0.006,+0.003]` pixels with response 0.96.
 This is a large improvement over the prior 3.7-4.1 pixel displacement. The settled post-touch frame is accepted as
 the new front-camera reference. It leaves adequate margin inside the 3-5 pixel visual tolerances, provided the
 camera and cable are not disturbed. The wrist-camera mount check remains pending.
+
+## Wrist camera accepted; Phase A1 complete
+
+The final wrist test recorded the six motor positions immediately before and after a deliberate light camera/cable
+touch. Every raw motor position was identical, eliminating unpowered arm drift as a confound. The image moved about
+`[+0.07,+1.10]` pixels over the whole frame. The table and both fingertip regions independently agreed within
+0.84-1.10 pixels vertically with strong registration responses. A later settled frame differed by only
+`[-0.067,-0.035]` pixels.
+
+Phase A1 is complete. Both cameras are accepted at their settled post-touch references. The next activity is Phase
+A2: construct and verify the slow bounded path to a documented successful start pose offline before any live move.
