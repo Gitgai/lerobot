@@ -26,7 +26,7 @@ stage-specific failure counts reported. A 200-trial blind evaluation may be used
 interval.
 
 The current heterogeneous fine-tune 3 orange record after five controlled Phase B repetitions and two exploratory
-10-action trials is **15/56 (26.8%)**.
+10-action trials is **15/57 (26.3%)**.
 Before Phase B it was 14/49. Row AH was **0/6**; all six trials failed
 while acquiring the orange. The immediate objective is therefore repeatable acquisition, not more unstructured
 end-to-end trials.
@@ -101,14 +101,16 @@ At the operator's request, two additional unchanged repetitions were subsequentl
 acquisition with the orange outside the left finger, making the controlled result **1/5 acquisition and 1/5
 end-to-end**. These extensions strengthen the stop decision; they do not reopen Decision B.
 
-On 2026-11-08, two operator-requested trials executed exactly 10 actions per request for the entire episode, with
+On 2026-11-08, three operator-requested trials executed exactly 10 actions per request for the entire episode, with
 no adaptive 3-5-action mode. The cap was increased from 75 to 150 requests to preserve the same 1,500-action
-maximum. Both failed acquisition: the orange remained outside the left finger during the initial approach and
+maximum. All three failed acquisition: the orange remained outside the left finger during the initial approach and
 later closes were empty. The second run's prolonged search accumulated approximately 116 degrees of measured wrist
-roll before the cap, despite zero client delta clamps. Both scripted returns and torque-off checks passed. The
+roll before the cap, despite zero client delta clamps. H10-3 repeated the same lateral miss, made empty closes down
+to a 3.25 sent gripper target, and returned to start after 150 requests. All scripted returns passed. The
 camera geometry had shifted and the orange placement changed between the two trials, so these are exploratory
 results rather than a controlled 10-versus-20 comparison. Ten actions alone did not solve alignment, and a
-150-request cap should not be reused without an absolute joint envelope and an earlier acquisition timeout.
+150-request cap should not be reused without an absolute joint envelope and an earlier acquisition timeout. The
+fine-tune 3 controlled-orange total is now **15/57 (26.3%)**.
 
 ## 2. What this plan is and is not
 
