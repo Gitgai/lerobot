@@ -2,7 +2,7 @@
 
 Date: 2026-11-08  
 Checkpoint: `ft4_orange_matchbox_corrective_20261108/checkpoints/002000/pretrained_model`  
-Result: **1 complete orange-to-tray success in 3 controlled trials (33.3%)**
+Result: **2 complete orange-to-tray successes in 6 controlled trials (33.3%)**
 
 ## Fixed settings
 
@@ -21,21 +21,25 @@ Result: **1 complete orange-to-tray success in 3 controlled trials (33.3%)**
 | 1 | Fail | 1.235 s | 19.9 | Orange entered both fingers and the gripper closed, but it was not secured or lifted |
 | 2 | Fail | 1.262 s | 17.4 | Approach was offset; repeated closes remained outside the right finger |
 | 3 | **Success** | 1.257 s | 25.2 | Closed by about chunk 15, airborne by 18, released in the tray by 24, returned by about 40 |
+| 4 | Fail | 1.219 s | 23.7 | Offset close pushed the orange right; it was never secured or lifted |
+| 5 | **Success** | 1.188 s | 20.6 | Secure grasp by about chunk 29; released in the tray by 38 and remained there through 55 |
+| 6 | Fail | 1.193 s | 14.8 | Repeated offset closes; orange stayed on the table and no transport began |
 
-Trial 3 was stopped after chunk 44 because the task and policy return were already complete. The client then restored
-the exact recorded start pose. This is counted as success rather than an abort.
+Trial 3 was stopped after chunk 44 because the task and policy return were complete. Trial 5 completed delivery by
+chunk 38. A hand removed the orange at chunk 56 after completion but before the cap; that intervention is visible in
+the trace and is recorded rather than mistaken for policy behavior. The completed delivery remains a success.
 
-One preceding forward-right exploratory failure is excluded from the 1/3 score because its placement did not match
+One preceding forward-right exploratory failure is excluded from the 2/6 score because its placement did not match
 the controlled central protocol.
 
 ## Reading
 
-Checkpoint 2,000 is deployable and can execute the full learned task, but acquisition is not repeatable. The failed
-trials closed more tightly than the successful trial, showing that a low gripper value alone is not evidence of a
-secure grasp. The useful distinction is visual centring followed by an immediate retained lift.
+Checkpoint 2,000 can execute the full learned sequence, but acquisition is not repeatable. Three of four failures
+were offset closes beside the orange, and one centred close did not retain the fruit through lift. The failures often
+closed more tightly than the successes, so gripper value alone does not prove a grasp. Visual centring and a retained
+lift distinguish the successful trials.
 
-This gate does not justify a ten-trial success claim or the 90% target. Compare the successful and failed close
-windows, then run checkpoint 3,000 through the same three-trial watched gate before choosing the candidate for the
-matched ten-trial row.
+At 2/6, further repetitions of checkpoint 2,000 are unlikely to change the candidate decision. Run checkpoint 3,000
+through the same watched three-trial gate. Only the stronger candidate should proceed to a matched ten-trial row.
 
 Machine-readable details, source log paths and trace paths are in `gate_summary.json`.

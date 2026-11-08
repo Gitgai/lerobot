@@ -116,15 +116,18 @@
   "physical_gate": {
     "date": "2026-11-08",
     "checkpoint": "ft4_2000",
-    "controlled_trials": 3,
-    "end_to_end_successes": 1,
+    "controlled_trials": 6,
+    "end_to_end_successes": 2,
     "rate": 0.3333333333333333,
     "outcomes": [
       "centred close but no secure lift",
       "close beside/right-jaw miss",
-      "complete orange-to-tray success"
+      "complete orange-to-tray success",
+      "offset close pushed orange; no lift",
+      "complete orange-to-tray success; manual reset after completion",
+      "repeated offset closes; no lift or transport"
     ],
     "report": "../ft4_physical_gate_20261108/gate_summary.json",
-    "decision": "Functional but not reliable; compare close windows and run the same watched gate on checkpoint 3000 before a ten-trial row."
+    "decision": "Functional but unreliable at 2/6; stop extending checkpoint 2000 and run the same watched three-trial gate on checkpoint 3000 before a ten-trial row."
   }
 }
