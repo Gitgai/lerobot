@@ -1,7 +1,7 @@
 # Fine-tune 4 execution plan
 
 Date: 2026-11-08
-Status: training and offline checkpoint screening complete; checkpoint 2,000 selected for watched robot evaluation
+Status: training and first watched robot gate complete; checkpoint 2,000 scored 1/3 end to end
 
 ## Objective
 
@@ -105,6 +105,27 @@ better:
 
 Checkpoint 2,000 is therefore the first robot-test candidate. These are imitation errors against held-out expert
 actions, not a physical success rate. The next gate is exactly three watched orange trials at the central mark.
+
+## Watched physical gate
+
+Checkpoint 2,000 was tested on three controlled central-area orange placements with 20 executed actions per policy
+request, a 75-request cap, two live camera inputs and return-to-start enabled:
+
+| Trial | Acquisition | End-to-end | Observed failure or completion |
+|---|---|---|---|
+| 1 | Fruit centred between both fingers | Fail | Closed to about 20 but did not secure or lift the orange |
+| 2 | No | Fail | Approach and repeated closes landed outside the right finger |
+| 3 | Yes | **Success** | Closed by chunk 15, airborne by 18, released in the tray by 24, back at rest around 40 |
+
+The watched result is **1/3 end to end (33.3%)**. This proves that the FT4 serving path and learned task sequence are
+functional, but it does not establish reliability or support a 90% claim. The two failures remain concentrated at
+acquisition and the transition from close to lift. One earlier forward-right exploratory failure is excluded from
+this controlled score because its placement did not match the central protocol. Exact logs, stage labels and key
+frames are in `results/so101_bench_20261019/ft4_physical_gate_20261108/`.
+
+Before a ten-trial row, compare the successful and failed close windows and run the same three-trial watched gate on
+checkpoint 3,000. Offline checkpoint 3,000 ranked a close second, so this comparison is cheaper and more informative
+than committing ten trials to the first candidate immediately.
 
 ## Reproducible commands
 

@@ -112,5 +112,19 @@
   ],
   "selected_candidate": "ft4_2000",
   "selected_checkpoint": "/home/kiran/lerobot_assets/training/ft4_orange_matchbox_corrective_20261108/checkpoints/002000/pretrained_model",
-  "selection_reason": "Lowest total and orange-task held-out action MAE; substantially lower gripper MAE than fine-tune 3. Physical evaluation remains required."
+  "selection_reason": "Lowest total and orange-task held-out action MAE; substantially lower gripper MAE than fine-tune 3. Physical evaluation remains required.",
+  "physical_gate": {
+    "date": "2026-11-08",
+    "checkpoint": "ft4_2000",
+    "controlled_trials": 3,
+    "end_to_end_successes": 1,
+    "rate": 0.3333333333333333,
+    "outcomes": [
+      "centred close but no secure lift",
+      "close beside/right-jaw miss",
+      "complete orange-to-tray success"
+    ],
+    "report": "../ft4_physical_gate_20261108/gate_summary.json",
+    "decision": "Functional but not reliable; compare close windows and run the same watched gate on checkpoint 3000 before a ten-trial row."
+  }
 }
