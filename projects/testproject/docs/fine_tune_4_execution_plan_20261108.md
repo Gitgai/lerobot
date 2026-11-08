@@ -160,6 +160,23 @@ green-yellow citrus and its next three used the small orange; each subgroup scor
 a shifted low/side front-camera view and remain exploratory. Restore the documented overhead camera geometry and use
 one fixed small orange before prospective shadow-mode verification.
 
+### Large-citrus exploratory row, 2026-11-09
+
+At the operator's request, checkpoint 3,000 ran five additional valid trials with the larger citrus while the front
+camera remained in the shifted low/side position. This row is deliberately separate from the controlled small-orange
+comparison and does not change its **1/3** score.
+
+The exploratory row scored **1/5 end to end (20%)**. Trials 1–3 failed during acquisition. Trial 4 recovered after
+several edge contacts, grasped the citrus at chunk 49 and released it in the tray by chunk 52. Trial 5 obtained a
+stable grasp and carried the citrus across the table, but released it on the table just short of the tray. Two starts
+with the citrus already in the tray were stopped and excluded before meaningful task motion.
+
+This row reinforces the diagnosis rather than changing the plan: acquisition remains inconsistent, and the one
+delivery failure shows that a retained-lift check alone cannot guarantee tray placement. Restore the reference camera,
+return to the fixed small orange and central marks, then validate the proposed pre-close centring plus retained-lift
+and tray-release checks in shadow mode. Evidence and per-trial labels are in
+`results/so101_bench_20261019/ft4_ckpt3000_large_citrus_lowcam_20261109/`.
+
 ## Reproducible commands
 
 ```text

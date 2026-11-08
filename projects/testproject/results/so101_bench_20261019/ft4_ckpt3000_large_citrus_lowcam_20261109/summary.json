@@ -1,0 +1,18 @@
+{
+  "date": "2026-11-09",
+  "policy": "ft4_checkpoint_3000",
+  "condition": "large_citrus_shifted_low_side_front_camera",
+  "controlled_small_orange_score_unchanged": "1/3",
+  "valid_trials": 5,
+  "successes": 1,
+  "success_rate": 0.2,
+  "void_starts": 2,
+  "void_reason": "citrus already in tray at trial start; interrupted before meaningful pickup motion",
+  "trials": [
+    {"trial": 1, "result": "fail", "stage": "acquisition", "mean_latency_ms": 1255.0},
+    {"trial": 2, "result": "fail", "stage": "acquisition", "mean_latency_ms": 1243.0},
+    {"trial": 3, "result": "fail", "stage": "acquisition", "mean_latency_ms": 1399.6},
+    {"trial": 4, "result": "success", "stage": "complete", "mean_latency_ms": 1242.5},
+    {"trial": 5, "result": "fail", "stage": "release", "mean_latency_ms": 1155.8}
+  ]
+}
