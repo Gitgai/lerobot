@@ -1,7 +1,7 @@
 # Fine-tune 4 execution plan
 
 Date: 2026-11-08
-Status: training and six-trial watched robot gate complete; checkpoint 2,000 scored 2/6 end to end
+Status: training and watched checkpoint comparison complete; checkpoint 2,000 scored 2/6 and checkpoint 3,000 scored 1/3
 
 ## Objective
 
@@ -127,9 +127,19 @@ exploratory failure is excluded from
 this controlled score because its placement did not match the central protocol. Exact logs, stage labels and key
 frames are in `results/so101_bench_20261019/ft4_physical_gate_20261108/`.
 
-Before a ten-trial row, compare the successful and failed close windows and run the same three-trial watched gate on
-checkpoint 3,000. Offline checkpoint 3,000 ranked a close second, so this comparison is cheaper and more informative
-than committing ten trials to the first candidate immediately.
+This result triggered the same three-trial watched gate on checkpoint 3,000 before committing ten trials to either
+candidate. Offline checkpoint 3,000 had ranked a close second, making that direct comparison the next gate.
+
+### Checkpoint 3,000 comparison gate
+
+Checkpoint 3,000 then ran the same watched three-trial protocol. Trial 1 recovered from early offset attempts, secured
+the orange around chunks 67–68 and released it in the tray at the 75-chunk cap. Trial 2 passed the orange with the
+jaws open and later closed over empty table. Trial 3 repeatedly centred and closed around the orange but never
+retained it through lift. The result was **1/3 (33.3%)**.
+
+Checkpoint 3,000 did not improve on checkpoint 2,000's **2/6 (33.3%)**. Neither candidate advances to the matched
+ten-trial row. The next gate is offline close-window comparison and a grasp-strategy revision; more blind repetitions
+of these two candidates are paused.
 
 ## Reproducible commands
 

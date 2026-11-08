@@ -1,7 +1,7 @@
 # SO-101 orange-to-tray reliability plan
 
 Date: 2026-11-07
-Status: active; fine-tune 4 checkpoint 2,000 watched gate complete at 2/6 end to end
+Status: active; fine-tune 4 comparison complete: checkpoint 2,000 at 2/6 and checkpoint 3,000 at 1/3
 Primary baseline: fine-tune 3, `row3_all169_conservative_010000`
 First candidate: fine-tune 4 checkpoint 2,000
 Primary diagnostic: [`../results/so101_bench_20261019/ROW_AH_OFFLINE_DIAGNOSIS.md`](../results/so101_bench_20261019/ROW_AH_OFFLINE_DIAGNOSIS.md)
@@ -607,3 +607,8 @@ The two successes both secured the orange before transport and released it in th
 to reject checkpoint 2,000 as the reliable candidate. Compare these close windows and test checkpoint 3,000 through
 the same watched gate before selecting a candidate for the matched ten-trial row.
 Auto-reset and the action gate remain disabled until the new policy demonstrates stable acquisition.
+
+Checkpoint 3,000 subsequently scored **1/3 (33.3%)** under the same protocol. Its only success required late recovery
+and completed at the cap; the other trials were a pass-by acquisition miss and a centred close without retained
+lift. This matches checkpoint 2,000's observed 33.3% rate and leaves no candidate for the matched ten-trial row.
+Pause blind repetitions and use the saved close windows to revise centring and retained-lift behavior first.

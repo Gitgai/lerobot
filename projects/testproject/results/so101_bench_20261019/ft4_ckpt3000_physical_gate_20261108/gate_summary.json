@@ -1,0 +1,139 @@
+{
+  "date": "2026-11-08",
+  "checkpoint": "/home/kiran/lerobot_assets/training/ft4_orange_matchbox_corrective_20261108/checkpoints/003000/pretrained_model",
+  "settings": {
+    "actions_per_chunk": 20,
+    "max_chunks": 75,
+    "fps": 30,
+    "placement": "controlled central area",
+    "return_start": true,
+    "server": "AI90 GPU 0 :8081",
+    "live_view": "Rerun 9882/9116"
+  },
+  "result": {
+    "successes": 1,
+    "trials": 3,
+    "rate": 0.3333333333333333,
+    "acquisition_successes": 2,
+    "retention_lift_failures": 1,
+    "pass_by_failures": 1
+  },
+  "trials": [
+    {
+      "trial": "controlled_1",
+      "success": true,
+      "stage": "success",
+      "chunks": 75,
+      "median_latency_s": 1.237,
+      "min_gripper_state": 19.899999618530273,
+      "max_gripper_state": 53.79999923706055,
+      "start_state": [
+        -7.5,
+        -104.80000305175781,
+        96.69999694824219,
+        69.0999984741211,
+        -6.599999904632568,
+        52.70000076293945
+      ],
+      "policy_end_state": [
+        54.70000076293945,
+        -26.799999237060547,
+        64.80000305175781,
+        59.599998474121094,
+        9.199999809265137,
+        39.20000076293945
+      ],
+      "task": "pick up the orange and place it on the plate",
+      "source_log": "/home/gaikwad-prakash/bench_ft4_ckpt3000_controlled_central_20261108_t1_t3_retry.jsonl",
+      "trace_dir": "/home/gaikwad-prakash/bench_trace_ft4_ckpt3000_controlled_central_20261108_t1_t3_retry",
+      "observation": "Recovered after early offset attempts, secured the orange around chunks 67-68, and released it inside the tray at the cap.",
+      "snapshots": {
+        "ep1_start_front.jpg": "controlled_1_start_front.jpg",
+        "ep1_after_last_chunk_front.jpg": "controlled_1_final_front.jpg",
+        "ep1_at_rest_front.jpg": "controlled_1_rest_front.jpg"
+      }
+    },
+    {
+      "trial": "controlled_2",
+      "success": false,
+      "stage": "acquisition_pass_by",
+      "chunks": 75,
+      "median_latency_s": 1.249,
+      "min_gripper_state": 21.600000381469727,
+      "max_gripper_state": 63.20000076293945,
+      "start_state": [
+        -7.400000095367432,
+        -104.4000015258789,
+        96.80000305175781,
+        69.0999984741211,
+        -6.599999904632568,
+        52.599998474121094
+      ],
+      "policy_end_state": [
+        -4.800000190734863,
+        53.20000076293945,
+        -42.599998474121094,
+        103.0,
+        15.899999618530273,
+        40.5
+      ],
+      "task": "pick up the orange and place it on the plate",
+      "source_log": "/home/gaikwad-prakash/bench_ft4_ckpt3000_controlled_central_20261108_t1_t3_retry.jsonl",
+      "trace_dir": "/home/gaikwad-prakash/bench_trace_ft4_ckpt3000_controlled_central_20261108_t1_t3_retry",
+      "observation": "Passed the orange with the jaws open, stretched beyond it, and later closed over empty table.",
+      "snapshots": {
+        "ep2_start_front.jpg": "controlled_2_start_front.jpg",
+        "ep2_after_last_chunk_front.jpg": "controlled_2_final_front.jpg",
+        "ep2_at_rest_front.jpg": "controlled_2_rest_front.jpg"
+      }
+    },
+    {
+      "trial": "controlled_3",
+      "success": false,
+      "stage": "retention_lift_failure",
+      "chunks": 75,
+      "median_latency_s": 1.221,
+      "min_gripper_state": 18.0,
+      "max_gripper_state": 62.29999923706055,
+      "start_state": [
+        -7.199999809265137,
+        -104.0999984741211,
+        96.5,
+        69.30000305175781,
+        -6.599999904632568,
+        52.5
+      ],
+      "policy_end_state": [
+        6.699999809265137,
+        39.400001525878906,
+        -24.0,
+        101.69999694824219,
+        -1.399999976158142,
+        58.900001525878906
+      ],
+      "task": "pick up the orange and place it on the plate",
+      "source_log": "/home/gaikwad-prakash/bench_ft4_ckpt3000_controlled_central_20261108_t1_t3_retry.jsonl",
+      "trace_dir": "/home/gaikwad-prakash/bench_trace_ft4_ckpt3000_controlled_central_20261108_t1_t3_retry",
+      "observation": "Centred the orange between both fingers and closed repeatedly, but never retained it through lift.",
+      "snapshots": {
+        "ep3_start_front.jpg": "controlled_3_start_front.jpg",
+        "ep3_after_last_chunk_front.jpg": "controlled_3_final_front.jpg",
+        "ep3_at_rest_front.jpg": "controlled_3_rest_front.jpg"
+      }
+    }
+  ],
+  "comparison": {
+    "checkpoint_2000": {
+      "successes": 2,
+      "trials": 6,
+      "rate": 0.3333333333333333
+    },
+    "checkpoint_3000": {
+      "successes": 1,
+      "trials": 3,
+      "rate": 0.3333333333333333
+    },
+    "conclusion": "Checkpoint 3000 did not improve the observed end-to-end rate over checkpoint 2000."
+  },
+  "decision": "Do not advance either checkpoint to a matched ten-trial row. Both scored 33.3%; failures remain concentrated at acquisition and retained lift. Compare the close windows and revise the grasp training/control strategy before more blind repetitions."
+}

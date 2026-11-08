@@ -129,5 +129,25 @@
     ],
     "report": "../ft4_physical_gate_20261108/gate_summary.json",
     "decision": "Functional but unreliable at 2/6; stop extending checkpoint 2000 and run the same watched three-trial gate on checkpoint 3000 before a ten-trial row."
+  },
+  "checkpoint_3000_physical_gate": {
+    "date": "2026-11-08",
+    "checkpoint": "ft4_3000",
+    "controlled_trials": 3,
+    "end_to_end_successes": 1,
+    "rate": 0.3333333333333333,
+    "outcomes": [
+      "late recovery and complete orange-to-tray success",
+      "pass-by and close over empty table",
+      "centred closes without retained lift"
+    ],
+    "report": "../ft4_ckpt3000_physical_gate_20261108/gate_summary.json",
+    "decision": "No physical improvement over checkpoint 2000; neither candidate advances to matched ten."
+  },
+  "physical_gate_comparison": {
+    "ft4_2000": "2/6 (33.3%)",
+    "ft4_3000": "1/3 (33.3%)",
+    "selected_for_matched_ten": null,
+    "next_step": "offline close-window comparison and grasp-strategy revision before further blind trials"
   }
 }
