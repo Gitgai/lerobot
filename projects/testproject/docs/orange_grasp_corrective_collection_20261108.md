@@ -3,7 +3,7 @@
 Date: 2026-11-08  
 Dataset: `orange_grasp_corrective_ft4_20261108`  
 Task text: `pick up the orange and place it on the plate`  
-Status: no-motion preflight passed; two of five pilot demonstrations accepted
+Status: five-episode quality pilot passed; 25 accepted demonstrations remain
 
 ## Why this dataset is needed
 
@@ -61,7 +61,17 @@ normal, and the subsequent safety check found torque off, zero load and 6.6-6.7 
 
 Episode 2 was recorded with 1,047 frames from each camera and also passed every acceptance check. It showed a
 centred grasp, secure lift, clean tray release and move-clear. Disconnect was normal; the safety check found torque
-off and zero load. Pilot progress is 2/5 accepted.
+off and zero load.
+
+Episodes 3-5 were recorded back-to-back with fixed 35-second recording and 15-second reset phases. All three passed
+the same visual checks and ended with clean releases and move-clear. The batch disconnected normally; the final
+safety check found torque off and zero load on all six follower motors. The pilot gate is therefore **5/5 accepted**.
+The dataset contains six physical recordings: accepted episodes 1-5 and rejected episode 0. Its manifest records
+6,585 total frames and SHA-256 hashes for every dataset file.
+
+The accepted pilot examples are direct centred grasps. The remaining 25 accepted demonstrations must complete the
+planned balance: ten additional direct grasps, ten lateral corrections (five from each side), and five shallow/depth
+corrections. Do not count another direct grasp toward a correction quota.
 
 ## Acceptance rating
 

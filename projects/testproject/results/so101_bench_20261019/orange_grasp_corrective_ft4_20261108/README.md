@@ -8,6 +8,7 @@ Target: 30 accepted episodes, beginning with a five-episode quality-gated pilot.
 
 The no-motion hardware/camera preflight passed on 2026-11-08. The saved front image records the scene before the
 first episode. Episode 0 was rejected because the orange was never released and remained held against the tray rim
-at the cap. Episodes 1 and 2 were accepted as the first two pilot demonstrations. Contact sheets and final-frame
-sheets are retained locally for review. `episodes.csv` is append-only: rejected attempts receive a row and are not
-deleted.
+at the cap. Episodes 1-5 passed the quality pilot and were accepted as direct centred-grasp demonstrations. The
+dataset has 6,585 frames across six physical recordings. Contact sheets and final-frame sheets are retained locally
+for review. `dataset_manifest.json` records accepted/rejected indices and file hashes. `episodes.csv` is append-only:
+rejected attempts receive a row and are not deleted.

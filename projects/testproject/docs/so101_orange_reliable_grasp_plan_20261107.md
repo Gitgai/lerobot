@@ -1,7 +1,7 @@
 # SO-101 orange-to-tray reliability plan
 
 Date: 2026-11-07  
-Status: active; Phases A1-B complete, Phase C is read-only, and Phase E's grasp-centering pilot is next
+Status: active; Phases A1-B complete, Phase C is read-only, and Phase E's five-episode quality pilot passed
 Primary policy: fine-tune 3, `row3_all169_conservative_010000`  
 Primary diagnostic: [`../results/so101_bench_20261019/ROW_AH_OFFLINE_DIAGNOSIS.md`](../results/so101_bench_20261019/ROW_AH_OFFLINE_DIAGNOSIS.md)  
 Auto-reset status: paused; manual orange placement is used during this plan
@@ -593,6 +593,6 @@ All physical rows also retain their full Rerun traces and start/end images under
 8. Resume close-gate or auto-reset work only after the new policy shows stable acquisition.
 ```
 
-The next physical action is one leader-arm demonstration, not another autonomous policy trial. Before it, the
-recorder must pass its no-motion preflight. Auto-reset and the action gate remain disabled during demonstration
-collection.
+The no-motion recorder preflight and five-accepted-episode quality pilot are complete. The next physical work is the
+remaining balanced demonstration collection: ten direct grasps, ten lateral corrections and five shallow/depth
+corrections. Auto-reset and the action gate remain disabled during demonstration collection.

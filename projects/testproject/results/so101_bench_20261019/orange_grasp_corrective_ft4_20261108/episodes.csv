@@ -2,3 +2,6 @@ episode,recorded_at,position,demo_type,cameras_valid,scene_valid,centred_preclos
 0,2026-11-08T15:31:13+05:30,p0_current,direct,yes,yes,yes,yes,yes,no,no,no,no,release,"Orange remained held against tray rim at cap; motor 6 overload reported during disconnect; subsequent safety check found torque off, zero load, 6.5-6.6 V and 31-33 C"
 1,2026-11-08T15:36:09+05:30,p0_current,direct,yes,yes,yes,yes,yes,yes,yes,yes,yes,,"Centred grasp; secure lift; released inside tray; arm moved clear; clean disconnect"
 2,2026-11-08T15:38:25+05:30,p1_next,direct,yes,yes,yes,yes,yes,yes,yes,yes,yes,,"Centred grasp; secure lift; clean tray release; arm moved clear; clean disconnect"
+3,2026-11-08T15:41:00+05:30,p2_third,direct,yes,yes,yes,yes,yes,yes,yes,yes,yes,,"Centred grasp; secure lift; clean tray release; arm moved clear"
+4,2026-11-08T15:42:08+05:30,p3_fourth,direct,yes,yes,yes,yes,yes,yes,yes,yes,yes,,"Centred grasp; secure lift; clean tray release; arm moved clear"
+5,2026-11-08T15:43:16+05:30,p4_fifth,direct,yes,yes,yes,yes,yes,yes,yes,yes,yes,,"Centred grasp; secure lift; clean tray release; arm moved clear; clean disconnect"

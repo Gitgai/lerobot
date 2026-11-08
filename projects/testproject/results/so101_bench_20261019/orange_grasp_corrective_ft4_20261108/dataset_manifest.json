@@ -1,0 +1,124 @@
+{
+  "created_at": "2026-11-08T15:45:00+05:30",
+  "dataset_name": "orange_grasp_corrective_ft4_20261108",
+  "dataset_root": "/home/gaikwad-prakash/orange_grasp_corrective_ft4_20261108",
+  "task": "pick up the orange and place it on the plate",
+  "codebase_version": "v3.0",
+  "fps": 30,
+  "total_episodes": 6,
+  "total_frames": 6585,
+  "accepted_episodes": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "rejected_episodes": [
+    0
+  ],
+  "accepted_count": 5,
+  "rejected_count": 1,
+  "pilot_gate": "passed",
+  "camera_keys": [
+    "observation.images.front",
+    "observation.images.wrist"
+  ],
+  "files": [
+    {
+      "path": "data/chunk-000/file-000.parquet",
+      "bytes": 51967,
+      "sha256": "bfd684e5c7dd68c7607cf71c65c12e48af936ac5a0a37d0635d07a5bca15f779"
+    },
+    {
+      "path": "data/chunk-000/file-001.parquet",
+      "bytes": 41697,
+      "sha256": "3d0c6f6ff9a376bf54081f046768397c92ae33600397c443cdf9d5f7c0785ec4"
+    },
+    {
+      "path": "data/chunk-000/file-002.parquet",
+      "bytes": 44598,
+      "sha256": "60fc6cb2321361ed88e01148391180a3a705bac75e355725546e403d31632eeb"
+    },
+    {
+      "path": "data/chunk-000/file-003.parquet",
+      "bytes": 121633,
+      "sha256": "2008e39d255a7bea9d43f891333f8672d9ee60c7225f8c4fe8f70782a5a96336"
+    },
+    {
+      "path": "meta/episodes/chunk-000/file-000.parquet",
+      "bytes": 52704,
+      "sha256": "5de957d2b083e0c0a8c1409297e71d0b4cae45d91e2215889f5ec59ff1a497b4"
+    },
+    {
+      "path": "meta/episodes/chunk-000/file-001.parquet",
+      "bytes": 52708,
+      "sha256": "79048f6b27607fd8fe937ecf2bdbe057e8132bfbde658fb58ad893baaa956319"
+    },
+    {
+      "path": "meta/episodes/chunk-000/file-002.parquet",
+      "bytes": 52709,
+      "sha256": "cc8ce086c25a252a7720bbc53cb030a86de1589a15cdfb6dd6bbccaed8fb4b76"
+    },
+    {
+      "path": "meta/episodes/chunk-000/file-003.parquet",
+      "bytes": 55876,
+      "sha256": "0c9eac4280884a8d8dda1b65f83b85af7f8e7a37b1076728936ba5b48a3c9120"
+    },
+    {
+      "path": "meta/info.json",
+      "bytes": 3226,
+      "sha256": "45a83a8ed3728295a8881edd59a1e0dfdeb1439f73502971c319303a5253cb91"
+    },
+    {
+      "path": "meta/stats.json",
+      "bytes": 12993,
+      "sha256": "c38396ef4012fc3d3b10f1e012e35a5e7c420490687971ed53b811b42067ec61"
+    },
+    {
+      "path": "meta/tasks.parquet",
+      "bytes": 2203,
+      "sha256": "e6c44d8a41e3bec1c63da0f4ff156ed1beccdc930eeefbdef251efa22314f4c7"
+    },
+    {
+      "path": "videos/observation.images.front/chunk-000/file-000.mp4",
+      "bytes": 7317253,
+      "sha256": "7b315e2eaa7cb088cc4d3cefa2ae5a164179b360280f3f48be4d2e42e0a7ebfe"
+    },
+    {
+      "path": "videos/observation.images.front/chunk-000/file-001.mp4",
+      "bytes": 5729425,
+      "sha256": "d20c26734d4668a4a93210ea46ea3035656a4731222ccb3fe1612af1e3b933bc"
+    },
+    {
+      "path": "videos/observation.images.front/chunk-000/file-002.mp4",
+      "bytes": 5794183,
+      "sha256": "d419c6493fe1a6ee9de1320f4afb752be3067bf13973044e957ba56655802bdd"
+    },
+    {
+      "path": "videos/observation.images.front/chunk-000/file-003.mp4",
+      "bytes": 17543065,
+      "sha256": "f39d0e575c8bac1125f44d297fcc15d620d65c5d4dc1e7345b2e58516027c82c"
+    },
+    {
+      "path": "videos/observation.images.wrist/chunk-000/file-000.mp4",
+      "bytes": 7074099,
+      "sha256": "dce96414390d18247740f256327fc492b57348d982fa2606c0122ed675703c06"
+    },
+    {
+      "path": "videos/observation.images.wrist/chunk-000/file-001.mp4",
+      "bytes": 5505773,
+      "sha256": "d25c888a17c160c8e796db2579d74b5d0eb9ff9d58f574122146277677ccbc68"
+    },
+    {
+      "path": "videos/observation.images.wrist/chunk-000/file-002.mp4",
+      "bytes": 5547778,
+      "sha256": "7ceb3aaac7581e9fc30019cc75bed272b09efed408993db1242d56ff13a86e59"
+    },
+    {
+      "path": "videos/observation.images.wrist/chunk-000/file-003.mp4",
+      "bytes": 16574349,
+      "sha256": "c16f36599a72b27b82a0ae13fcb5347b74834839a0a39ccf09332ffbe3da5d2a"
+    }
+  ]
+}
