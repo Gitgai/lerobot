@@ -91,6 +91,10 @@ projects/testproject/scripts/bench/record_orange_grasp_corrective.sh --record
 The script resolves arms by controller serial and cameras by hardware name. It refuses to record when calibration,
 either arm, either camera, or an existing empty/corrupt dataset is missing. It never deletes a dataset.
 
+During recording, the same LeRobot process publishes its front and wrist observations, joint/action values, and a
+35-second countdown to the local Rerun server on ports 9882/9116. The browser viewer consumes that Rerun stream; it
+does not open either camera and therefore does not compete with the recorder.
+
 ### Preflight result
 
 The no-motion preflight passed on 2026-11-08. It resolved the follower as `/dev/ttyACM0` and the leader as

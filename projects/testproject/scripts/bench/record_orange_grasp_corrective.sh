@@ -96,15 +96,34 @@ if (( BEFORE > 0 )); then
   RESUME_ARGS+=(--resume=true)
 fi
 
+RERUN_BIN=/home/gaikwad-prakash/PrakashProjects/lerobot/lerobot/.venv/bin/rerun
+RERUN_GRPC_PORT=9882
+RERUN_WEB_PORT=9116
+if ! ss -ltn | grep -q ":$RERUN_GRPC_PORT "; then
+  [[ -x "$RERUN_BIN" ]] || { echo "ERROR: Rerun executable is missing: $RERUN_BIN"; exit 1; }
+  nohup "$RERUN_BIN" --serve-web --bind 127.0.0.1 \
+    --port "$RERUN_GRPC_PORT" --web-viewer-port "$RERUN_WEB_PORT" \
+    --server-memory-limit 1GB >/tmp/orange_grasp_rerun.log 2>&1 &
+  echo $! >/tmp/orange_grasp_rerun.pid
+  for _ in $(seq 1 40); do
+    ss -ltn | grep -q ":$RERUN_GRPC_PORT " && break
+    sleep 0.25
+  done
+fi
+ss -ltn | grep -q ":$RERUN_GRPC_PORT " || { echo "ERROR: Rerun server did not start"; exit 1; }
+LIVE_URL="http://127.0.0.1:$RERUN_WEB_PORT/?url=rerun%2Bhttp%3A%2F%2F127.0.0.1%3A$RERUN_GRPC_PORT%2Fproxy"
+echo "LIVE VIEW: $LIVE_URL"
+
 echo "RECORDING ONE EPISODE. Teleoperate with the leader arm; use Esc to stop the session."
-HF_HUB_OFFLINE=1 "$PYTHON" "$SCRIPT_DIR/record_2cam_demos.py" \
+ORANGE_DEMO_LIVE=1 HF_HUB_OFFLINE=1 "$PYTHON" "$SCRIPT_DIR/record_2cam_demos.py" \
   --robot.type=so101_follower --robot.port="$FOLLOWER_PORT" --robot.id=my_so101_follower \
   --robot.cameras="{front: {type: opencv, index_or_path: $FRONT_CAM, width: 640, height: 480, fps: 30}, wrist: {type: opencv, index_or_path: $WRIST_CAM, width: 640, height: 480, fps: 30}}" \
   --teleop.type=so101_leader --teleop.port="$LEADER_PORT" --teleop.id=my_so101_leader \
   --dataset.repo_id="local/$NAME" --dataset.root="$ROOT" \
   --dataset.single_task="$TASK" \
   --dataset.num_episodes=1 --dataset.episode_time_s=35 --dataset.reset_time_s=3 \
-  --dataset.vcodec=h264 --dataset.push_to_hub=false --display_data=false \
+  --dataset.vcodec=h264 --dataset.push_to_hub=false \
+  --display_data=true --display_ip=127.0.0.1 --display_port="$RERUN_GRPC_PORT" \
   "${RESUME_ARGS[@]}"
 
 AFTER=$("$PYTHON" "$SCRIPT_DIR/epcount.py" "$ROOT")
