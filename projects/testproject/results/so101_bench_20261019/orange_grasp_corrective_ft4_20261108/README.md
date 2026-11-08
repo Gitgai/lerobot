@@ -14,3 +14,6 @@ recording. Episodes 11-15 completed the planned direct-grasp quota, giving 15 ac
 Contact sheets and final-frame sheets are retained for review. `dataset_manifest.json` records
 accepted/rejected indices and file hashes. `episodes.csv` is append-only: rejected attempts receive a row and are
 not deleted.
+
+Episodes 16-20 passed review as left-side lateral-correction demonstrations. The current accepted balance is 15
+direct grasps and five left-side lateral corrections; five right-side corrections and five depth corrections remain.

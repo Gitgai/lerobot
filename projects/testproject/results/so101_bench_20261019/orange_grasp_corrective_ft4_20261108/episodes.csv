@@ -15,3 +15,8 @@ episode,recorded_at,position,demo_type,cameras_valid,scene_valid,centred_preclos
 13,2026-11-08T16:03:14+05:30,p2_cycle3,direct,yes,yes,yes,yes,yes,yes,yes,yes,yes,,"Centred bilateral grasp; secure lift; controlled carry; released inside tray; arm moved clear"
 14,2026-11-08T16:04:20+05:30,p3_cycle3,direct,yes,yes,yes,yes,yes,yes,yes,yes,yes,,"Centred bilateral grasp; secure lift; controlled carry; released inside tray; arm moved clear"
 15,2026-11-08T16:05:25+05:30,p4_cycle3,direct,yes,yes,yes,yes,yes,yes,yes,yes,yes,,"Centred bilateral grasp; secure lift; controlled carry; released inside tray; arm moved clear; clean disconnect"
+16,2026-11-08T16:08:02+05:30,p0_lateral_left,lateral_left,yes,yes,yes,yes,yes,yes,yes,yes,yes,,"Initial lateral offset remained open; withdrew and re-centred without a bad close; bilateral close after alignment; secure lift and tray release"
+17,2026-11-08T16:09:09+05:30,p1_lateral_left,lateral_left,yes,yes,yes,yes,yes,yes,yes,yes,yes,,"Visible open lateral offset and sideways centring before close; secure lift; controlled carry; tray release; move-clear"
+18,2026-11-08T16:10:17+05:30,p2_lateral_left,lateral_left,yes,yes,yes,yes,yes,yes,yes,yes,yes,,"Visible open lateral offset and sideways centring before close; secure lift; controlled carry; tray release; move-clear"
+19,2026-11-08T16:11:23+05:30,p3_lateral_left,lateral_left,yes,yes,yes,yes,yes,yes,yes,yes,yes,,"Visible open lateral offset and sideways centring before close; secure lift; controlled carry; tray release; move-clear"
+20,2026-11-08T16:12:29+05:30,p4_lateral_left,lateral_left,yes,yes,yes,yes,yes,yes,yes,yes,yes,,"Visible open lateral offset and sideways centring before close; secure lift; controlled carry; tray release; move-clear; clean disconnect"

@@ -3,7 +3,7 @@
 Date: 2026-11-08  
 Dataset: `orange_grasp_corrective_ft4_20261108`  
 Task text: `pick up the orange and place it on the plate`  
-Status: 15/30 accepted demonstrations recorded; direct-grasp quota complete
+Status: 20/30 accepted demonstrations recorded; direct and left-lateral quotas complete
 
 ## Why this dataset is needed
 
@@ -81,6 +81,16 @@ zero load on every follower joint.
 The collection now has **15 accepted direct grasps** and one rejected recording. The direct quota is complete.
 Fifteen accepted demonstrations remain: ten lateral corrections (five from each side) and five shallow/depth
 corrections. Do not record more ordinary direct grasps for this dataset.
+
+Episodes 16-20 added the five left-side lateral corrections. Each episode shows the gripper remain open while the
+orange is outside one finger, followed by a visible repositioning that centres the orange before closure. Episode
+16 uses an open withdraw-and-reapproach correction; the gripper value confirms it did not close during the first
+offset. Episodes 17-20 show a more direct sideways correction. All five then pass bilateral contact, secure lift,
+controlled transport, tray release and move-clear. The batch disconnected normally, and the safety check found
+torque off and zero load on every follower joint.
+
+The collection now has **20 accepted demonstrations**: 15 direct and five left-side lateral corrections. Ten remain:
+five right-side lateral corrections and five shallow/depth corrections.
 
 ## Acceptance rating
 
