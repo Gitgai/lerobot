@@ -3,7 +3,7 @@
 Date: 2026-11-08  
 Dataset: `orange_grasp_corrective_ft4_20261108`  
 Task text: `pick up the orange and place it on the plate`  
-Status: 20/30 accepted demonstrations recorded; direct and left-lateral quotas complete
+Status: 25/30 accepted demonstrations recorded; direct and bilateral lateral quotas complete
 
 ## Why this dataset is needed
 
@@ -91,6 +91,21 @@ torque off and zero load on every follower joint.
 
 The collection now has **20 accepted demonstrations**: 15 direct and five left-side lateral corrections. Ten remain:
 five right-side lateral corrections and five shallow/depth corrections.
+
+Episodes 21-25 added the five right-side lateral corrections. A matched top-camera comparison against episodes
+16-20 confirms the approach crosses the orange from the opposite global side before centring. The gripper commands
+remain open during the offset. Every episode then shows bilateral contact, secure lift, controlled transport, tray
+release and move-clear. Episode 24 includes a centred open-close-open-reclose adjustment without losing the orange's
+centred position. The batch disconnected normally, and the safety check found torque off, zero load and normal
+6.6-6.7 V on every follower joint.
+
+The first connection attempt before episode 21 stopped before recording because gripper motor ID 6 did not return a
+status packet while torque was being enabled. The subsequent safety check communicated with all six motors and
+found torque off, zero load and normal voltage. A no-motion preflight passed, the retry connected normally, and no
+empty episode was added.
+
+The collection now has **25 accepted demonstrations**: 15 direct, five left-side corrections and five right-side
+corrections. Only five shallow/depth corrections remain.
 
 ## Acceptance rating
 

@@ -17,3 +17,6 @@ not deleted.
 
 Episodes 16-20 passed review as left-side lateral-correction demonstrations. The current accepted balance is 15
 direct grasps and five left-side lateral corrections; five right-side corrections and five depth corrections remain.
+
+Episodes 21-25 passed review as right-side lateral-correction demonstrations. The collection now contains 25
+accepted demonstrations: 15 direct and five corrections from each lateral side. Five depth corrections remain.
