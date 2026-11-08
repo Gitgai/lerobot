@@ -10,6 +10,7 @@ The no-motion hardware/camera preflight passed on 2026-11-08. The saved front im
 first episode. Episode 0 was rejected because the orange was never released and remained held against the tray rim
 at the cap. Episodes 1-5 passed the quality pilot. Episodes 6-10 were then recorded back-to-back and also passed all
 visual checks. The collection currently has 10 accepted direct centred-grasp demonstrations and one rejected
-recording. Contact sheets and final-frame sheets are retained for review. `dataset_manifest.json` records
+recording. Episodes 11-15 completed the planned direct-grasp quota, giving 15 accepted direct demonstrations total.
+Contact sheets and final-frame sheets are retained for review. `dataset_manifest.json` records
 accepted/rejected indices and file hashes. `episodes.csv` is append-only: rejected attempts receive a row and are
 not deleted.

@@ -3,7 +3,7 @@
 Date: 2026-11-08  
 Dataset: `orange_grasp_corrective_ft4_20261108`  
 Task text: `pick up the orange and place it on the plate`  
-Status: 10/30 accepted demonstrations recorded; 20 remain
+Status: 15/30 accepted demonstrations recorded; direct-grasp quota complete
 
 ## Why this dataset is needed
 
@@ -74,9 +74,13 @@ each marked position. Both camera streams were valid, every episode contained 1,
 showed centred bilateral contact, secure lift, controlled transport, release inside the tray and a move-clear. The
 batch disconnected normally; the safety check found torque off and zero load on every follower joint.
 
-The collection now has **10 accepted direct grasps** and one rejected recording. Twenty accepted demonstrations
-remain: five direct grasps, ten lateral corrections (five from each side), and five shallow/depth corrections. Do
-not count another direct grasp toward a correction quota after the direct total reaches 15.
+Episodes 11-15 completed the third pass over the five marked positions. All five passed the synchronized front/wrist
+review, with 1,047-1,048 frames each. The batch disconnected normally, and the safety check found torque off and
+zero load on every follower joint.
+
+The collection now has **15 accepted direct grasps** and one rejected recording. The direct quota is complete.
+Fifteen accepted demonstrations remain: ten lateral corrections (five from each side) and five shallow/depth
+corrections. Do not record more ordinary direct grasps for this dataset.
 
 ## Acceptance rating
 

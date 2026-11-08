@@ -10,3 +10,8 @@ episode,recorded_at,position,demo_type,cameras_valid,scene_valid,centred_preclos
 8,2026-11-08T15:55:04+05:30,p2_cycle2,direct,yes,yes,yes,yes,yes,yes,yes,yes,yes,,"Centred bilateral grasp; secure lift; controlled carry; released inside tray; arm moved clear"
 9,2026-11-08T15:56:12+05:30,p3_cycle2,direct,yes,yes,yes,yes,yes,yes,yes,yes,yes,,"Centred bilateral grasp; secure lift; controlled carry; released inside tray; arm moved clear"
 10,2026-11-08T15:57:20+05:30,p4_cycle2,direct,yes,yes,yes,yes,yes,yes,yes,yes,yes,,"Centred bilateral grasp; secure lift; controlled carry; released inside tray; arm moved clear; clean disconnect"
+11,2026-11-08T16:01:00+05:30,p0_cycle3,direct,yes,yes,yes,yes,yes,yes,yes,yes,yes,,"Centred bilateral grasp; secure lift; controlled carry; released inside tray; arm moved clear"
+12,2026-11-08T16:02:08+05:30,p1_cycle3,direct,yes,yes,yes,yes,yes,yes,yes,yes,yes,,"Centred bilateral grasp; secure lift; controlled carry; released inside tray; arm moved clear"
+13,2026-11-08T16:03:14+05:30,p2_cycle3,direct,yes,yes,yes,yes,yes,yes,yes,yes,yes,,"Centred bilateral grasp; secure lift; controlled carry; released inside tray; arm moved clear"
+14,2026-11-08T16:04:20+05:30,p3_cycle3,direct,yes,yes,yes,yes,yes,yes,yes,yes,yes,,"Centred bilateral grasp; secure lift; controlled carry; released inside tray; arm moved clear"
+15,2026-11-08T16:05:25+05:30,p4_cycle3,direct,yes,yes,yes,yes,yes,yes,yes,yes,yes,,"Centred bilateral grasp; secure lift; controlled carry; released inside tray; arm moved clear; clean disconnect"
