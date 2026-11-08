@@ -3,7 +3,7 @@
 Date: 2026-11-08  
 Dataset: `orange_grasp_corrective_ft4_20261108`  
 Task text: `pick up the orange and place it on the plate`  
-Status: no-motion preflight passed; one of five pilot demonstrations accepted
+Status: no-motion preflight passed; two of five pilot demonstrations accepted
 
 ## Why this dataset is needed
 
@@ -57,7 +57,11 @@ on all six motors, zero load, 6.5-6.6 V and normal 31-33 C temperatures. Episode
 
 Episode 1 was recorded with 1,048 frames from each camera and passed every acceptance check: centred pre-close,
 bilateral contact, secure lift, controlled transport, release inside the tray and a clean move-clear. Disconnect was
-normal, and the subsequent safety check found torque off, zero load and 6.6-6.7 V. Pilot progress is 1/5 accepted.
+normal, and the subsequent safety check found torque off, zero load and 6.6-6.7 V.
+
+Episode 2 was recorded with 1,047 frames from each camera and also passed every acceptance check. It showed a
+centred grasp, secure lift, clean tray release and move-clear. Disconnect was normal; the safety check found torque
+off and zero load. Pilot progress is 2/5 accepted.
 
 ## Acceptance rating
 
