@@ -1,0 +1,62 @@
+{
+  "updated_at": "2026-11-08T17:35:45+05:30",
+  "dataset_name": "matchbox_pickplace_ft4_20261108",
+  "dataset_root": "/home/gaikwad-prakash/matchbox_pickplace_ft4_20261108",
+  "task": "pick up the matchbox and place it on the plate",
+  "scene": "matchbox with orange distractor",
+  "codebase_version": "v3.0",
+  "fps": 30,
+  "total_episodes": 5,
+  "total_frames": 5237,
+  "accepted_episodes": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "rejected_episodes": [],
+  "accepted_count": 5,
+  "rejected_count": 0,
+  "camera_keys": [
+    "observation.images.front",
+    "observation.images.wrist"
+  ],
+  "files": [
+    {
+      "path": "data/chunk-000/file-000.parquet",
+      "bytes": 195743,
+      "sha256": "17866ff4ec6ec1cea755992eccb9ec9b402c10e7cdfcf5e5349d0eacbd3f0930"
+    },
+    {
+      "path": "meta/episodes/chunk-000/file-000.parquet",
+      "bytes": 58419,
+      "sha256": "6345566b73205070e6a03ac44e8ed3b4647aff1940ce8b85f8bc9108fe6693a4"
+    },
+    {
+      "path": "meta/info.json",
+      "bytes": 3226,
+      "sha256": "c6c5d9fe22be250eafb062f5f2926ed29666f044f7c86ce1b72f1fb7a024be0c"
+    },
+    {
+      "path": "meta/stats.json",
+      "bytes": 12993,
+      "sha256": "a2a7ea75497fae73309e7b7286dc84ea8b658f080ee9e5c1d9ae8e76b34e0b0b"
+    },
+    {
+      "path": "meta/tasks.parquet",
+      "bytes": 2213,
+      "sha256": "8ffbfe84ddeb4f9ca347793deef094fb5630aad606bf06a3027ed2b5c47e9f39"
+    },
+    {
+      "path": "videos/observation.images.front/chunk-000/file-000.mp4",
+      "bytes": 31495255,
+      "sha256": "13c215898bb2eaff59f29ac41ad66a85fe4c87d26358d4830d196408d1e28893"
+    },
+    {
+      "path": "videos/observation.images.wrist/chunk-000/file-000.mp4",
+      "bytes": 31336466,
+      "sha256": "22ea0524018d517586f084fe03cd364d1cf9fa0c77dca073cbbcd3b7f5b03110"
+    }
+  ]
+}

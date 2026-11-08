@@ -1,0 +1,6 @@
+episode,recorded_at,position,cameras_valid,scene_valid,matchbox_selected,orange_untouched,secure_grasp,secure_lift,controlled_transport,correct_release,clean_completion,accepted,rejection_reason,notes
+0,2026-11-08T17:29:34+05:30,left_mid,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,,Direct matchbox selection and clean tray delivery
+1,2026-11-08T17:30:42+05:30,left_mid,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,,Direct matchbox selection and clean tray delivery
+2,2026-11-08T17:31:51+05:30,left_mid,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,,Direct matchbox selection and clean tray delivery
+3,2026-11-08T17:32:58+05:30,left_mid,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,,Direct matchbox selection and clean tray delivery
+4,2026-11-08T17:34:04+05:30,left_mid,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,,Direct matchbox selection and clean tray delivery; clean disconnect
