@@ -7,5 +7,6 @@ Target: 30 accepted episodes, beginning with a five-episode quality-gated pilot.
 [`../../../docs/orange_grasp_corrective_collection_20261108.md`](../../../docs/orange_grasp_corrective_collection_20261108.md).
 
 The no-motion hardware/camera preflight passed on 2026-11-08. The saved front image records the scene before the
-first episode. No physical episode had been recorded when this directory was created. `episodes.csv` is
-append-only: rejected attempts receive a row and are not deleted.
+first episode. Episode 0 was rejected because the orange was never released and remained held against the tray rim
+at the cap. Its contact sheet and final-frame sheet are retained here. `episodes.csv` is append-only: rejected
+attempts receive a row and are not deleted.

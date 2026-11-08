@@ -103,7 +103,7 @@ HF_HUB_OFFLINE=1 "$PYTHON" "$SCRIPT_DIR/record_2cam_demos.py" \
   --teleop.type=so101_leader --teleop.port="$LEADER_PORT" --teleop.id=my_so101_leader \
   --dataset.repo_id="local/$NAME" --dataset.root="$ROOT" \
   --dataset.single_task="$TASK" \
-  --dataset.num_episodes=1 --dataset.episode_time_s=45 --dataset.reset_time_s=3 \
+  --dataset.num_episodes=1 --dataset.episode_time_s=35 --dataset.reset_time_s=3 \
   --dataset.vcodec=h264 --dataset.push_to_hub=false --display_data=false \
   "${RESUME_ARGS[@]}"
 

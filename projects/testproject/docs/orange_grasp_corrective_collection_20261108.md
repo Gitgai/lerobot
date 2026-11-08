@@ -3,7 +3,7 @@
 Date: 2026-11-08  
 Dataset: `orange_grasp_corrective_ft4_20261108`  
 Task text: `pick up the orange and place it on the plate`  
-Status: no-motion preflight passed; no episode recorded yet
+Status: no-motion preflight passed; episode 0 recorded and rejected; next recording is a replacement pilot
 
 ## Why this dataset is needed
 
@@ -47,6 +47,13 @@ Use five marked orange positions. Collect six accepted episodes at each position
 The first milestone is five accepted pilot episodes, one per position. We inspect these before recording the other
 25. This catches swapped cameras, weak closes, occlusion, timing errors, or an unsuitable placement distribution
 before a full session is recorded.
+
+Episode 0 was recorded on 2026-11-08 with 1,347 frames from each camera. It had a centred grasp and secure lift, but
+the gripper remained closed over the tray and held the orange against the rim through the end of the 45-second
+recording. The recorder then reported motor 6 overload while disconnecting. A direct safety check found torque off
+on all six motors, zero load, 6.5-6.6 V and normal 31-33 C temperatures. Episode 0 is preserved but rejected for
+`release`; it is not one of the five accepted pilot episodes. Subsequent recordings use 35 seconds, enough for a
+20-30-second demonstration plus a move-clear margin without a long loaded hold.
 
 ## Acceptance rating
 
