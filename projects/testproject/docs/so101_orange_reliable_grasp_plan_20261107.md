@@ -1,7 +1,7 @@
 # SO-101 orange-to-tray reliability plan
 
 Date: 2026-11-07  
-Status: active; Phases A1-B complete, initial Phase C calibration and held-out selected-frame check complete, action gating remains disabled
+Status: active; Phases A1-B complete, Phase C is read-only, and Phase E's grasp-centering pilot is next
 Primary policy: fine-tune 3, `row3_all169_conservative_010000`  
 Primary diagnostic: [`../results/so101_bench_20261019/ROW_AH_OFFLINE_DIAGNOSIS.md`](../results/so101_bench_20261019/ROW_AH_OFFLINE_DIAGNOSIS.md)  
 Auto-reset status: paused; manual orange placement is used during this plan
@@ -25,7 +25,7 @@ target is at least **90 successes in a fresh 100-trial blind evaluation**, with 
 stage-specific failure counts reported. A 200-trial blind evaluation may be used later for a tighter confidence
 interval.
 
-The current heterogeneous fine-tune 3 orange record after five controlled Phase B repetitions and two exploratory
+The current heterogeneous fine-tune 3 orange record after five controlled Phase B repetitions and three exploratory
 10-action trials is **15/57 (26.3%)**.
 Before Phase B it was 14/49. Row AH was **0/6**; all six trials failed
 while acquiring the orange. The immediate objective is therefore repeatable acquisition, not more unstructured
@@ -376,7 +376,29 @@ than accumulating wrapper complexity.
 
 ## 9. Phase E — collect corrective and balanced demonstrations
 
-The controlled experiment determines the final quantity, but the expected target is:
+### 2026-11-08 data decision
+
+Fine-tune 3 already contains the earlier 30-episode `esp_recovery` / `recovery30_v21` batch. Those demonstrations
+successfully taught the arm to descend and correct from an off-target reach, but the subsequent evaluation showed a
+new bottleneck: precise initial contact and early grasp. Recording another generic recovery batch would repeat data
+that the current checkpoint has already seen.
+
+The next dataset is therefore `orange_grasp_corrective_ft4_20261108`. Begin with a five-episode pilot, review every
+episode, and continue to 30 accepted episodes only if the pilot has the required camera views and grasp sequence.
+The 30 accepted episodes are balanced as follows:
+
+| Demonstration type | Accepted episodes | Required behavior |
+|---|---:|---|
+| Direct centred grasp | 15 | Approach open, place both fingers around the orange, close bilaterally, lift 3-5 cm, hold, then deliver |
+| Lateral correction | 10 | Five safe left-side and five safe right-side misalignments; stop open, re-centre, then close and lift |
+| Depth correction | 5 | Begin slightly shallow/far, advance while open until contact depth is clear, then close and lift |
+
+Use five marked positions with six accepted episodes per position. Position order and demonstration type must be
+written before each recording. Rejected attempts remain on disk and in the manifest with the rejection reason; they
+are excluded from training rather than deleted.
+
+After the 30-episode acquisition-focused batch passes audit, expand toward the longer-term target only if physical
+evaluation shows remaining coverage gaps. The expected eventual target remains:
 
 - approximately **200 clean expert demonstrations**;
 - **50-100 corrective/recovery demonstrations** covering the observed acquisition errors.
@@ -443,6 +465,10 @@ Before training, produce:
 - camera freshness and synchronization checks;
 - duplicate and corrupted-episode report;
 - held-out validation split by complete episode.
+
+The first five episodes are a quality gate. Continue recording only if all five contain both camera streams, a
+centred bilateral close, visible lift and retention, and a valid tray release. One failed pilot episode does not
+invalidate the recorder; it is labelled rejected and replaced with another accepted demonstration.
 
 ## 10. Phase F — fine-tune and select a new checkpoint
 
@@ -557,17 +583,16 @@ All physical rows also retain their full Rerun traces and start/end images under
 ## 15. Immediate execution order
 
 ```text
-1. Empty workspace: finger, camera, cable and motor-status inspection.
-2. Build the frozen baseline manifest.
-3. Clearance-test and reproduce one successful start state.
-4. Register one successful orange location in the current camera view.
-5. Run exactly three unchanged controlled trials.
-6. Apply Decision B.
-7. Build and validate the read-only pre-close diagnostic.
-8. Shadow-test it before any action gating.
-9. Collect the failure-balanced expert and corrective demonstrations.
-10. Fine-tune and evaluate a new checkpoint through 3, 10, 50 and 100-trial gates.
+1. Preserve fine-tune 3 and its 15/57 result as the frozen baseline.
+2. Preflight the two-camera teleoperation recorder without moving either arm.
+3. Record and audit five pilot episodes for `orange_grasp_corrective_ft4_20261108`.
+4. If the pilot passes, record replacements until there are 30 accepted, balanced episodes.
+5. Build a dataset manifest, contact sheets, checksums and an episode-level train/validation split.
+6. Train fine-tune 4 from the frozen fine-tune 3 lineage with explicit sampling weights for the new data.
+7. Screen checkpoints offline, then evaluate through watched 3, matched 10, development 50 and blind 100-trial gates.
+8. Resume close-gate or auto-reset work only after the new policy shows stable acquisition.
 ```
 
-The next physical action is step 1 with an empty workspace. No additional blind orange trials and no auto-reset
-motion should run before that check.
+The next physical action is one leader-arm demonstration, not another autonomous policy trial. Before it, the
+recorder must pass its no-motion preflight. Auto-reset and the action gate remain disabled during demonstration
+collection.
