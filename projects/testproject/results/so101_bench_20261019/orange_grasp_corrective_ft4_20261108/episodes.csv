@@ -25,3 +25,8 @@ episode,recorded_at,position,demo_type,cameras_valid,scene_valid,centred_preclos
 23,2026-11-08T17:09:26+05:30,p2_lateral_right,lateral_right,yes,yes,yes,yes,yes,yes,yes,yes,yes,,"Visible right-side open offset and sideways centring before close; secure lift; controlled carry; tray release; move-clear"
 24,2026-11-08T17:10:32+05:30,p3_lateral_right,lateral_right,yes,yes,yes,yes,yes,yes,yes,yes,yes,,"Visible right-side correction; centred open-close-open-reclose adjustment without losing centring; secure lift; tray release; move-clear"
 25,2026-11-08T17:11:38+05:30,p4_lateral_right,lateral_right,yes,yes,yes,yes,yes,yes,yes,yes,yes,,"Visible right-side open offset and sideways centring before close; secure lift; controlled carry; tray release; move-clear; clean disconnect"
+26,2026-11-08T17:15:42+05:30,p0_depth,depth,yes,yes,yes,yes,yes,yes,yes,yes,yes,,"Visible open shallow approach followed by deeper centring and secure close; lift, tray release and move-clear"
+27,2026-11-08T17:16:49+05:30,p1_depth,depth,yes,yes,yes,yes,yes,yes,yes,yes,yes,,"Visible open shallow-to-deep approach before bilateral close; secure lift, tray release and move-clear"
+28,2026-11-08T17:17:57+05:30,p2_depth,depth,yes,yes,yes,yes,yes,yes,yes,yes,yes,,"Visible depth approach with partial close, reopen and deeper retry; secure bilateral grasp, lift, tray release and move-clear"
+29,2026-11-08T17:19:04+05:30,p3_depth,depth,yes,yes,yes,yes,yes,yes,yes,yes,yes,,"Visible open shallow-to-deep correction followed by gradual secure close; lift, tray release and move-clear"
+30,2026-11-08T17:20:10+05:30,p4_depth,depth,yes,yes,yes,yes,yes,yes,yes,yes,yes,,"Visible open shallow-to-deep approach before secure close; lift, tray release, move-clear and clean disconnect"

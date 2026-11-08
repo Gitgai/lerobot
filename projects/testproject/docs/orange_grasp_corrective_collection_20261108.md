@@ -3,7 +3,7 @@
 Date: 2026-11-08  
 Dataset: `orange_grasp_corrective_ft4_20261108`  
 Task text: `pick up the orange and place it on the plate`  
-Status: 25/30 accepted demonstrations recorded; direct and bilateral lateral quotas complete
+Status: 30/30 accepted demonstrations recorded; collection complete and audited
 
 ## Why this dataset is needed
 
@@ -107,6 +107,18 @@ empty episode was added.
 The collection now has **25 accepted demonstrations**: 15 direct, five left-side corrections and five right-side
 corrections. Only five shallow/depth corrections remain.
 
+Episodes 26-30 completed the five shallow/depth corrections. In every episode, the wrist view shows the orange
+advance from a shallow position toward the centre of the open fingers before the secure close. Episode 28 contains
+an additional partial close, reopen and deeper retry, which is retained as a useful recovery example. All five then
+show bilateral retention, secure lift, controlled transport, release inside the tray and a clean move-clear. Both
+camera streams are valid. The batch disconnected normally; the final safety check found torque off, zero load and
+normal 6.5-6.6 V on every follower joint.
+
+The collection is complete with **30 accepted demonstrations** and one preserved rejected attempt: 15 direct,
+five left-side corrections, five right-side corrections and five depth corrections. The dataset contains 32,770
+frames across 31 physical episodes. The next step is to freeze an episode-level train/validation split and use only
+the 30 accepted indices for fine-tune 4.
+
 ## Acceptance rating
 
 An episode is accepted only when every item below is `yes`:
@@ -165,9 +177,9 @@ The no-motion preflight passed on 2026-11-08. It resolved the follower as `/dev/
 LeRobot recorder imports loaded. The C270 produced black warm-up frames while automatic exposure settled; the
 preflight now waits for three usable frames instead of treating those warm-up frames as a fault.
 
-## After the five-episode pilot
+## After collection
 
-Generate front/wrist contact sheets and inspect the close and first lift. Add the decision to `episodes.csv`. If all
-five are accepted, continue to 30 accepted episodes. Then generate hashes, distribution counts and an episode-level
-held-out split before fine-tune 4. Do not start training from an unaudited folder or report training loss as robot
-success.
+The synchronized front/wrist contact sheets, per-episode decisions, hashes and distribution counts are complete.
+Create and record an episode-level held-out split before fine-tune 4. Exclude rejected episode 0 from positive
+imitation training. After training, measure robot success with fresh physical trials; training loss alone is not a
+success-rate measurement.

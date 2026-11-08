@@ -1,12 +1,12 @@
 {
-  "updated_at": "2026-11-08T17:14:28+05:30",
+  "updated_at": "2026-11-08T17:22:37+05:30",
   "dataset_name": "orange_grasp_corrective_ft4_20261108",
   "dataset_root": "/home/gaikwad-prakash/orange_grasp_corrective_ft4_20261108",
   "task": "pick up the orange and place it on the plate",
   "codebase_version": "v3.0",
   "fps": 30,
-  "total_episodes": 26,
-  "total_frames": 27533,
+  "total_episodes": 31,
+  "total_frames": 32770,
   "accepted_episodes": [
     1,
     2,
@@ -32,18 +32,23 @@
     22,
     23,
     24,
-    25
+    25,
+    26,
+    27,
+    28,
+    29,
+    30
   ],
   "rejected_episodes": [
     0
   ],
-  "accepted_count": 25,
+  "accepted_count": 30,
   "rejected_count": 1,
   "direct_accepted_count": 15,
   "lateral_accepted_count": 10,
   "lateral_left_accepted_count": 5,
   "lateral_right_accepted_count": 5,
-  "depth_accepted_count": 0,
+  "depth_accepted_count": 5,
   "pilot_gate": "passed",
   "camera_keys": [
     "observation.images.front",
@@ -91,6 +96,11 @@
       "sha256": "9608fbb608e26294f3c444e9ab650621098af1049dae78bce26810eab8addd66"
     },
     {
+      "path": "data/chunk-000/file-008.parquet",
+      "bytes": 206952,
+      "sha256": "bbe219b6577f1d9034bd4e5aadf688b51dfae3aab4bc3690d2e9c555d490b09c"
+    },
+    {
       "path": "meta/episodes/chunk-000/file-000.parquet",
       "bytes": 52704,
       "sha256": "5de957d2b083e0c0a8c1409297e71d0b4cae45d91e2215889f5ec59ff1a497b4"
@@ -131,14 +141,19 @@
       "sha256": "c4980879133258c296b8313d0415b97bd1d3aa576749ae0cc29ec5ec53997a68"
     },
     {
+      "path": "meta/episodes/chunk-000/file-008.parquet",
+      "bytes": 58397,
+      "sha256": "47744dcd94be9cc47e913e9918b25c6b0fed58e76411fc0ceb7a6f5c8099d9e3"
+    },
+    {
       "path": "meta/info.json",
       "bytes": 3229,
-      "sha256": "41a90797666e505e8edb38797498617dde42eb2d2333e295b03a6f4c687a2c8c"
+      "sha256": "ab0319be0cea102367984f6f7b4dcb3d56ac7e5879246f1c4437856405d10f7c"
     },
     {
       "path": "meta/stats.json",
-      "bytes": 13027,
-      "sha256": "150ff2fccb9429d289fa6368f859d582d70b82a640141559970a69315d91e3fc"
+      "bytes": 13040,
+      "sha256": "a5869799118eed4e9b6a70f787ce7b9819d069feacdfb60516179150dcf3994c"
     },
     {
       "path": "meta/tasks.parquet",
@@ -186,6 +201,11 @@
       "sha256": "c115f7008c32e889c4a2e7e7f614f4980931321413b0a797f764d4a9847a8467"
     },
     {
+      "path": "videos/observation.images.front/chunk-000/file-008.mp4",
+      "bytes": 29865636,
+      "sha256": "08943d95f275abc61a6c857da076026ee33f2777f1c95b480218d52307f5dcfe"
+    },
+    {
       "path": "videos/observation.images.wrist/chunk-000/file-000.mp4",
       "bytes": 7074099,
       "sha256": "dce96414390d18247740f256327fc492b57348d982fa2606c0122ed675703c06"
@@ -224,6 +244,11 @@
       "path": "videos/observation.images.wrist/chunk-000/file-007.mp4",
       "bytes": 27585346,
       "sha256": "d2a0ad65517d348edd53954def94c111cbbd8627456b25b22fbb8a70e7e1dad8"
+    },
+    {
+      "path": "videos/observation.images.wrist/chunk-000/file-008.mp4",
+      "bytes": 26469470,
+      "sha256": "535ad846a1388b3aafd4a01636bb63b1934ec7854087f2494de289fc842e26d5"
     }
   ]
 }

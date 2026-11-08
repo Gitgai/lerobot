@@ -20,3 +20,9 @@ direct grasps and five left-side lateral corrections; five right-side correction
 
 Episodes 21-25 passed review as right-side lateral-correction demonstrations. The collection now contains 25
 accepted demonstrations: 15 direct and five corrections from each lateral side. Five depth corrections remain.
+
+Episodes 26-30 passed synchronized front/wrist review as depth-correction demonstrations. Each includes a visible
+shallow-to-deep approach before a secure close; episode 28 additionally demonstrates a reopen-and-retry correction.
+The finished collection contains 30 accepted demonstrations: 15 direct, five left-side, five right-side and five
+depth corrections. Episode 0 remains preserved and rejected. The final safety check found all follower torque off,
+zero load and normal voltage.
