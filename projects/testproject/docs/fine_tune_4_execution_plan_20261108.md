@@ -1,7 +1,7 @@
 # Fine-tune 4 execution plan
 
 Date: 2026-11-08
-Status: dataset audit, materialization, staging and smoke test complete; 3,000-step AI90 run active
+Status: training and offline checkpoint screening complete; checkpoint 2,000 selected for watched robot evaluation
 
 ## Objective
 
@@ -74,8 +74,9 @@ The six validation episodes are never included in training.
 2. Load the training dataset and run a 20-step smoke test. Require finite loss, correct camera keys, correct task
    strings, checkpoint writing and no decoding failure.
 3. Start the 3,000-step run only after the smoke test passes.
-4. Rank checkpoints 1,000, 2,000 and 3,000 using the six held-out episodes. Validation only rejects broken or clearly
-   weaker candidates; training loss cannot prove robot success.
+4. Rank checkpoints 1,000, 2,000 and 3,000 using the six held-out episodes. This selected checkpoint 2,000 as the
+   first physical candidate. Validation only rejects broken or clearly weaker candidates; it cannot prove robot
+   success.
 5. Evaluate the selected candidates on the robot through watched 3, matched 10, development 50 and blind 100-trial
    gates. The development target is at least 45/50; the release target is at least 90/100.
 6. Use the measured failure distribution to decide whether more demonstrations are needed. Resume auto-reset work
@@ -84,15 +85,32 @@ The six validation episodes are never included in training.
 ## Execution record
 
 The AI90 package passed remote hash verification and loaded through the deployed PyAV data path. A first batch-8
-smoke attempt reached the forward pass but exceeded the RTX 5090's 31.36 GiB capacity. The tested configuration now
-uses batch 4 with two-step accumulation, retaining effective batch 8. Its 20-step smoke run completed with finite
-losses from 0.006 to 0.029 and saved checkpoint 000020. The full 3,000-step run started at
-2026-11-08 17:12:46 +05:30 under PID 3579218; progress and final status are recorded in `training_manifest.json`.
+smoke attempt reached the forward pass but exceeded the RTX 5090's 31.36 GiB capacity. The tested configuration used
+batch 4 with two-step accumulation, retaining effective batch 8. Its 20-step smoke run completed with finite losses
+from 0.006 to 0.029 and saved checkpoint 000020.
+
+The full 3,000-step run completed on the RTX 5090 at 2026-11-08 17:45:40 +05:30. It processed 24,000 samples
+(approximately 0.79 epoch), ended at loss 0.008 and saved checkpoints 1,000, 2,000 and 3,000 with recorded hashes.
+No NaN or decode failure occurred.
+
+Offline screening evaluated 108 next-ten-action probes from the six held-out episodes. Lower mean absolute error is
+better:
+
+| Checkpoint | All-action MAE | Orange MAE | Gripper MAE | Step-10 gripper agreement |
+|---|---:|---:|---:|---:|
+| Fine-tune 3 baseline | 2.6209 | 2.6569 | 2.2869 | 94.44% |
+| Fine-tune 4, step 1,000 | 2.4962 | 2.4589 | 1.6879 | 99.07% |
+| **Fine-tune 4, step 2,000** | **2.3294** | **2.2921** | **1.4261** | **99.07%** |
+| Fine-tune 4, step 3,000 | 2.3498 | 2.3086 | 1.4396 | 99.07% |
+
+Checkpoint 2,000 is therefore the first robot-test candidate. These are imitation errors against held-out expert
+actions, not a physical success rate. The next gate is exactly three watched orange trials at the central mark.
 
 ## Reproducible commands
 
 ```text
 scripts/audit_ft4_datasets.py
 scripts/prepare_ft4_datasets.py
+scripts/evaluate_ft4_holdout.py
 configs/ft4_orange_matchbox_corrective_20261108.yaml
 ```

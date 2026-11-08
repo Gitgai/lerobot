@@ -1,9 +1,10 @@
 # SO-101 orange-to-tray reliability plan
 
-Date: 2026-11-07  
-Status: active; 30 accepted orange demonstrations collected and audited; fine-tune 4 preparation complete
-Primary policy: fine-tune 3, `row3_all169_conservative_010000`  
-Primary diagnostic: [`../results/so101_bench_20261019/ROW_AH_OFFLINE_DIAGNOSIS.md`](../results/so101_bench_20261019/ROW_AH_OFFLINE_DIAGNOSIS.md)  
+Date: 2026-11-07
+Status: active; fine-tune 4 trained and screened offline; checkpoint 2,000 awaits watched physical evaluation
+Primary baseline: fine-tune 3, `row3_all169_conservative_010000`
+First candidate: fine-tune 4 checkpoint 2,000
+Primary diagnostic: [`../results/so101_bench_20261019/ROW_AH_OFFLINE_DIAGNOSIS.md`](../results/so101_bench_20261019/ROW_AH_OFFLINE_DIAGNOSIS.md)
 Auto-reset status: paused; manual orange placement is used during this plan
 
 ## 1. Objective
@@ -598,4 +599,7 @@ five depth corrections passed review. Five separately labelled matchbox demonstr
 also passed and remain a distinct source group. All 35 accepted episodes passed the automated metadata, camera,
 synchronization, freshness, duplicate and full-decode audit. A complete-episode split now provides 29 training
 episodes and six held-out episodes. See `fine_tune_4_execution_plan_20261108.md` for the exact run configuration and
-gates. Auto-reset and the action gate remain disabled until the new policy demonstrates stable acquisition.
+gates. Fine-tune 4 completed 3,000 steps and saved three candidates. Held-out next-ten-action screening ranked
+checkpoint 2,000 first (orange MAE 2.2921 versus 2.6569 for fine-tune 3; gripper MAE 1.4261 versus 2.4780). This is
+an offline candidate ranking, not a robot success claim. Checkpoint 2,000 now proceeds to three watched trials.
+Auto-reset and the action gate remain disabled until the new policy demonstrates stable acquisition.

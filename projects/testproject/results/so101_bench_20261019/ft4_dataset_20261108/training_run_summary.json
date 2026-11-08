@@ -1,0 +1,116 @@
+{
+  "completed_at": "2026-11-08T17:45:40+05:30",
+  "status": "complete",
+  "host": "kiran-AI90",
+  "gpu": "NVIDIA GeForce RTX 5090",
+  "steps": 3000,
+  "samples": 24000,
+  "effective_epochs": 0.7901,
+  "logged_points": 120,
+  "loss_min": 0.006,
+  "loss_max": 0.013,
+  "loss_last": 0.008,
+  "gradient_norm_max": 0.319,
+  "mean_update_seconds": 0.6204,
+  "checkpoints": {
+    "001000": {
+      "files": [
+        {
+          "path": "config.json",
+          "bytes": 2136
+        },
+        {
+          "path": "lora_adapters/README.md",
+          "bytes": 5074
+        },
+        {
+          "path": "lora_adapters/adapter_config.json",
+          "bytes": 1318
+        },
+        {
+          "path": "lora_adapters/adapter_model.safetensors",
+          "bytes": 140960552
+        },
+        {
+          "path": "model.safetensors",
+          "bytes": 7481485688
+        },
+        {
+          "path": "train_config.json",
+          "bytes": 7016
+        }
+      ],
+      "model_sha256": "58b5dfebe49718a18c1823e67b47bd98d783be67467c22bf20680bd2862e800d",
+      "adapter_sha256": "ac96639beaf0fa02f53d046ccfbec462dd610f0c523c53deb6f92a5a31fb6419"
+    },
+    "002000": {
+      "files": [
+        {
+          "path": "config.json",
+          "bytes": 2136
+        },
+        {
+          "path": "lora_adapters/README.md",
+          "bytes": 5074
+        },
+        {
+          "path": "lora_adapters/adapter_config.json",
+          "bytes": 1318
+        },
+        {
+          "path": "lora_adapters/adapter_model.safetensors",
+          "bytes": 140960552
+        },
+        {
+          "path": "model.safetensors",
+          "bytes": 7481485688
+        },
+        {
+          "path": "train_config.json",
+          "bytes": 7016
+        }
+      ],
+      "model_sha256": "fa156ef180a39c94a751ac14e941a818e542a0b7d20ac22f165e3cd6a2e81b82",
+      "adapter_sha256": "73bd94b4906767ff89498d3d0bd97d8767de93abad0aab6a6f648afabf42f2c6"
+    },
+    "003000": {
+      "files": [
+        {
+          "path": "config.json",
+          "bytes": 2136
+        },
+        {
+          "path": "lora_adapters/README.md",
+          "bytes": 5074
+        },
+        {
+          "path": "lora_adapters/adapter_config.json",
+          "bytes": 1318
+        },
+        {
+          "path": "lora_adapters/adapter_model.safetensors",
+          "bytes": 140960552
+        },
+        {
+          "path": "model.safetensors",
+          "bytes": 7481485688
+        },
+        {
+          "path": "train_config.json",
+          "bytes": 7016
+        }
+      ],
+      "model_sha256": "812dfb11bb3d35a3bbdaa9d0638adde1c1fae4ef4adf56bcdfbfbf4fcee73d2a",
+      "adapter_sha256": "98c85aebf42e4c85c424a132608b35c283dadcb552014a8e36ced4f93b101f9d"
+    }
+  },
+  "holdout_ranking": [
+    "ft4_2000",
+    "ft4_3000",
+    "ft4_1000",
+    "baseline"
+  ],
+  "selected_candidate": "ft4_2000",
+  "selected_checkpoint": "/home/kiran/lerobot_assets/training/ft4_orange_matchbox_corrective_20261108/checkpoints/002000/pretrained_model",
+  "selection_reason": "Lowest total and orange-task held-out action MAE; substantially lower gripper MAE than fine-tune 3. Physical evaluation remains required."
+}

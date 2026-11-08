@@ -1,7 +1,7 @@
 {
   "created_at": "2026-11-08T17:58:41+05:30",
   "name": "fine_tune_4_orange_acquisition_with_matchbox_auxiliary_20261108",
-  "status": "materialized_and_audited",
+  "status": "training_complete_offline_screened",
   "objective": "Improve orange acquisition while retaining a small language-conditioned matchbox selection task.",
   "baseline": {
     "name": "fine-tune 3 row3_all169_conservative_010000",
@@ -196,12 +196,63 @@
     "effective_batch_size": 8
   },
   "full_run": {
-    "status": "running",
+    "status": "complete",
     "host": "kiran-AI90",
     "gpu": "NVIDIA GeForce RTX 5090",
     "pid": 3579218,
     "started_at": "2026-11-08T17:12:46+05:30",
     "output_dir": "/home/kiran/lerobot_assets/training/ft4_orange_matchbox_corrective_20261108",
-    "log": "/home/kiran/lerobot_assets/ft4_20261108/train_full.log"
+    "log": "/home/kiran/lerobot_assets/ft4_20261108/train_full.log",
+    "completed_at": "2026-11-08T17:45:40+05:30",
+    "checkpoints": [
+      1000,
+      2000,
+      3000
+    ],
+    "loss_last": 0.008
+  },
+  "holdout_evaluation": {
+    "path": "/home/gaikwad-prakash/Documents/ChatGPT/Lerobot-rowN-record/projects/testproject/results/so101_bench_20261019/ft4_dataset_20261108/holdout_eval.json",
+    "ranking": [
+      "ft4_2000",
+      "ft4_3000",
+      "ft4_1000",
+      "baseline"
+    ],
+    "selected": "ft4_2000",
+    "baseline_mae_all": 2.6209,
+    "selected_mae_all": 2.3294,
+    "baseline_gripper_mae": 2.2869,
+    "selected_gripper_mae": 1.4261
+  },
+  "training_run_summary": {
+    "path": "/home/gaikwad-prakash/Documents/ChatGPT/Lerobot-rowN-record/projects/testproject/results/so101_bench_20261019/ft4_dataset_20261108/training_run_summary.json",
+    "status": "complete"
+  },
+  "training_result": {
+    "status": "complete",
+    "steps": 3000,
+    "samples": 24000,
+    "effective_epochs": 0.7901,
+    "completed_at": "2026-11-08T17:45:40+05:30",
+    "run_summary": "training_run_summary.json"
+  },
+  "offline_screening": {
+    "report": "holdout_eval.json",
+    "probes": 108,
+    "horizon": 10,
+    "ranking": [
+      "ft4_2000",
+      "ft4_3000",
+      "ft4_1000",
+      "baseline"
+    ],
+    "selected_candidate": "ft4_2000",
+    "selected_checkpoint": "/home/kiran/lerobot_assets/training/ft4_orange_matchbox_corrective_20261108/checkpoints/002000/pretrained_model",
+    "orange_mae": 2.2921,
+    "baseline_orange_mae": 2.6569,
+    "gripper_mae": 1.4261,
+    "baseline_gripper_mae": 2.478,
+    "limitation": "Offline action imitation metrics do not establish physical task success."
   }
 }
