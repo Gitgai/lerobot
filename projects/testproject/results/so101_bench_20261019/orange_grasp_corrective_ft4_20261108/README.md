@@ -8,5 +8,5 @@ Target: 30 accepted episodes, beginning with a five-episode quality-gated pilot.
 
 The no-motion hardware/camera preflight passed on 2026-11-08. The saved front image records the scene before the
 first episode. Episode 0 was rejected because the orange was never released and remained held against the tray rim
-at the cap. Its contact sheet and final-frame sheet are retained here. `episodes.csv` is append-only: rejected
-attempts receive a row and are not deleted.
+at the cap. Episode 1 was accepted as the first pilot demonstration. Contact sheets and final-frame sheets are
+retained locally for review. `episodes.csv` is append-only: rejected attempts receive a row and are not deleted.

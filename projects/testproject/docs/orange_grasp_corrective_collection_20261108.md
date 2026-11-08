@@ -3,7 +3,7 @@
 Date: 2026-11-08  
 Dataset: `orange_grasp_corrective_ft4_20261108`  
 Task text: `pick up the orange and place it on the plate`  
-Status: no-motion preflight passed; episode 0 recorded and rejected; next recording is a replacement pilot
+Status: no-motion preflight passed; one of five pilot demonstrations accepted
 
 ## Why this dataset is needed
 
@@ -54,6 +54,10 @@ recording. The recorder then reported motor 6 overload while disconnecting. A di
 on all six motors, zero load, 6.5-6.6 V and normal 31-33 C temperatures. Episode 0 is preserved but rejected for
 `release`; it is not one of the five accepted pilot episodes. Subsequent recordings use 35 seconds, enough for a
 20-30-second demonstration plus a move-clear margin without a long loaded hold.
+
+Episode 1 was recorded with 1,048 frames from each camera and passed every acceptance check: centred pre-close,
+bilateral contact, secure lift, controlled transport, release inside the tray and a clean move-clear. Disconnect was
+normal, and the subsequent safety check found torque off, zero load and 6.6-6.7 V. Pilot progress is 1/5 accepted.
 
 ## Acceptance rating
 
