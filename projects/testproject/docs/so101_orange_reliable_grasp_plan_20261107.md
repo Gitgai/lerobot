@@ -1,7 +1,7 @@
 # SO-101 orange-to-tray reliability plan
 
 Date: 2026-11-07  
-Status: active; Phases A1-B complete, Phase C is read-only, and Phase E's five-episode quality pilot passed
+Status: active; 30 accepted orange demonstrations collected and audited; fine-tune 4 preparation complete
 Primary policy: fine-tune 3, `row3_all169_conservative_010000`  
 Primary diagnostic: [`../results/so101_bench_20261019/ROW_AH_OFFLINE_DIAGNOSIS.md`](../results/so101_bench_20261019/ROW_AH_OFFLINE_DIAGNOSIS.md)  
 Auto-reset status: paused; manual orange placement is used during this plan
@@ -593,6 +593,9 @@ All physical rows also retain their full Rerun traces and start/end images under
 8. Resume close-gate or auto-reset work only after the new policy shows stable acquisition.
 ```
 
-The no-motion recorder preflight and five-accepted-episode quality pilot are complete. The next physical work is the
-remaining balanced demonstration collection: ten direct grasps, ten lateral corrections and five shallow/depth
-corrections. Auto-reset and the action gate remain disabled during demonstration collection.
+The balanced orange collection is complete: 15 direct grasps, five left corrections, five right corrections and
+five depth corrections passed review. Five separately labelled matchbox demonstrations with an orange distractor
+also passed and remain a distinct source group. All 35 accepted episodes passed the automated metadata, camera,
+synchronization, freshness, duplicate and full-decode audit. A complete-episode split now provides 29 training
+episodes and six held-out episodes. See `fine_tune_4_execution_plan_20261108.md` for the exact run configuration and
+gates. Auto-reset and the action gate remain disabled until the new policy demonstrates stable acquisition.

@@ -1,0 +1,16 @@
+{
+  "sources": [
+    {
+      "name": "orange_grasp_corrective_ft4_20261108",
+      "root": "/home/gaikwad-prakash/orange_grasp_corrective_ft4_20261108",
+      "review_csv": "/home/gaikwad-prakash/Documents/ChatGPT/Lerobot-rowN-record/projects/testproject/results/so101_bench_20261019/orange_grasp_corrective_ft4_20261108/episodes.csv",
+      "accepted": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
+    },
+    {
+      "name": "matchbox_pickplace_ft4_20261108",
+      "root": "/home/gaikwad-prakash/matchbox_pickplace_ft4_20261108",
+      "review_csv": "/home/gaikwad-prakash/Documents/ChatGPT/Lerobot-rowN-record/projects/testproject/results/so101_bench_20261019/matchbox_pickplace_ft4_20261108/episodes.csv",
+      "accepted": [0, 1, 2, 3, 4]
+    }
+  ]
+}

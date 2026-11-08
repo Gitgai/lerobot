@@ -1,0 +1,31 @@
+{
+  "validated_at": "2026-11-08T18:07:00+05:30",
+  "status": "pass",
+  "train": {
+    "root": "/home/gaikwad-prakash/ft4_datasets_20261108/train29",
+    "episodes": 29,
+    "frames": 30376,
+    "front_frames": 30376,
+    "wrist_frames": 30376,
+    "codec": "h264",
+    "width": 640,
+    "height": 480,
+    "fps": 30,
+    "video_files_per_camera": 4,
+    "full_decode": "pass"
+  },
+  "validation": {
+    "root": "/home/gaikwad-prakash/ft4_datasets_20261108/val6",
+    "episodes": 6,
+    "frames": 6284,
+    "front_frames": 6284,
+    "wrist_frames": 6284,
+    "codec": "h264",
+    "width": 640,
+    "height": 480,
+    "fps": 30,
+    "video_files_per_camera": 1,
+    "full_decode": "pass"
+  },
+  "codec_issue_resolution": "Discarded the first derived merge; normalized all split clips to H.264 before bounded-size aggregation."
+}

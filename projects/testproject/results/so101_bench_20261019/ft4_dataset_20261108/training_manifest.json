@@ -1,0 +1,207 @@
+{
+  "created_at": "2026-11-08T17:58:41+05:30",
+  "name": "fine_tune_4_orange_acquisition_with_matchbox_auxiliary_20261108",
+  "status": "materialized_and_audited",
+  "objective": "Improve orange acquisition while retaining a small language-conditioned matchbox selection task.",
+  "baseline": {
+    "name": "fine-tune 3 row3_all169_conservative_010000",
+    "checkpoint_on_ai90": "/home/kiran/lerobot_assets/ckpt_mirror/row3_all169_conservative_010000",
+    "controlled_orange_result": "15/57 (26.3%)"
+  },
+  "source_audit": {
+    "path": "/home/gaikwad-prakash/Documents/ChatGPT/Lerobot-rowN-record/projects/testproject/results/so101_bench_20261019/ft4_dataset_20261108/dataset_audit.json",
+    "sha256": "54d2ea03981359264d54bb59fd340d6f108b0843ad78a3a475eaf0ae5a5c0680",
+    "accepted_episodes": 35,
+    "status": "pass"
+  },
+  "split": {
+    "path": "/home/gaikwad-prakash/Documents/ChatGPT/Lerobot-rowN-record/projects/testproject/results/so101_bench_20261019/ft4_dataset_20261108/episode_split.json",
+    "sha256": "357faf720f7a645aef0f03caa5f64a0485de0e15344debc9fe7104c075c07398"
+  },
+  "training_mix": {
+    "orange_episodes": 25,
+    "matchbox_episodes": 4,
+    "natural_episode_sampling_weights": {
+      "orange": 0.86206897,
+      "matchbox": 0.13793103
+    },
+    "note": "Task strings remain distinct. Matchbox is an auxiliary selection task, not an orange correction label."
+  },
+  "validation_mix": {
+    "orange_episodes": 5,
+    "matchbox_episodes": 1
+  },
+  "datasets": {
+    "train": {
+      "repo_id": "local/ft4_orange_matchbox_train29_20261108",
+      "root": "/home/gaikwad-prakash/ft4_datasets_20261108/train29",
+      "episodes": 29,
+      "frames": 30376,
+      "fps": 30,
+      "tasks": [
+        "pick up the matchbox and place it on the plate",
+        "pick up the orange and place it on the plate"
+      ],
+      "files": [
+        {
+          "path": "data/chunk-000/file-000.parquet",
+          "bytes": 788073,
+          "sha256": "0f44a46f722f436416fd87e64796219b99d097f749f18573ddac5c33521970fb"
+        },
+        {
+          "path": "meta/episodes/chunk-000/file-000.parquet",
+          "bytes": 129471,
+          "sha256": "f0f8ed5707a8708102b2a7559295514ee193347af0fb37513f3c5f8a32b70b06"
+        },
+        {
+          "path": "meta/info.json",
+          "bytes": 3228,
+          "sha256": "11d94859fc8d7af45c9672cf65fba62ceb060a4ca6aeb5fc70c89a654e42833b"
+        },
+        {
+          "path": "meta/stats.json",
+          "bytes": 13011,
+          "sha256": "fa5f42e068592455d195c315ec642978763ce5b3c6062bf07b24436035a1960a"
+        },
+        {
+          "path": "meta/tasks.parquet",
+          "bytes": 2233,
+          "sha256": "ea5d637e55af5f4d099628121c30179e2d9dc0834eb9de9e5a2c4a71cb6f502f"
+        },
+        {
+          "path": "videos/observation.images.front/chunk-000/file-000.mp4",
+          "bytes": 24668602,
+          "sha256": "8023ce0ccd18c71577b31b239294c6031842c0e0bcc74de5b70dafccd1e2cff5"
+        },
+        {
+          "path": "videos/observation.images.front/chunk-000/file-001.mp4",
+          "bytes": 28102973,
+          "sha256": "1cca6af47dd8d4f59158dfd75e2474393caed3517d6acd1df0f1f533600085db"
+        },
+        {
+          "path": "videos/observation.images.front/chunk-000/file-002.mp4",
+          "bytes": 24050609,
+          "sha256": "717ec031281e2a48dff7f85f8a6c64ece320a1ed447e5f5c40323c442bd1032d"
+        },
+        {
+          "path": "videos/observation.images.front/chunk-000/file-003.mp4",
+          "bytes": 11740521,
+          "sha256": "56c99cb0bd86fcc08776d2f5291ed56e0685c3eff4fc356775f5c0b826e8ba7a"
+        },
+        {
+          "path": "videos/observation.images.wrist/chunk-000/file-000.mp4",
+          "bytes": 23055131,
+          "sha256": "cff59db40f6c3cb689b792bbf6c524bce161371dfe76b3ec89d0064fa14e7ceb"
+        },
+        {
+          "path": "videos/observation.images.wrist/chunk-000/file-001.mp4",
+          "bytes": 26473617,
+          "sha256": "230076c52f228dedb617aa06f5ed8f57687aee85e0d83f30c63caea0f6b5d012"
+        },
+        {
+          "path": "videos/observation.images.wrist/chunk-000/file-002.mp4",
+          "bytes": 23562223,
+          "sha256": "56fcba082454d9f4b4e8c2e3efb0cd98334bcf58d41fbc684f70514781768579"
+        },
+        {
+          "path": "videos/observation.images.wrist/chunk-000/file-003.mp4",
+          "bytes": 12037328,
+          "sha256": "47c33ff9d3a29d5fa55091d45dfa08cb7a6647c70d183ba69f584736d5118a19"
+        }
+      ]
+    },
+    "validation": {
+      "repo_id": "local/ft4_orange_matchbox_val6_20261108",
+      "root": "/home/gaikwad-prakash/ft4_datasets_20261108/val6",
+      "episodes": 6,
+      "frames": 6284,
+      "fps": 30,
+      "tasks": [
+        "pick up the matchbox and place it on the plate",
+        "pick up the orange and place it on the plate"
+      ],
+      "files": [
+        {
+          "path": "data/chunk-000/file-000.parquet",
+          "bytes": 164075,
+          "sha256": "3232185b24cbd16c2cf84395ffc51f24a469dafffbd66fbaf1f5f66bfc54b75d"
+        },
+        {
+          "path": "meta/episodes/chunk-000/file-000.parquet",
+          "bytes": 99589,
+          "sha256": "43c0815c8a6e1937673aa5426c8e09937a794720eea0c44bdf672433b8cb3547"
+        },
+        {
+          "path": "meta/info.json",
+          "bytes": 3225,
+          "sha256": "214d8c10f0852bbd7b27b6ee9dd1e78920e0e8357bb3865027c95b5fb9eadca9"
+        },
+        {
+          "path": "meta/stats.json",
+          "bytes": 13034,
+          "sha256": "6b4ca968a5eb4af73f29843b51a0f1fbff6019c0273387947571d79fb9821105"
+        },
+        {
+          "path": "meta/tasks.parquet",
+          "bytes": 2233,
+          "sha256": "ea5d637e55af5f4d099628121c30179e2d9dc0834eb9de9e5a2c4a71cb6f502f"
+        },
+        {
+          "path": "videos/observation.images.front/chunk-000/file-000.mp4",
+          "bytes": 18209948,
+          "sha256": "edfdccdef588571cabb6d57a59cbf1d93192e1455d923f8b0659c3035bb40489"
+        },
+        {
+          "path": "videos/observation.images.wrist/chunk-000/file-000.mp4",
+          "bytes": 17748238,
+          "sha256": "dc76f094885b289f240d7af9746a84dc5c899296914e75272cb02065dafd5c35"
+        }
+      ]
+    }
+  },
+  "checkpoint_selection": {
+    "save_steps": [
+      1000,
+      2000,
+      3000
+    ],
+    "offline_validation": "Use the six held-out complete episodes only for broken-run screening and candidate ranking.",
+    "physical_gates": [
+      "watched 3",
+      "matched 10",
+      "development 50",
+      "blind 100"
+    ]
+  },
+  "training_config": {
+    "path": "/home/gaikwad-prakash/Documents/ChatGPT/Lerobot-rowN-record/projects/testproject/configs/ft4_orange_matchbox_corrective_20261108.yaml",
+    "sha256": "56b4fe7320d0b0aa8f4610f58dec2afa104edae4be003058e78615593cc985f2",
+    "steps": 3000,
+    "batch_size": 4,
+    "seed": 1108,
+    "output_dir": "/home/kiran/lerobot_assets/training/ft4_orange_matchbox_corrective_20261108",
+    "hf_home": "/home/kiran/hf-cache-recovered",
+    "grad_accum_steps": 2,
+    "effective_batch_size": 8
+  },
+  "materialized_validation": {
+    "path": "/home/gaikwad-prakash/Documents/ChatGPT/Lerobot-rowN-record/projects/testproject/results/so101_bench_20261019/ft4_dataset_20261108/materialized_validation.json",
+    "sha256": "9a871ef247bc5531c831ea8224ed988adb8e8189d69819e95ca1ecc228c79fd9",
+    "status": "pass"
+  },
+  "smoke_test": {
+    "path": "/home/gaikwad-prakash/Documents/ChatGPT/Lerobot-rowN-record/projects/testproject/results/so101_bench_20261019/ft4_dataset_20261108/smoke_test.json",
+    "status": "pass",
+    "steps": 20,
+    "effective_batch_size": 8
+  },
+  "full_run": {
+    "status": "running",
+    "host": "kiran-AI90",
+    "gpu": "NVIDIA GeForce RTX 5090",
+    "pid": 3579218,
+    "started_at": "2026-11-08T17:12:46+05:30",
+    "output_dir": "/home/kiran/lerobot_assets/training/ft4_orange_matchbox_corrective_20261108",
+    "log": "/home/kiran/lerobot_assets/ft4_20261108/train_full.log"
+  }
+}

@@ -1,0 +1,98 @@
+# Fine-tune 4 execution plan
+
+Date: 2026-11-08
+Status: dataset audit, materialization, staging and smoke test complete; 3,000-step AI90 run active
+
+## Objective
+
+Fine-tune the existing `row3_all169_conservative_010000` policy to improve the weak acquisition phase: centre both
+fingers around the orange, correct lateral or depth errors before closing, and establish a secure initial grasp.
+The small matchbox group adds language-conditioned object selection while an orange distractor is present.
+
+## Accepted demonstrations
+
+| Source | Accepted | Training | Validation | Purpose |
+|---|---:|---:|---:|---|
+| Orange direct | 15 | 13 | 2 | Centred bilateral grasp |
+| Orange lateral-left | 5 | 4 | 1 | Correct one lateral error direction |
+| Orange lateral-right | 5 | 4 | 1 | Correct the opposite direction |
+| Orange depth | 5 | 4 | 1 | Advance from a shallow approach before closing |
+| Matchbox with orange distractor | 5 | 4 | 1 | Select the named object and leave the distractor untouched |
+| **Total** | **35** | **29** | **6** | Complete-episode split |
+
+Orange source episode 0 remains preserved as a rejected attempt and is absent from both derived datasets.
+
+## Audit result
+
+The automated audit passed all 35 accepted episodes. It checked:
+
+- source metadata and contiguous frame indices;
+- accepted human-review labels;
+- both 640×480, 30 Hz camera streams;
+- nonblank and changing camera samples;
+- front/wrist episode timing agreement;
+- exact duplicate action/state trajectories;
+- full decode and exact frame counts after materialization.
+
+The first derived merge exposed a LeRobot codec mismatch: sliced files could be AV1 while their metadata still said
+H.264. That copy was discarded. The preparation script now normalizes every derived clip to H.264 before merging.
+The corrected datasets contain exactly 30,376 training frames and 6,284 validation frames in each camera stream.
+Merged video files are capped at 30 MB so random frame access during training remains practical.
+
+## Dataset locations
+
+```text
+local train: /home/gaikwad-prakash/ft4_datasets_20261108/train29
+local val:   /home/gaikwad-prakash/ft4_datasets_20261108/val6
+```
+
+The exact source audit, split, file hashes and training provenance are stored under
+`results/so101_bench_20261019/ft4_dataset_20261108/`.
+
+## Training configuration
+
+The run continues from the frozen fine-tune 3 checkpoint with a fresh LoRA adapter:
+
+```text
+checkpoint: /home/kiran/lerobot_assets/ckpt_mirror/row3_all169_conservative_010000
+GPU:        AI90 GPU 0, RTX 5090
+output:     /home/kiran/lerobot_assets/training/ft4_orange_matchbox_corrective_20261108
+HF cache:   /home/kiran/hf-cache-recovered (the /mnt/data4tb cache link is unavailable)
+batch:      4 × 2 gradient accumulation = effective batch 8
+steps:      3,000
+LR:         1e-5 cosine decay; 150 warm-up steps
+delay aug:  0-8 frames, matching fine-tune 3
+checkpoints: 1,000, 2,000 and 3,000
+```
+
+Natural episode sampling gives orange 25/29 (86.2%) and matchbox 4/29 (13.8%). The task strings remain distinct.
+The six validation episodes are never included in training.
+
+## Execution gates
+
+1. Stage the train/validation datasets, configuration, audit and manifest on AI90.
+2. Load the training dataset and run a 20-step smoke test. Require finite loss, correct camera keys, correct task
+   strings, checkpoint writing and no decoding failure.
+3. Start the 3,000-step run only after the smoke test passes.
+4. Rank checkpoints 1,000, 2,000 and 3,000 using the six held-out episodes. Validation only rejects broken or clearly
+   weaker candidates; training loss cannot prove robot success.
+5. Evaluate the selected candidates on the robot through watched 3, matched 10, development 50 and blind 100-trial
+   gates. The development target is at least 45/50; the release target is at least 90/100.
+6. Use the measured failure distribution to decide whether more demonstrations are needed. Resume auto-reset work
+   only after acquisition is stable.
+
+## Execution record
+
+The AI90 package passed remote hash verification and loaded through the deployed PyAV data path. A first batch-8
+smoke attempt reached the forward pass but exceeded the RTX 5090's 31.36 GiB capacity. The tested configuration now
+uses batch 4 with two-step accumulation, retaining effective batch 8. Its 20-step smoke run completed with finite
+losses from 0.006 to 0.029 and saved checkpoint 000020. The full 3,000-step run started at
+2026-11-08 17:12:46 +05:30 under PID 3579218; progress and final status are recorded in `training_manifest.json`.
+
+## Reproducible commands
+
+```text
+scripts/audit_ft4_datasets.py
+scripts/prepare_ft4_datasets.py
+configs/ft4_orange_matchbox_corrective_20261108.yaml
+```

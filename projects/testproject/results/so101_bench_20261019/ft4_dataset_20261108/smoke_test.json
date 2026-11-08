@@ -1,0 +1,20 @@
+{
+  "run_at": "2026-11-08T17:11:21+05:30",
+  "status": "pass",
+  "host": "kiran-AI90",
+  "gpu": "NVIDIA GeForce RTX 5090",
+  "steps": 20,
+  "batch_size": 4,
+  "grad_accum_steps": 2,
+  "effective_batch_size": 8,
+  "finite_losses": true,
+  "loss_min": 0.006,
+  "loss_max": 0.029,
+  "mean_update_seconds": 0.64075,
+  "checkpoint": "/home/kiran/lerobot_assets/training/ft4_orange_matchbox_smoke20_20261108/checkpoints/000020/pretrained_model",
+  "checkpoint_saved": true,
+  "observations": [
+    "Batch 8 without accumulation exceeded 31.36 GiB and was replaced by batch 4 with two-step accumulation.",
+    "The missing /mnt/data4tb cache was replaced with /home/kiran/hf-cache-recovered."
+  ]
+}
