@@ -1,0 +1,10 @@
+sample,image_path,expected_eligible,reason,detector_status,correct_for_gate,x,y,radius,saturation,value,detector_reason
+ft4_2k_T1_c31,samples/ft4_2k_T1_c31.jpg,0,centred close but no retained lift; green-yellow fruit,unknown,1,,,,,,no confident fruit circle
+ft4_2k_T2_c34,samples/ft4_2k_T2_c34.jpg,0,fruit remained offset outside left finger; green-yellow fruit,eligible,0,256.2,204.6,99.6,133.4,196.4,inside reviewed grasp band
+ft4_2k_T3_c15,samples/ft4_2k_T3_c15.jpg,1,successful retained grasp; green-yellow fruit,eligible,1,269.4,220.2,167.4,128.1,188.5,inside reviewed grasp band
+ft4_2k_T4_c24,samples/ft4_2k_T4_c24.jpg,0,offset close pushed small orange,unknown,1,,,,,,no confident fruit circle
+ft4_2k_T5_c29,samples/ft4_2k_T5_c29.jpg,1,successful retained grasp; small orange,eligible,1,291.0,255.0,147.6,149.2,222.3,inside reviewed grasp band
+ft4_2k_T6_c48,samples/ft4_2k_T6_c48.jpg,0,centred tight close without retained lift; small orange,eligible,0,281.4,273.0,133.0,143.9,194.9,inside reviewed grasp band
+ft4_3k_T1_c68,samples/ft4_3k_T1_c68.jpg,1,successful late recovery grasp; small orange,eligible,1,387.0,175.8,95.2,144.9,242.1,inside reviewed grasp band
+ft4_3k_T2_c22,samples/ft4_3k_T2_c22.jpg,0,fruit too deep and outside effective finger contact; pass-by,unknown,1,,,,,,no confident fruit circle
+ft4_3k_T3_c61,samples/ft4_3k_T3_c61.jpg,0,visually centred tight close without retained lift; small orange,eligible,0,345.0,226.2,122.5,157.9,184.5,inside reviewed grasp band

@@ -1,7 +1,7 @@
 # Fine-tune 4 execution plan
 
 Date: 2026-11-08
-Status: training and watched checkpoint comparison complete; checkpoint 2,000 scored 2/6 and checkpoint 3,000 scored 1/3
+Status: checkpoint comparison and close-window diagnosis complete; no candidate advances to matched ten
 
 ## Objective
 
@@ -140,6 +140,25 @@ retained it through lift. The result was **1/3 (33.3%)**.
 Checkpoint 3,000 did not improve on checkpoint 2,000's **2/6 (33.3%)**. Neither candidate advances to the matched
 ten-trial row. The next gate is offline close-window comparison and a grasp-strategy revision; more blind repetitions
 of these two candidates are paused.
+
+### Close-window diagnosis
+
+The read-only comparison of all nine controlled FT4 trials split the six failures evenly: three offset/pass-by
+acquisition errors and three visually centred closes without retained lift. Applying the previously fixed wrist
+detector without retuning marked all three successes eligible, but blocked only three of six failures. It falsely
+permitted one offset close and two centred retention failures. A 2D pre-close fruit centre is therefore insufficient
+as a motor gate.
+
+The successful trials showed a sustained contact aperture followed by fruit motion with the gripper. Two centred
+failures closed more tightly and immediately reopened, while one remained closed without lifting. Aperture alone is
+also insufficient. The next implementation must combine pre-close geometry, post-close contact stability and visual
+evidence that a short lift moves the fruit off the table. The full measurements are in
+`results/so101_bench_20261019/ft4_close_window_diagnosis_20261109/`.
+
+The analysis also identified two experimental confounds. Checkpoint 2,000's first three trials used the larger
+green-yellow citrus and its next three used the small orange; each subgroup scored 1/3. Later large-citrus trials used
+a shifted low/side front-camera view and remain exploratory. Restore the documented overhead camera geometry and use
+one fixed small orange before prospective shadow-mode verification.
 
 ## Reproducible commands
 

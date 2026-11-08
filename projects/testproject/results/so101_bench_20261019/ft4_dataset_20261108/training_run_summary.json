@@ -149,5 +149,28 @@
     "ft4_3000": "1/3 (33.3%)",
     "selected_for_matched_ten": null,
     "next_step": "offline close-window comparison and grasp-strategy revision before further blind trials"
+  },
+  "close_window_diagnosis": {
+    "date": "2026-11-09",
+    "controlled_trials": 9,
+    "successes": 3,
+    "failures": 6,
+    "failure_classes": {
+      "offset_or_pass_by": 3,
+      "centred_close_without_retained_lift": 3
+    },
+    "fixed_preclose_detector": {
+      "successful_eligible": "3/3",
+      "failed_blocked_or_unknown": "3/6",
+      "agreement": "6/9",
+      "decision": "insufficient as a motor gate"
+    },
+    "object_strata": {
+      "ft4_2000_green_yellow_citrus": "1/3",
+      "ft4_2000_small_orange": "1/3",
+      "ft4_3000_small_orange": "1/3"
+    },
+    "report": "../ft4_close_window_diagnosis_20261109/README.md",
+    "next_step": "restore camera geometry and implement combined pre-close plus post-close retained-lift verification in shadow mode"
   }
 }

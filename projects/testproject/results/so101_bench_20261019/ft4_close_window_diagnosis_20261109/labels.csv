@@ -1,0 +1,10 @@
+sample,image_path,expected_eligible,reason
+ft4_2k_T1_c31,samples/ft4_2k_T1_c31.jpg,0,centred close but no retained lift; green-yellow fruit
+ft4_2k_T2_c34,samples/ft4_2k_T2_c34.jpg,0,fruit remained offset outside left finger; green-yellow fruit
+ft4_2k_T3_c15,samples/ft4_2k_T3_c15.jpg,1,successful retained grasp; green-yellow fruit
+ft4_2k_T4_c24,samples/ft4_2k_T4_c24.jpg,0,offset close pushed small orange
+ft4_2k_T5_c29,samples/ft4_2k_T5_c29.jpg,1,successful retained grasp; small orange
+ft4_2k_T6_c48,samples/ft4_2k_T6_c48.jpg,0,centred tight close without retained lift; small orange
+ft4_3k_T1_c68,samples/ft4_3k_T1_c68.jpg,1,successful late recovery grasp; small orange
+ft4_3k_T2_c22,samples/ft4_3k_T2_c22.jpg,0,fruit too deep and outside effective finger contact; pass-by
+ft4_3k_T3_c61,samples/ft4_3k_T3_c61.jpg,0,visually centred tight close without retained lift; small orange

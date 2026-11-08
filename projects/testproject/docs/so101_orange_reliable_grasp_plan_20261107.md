@@ -1,7 +1,7 @@
 # SO-101 orange-to-tray reliability plan
 
 Date: 2026-11-07
-Status: active; fine-tune 4 comparison complete: checkpoint 2,000 at 2/6 and checkpoint 3,000 at 1/3
+Status: active; fine-tune 4 close-window diagnosis complete; camera restoration and retained-lift verification next
 Primary baseline: fine-tune 3, `row3_all169_conservative_010000`
 First candidate: fine-tune 4 checkpoint 2,000
 Primary diagnostic: [`../results/so101_bench_20261019/ROW_AH_OFFLINE_DIAGNOSIS.md`](../results/so101_bench_20261019/ROW_AH_OFFLINE_DIAGNOSIS.md)
@@ -612,3 +612,10 @@ Checkpoint 3,000 subsequently scored **1/3 (33.3%)** under the same protocol. It
 and completed at the cap; the other trials were a pass-by acquisition miss and a centred close without retained
 lift. This matches checkpoint 2,000's observed 33.3% rate and leaves no candidate for the matched ten-trial row.
 Pause blind repetitions and use the saved close windows to revise centring and retained-lift behavior first.
+
+The completed nine-trial close-window review found three offset/pass-by failures and three visually centred closes
+without retained lift. The existing fixed wrist detector recognized all three successes but would have permitted
+three of six failures, so it cannot be enabled as a motor gate. The replacement shadow verifier must require both a
+plausible pre-close pose and post-close evidence that the fruit remains between the fingers during a short lift. The
+current front-camera view has also shifted from the controlled overhead reference and must be restored before any
+new matched row. See `../results/so101_bench_20261019/ft4_close_window_diagnosis_20261109/README.md`.
