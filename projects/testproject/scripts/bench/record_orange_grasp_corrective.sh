@@ -11,13 +11,18 @@ ROBOT_CAL=/home/gaikwad-prakash/.cache/huggingface/lerobot/calibration/robots/so
 LEADER_CAL=/home/gaikwad-prakash/.cache/huggingface/lerobot/calibration/teleoperators/so_leader/my_so101_leader.json
 
 usage() {
-  echo "Usage: $0 --check | --record"
+  echo "Usage: $0 --check | --record | --record-batch N"
   echo "  --check   validate devices, calibration, imports and camera frames; no arm motion"
   echo "  --record  run the same check, then record exactly one teleoperated episode"
+  echo "  --record-batch N  record 2-5 episodes with a 15-second reset between episodes"
 }
 
 MODE=${1:-}
-if [[ "$MODE" != "--check" && "$MODE" != "--record" ]]; then
+BATCH_EPISODES=1
+if [[ "$MODE" == "--record-batch" ]]; then
+  BATCH_EPISODES=${2:-}
+  [[ "$BATCH_EPISODES" =~ ^[2-5]$ ]] || { echo "ERROR: batch size must be 2-5"; usage; exit 2; }
+elif [[ "$MODE" != "--check" && "$MODE" != "--record" ]]; then
   usage
   exit 2
 fi
@@ -114,21 +119,24 @@ ss -ltn | grep -q ":$RERUN_GRPC_PORT " || { echo "ERROR: Rerun server did not st
 LIVE_URL="http://127.0.0.1:$RERUN_WEB_PORT/?url=rerun%2Bhttp%3A%2F%2F127.0.0.1%3A$RERUN_GRPC_PORT%2Fproxy"
 echo "LIVE VIEW: $LIVE_URL"
 
-echo "RECORDING ONE EPISODE. Teleoperate with the leader arm; use Esc to stop the session."
+echo "RECORDING $BATCH_EPISODES EPISODE(S). Teleoperate with the leader arm."
+if (( BATCH_EPISODES > 1 )); then
+  echo "Between episodes, use the 15-second RESET phase to move the orange to the next position."
+fi
 ORANGE_DEMO_LIVE=1 HF_HUB_OFFLINE=1 "$PYTHON" "$SCRIPT_DIR/record_2cam_demos.py" \
   --robot.type=so101_follower --robot.port="$FOLLOWER_PORT" --robot.id=my_so101_follower \
   --robot.cameras="{front: {type: opencv, index_or_path: $FRONT_CAM, width: 640, height: 480, fps: 30}, wrist: {type: opencv, index_or_path: $WRIST_CAM, width: 640, height: 480, fps: 30}}" \
   --teleop.type=so101_leader --teleop.port="$LEADER_PORT" --teleop.id=my_so101_leader \
   --dataset.repo_id="local/$NAME" --dataset.root="$ROOT" \
   --dataset.single_task="$TASK" \
-  --dataset.num_episodes=1 --dataset.episode_time_s=35 --dataset.reset_time_s=3 \
+  --dataset.num_episodes="$BATCH_EPISODES" --dataset.episode_time_s=35 --dataset.reset_time_s=15 \
   --dataset.vcodec=h264 --dataset.push_to_hub=false \
   --display_data=true --display_ip=127.0.0.1 --display_port="$RERUN_GRPC_PORT" \
   "${RESUME_ARGS[@]}"
 
 AFTER=$("$PYTHON" "$SCRIPT_DIR/epcount.py" "$ROOT")
-if (( AFTER != BEFORE + 1 )); then
-  echo "ERROR: expected episode count $((BEFORE + 1)), found $AFTER"
+if (( AFTER != BEFORE + BATCH_EPISODES )); then
+  echo "ERROR: expected episode count $((BEFORE + BATCH_EPISODES)), found $AFTER"
   exit 1
 fi
-echo "RECORDED: $ROOT now contains $AFTER episode(s). Review this episode before accepting it."
+echo "RECORDED: $ROOT now contains $AFTER episode(s). Review the new episode(s) before accepting them."

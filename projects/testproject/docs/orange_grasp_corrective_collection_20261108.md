@@ -96,6 +96,16 @@ Record exactly one new episode after the scene and leader arm are ready:
 projects/testproject/scripts/bench/record_orange_grasp_corrective.sh --record
 ```
 
+Record a small reviewed batch back-to-back:
+
+```bash
+projects/testproject/scripts/bench/record_orange_grasp_corrective.sh --record-batch 3
+```
+
+Batch mode uses the same 35-second episode timer and inserts a 15-second live `RESET` phase. During reset, move the
+arm clear, return the orange from the tray to the next marked position, and have hands clear before the countdown
+ends. Batch mode is limited to five episodes so a recording mistake cannot contaminate a long session.
+
 The script resolves arms by controller serial and cameras by hardware name. It refuses to record when calibration,
 either arm, either camera, or an existing empty/corrupt dataset is missing. It never deletes a dataset.
 
