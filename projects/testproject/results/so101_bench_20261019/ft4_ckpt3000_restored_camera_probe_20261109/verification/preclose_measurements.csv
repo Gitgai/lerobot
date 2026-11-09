@@ -1,0 +1,6 @@
+sample,image_path,expected_eligible,detector_status,correct_for_gate,x,y,radius,saturation,value,detector_reason
+T1,/home/gaikwad-prakash/bench_trace_ft4_ckpt3000_small_orange_restoredcam_20261109_t3/frames/ep01_chunk040_wrist.jpg,0,ineligible,1,360.6,53.4,134.0,132.4,225.2,outside reviewed grasp band
+T2,/home/gaikwad-prakash/bench_trace_ft4_ckpt3000_small_orange_restoredcam_20261109_t2_t5/frames/ep01_chunk032_wrist.jpg,0,unknown,1,,,,,,no confident fruit circle
+T3,/home/gaikwad-prakash/bench_trace_ft4_ckpt3000_small_orange_restoredcam_20261109_t2_t5/frames/ep02_chunk033_wrist.jpg,1,eligible,1,463.8,180.6,84.1,129.2,238.6,inside reviewed grasp band
+T4,/home/gaikwad-prakash/bench_trace_ft4_ckpt3000_small_orange_restoredcam_20261109_t2_t5/frames/ep03_chunk012_wrist.jpg,1,eligible,1,418.2,178.2,120.4,138.9,226.5,inside reviewed grasp band
+T5,/home/gaikwad-prakash/bench_trace_ft4_ckpt3000_small_orange_restoredcam_20261109_t2_t5/frames/ep04_chunk020_wrist.jpg,0,eligible,0,399.0,191.4,155.3,108.6,220.9,inside reviewed grasp band

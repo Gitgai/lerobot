@@ -619,3 +619,11 @@ three of six failures, so it cannot be enabled as a motor gate. The replacement 
 plausible pre-close pose and post-close evidence that the fruit remains between the fingers during a short lift. The
 current front-camera view has also shifted from the controlled overhead reference and must be restored before any
 new matched row. See `../results/so101_bench_20261019/ft4_close_window_diagnosis_20261109/README.md`.
+
+The front camera was subsequently restored and checkpoint 3,000 ran a five-trial fixed-small-orange row. It scored
+**1/5**: three acquisition failures, one grasp-and-carry followed by a release failure, and one complete success. The
+fixed pre-close wrist detector agreed with reviewed outcomes on **4/5** frames. It allowed both real grasps but also
+allowed one centred close that failed to retain the fruit. This evidence preserves the planned design: pre-close
+centring is useful, but the shadow verifier must also require post-close fruit motion during a short lift and verify
+tray retention after release. See
+`../results/so101_bench_20261019/ft4_ckpt3000_restored_camera_probe_20261109/README.md`.

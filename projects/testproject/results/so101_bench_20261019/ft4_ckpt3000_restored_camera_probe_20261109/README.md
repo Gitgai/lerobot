@@ -1,18 +1,51 @@
-# FT4 checkpoint 3,000: restored-camera small-orange probe
+# FT4 checkpoint 3,000: restored-camera small-orange row
 
 Date: 2026-11-09  
-Result: **0/1**  
+Result: **1/5 (20%)**
 Execution: 20 actions per request, 30 Hz, 75-request cap, return to start
 
 The front camera was restored to the controlled overhead view and checked before movement. The tray occupied the
-upper-left of the frame, the arm was upper-centre and the orange was unobstructed below the gripper.
+upper-left of the frame, the arm was upper-centre and the fixed small orange was unobstructed below the gripper.
 
-The policy reached the orange, contacted it with an offset approach and pushed it right. It later closed around the
-orange edge but did not retain it through lift; the gripper reopened and the arm moved away. There was no transport
-or tray release. Mean request latency across 75 requests was 1,140 ms (median 1,181 ms; maximum 1,393 ms).
+| Trial | Result | Acquisition | Delivery | Mean request latency |
+| --- | --- | --- | --- | ---: |
+| T1 | fail | offset contact; close without retained lift | none | 1,140 ms |
+| T2 | fail | passed/closed to the side of the orange | none | 1,131 ms |
+| T3 | success | secure close around chunks 37–38 | released in tray by chunk 47 | 1,177 ms |
+| T4 | fail | secure grasp and carry | orange ended on table immediately in front of tray | 1,186 ms |
+| T5 | fail | centred close without retained lift | none | 1,180 ms |
 
-This probe shows that restoring the camera removes the low/side-view confound but does not by itself fix acquisition.
-Further blind checkpoint trials are paused pending shadow-mode validation of pre-close centring, retained lift and
-tray-release checks.
+The restored camera removed the view mismatch but did not make acquisition repeatable. Three of five trials failed
+before a retained lift. One obtained a real grasp and carry but failed at release, and one completed the task.
 
-Raw trace: `/home/gaikwad-prakash/bench_trace_ft4_ckpt3000_small_orange_restoredcam_20261109_t3`
+## Offline verifier check
+
+The existing fixed wrist-image pre-close detector was applied without retuning to one reviewed frame from each
+trial. A pre-close frame was labelled eligible when the later trace proved a real grasp, even if delivery later
+failed. It allowed both real grasps (T3 and T4), blocked T1 and T2, and incorrectly allowed T5. Agreement was
+**4/5**: positive eligibility **2/2**, failed-acquisition blocking **2/3**.
+
+This result demonstrates why an image-centering check cannot be the only motor gate. T5 looked centred before the
+fingers closed but did not retain the orange. Retrospective post-close evidence separates the cases:
+
+| Trial | Pre-close check | Orange follows short lift | Orange remains in tray | Verified stage |
+| --- | --- | --- | --- | --- |
+| T1 | block | no | n/a | acquisition failure |
+| T2 | block/unknown | no | n/a | acquisition failure |
+| T3 | allow | yes | yes | success |
+| T4 | allow | yes | no | release failure |
+| T5 | allow (false positive) | no | n/a | acquisition failure |
+
+The next implementation should run these checks prospectively in shadow mode: require plausible pre-close geometry,
+then confirm that the orange moves with the fingers during a short lift, and finally confirm that it remains inside
+the tray after release. These results validate the check sequence offline; they do not yet establish a safe live
+action gate.
+
+Artifacts:
+
+- `verification/preclose_labels.csv`: reviewed labels and source frames.
+- `verification/preclose_measurements.csv`: detector decisions and measurements.
+- `verification/annotated/`: detector overlays.
+- `key_frames/`: acquisition, carry and release evidence.
+- Raw T1 trace: `/home/gaikwad-prakash/bench_trace_ft4_ckpt3000_small_orange_restoredcam_20261109_t3`.
+- Raw T2–T5 trace: `/home/gaikwad-prakash/bench_trace_ft4_ckpt3000_small_orange_restoredcam_20261109_t2_t5`.

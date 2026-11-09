@@ -1,0 +1,6 @@
+sample,image_path,expected_eligible
+T1,/home/gaikwad-prakash/bench_trace_ft4_ckpt3000_small_orange_restoredcam_20261109_t3/frames/ep01_chunk040_wrist.jpg,0
+T2,/home/gaikwad-prakash/bench_trace_ft4_ckpt3000_small_orange_restoredcam_20261109_t2_t5/frames/ep01_chunk032_wrist.jpg,0
+T3,/home/gaikwad-prakash/bench_trace_ft4_ckpt3000_small_orange_restoredcam_20261109_t2_t5/frames/ep02_chunk033_wrist.jpg,1
+T4,/home/gaikwad-prakash/bench_trace_ft4_ckpt3000_small_orange_restoredcam_20261109_t2_t5/frames/ep03_chunk012_wrist.jpg,1
+T5,/home/gaikwad-prakash/bench_trace_ft4_ckpt3000_small_orange_restoredcam_20261109_t2_t5/frames/ep04_chunk020_wrist.jpg,0

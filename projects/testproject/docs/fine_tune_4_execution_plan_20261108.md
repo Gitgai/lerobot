@@ -177,16 +177,23 @@ return to the fixed small orange and central marks, then validate the proposed p
 and tray-release checks in shadow mode. Evidence and per-trial labels are in
 `results/so101_bench_20261019/ft4_ckpt3000_large_citrus_lowcam_20261109/`.
 
-### Restored-camera small-orange probe, 2026-11-09
+### Restored-camera small-orange row and offline verification, 2026-11-09
 
 The front camera was returned to the documented overhead geometry and verified before motion: tray upper-left, arm
-upper-centre, table filling the image and the orange unobstructed below the gripper. One checkpoint 3,000 probe then
-ran with the normal 20-action requests and 75-request cap. It scored **0/1**. The approach pushed the orange right,
-the close did not retain it through lift, and the arm moved away without transport.
+upper-centre, table filling the image and the orange unobstructed below the gripper. Five checkpoint 3,000 trials ran
+with the normal 20-action requests and 75-request cap. The row scored **1/5 (20%)**. Three trials failed acquisition,
+one secured and carried the orange but left it on the table immediately in front of the tray, and one completed the
+task. The four-trial extension alone scored **1/4**.
 
-The camera correction removed an experimental confound but did not remove the acquisition failure. More blind trials
-are paused. The next useful gate is the planned shadow-mode grasp verifier: log whether pre-close geometry is eligible,
-whether the fruit follows a short post-close lift and whether release occurs over the tray. Evidence is in
+The existing fixed wrist-image pre-close detector was then applied offline, without retuning, to one reviewed close
+frame per trial. It allowed both genuine grasps and blocked two of the three acquisition failures, for **4/5** total
+agreement. T5 was the decisive false positive: the orange appeared centred before closing but did not remain between
+the fingers during lift. A prospective verifier must therefore combine pre-close geometry with retained-lift evidence;
+the T4 delivery failure separately requires confirmation that the orange remains in the tray after release.
+
+The camera correction removed an experimental confound but did not remove the acquisition failure. Further blind
+repetitions are paused until the three checks can be logged prospectively in shadow mode. Evidence, detector outputs
+and per-trial key frames are in
 `results/so101_bench_20261019/ft4_ckpt3000_restored_camera_probe_20261109/`.
 
 ## Reproducible commands
