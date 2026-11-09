@@ -1,0 +1,14 @@
+{
+  "date": "2026-11-09",
+  "policy": "ft4_checkpoint_3000",
+  "condition": "small_orange_restored_overhead_camera",
+  "valid_trials": 1,
+  "successes": 0,
+  "result": "acquisition_failure",
+  "requests": 75,
+  "latency_ms": {
+    "mean": 1139.8,
+    "median": 1181.0,
+    "maximum": 1393.0
+  }
+}

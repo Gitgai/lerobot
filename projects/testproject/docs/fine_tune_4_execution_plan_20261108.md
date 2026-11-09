@@ -177,6 +177,18 @@ return to the fixed small orange and central marks, then validate the proposed p
 and tray-release checks in shadow mode. Evidence and per-trial labels are in
 `results/so101_bench_20261019/ft4_ckpt3000_large_citrus_lowcam_20261109/`.
 
+### Restored-camera small-orange probe, 2026-11-09
+
+The front camera was returned to the documented overhead geometry and verified before motion: tray upper-left, arm
+upper-centre, table filling the image and the orange unobstructed below the gripper. One checkpoint 3,000 probe then
+ran with the normal 20-action requests and 75-request cap. It scored **0/1**. The approach pushed the orange right,
+the close did not retain it through lift, and the arm moved away without transport.
+
+The camera correction removed an experimental confound but did not remove the acquisition failure. More blind trials
+are paused. The next useful gate is the planned shadow-mode grasp verifier: log whether pre-close geometry is eligible,
+whether the fruit follows a short post-close lift and whether release occurs over the tray. Evidence is in
+`results/so101_bench_20261019/ft4_ckpt3000_restored_camera_probe_20261109/`.
+
 ## Reproducible commands
 
 ```text
