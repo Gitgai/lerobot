@@ -1,14 +1,30 @@
 # Fine-tune 4 execution plan
 
 Date: 2026-11-08
-Status: checkpoint comparison and close-window diagnosis complete; no candidate advances to matched ten
+Status: corrected FT4B derivative prepared and audited; training explicitly paused
 
-Post-run opening audit: the 35 accepted demonstrations remain valid complete-task examples, but every orange episode
-contains a 2.40-6.87 s pre-reach prefix, the deployed and training task strings differ, only 2/30 orange starts match
-all five deployed arm joints within 2 degrees, and the run processed only 0.7901 effective epoch. See
-`results/so101_bench_20261019/ft4_episode_opening_audit_20261110/README.md`. Reuse the accepted episodes in a derived
-dataset with trimmed opening prefixes, the exact deployed task string and explicit phase weighting before considering
-more collection or physical trials.
+Post-run opening audit: the 35 accepted demonstrations remain valid complete-task examples. The original FT4 run
+processed only 0.7901 effective epoch and used a different orange sentence during physical deployment. The user has
+now selected the exact recorded sentence, `pick up the orange and place it on the plate`, for both future training
+and deployment. A separate derivative retains five frames before meaningful expert motion, excludes earlier static
+or human object-placement setup, and repeats the approach-through-lift window once. Original recordings remain
+unchanged. Four representative two-camera openings were visually reviewed and the rebuilt derivative passed its
+alignment audit. No FT4B training has started.
+
+Current derivative:
+
+```text
+local train: /home/gaikwad-prakash/ft4_reweighted_20261110/train54
+local val:   /home/gaikwad-prakash/ft4_reweighted_20261110/val6
+train:       54 derived entries / 42,024 frames
+validation:  6 held-out complete episodes / 5,907 frames
+instruction: pick up the orange and place it on the plate
+```
+
+The 54 training entries comprise 25 complete orange episodes, four complete matchbox episodes and 25 repeated
+orange approach-through-lift windows. They are not 54 separately recorded demonstrations. The visual opening review,
+manifest and audit are under
+`results/so101_bench_20261019/ft4_reweighted_dataset_20261110/`.
 
 ## Objective
 

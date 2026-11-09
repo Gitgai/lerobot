@@ -33,20 +33,21 @@ This matches the frozen policy replay: all 70 replays of seven deployed chunk-1 
 reach, while an identical later T3 transition observation produced a reach in only 5/10 samples. The training labels
 and deployed stochastic behavior are consistent with the same idle-versus-reach ambiguity.
 
-### 2. The demonstrated start state is close overall, but rarely matches the deployed start completely
+### 2. The demonstrated and deployed starts are both functional rest poses
 
 Compared with the deployed start `[-5, -104, 97, 78, -2, 65]`:
 
 - median five-arm-joint MAE: **1.73°**;
 - median largest single-joint error: **5.69°**;
-- all five arm joints within 2°: **2/30 episodes**;
+- all five arm joints within a strict post-hoc 2° threshold: **2/30 episodes**;
 - demonstration start gripper at least 64°: **5/30 episodes**;
 - deployed trials normally start near 65°.
 
-Most of the arm difference is wrist-roll or shoulder-pan variation. This does not make the demonstrations bad, but
-it means the exact deployed state/image has little direct coverage.
+Most of the numerical difference is wrist-roll or shoulder-pan variation. All episodes visibly and functionally
+start at rest. The strict all-five-joints threshold was not a collection requirement and must not be used to reject
+episodes or claim that only two have a valid start pose.
 
-### 3. The correction demonstrations and physical trials use different task strings
+### 3. The correction demonstrations and earlier physical trials used different task strings
 
 - FT4 orange demonstrations: `pick up the orange and place it on the plate`
 - Physical FT4 trials: `Grab oranges and place into plate.`
@@ -54,6 +55,9 @@ it means the exact deployed state/image has little direct coverage.
 PI05 can generalize across paraphrases, so this mismatch is not proven to be the sole cause. However, the new
 centering/recovery supervision was attached to the first string, while deployment requested the second. For a small
 corrective LoRA dataset, this is an avoidable source of transfer uncertainty.
+
+The user selected the original recording sentence for future training and deployment:
+`pick up the orange and place it on the plate`.
 
 ### 4. Training did not complete one full effective pass over the new dataset
 
@@ -82,7 +86,7 @@ training exposure, task-text mismatch and incomplete exact-start coverage make t
 Do not discard or rerecord all 35 episodes. Build a revised derived dataset from them:
 
 1. Trim the stationary opening prefix so the first start-like observations are paired with purposeful reach actions.
-2. Relabel orange episodes with the exact deployed task string.
+2. Preserve the exact recorded orange sentence and use it unchanged during deployment.
 3. Upweight start-to-reach, centring, correction and retained-lift windows while retaining complete episodes for
    transport and release.
 4. Train for multiple effective passes, with checkpoints selected by frozen start-observation replay as well as
