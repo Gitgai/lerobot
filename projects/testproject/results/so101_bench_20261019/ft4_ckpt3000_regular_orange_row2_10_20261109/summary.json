@@ -1,0 +1,107 @@
+{
+  "date": "2026-11-09",
+  "policy": "FT4 checkpoint 3000",
+  "object": "regular orange",
+  "task": "Grab oranges and place into plate.",
+  "camera_geometry": "restored overhead",
+  "valid_trials": 10,
+  "successes": 1,
+  "success_rate": 0.1,
+  "trial_outcomes": [
+    {
+      "trial": 1,
+      "result": "fail",
+      "stage": "acquisition",
+      "detail": "repeated close-beside; no retained lift"
+    },
+    {
+      "trial": 2,
+      "result": "fail",
+      "stage": "acquisition",
+      "detail": "late reach; cap with gripper open"
+    },
+    {
+      "trial": 3,
+      "result": "success",
+      "stage": "complete",
+      "detail": "retained grasp at c49-50; released in tray c59-60"
+    },
+    {
+      "trial": 4,
+      "result": "fail",
+      "stage": "acquisition",
+      "detail": "edge contact and pushing; no retained lift"
+    },
+    {
+      "trial": 5,
+      "result": "fail",
+      "stage": "no_engagement",
+      "detail": "remained near start for full cap"
+    },
+    {
+      "trial": 6,
+      "result": "fail",
+      "stage": "acquisition",
+      "detail": "late reach passed beside orange; no close/retention"
+    },
+    {
+      "trial": 7,
+      "result": "fail",
+      "stage": "no_engagement",
+      "detail": "remained near start for full cap"
+    },
+    {
+      "trial": 8,
+      "result": "fail",
+      "stage": "no_engagement",
+      "detail": "remained near start for full cap"
+    },
+    {
+      "trial": 9,
+      "result": "fail",
+      "stage": "no_engagement",
+      "detail": "remained near start for full cap"
+    },
+    {
+      "trial": 10,
+      "result": "fail",
+      "stage": "acquisition",
+      "detail": "reach began c67; cap before close/grasp"
+    }
+  ],
+  "failure_mode_counts": {
+    "no_engagement": 4,
+    "late_reach_or_no_close": 3,
+    "close_beside_or_edge_contact": 2
+  },
+  "retained_grasps": 1,
+  "tray_releases": 1,
+  "observations": 750,
+  "policy_responses": 750,
+  "dispatched_actions": 15000,
+  "latency_ms": {
+    "mean": 1211.7,
+    "median": 1197.0,
+    "p95": 1281.8,
+    "max": 2885.0
+  },
+  "latency_stage_median_ms": {
+    "front_jpeg": 2.8,
+    "wrist_jpeg": 2.3,
+    "observation_rpc": 773.4,
+    "actions_rpc": 410.0
+  },
+  "excluded_attempt": {
+    "reason": "orange remained in tray after T3",
+    "stopped_at_chunk": 9,
+    "counted": false
+  },
+  "raw_traces": [
+    "/home/gaikwad-prakash/bench_trace_ft4_ckpt3000_regular_orange10_row2f_20261109",
+    "/home/gaikwad-prakash/bench_trace_ft4_ckpt3000_regular_orange10_row2_remaining7_20261109"
+  ],
+  "chunk_logs": [
+    "/home/gaikwad-prakash/bench_ft4_ckpt3000_regular_orange10_row2f_20261109.jsonl",
+    "/home/gaikwad-prakash/bench_ft4_ckpt3000_regular_orange10_row2_remaining7_20261109.jsonl"
+  ]
+}

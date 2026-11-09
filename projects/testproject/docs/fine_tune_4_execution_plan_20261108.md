@@ -230,6 +230,15 @@ the next candidate to preserve T3, T7 and T10 before any further physical gate t
 confirms that FT4 checkpoint 3,000 is not the 90% solution by itself. Full results and key frames are in
 `results/so101_bench_20261019/ft4_shadow_verifier_prospective_20261109/`.
 
+A second controlled regular-orange row then ran for ten valid trials with the verifier disabled and the same
+checkpoint, task string, restored camera, 20-action dispatch, 75-request cap and return-to-start protocol. It scored
+**1/10 (10%)**. T3 was the only success: it retained the orange around c49-50 and released it inside the tray at
+c59-60. The nine failures were four no-engagement trials, three late-reach/no-close trials and two close-beside or
+edge-contact trials. One extra attempt with the orange still in the tray was stopped at c9 and excluded. The row adds
+strong evidence that task initiation and acquisition repeatability remain unresolved; more unchanged blind trials
+will not address either failure mode. Full evidence is in
+`results/so101_bench_20261019/ft4_ckpt3000_regular_orange_row2_10_20261109/`.
+
 ## Reproducible commands
 
 ```text
