@@ -4,6 +4,8 @@ Date: 2026-11-09
 
 Result: **1/10 end-to-end (10%)**
 
+See [DETAILED_ANALYSIS.md](DETAILED_ANALYSIS.md) for the synchronized camera and joint-trace review of every trial.
+
 This row used the regular orange, not the larger green-yellow citrus from the preceding experiment. A fresh overhead
 frame confirmed the empty tray on the left, the arm at its recorded start pose and the orange in the lower-right
 pickup area. The task string was `Grab oranges and place into plate.`. Execution used 20 actions per request at
