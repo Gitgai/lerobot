@@ -177,6 +177,15 @@ return to the fixed small orange and central marks, then validate the proposed p
 and tray-release checks in shadow mode. Evidence and per-trial labels are in
 `results/so101_bench_20261019/ft4_ckpt3000_large_citrus_lowcam_20261109/`.
 
+The same large green-yellow citrus later ran ten back-to-back trials after the front camera was restored. The row
+scored **0/10**. Three trials never made a meaningful reach; seven reached or contacted the fruit but none secured a
+retained lift. There was no transport or tray release. An initial run with an incorrect `apple` instruction was
+stopped and excluded; the counted row used the trained orange instruction. Across the earlier low-camera row and this
+restored-camera row, checkpoint 3,000 is **1/15 (6.7%)** on the large citrus. This is separate from the controlled
+small-orange result and shows that the larger diameter needs its own acquisition demonstrations rather than more blind
+repetitions. Evidence is in
+`results/so101_bench_20261019/ft4_ckpt3000_large_citrus_restored_camera_10_20261109/`.
+
 ### Restored-camera small-orange row and offline verification, 2026-11-09
 
 The front camera was returned to the documented overhead geometry and verified before motion: tray upper-left, arm
