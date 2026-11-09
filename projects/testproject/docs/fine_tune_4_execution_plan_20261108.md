@@ -3,6 +3,13 @@
 Date: 2026-11-08
 Status: checkpoint comparison and close-window diagnosis complete; no candidate advances to matched ten
 
+Post-run opening audit: the 35 accepted demonstrations remain valid complete-task examples, but every orange episode
+contains a 2.40-6.87 s pre-reach prefix, the deployed and training task strings differ, only 2/30 orange starts match
+all five deployed arm joints within 2 degrees, and the run processed only 0.7901 effective epoch. See
+`results/so101_bench_20261019/ft4_episode_opening_audit_20261110/README.md`. Reuse the accepted episodes in a derived
+dataset with trimmed opening prefixes, the exact deployed task string and explicit phase weighting before considering
+more collection or physical trials.
+
 ## Objective
 
 Fine-tune the existing `row3_all169_conservative_010000` policy to improve the weak acquisition phase: centre both
