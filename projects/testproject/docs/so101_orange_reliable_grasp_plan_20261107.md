@@ -637,3 +637,16 @@ Phase D1 prospective trial 1 is complete. The policy never closed during its 75-
 the shadow verifier both labelled acquisition failure. The trace contains all 75 verifier decisions with no stale
 camera frames. This covers the no-close path but provides no new retained-lift or release example, so Phase D1 is
 **1/10** and remains open.
+
+Phase D1 subsequently completed all **10/10** prospective trials. Reviewed task success was **3/10** (T3, T7 and
+T10), with three acquisition failures and four failures after some acquisition. T3 was physically successful before
+a hand removed the orange between c69 and c70; exclude it from the strict hands-clear subset while retaining its real
+c60 release as verifier evidence. The shadow outcome labels agreed with all ten reviewed end-to-end outcomes and no
+camera observation was stale.
+
+The close gate nevertheless fails the D1 acceptance rule. Its two-consecutive-frame pre-close condition reported
+`blocked` for the decisive close in **all three successful trials**. Enabling it would therefore risk removing every
+observed success. Keep it in shadow mode. The next work is offline threshold/timing revision against the frozen
+prospective trace, with T3, T7 and T10 treated as mandatory preserve cases. Do not run another physical gate row until
+that replay passes. Evidence is in
+`../results/so101_bench_20261019/ft4_shadow_verifier_prospective_20261109/README.md`.

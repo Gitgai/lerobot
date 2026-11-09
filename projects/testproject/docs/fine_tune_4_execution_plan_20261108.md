@@ -208,6 +208,19 @@ predictions and 1,500 dispatched actions were captured with zero stale camera fr
 the no-close path only; retained-lift and tray-release branches still require prospective examples. Evidence is in
 `results/so101_bench_20261019/ft4_shadow_verifier_prospective_20261109/`.
 
+Phase D1 is now complete at **10/10 prospective trials**. Trials 2-10 ran back to back with the same checkpoint and
+unchanged dispatch settings. Physical task success was **3/10**: T3, T7 and T10 delivered the orange. T3 had a hand
+remove the orange after its successful c60 release but before the cap, so the strict hands-clear subset is **2/9**.
+The other outcomes were three acquisition failures and four post-acquisition delivery/retention failures. The shadow
+outcome classifier agreed with all ten reviewed task outcomes and both cameras recorded zero stale observations.
+
+This agreement does **not** authorize the motor gate. The proposed two-consecutive-frame pre-close rule would have
+blocked the decisive close in all three successful trials. That directly fails the requirement to preserve successful
+acquisitions. Keep the verifier read-only, revise its pre-close timing on the frozen 750-observation trace and require
+the next candidate to preserve T3, T7 and T10 before any further physical gate test. The current policy's 30% row also
+confirms that FT4 checkpoint 3,000 is not the 90% solution by itself. Full results and key frames are in
+`results/so101_bench_20261019/ft4_shadow_verifier_prospective_20261109/`.
+
 ## Reproducible commands
 
 ```text
