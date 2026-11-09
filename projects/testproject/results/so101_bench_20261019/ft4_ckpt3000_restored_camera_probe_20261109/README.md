@@ -41,11 +41,25 @@ then confirm that the orange moves with the fingers during a short lift, and fin
 the tray after release. These results validate the check sequence offline; they do not yet establish a safe live
 action gate.
 
+## Shadow implementation
+
+The bench client now has `--shadow-grasp-verifier`. When enabled, it records a read-only state machine alongside the
+normal trace and exposes it in the Rerun viewer. It detects close transitions from measured gripper motion, requires
+two plausible wrist observations plus a stable closed aperture and arm motion for retained lift, then checks the
+orange centre against the fixed overhead tray region when the gripper reopens. It has no robot/action method and its
+return value is never consulted by the dispatch loop.
+
+Replay over all five trials produced the reviewed stage verdicts exactly: T1/T2/T5 acquisition failure, T3 success
+and T4 delivery failure. The full stateful verifier averaged **11.79 ms per observation** over the 300-observation
+T2–T5 trace. This is a calibration replay on the same evidence used to build the thresholds, not held-out accuracy.
+The next requirement is a prospective watched row with the verifier enabled and the policy unchanged.
+
 Artifacts:
 
 - `verification/preclose_labels.csv`: reviewed labels and source frames.
 - `verification/preclose_measurements.csv`: detector decisions and measurements.
 - `verification/annotated/`: detector overlays.
+- `verification/shadow_replay_T1.json` and `shadow_replay_T2_T5.json`: complete state-machine replay results.
 - `key_frames/`: acquisition, carry and release evidence.
 - Raw T1 trace: `/home/gaikwad-prakash/bench_trace_ft4_ckpt3000_small_orange_restoredcam_20261109_t3`.
 - Raw T2–T5 trace: `/home/gaikwad-prakash/bench_trace_ft4_ckpt3000_small_orange_restoredcam_20261109_t2_t5`.

@@ -34,6 +34,7 @@ def main():
         rb.Horizontal(rb.Spatial2DView(origin="camera/front", name="Front policy input"),
                       rb.Spatial2DView(origin="camera/wrist", name="Wrist policy input")),
         rb.Tabs(
+            rb.TextDocumentView(origin="verification", name="Shadow grasp verifier"),
             rb.TextDocumentView(origin="prediction", name="Predicted 20-action chunk"),
             rb.TextDocumentView(origin="dispatch", name="Executed actions"),
             rb.TextDocumentView(origin="state", name="Measured joints"),
@@ -85,6 +86,31 @@ def main():
                          "| ep | chunk | step | gripper | clamped |", "|---:|---:|---:|---:|:---:|"]
                 lines += [f"| {x['ep']} | {x['chunk']} | {x['action_index']} | {x['sent'][5]:.2f} | {x['clamped']} |" for x in sends]
                 rr.log("dispatch", rr.TextDocument("\n".join(lines), media_type="text/markdown"))
+            elif kind == "shadow_verifier":
+                attempt = e.get("attempt") or {}
+                lines = [
+                    "# Read-only shadow verifier", "",
+                    f"**Phase:** {e['phase']}",
+                    f"**Transition:** {e.get('transition') or 'none'}", "",
+                    f"Wrist geometry: **{e['wrist']['status']}** — {e['wrist']['reason']}",
+                    f"Two eligible pre-close frames: **{e['preclose_two_consecutive']}**",
+                    f"Measured gripper: **{e['gripper']:.2f}**", "",
+                    f"Attempt: {attempt.get('number', 'none')}",
+                    f"Closed samples: {attempt.get('closed_samples', 0)}",
+                    f"Eligible closed samples: {attempt.get('eligible_closed_samples', 0)}", "",
+                    f"Tray check: **{e['tray']['status']}** — {e['tray']['reason']}", "",
+                    "This display never blocks, changes or creates robot actions.",
+                ]
+                rr.log("verification", rr.TextDocument("\n".join(lines), media_type="text/markdown"))
+            elif kind == "shadow_episode_summary":
+                rr.log("verification", rr.TextDocument(
+                    "# Shadow verifier episode result\n\n"
+                    f"**Verdict: {e['verdict']}**\n\n"
+                    f"Attempts: {e['attempts']}  \n"
+                    f"Retained lift: {e['retained_lift']}  \n"
+                    f"Tray: {e['tray']['status']} — {e['tray']['reason']}\n\n"
+                    "Read-only result; policy and robot commands were unchanged.",
+                    media_type="text/markdown"))
             elif kind == "trace_closed": done = True
 
         phase = "waiting for trace"; ep = "–"; chunk = "–"; latency = "–"

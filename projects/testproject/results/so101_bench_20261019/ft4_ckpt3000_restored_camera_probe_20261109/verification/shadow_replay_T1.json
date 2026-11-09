@@ -1,0 +1,63 @@
+{
+  "trace": "/home/gaikwad-prakash/bench_trace_ft4_ckpt3000_small_orange_restoredcam_20261109_t3",
+  "observations": 75,
+  "final_phase_by_episode": {
+    "1": {
+      "ep": 1,
+      "mode": "shadow_only",
+      "verdict": "acquisition_failure",
+      "attempts": 1,
+      "retained_lift": false,
+      "tray": {
+        "status": "not_checked",
+        "reason": "release not observed"
+      },
+      "active_attempt_at_cap": false
+    }
+  },
+  "transitions": [
+    {
+      "ep": 1,
+      "chunk": 59,
+      "mode": "shadow_only",
+      "wrist": {
+        "status": "unknown",
+        "reason": "no confident fruit circle"
+      },
+      "preclose_two_consecutive": false,
+      "gripper": 25.837,
+      "phase": "evaluating_close",
+      "transition": "close_started",
+      "attempt": {
+        "number": 1,
+        "start_chunk": 59,
+        "preclose": "blocked",
+        "closed_samples": 1,
+        "eligible_closed_samples": 0,
+        "minimum_grip": 25.837299346923828
+      },
+      "tray": {
+        "status": "not_checked",
+        "reason": "release not observed"
+      }
+    },
+    {
+      "ep": 1,
+      "chunk": 67,
+      "mode": "shadow_only",
+      "wrist": {
+        "status": "unknown",
+        "reason": "no confident fruit circle"
+      },
+      "preclose_two_consecutive": false,
+      "gripper": 38.824,
+      "phase": "observing",
+      "transition": "grasp_not_retained",
+      "attempt": null,
+      "tray": {
+        "status": "not_checked",
+        "reason": "release not observed"
+      }
+    }
+  ]
+}

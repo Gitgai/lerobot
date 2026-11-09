@@ -169,6 +169,7 @@ def main():
     ap.add_argument("--episodes", type=int, default=1); ap.add_argument("--max-delta-deg", type=float, default=8.0); ap.add_argument("--max-delta-grip", type=float, default=15.0)
     ap.add_argument("--out", default="bench_log.jsonl"); ap.add_argument("--dry-run", action="store_true", help="read cameras + arm, query the policy, do NOT send actions")
     ap.add_argument("--trace-dir", default="", help="fresh directory for full live-view trace (images, full predictions, sends, timing and status)")
+    ap.add_argument("--shadow-grasp-verifier", action="store_true", help="log read-only pre-close, retained-lift and tray-release checks; never changes actions")
     ap.add_argument("--no-robot", action="store_true", help="dry run without the arm: cameras + network + policy only (state = zeros)")
     ap.add_argument("--auto", action="store_true", help="no prompts: start the episode immediately, record the result as 'unscored' (operator scores it afterwards)")
     ap.add_argument("--home-to", default="", help="six comma-separated joint targets (LeRobot units): move there slowly (1.5 deg/step, 3 grip/step at --fps) and exit; no cameras, no policy")
@@ -188,7 +189,8 @@ def main():
                     actions_per_chunk=a.actions_per_chunk, max_chunks=a.max_chunks,
                     near_actions=a.near_actions,
                     episodes=a.episodes, pause_between=a.pause_between,
-                    return_start=a.return_start, dry_run=a.dry_run, no_robot=a.no_robot)
+                    return_start=a.return_start, dry_run=a.dry_run, no_robot=a.no_robot,
+                    shadow_grasp_verifier=a.shadow_grasp_verifier)
 
     robot = None
     if not a.no_robot:
@@ -242,6 +244,11 @@ def main():
         except Exception as e:
             print(f"[snap] {tag} failed: {e}", flush=True)
     out = open(a.out, "a"); stop = {"flag": False}
+    shadow_verifier = None
+    if a.shadow_grasp_verifier:
+        from shadow_grasp_verifier import ShadowGraspVerifier
+        shadow_verifier = ShadowGraspVerifier()
+        print("[shadow verifier] logging only; robot actions are unchanged", flush=True)
     resetter = None; slot_order = []
     if a.reset_between or a.reset_dry_run:
         import random
@@ -294,6 +301,12 @@ def main():
                 if stop["flag"]: break
                 q = joints_now(); f, w = front.read(), wrist.read()
                 if trace: trace.observation(ep + 1, ci + 1, f, w, q, front, wrist)
+                if shadow_verifier is not None:
+                    shadow = shadow_verifier.update(ep + 1, ci + 1, f, w, q)
+                    if trace: trace.event("shadow_verifier", **shadow)
+                    out.write(json.dumps({"event": "shadow_verifier", **shadow}) + "\n"); out.flush()
+                    if shadow["transition"]:
+                        print(f"[shadow verifier] c{ci+1}: {shadow['transition']} — phase {shadow['phase']}", flush=True)
                 t0 = time.time(); chunk = act(f, w, q, a.task); dt = time.time() - t0; lat.append(dt)
                 if trace: trace.event("action_chunk_received", ep=ep + 1, chunk=ci + 1,
                                       latency_s=dt, latency_stages=act.last_timing, actions=chunk.round(4).tolist())
@@ -317,6 +330,11 @@ def main():
                                           sent=tgt.round(4).tolist(), clamped=bool(np.any(np.abs(tgt-act_vec) > 1e-5)))
                     prev = tgt; time.sleep(1.0 / a.fps)
                 n_chunks += 1
+            if shadow_verifier is not None:
+                shadow_summary = shadow_verifier.episode_summary()
+                if trace: trace.event("shadow_episode_summary", **shadow_summary)
+                out.write(json.dumps({"event": "shadow_episode_summary", **shadow_summary}) + "\n"); out.flush()
+                print(f"[shadow verifier] episode verdict: {shadow_summary['verdict']}", flush=True)
             snap(ep + 1, "after_last_chunk")                                      # the pose the policy left the arm in (the server never sees it)
             res = "d" if a.dry_run else ("unscored" if a.auto else input("result? [s]uccess / [f]ail / [a]bort: ").strip().lower()[:1])
             out.write(json.dumps({"ep": ep + 1, "result": res, "chunks": n_chunks, "wall_s": round(time.time() - t_ep, 1), "latency_median_s": round(float(np.median(lat)), 3) if lat else None, "start_state": q_start.round(1).tolist(), "end_state": joints_now().round(1).tolist(), "task": a.task, "utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}) + "\n"); out.flush()

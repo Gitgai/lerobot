@@ -627,3 +627,8 @@ allowed one centred close that failed to retain the fruit. This evidence preserv
 centring is useful, but the shadow verifier must also require post-close fruit motion during a short lift and verify
 tray retention after release. See
 `../results/so101_bench_20261019/ft4_ckpt3000_restored_camera_probe_20261109/README.md`.
+
+The combined verifier is now implemented as read-only bench-client instrumentation. Replaying the five-trial row
+produced the five reviewed stage labels and took 11.79 ms per observation. This is same-row calibration evidence,
+so Phase D1 remains open: the next row must measure prospective shadow decisions while leaving policy execution
+unchanged.

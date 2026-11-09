@@ -1,0 +1,521 @@
+{
+  "trace": "/home/gaikwad-prakash/bench_trace_ft4_ckpt3000_small_orange_restoredcam_20261109_t2_t5",
+  "observations": 300,
+  "final_phase_by_episode": {
+    "1": {
+      "ep": 1,
+      "mode": "shadow_only",
+      "verdict": "acquisition_failure",
+      "attempts": 3,
+      "retained_lift": false,
+      "tray": {
+        "status": "not_checked",
+        "reason": "release not observed"
+      },
+      "active_attempt_at_cap": false
+    },
+    "2": {
+      "ep": 2,
+      "mode": "shadow_only",
+      "verdict": "success",
+      "attempts": 1,
+      "retained_lift": true,
+      "tray": {
+        "status": "inside",
+        "reason": "orange centre inside fixed tray ROI",
+        "x": 192.0,
+        "y": 130.8
+      },
+      "active_attempt_at_cap": false
+    },
+    "3": {
+      "ep": 3,
+      "mode": "shadow_only",
+      "verdict": "delivery_failure",
+      "attempts": 1,
+      "retained_lift": true,
+      "tray": {
+        "status": "outside",
+        "reason": "orange centre outside fixed tray ROI",
+        "x": 155.4,
+        "y": 228.6
+      },
+      "active_attempt_at_cap": false
+    },
+    "4": {
+      "ep": 4,
+      "mode": "shadow_only",
+      "verdict": "acquisition_failure",
+      "attempts": 4,
+      "retained_lift": false,
+      "tray": {
+        "status": "not_checked",
+        "reason": "release not observed"
+      },
+      "active_attempt_at_cap": true
+    }
+  },
+  "transitions": [
+    {
+      "ep": 1,
+      "chunk": 34,
+      "mode": "shadow_only",
+      "wrist": {
+        "status": "unknown",
+        "reason": "no confident fruit circle"
+      },
+      "preclose_two_consecutive": false,
+      "gripper": 35.543,
+      "phase": "evaluating_close",
+      "transition": "close_started",
+      "attempt": {
+        "number": 1,
+        "start_chunk": 34,
+        "preclose": "blocked",
+        "closed_samples": 0,
+        "eligible_closed_samples": 0,
+        "minimum_grip": 35.543399810791016
+      },
+      "tray": {
+        "status": "not_checked",
+        "reason": "release not observed"
+      }
+    },
+    {
+      "ep": 1,
+      "chunk": 39,
+      "mode": "shadow_only",
+      "wrist": {
+        "status": "unknown",
+        "reason": "no confident fruit circle"
+      },
+      "preclose_two_consecutive": false,
+      "gripper": 45.933,
+      "phase": "observing",
+      "transition": "grasp_not_retained",
+      "attempt": null,
+      "tray": {
+        "status": "not_checked",
+        "reason": "release not observed"
+      }
+    },
+    {
+      "ep": 1,
+      "chunk": 49,
+      "mode": "shadow_only",
+      "wrist": {
+        "status": "unknown",
+        "reason": "no confident fruit circle"
+      },
+      "preclose_two_consecutive": false,
+      "gripper": 34.108,
+      "phase": "evaluating_close",
+      "transition": "close_started",
+      "attempt": {
+        "number": 2,
+        "start_chunk": 49,
+        "preclose": "blocked",
+        "closed_samples": 1,
+        "eligible_closed_samples": 0,
+        "minimum_grip": 34.108001708984375
+      },
+      "tray": {
+        "status": "not_checked",
+        "reason": "release not observed"
+      }
+    },
+    {
+      "ep": 1,
+      "chunk": 50,
+      "mode": "shadow_only",
+      "wrist": {
+        "status": "unknown",
+        "reason": "no confident fruit circle"
+      },
+      "preclose_two_consecutive": false,
+      "gripper": 48.052,
+      "phase": "observing",
+      "transition": "grasp_not_retained",
+      "attempt": null,
+      "tray": {
+        "status": "not_checked",
+        "reason": "release not observed"
+      }
+    },
+    {
+      "ep": 1,
+      "chunk": 58,
+      "mode": "shadow_only",
+      "wrist": {
+        "status": "eligible",
+        "reason": "inside reviewed grasp band",
+        "x": 474.6,
+        "y": 102.6,
+        "radius": 96.0
+      },
+      "preclose_two_consecutive": false,
+      "gripper": 27.683,
+      "phase": "evaluating_close",
+      "transition": "close_started",
+      "attempt": {
+        "number": 3,
+        "start_chunk": 58,
+        "preclose": "blocked",
+        "closed_samples": 1,
+        "eligible_closed_samples": 1,
+        "minimum_grip": 27.68280029296875
+      },
+      "tray": {
+        "status": "not_checked",
+        "reason": "release not observed"
+      }
+    },
+    {
+      "ep": 1,
+      "chunk": 67,
+      "mode": "shadow_only",
+      "wrist": {
+        "status": "unknown",
+        "reason": "no confident fruit circle"
+      },
+      "preclose_two_consecutive": false,
+      "gripper": 52.905,
+      "phase": "observing",
+      "transition": "grasp_not_retained",
+      "attempt": null,
+      "tray": {
+        "status": "not_checked",
+        "reason": "release not observed"
+      }
+    },
+    {
+      "ep": 2,
+      "chunk": 34,
+      "mode": "shadow_only",
+      "wrist": {
+        "status": "eligible",
+        "reason": "inside reviewed grasp band",
+        "x": 450.6,
+        "y": 189.0,
+        "radius": 79.6
+      },
+      "preclose_two_consecutive": true,
+      "gripper": 41.558,
+      "phase": "evaluating_close",
+      "transition": "close_started",
+      "attempt": {
+        "number": 1,
+        "start_chunk": 34,
+        "preclose": "eligible",
+        "closed_samples": 0,
+        "eligible_closed_samples": 0,
+        "minimum_grip": 41.55839920043945
+      },
+      "tray": {
+        "status": "not_checked",
+        "reason": "release not observed"
+      }
+    },
+    {
+      "ep": 2,
+      "chunk": 40,
+      "mode": "shadow_only",
+      "wrist": {
+        "status": "eligible",
+        "reason": "inside reviewed grasp band",
+        "x": 360.6,
+        "y": 273.0,
+        "radius": 140.5
+      },
+      "preclose_two_consecutive": false,
+      "gripper": 22.01,
+      "phase": "retained_lift",
+      "transition": "retained_lift",
+      "attempt": {
+        "number": 1,
+        "start_chunk": 34,
+        "preclose": "eligible",
+        "closed_samples": 4,
+        "eligible_closed_samples": 2,
+        "minimum_grip": 22.009599685668945
+      },
+      "tray": {
+        "status": "not_checked",
+        "reason": "release not observed"
+      }
+    },
+    {
+      "ep": 2,
+      "chunk": 48,
+      "mode": "shadow_only",
+      "wrist": {
+        "status": "eligible",
+        "reason": "inside reviewed grasp band",
+        "x": 400.2,
+        "y": 209.4,
+        "radius": 112.6
+      },
+      "preclose_two_consecutive": false,
+      "gripper": 46.685,
+      "phase": "released",
+      "transition": "release_verified",
+      "attempt": {
+        "number": 1,
+        "start_chunk": 34,
+        "preclose": "eligible",
+        "closed_samples": 4,
+        "eligible_closed_samples": 2,
+        "minimum_grip": 22.009599685668945
+      },
+      "tray": {
+        "status": "inside",
+        "reason": "orange centre inside fixed tray ROI",
+        "x": 192.0,
+        "y": 130.8
+      }
+    },
+    {
+      "ep": 3,
+      "chunk": 13,
+      "mode": "shadow_only",
+      "wrist": {
+        "status": "eligible",
+        "reason": "inside reviewed grasp band",
+        "x": 395.4,
+        "y": 148.2,
+        "radius": 118.2
+      },
+      "preclose_two_consecutive": true,
+      "gripper": 40.602,
+      "phase": "evaluating_close",
+      "transition": "close_started",
+      "attempt": {
+        "number": 1,
+        "start_chunk": 13,
+        "preclose": "eligible",
+        "closed_samples": 0,
+        "eligible_closed_samples": 0,
+        "minimum_grip": 40.60150146484375
+      },
+      "tray": {
+        "status": "not_checked",
+        "reason": "release not observed"
+      }
+    },
+    {
+      "ep": 3,
+      "chunk": 22,
+      "mode": "shadow_only",
+      "wrist": {
+        "status": "eligible",
+        "reason": "inside reviewed grasp band",
+        "x": 313.8,
+        "y": 159.0,
+        "radius": 110.8
+      },
+      "preclose_two_consecutive": false,
+      "gripper": 14.696,
+      "phase": "retained_lift",
+      "transition": "retained_lift",
+      "attempt": {
+        "number": 1,
+        "start_chunk": 13,
+        "preclose": "eligible",
+        "closed_samples": 3,
+        "eligible_closed_samples": 2,
+        "minimum_grip": 14.42240047454834
+      },
+      "tray": {
+        "status": "not_checked",
+        "reason": "release not observed"
+      }
+    },
+    {
+      "ep": 3,
+      "chunk": 32,
+      "mode": "shadow_only",
+      "wrist": {
+        "status": "unknown",
+        "reason": "no confident fruit circle"
+      },
+      "preclose_two_consecutive": false,
+      "gripper": 35.749,
+      "phase": "release_failed_or_unknown",
+      "transition": "release_failed_or_unknown",
+      "attempt": {
+        "number": 1,
+        "start_chunk": 13,
+        "preclose": "eligible",
+        "closed_samples": 3,
+        "eligible_closed_samples": 2,
+        "minimum_grip": 14.42240047454834
+      },
+      "tray": {
+        "status": "outside",
+        "reason": "orange centre outside fixed tray ROI",
+        "x": 155.4,
+        "y": 228.6
+      }
+    },
+    {
+      "ep": 4,
+      "chunk": 23,
+      "mode": "shadow_only",
+      "wrist": {
+        "status": "unknown",
+        "reason": "no confident fruit circle"
+      },
+      "preclose_two_consecutive": false,
+      "gripper": 25.017,
+      "phase": "evaluating_close",
+      "transition": "close_started",
+      "attempt": {
+        "number": 1,
+        "start_chunk": 23,
+        "preclose": "blocked",
+        "closed_samples": 1,
+        "eligible_closed_samples": 0,
+        "minimum_grip": 25.017099380493164
+      },
+      "tray": {
+        "status": "not_checked",
+        "reason": "release not observed"
+      }
+    },
+    {
+      "ep": 4,
+      "chunk": 25,
+      "mode": "shadow_only",
+      "wrist": {
+        "status": "eligible",
+        "reason": "inside reviewed grasp band",
+        "x": 420.6,
+        "y": 127.8,
+        "radius": 72.1
+      },
+      "preclose_two_consecutive": false,
+      "gripper": 39.508,
+      "phase": "observing",
+      "transition": "grasp_not_retained",
+      "attempt": null,
+      "tray": {
+        "status": "not_checked",
+        "reason": "release not observed"
+      }
+    },
+    {
+      "ep": 4,
+      "chunk": 32,
+      "mode": "shadow_only",
+      "wrist": {
+        "status": "unknown",
+        "reason": "no confident fruit circle"
+      },
+      "preclose_two_consecutive": true,
+      "gripper": 28.23,
+      "phase": "evaluating_close",
+      "transition": "close_started",
+      "attempt": {
+        "number": 2,
+        "start_chunk": 32,
+        "preclose": "eligible",
+        "closed_samples": 1,
+        "eligible_closed_samples": 0,
+        "minimum_grip": 28.229700088500977
+      },
+      "tray": {
+        "status": "not_checked",
+        "reason": "release not observed"
+      }
+    },
+    {
+      "ep": 4,
+      "chunk": 34,
+      "mode": "shadow_only",
+      "wrist": {
+        "status": "eligible",
+        "reason": "inside reviewed grasp band",
+        "x": 394.2,
+        "y": 136.2,
+        "radius": 98.8
+      },
+      "preclose_two_consecutive": false,
+      "gripper": 39.713,
+      "phase": "observing",
+      "transition": "grasp_not_retained",
+      "attempt": null,
+      "tray": {
+        "status": "not_checked",
+        "reason": "release not observed"
+      }
+    },
+    {
+      "ep": 4,
+      "chunk": 62,
+      "mode": "shadow_only",
+      "wrist": {
+        "status": "unknown",
+        "reason": "no confident fruit circle"
+      },
+      "preclose_two_consecutive": false,
+      "gripper": 30.485,
+      "phase": "evaluating_close",
+      "transition": "close_started",
+      "attempt": {
+        "number": 3,
+        "start_chunk": 62,
+        "preclose": "blocked",
+        "closed_samples": 1,
+        "eligible_closed_samples": 0,
+        "minimum_grip": 30.485300064086914
+      },
+      "tray": {
+        "status": "not_checked",
+        "reason": "release not observed"
+      }
+    },
+    {
+      "ep": 4,
+      "chunk": 66,
+      "mode": "shadow_only",
+      "wrist": {
+        "status": "unknown",
+        "reason": "no confident fruit circle"
+      },
+      "preclose_two_consecutive": false,
+      "gripper": 40.875,
+      "phase": "observing",
+      "transition": "grasp_not_retained",
+      "attempt": null,
+      "tray": {
+        "status": "not_checked",
+        "reason": "release not observed"
+      }
+    },
+    {
+      "ep": 4,
+      "chunk": 73,
+      "mode": "shadow_only",
+      "wrist": {
+        "status": "unknown",
+        "reason": "no confident fruit circle"
+      },
+      "preclose_two_consecutive": false,
+      "gripper": 21.463,
+      "phase": "evaluating_close",
+      "transition": "close_started",
+      "attempt": {
+        "number": 4,
+        "start_chunk": 73,
+        "preclose": "blocked",
+        "closed_samples": 1,
+        "eligible_closed_samples": 0,
+        "minimum_grip": 21.46269989013672
+      },
+      "tray": {
+        "status": "not_checked",
+        "reason": "release not observed"
+      }
+    }
+  ]
+}

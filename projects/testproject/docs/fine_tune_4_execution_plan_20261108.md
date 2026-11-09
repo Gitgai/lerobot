@@ -196,6 +196,12 @@ repetitions are paused until the three checks can be logged prospectively in sha
 and per-trial key frames are in
 `results/so101_bench_20261019/ft4_ckpt3000_restored_camera_probe_20261109/`.
 
+The read-only state machine is now implemented behind `bench_client.py --shadow-grasp-verifier` and displayed by
+the existing Rerun watcher. It never changes the predicted or dispatched action. Calibration replay classified all
+five saved trials at the correct stage and averaged 11.79 ms per observation. Because its thresholds were developed
+from these same trials, this is an implementation check rather than independent validation. Run the next controlled
+row prospectively with shadow logging enabled; do not enable a motor gate from the replay result.
+
 ## Reproducible commands
 
 ```text
