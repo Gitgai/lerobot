@@ -1,29 +1,23 @@
 {
-  "generated_at": "2026-11-10T01:38:02+05:30",
-  "root": "/home/gaikwad-prakash/ft4_reweighted_20261110",
+  "generated_at": "2026-11-10T02:11:54+05:30",
+  "root": "/home/gaikwad-prakash/ft4_corrected_20261110",
   "subsets": {
-    "train54": {
-      "episodes": 54,
-      "frames": 42024,
+    "train29": {
+      "episodes": 29,
+      "frames": 28494,
       "tasks": [
         "pick up the orange and place it on the plate",
         "pick up the matchbox and place it on the plate"
       ],
-      "paired_camera_samples": 162,
+      "paired_camera_samples": 87,
       "motion_onset_frames": {
         "min": 5,
         "median": 5.0,
         "max": 6,
-        "within_first_10": 54,
-        "total": 54
+        "within_first_10": 29,
+        "total": 29
       },
       "composition": [
-        {
-          "kind": "grasp_focus_2x",
-          "source_kind": "orange",
-          "count": 25,
-          "sum": 13530
-        },
         {
           "kind": "trimmed_full",
           "source_kind": "matchbox",

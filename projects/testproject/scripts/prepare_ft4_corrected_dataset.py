@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Build a trimmed and phase-weighted FT4 LeRobot v3 dataset view.
+"""Build a corrected FT4 LeRobot v3 dataset view.
 
 Source demonstrations and MP4 files remain immutable. The derivative rewrites
-aligned parquet rows and episode timestamps, relabels orange examples with the
-deployed instruction, and adds one approach-to-lift focus window for each
-training orange. Those focus frames receive 2x exposure without a custom
-sampler in the remote PI05 environment.
+aligned parquet rows and episode timestamps, keeps the exact recorded task
+instruction, and removes only reviewed static or human setup before movement.
+It deliberately avoids truncated focus episodes because PI05 trains on a
+50-action target and does not mask episode-end padding.
 """
 
 from __future__ import annotations
@@ -25,13 +25,14 @@ import pandas as pd
 FPS = 30
 ORANGE_SOURCE = Path("/home/gaikwad-prakash/orange_grasp_corrective_ft4_20261108")
 MATCHBOX_SOURCE = Path("/home/gaikwad-prakash/matchbox_pickplace_ft4_20261108")
-OUTPUT_ROOT = Path("/home/gaikwad-prakash/ft4_reweighted_20261110")
+OUTPUT_ROOT = Path("/home/gaikwad-prakash/ft4_corrected_20261110")
 DEPLOYED_ORANGE_TASK = "pick up the orange and place it on the plate"
 MATCHBOX_TASK = "pick up the matchbox and place it on the plate"
 ORANGE_ACCEPTED = list(range(1, 31))
 ORANGE_VALIDATION = [1, 7, 18, 24, 30]
 MATCHBOX_VALIDATION = [4]
 OPENING_LEAD_FRAMES = 5
+# Diagnostic boundary only; no truncated focus episodes are materialized.
 FOCUS_POST_CLOSE_FRAMES = 120
 CAMERAS = ("observation.images.front", "observation.images.wrist")
 
@@ -206,10 +207,6 @@ def build_specs(plan: dict, bundles: dict[str, dict]) -> tuple[list[OutputEpisod
         length = len(source_episode(bundles["orange"], episode)[0])
         validation.append(OutputEpisode("orange", episode, plan["orange"][episode]["trim_start"], length,
                                         DEPLOYED_ORANGE_TASK, 0, "trimmed_full"))
-    for episode in orange_train:
-        train.append(OutputEpisode("orange", episode, plan["orange"][episode]["trim_start"],
-                                   plan["orange"][episode]["focus_stop_exclusive"],
-                                   DEPLOYED_ORANGE_TASK, 0, "grasp_focus_2x"))
     return train, validation
 
 
@@ -331,7 +328,7 @@ def main() -> int:
         type=Path,
         default=Path(
             "projects/testproject/results/so101_bench_20261019/"
-            "ft4_reweighted_dataset_20261110/manifest.json"
+            "ft4_corrected_dataset_20261110/manifest.json"
         ),
     )
     args = parser.parse_args()
@@ -359,15 +356,15 @@ def main() -> int:
         matchbox_offset = video_file_count(ORANGE_SOURCE, CAMERAS[0])
         materialized = {
             "train": materialize_view(
-                OUTPUT_ROOT / "train54",
-                "local/ft4_trimmed_phaseweighted_train54_20261110",
+                OUTPUT_ROOT / "train29",
+                "local/ft4_corrected_train29_20261110",
                 train_specs,
                 bundles,
                 matchbox_offset,
             ),
             "validation": materialize_view(
                 OUTPUT_ROOT / "val6",
-                "local/ft4_trimmed_val6_20261110",
+                "local/ft4_corrected_val6_20261110",
                 validation_specs,
                 bundles,
                 matchbox_offset,
@@ -392,9 +389,12 @@ def main() -> int:
             ),
         },
         "phase_weighting": {
-            "method": "one additional derived focus episode per training orange",
-            "effective_weight": "2x from retained start through four seconds after strongest close; 1x elsewhere",
-            "focus_post_close_frames": FOCUS_POST_CLOSE_FRAMES,
+            "method": "none",
+            "reason": (
+                "Truncated focus episodes were rejected before training because PI05's 50-action "
+                "loss does not mask episode-end padding. All retained entries end at the natural "
+                "recorded episode boundary."
+            ),
         },
         "split": {
             "orange_train_source_episodes": [

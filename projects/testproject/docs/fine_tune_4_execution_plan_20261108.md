@@ -1,30 +1,33 @@
 # Fine-tune 4 execution plan
 
 Date: 2026-11-08
-Status: corrected FT4B derivative prepared and audited; training explicitly paused
+Status: corrected FT4B 29-entry derivative prepared and audited; training explicitly paused
 
 Post-run opening audit: the 35 accepted demonstrations remain valid complete-task examples. The original FT4 run
 processed only 0.7901 effective epoch and used a different orange sentence during physical deployment. The user has
 now selected the exact recorded sentence, `pick up the orange and place it on the plate`, for both future training
-and deployment. A separate derivative retains five frames before meaningful expert motion, excludes earlier static
-or human object-placement setup, and repeats the approach-through-lift window once. Original recordings remain
-unchanged. Four representative two-camera openings were visually reviewed and the rebuilt derivative passed its
-alignment audit. No FT4B training has started.
+and deployment. A separate derivative retains five frames before meaningful expert motion and excludes earlier
+static or human object-placement setup. Original recordings remain unchanged. All 35 front-camera openings and
+representative wrist openings were visually reviewed. A proposed 25-window phase duplication was rejected before
+training after the deployed loader showed unmasked 50-action padding at shortened episode boundaries. The corrected
+derivative contains only naturally ending entries and passes its alignment audit. No FT4B training has started.
 
 Current derivative:
 
 ```text
-local train: /home/gaikwad-prakash/ft4_reweighted_20261110/train54
-local val:   /home/gaikwad-prakash/ft4_reweighted_20261110/val6
-train:       54 derived entries / 42,024 frames
+local train: /home/gaikwad-prakash/ft4_corrected_20261110/train29
+local val:   /home/gaikwad-prakash/ft4_corrected_20261110/val6
+train:       29 complete retained entries / 28,494 frames
 validation:  6 held-out complete episodes / 5,907 frames
 instruction: pick up the orange and place it on the plate
+proposed steps: 9,000 (not started)
+effective batch: 8
+planned exposure: 72,000 samples / 28,494 frames = 2.53 effective passes
 ```
 
-The 54 training entries comprise 25 complete orange episodes, four complete matchbox episodes and 25 repeated
-orange approach-through-lift windows. They are not 54 separately recorded demonstrations. The visual opening review,
-manifest and audit are under
-`results/so101_bench_20261019/ft4_reweighted_dataset_20261110/`.
+The 29 training entries comprise 25 orange episodes and four matchbox episodes. The visual opening review, manifest,
+loader-padding correction and audit are under
+`results/so101_bench_20261019/ft4_corrected_dataset_20261110/`.
 
 ## Objective
 

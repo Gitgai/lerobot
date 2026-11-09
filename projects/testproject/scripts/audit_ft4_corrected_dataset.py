@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify the FT4 trimmed/phase-weighted derivative against its sources."""
+"""Verify the corrected FT4 derivative against its sources."""
 
 from __future__ import annotations
 
@@ -13,16 +13,16 @@ import pandas as pd
 from lerobot.datasets.lerobot_dataset import LeRobotDataset
 
 
-ROOT = Path("/home/gaikwad-prakash/ft4_reweighted_20261110")
+ROOT = Path("/home/gaikwad-prakash/ft4_corrected_20261110")
 OUTPUT = Path(
     "projects/testproject/results/so101_bench_20261019/"
-    "ft4_reweighted_dataset_20261110/audit.json"
+    "ft4_corrected_dataset_20261110/audit.json"
 )
 SOURCES = {
     "orange": Path("/home/gaikwad-prakash/orange_grasp_corrective_ft4_20261108"),
     "matchbox": Path("/home/gaikwad-prakash/matchbox_pickplace_ft4_20261108"),
 }
-EXPECTED = {"train54": (54, 42024), "val6": (6, 5907)}
+EXPECTED = {"train29": (29, 28494), "val6": (6, 5907)}
 
 
 def dataset(name: str, root: Path) -> LeRobotDataset:
@@ -130,7 +130,7 @@ def main() -> int:
             "errors": subset_errors,
         }
 
-    overlap = split_sources["train54"] & split_sources["val6"]
+    overlap = split_sources["train29"] & split_sources["val6"]
     if overlap:
         errors.append(f"source episode leakage between train and validation: {sorted(overlap)}")
     report["source_episode_overlap"] = sorted(overlap)

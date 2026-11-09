@@ -1,5 +1,5 @@
 {
-  "created_at": "2026-11-10T01:37:59+05:30",
+  "created_at": "2026-11-10T02:05:25+05:30",
   "status": "materialized",
   "sources_preserved": true,
   "source_roots": {
@@ -17,9 +17,8 @@
     "reason": "Keep five start-pose frames immediately before meaningful expert motion; exclude earlier static or human object-placement setup frames."
   },
   "phase_weighting": {
-    "method": "one additional derived focus episode per training orange",
-    "effective_weight": "2x from retained start through four seconds after strongest close; 1x elsewhere",
-    "focus_post_close_frames": 120
+    "method": "none",
+    "reason": "Truncated focus episodes were rejected before training because PI05's 50-action loss does not mask episode-end padding. All retained entries end at the natural recorded episode boundary."
   },
   "split": {
     "orange_train_source_episodes": [
@@ -482,10 +481,10 @@
   "image_stats_note": "Camera pixels are exact source MP4 frames. Image summary stats are inherited; PI05 training uses use_imagenet_stats=false.",
   "materialized": {
     "train": {
-      "root": "/home/gaikwad-prakash/ft4_reweighted_20261110/train54",
-      "repo_id": "local/ft4_trimmed_phaseweighted_train54_20261110",
-      "episodes": 54,
-      "frames": 42024,
+      "root": "/home/gaikwad-prakash/ft4_corrected_20261110/train29",
+      "repo_id": "local/ft4_corrected_train29_20261110",
+      "episodes": 29,
+      "frames": 28494,
       "mapping": [
         {
           "output_episode": 0,
@@ -776,262 +775,12 @@
           "frames": 958,
           "kind": "trimmed_full",
           "task": "pick up the matchbox and place it on the plate"
-        },
-        {
-          "output_episode": 29,
-          "source_kind": "orange",
-          "source_episode": 2,
-          "source_start_frame": 52,
-          "source_stop_exclusive": 466,
-          "frames": 414,
-          "kind": "grasp_focus_2x",
-          "task": "pick up the orange and place it on the plate"
-        },
-        {
-          "output_episode": 30,
-          "source_kind": "orange",
-          "source_episode": 3,
-          "source_start_frame": 57,
-          "source_stop_exclusive": 500,
-          "frames": 443,
-          "kind": "grasp_focus_2x",
-          "task": "pick up the orange and place it on the plate"
-        },
-        {
-          "output_episode": 31,
-          "source_kind": "orange",
-          "source_episode": 4,
-          "source_start_frame": 61,
-          "source_stop_exclusive": 460,
-          "frames": 399,
-          "kind": "grasp_focus_2x",
-          "task": "pick up the orange and place it on the plate"
-        },
-        {
-          "output_episode": 32,
-          "source_kind": "orange",
-          "source_episode": 5,
-          "source_start_frame": 77,
-          "source_stop_exclusive": 592,
-          "frames": 515,
-          "kind": "grasp_focus_2x",
-          "task": "pick up the orange and place it on the plate"
-        },
-        {
-          "output_episode": 33,
-          "source_kind": "orange",
-          "source_episode": 6,
-          "source_start_frame": 127,
-          "source_stop_exclusive": 533,
-          "frames": 406,
-          "kind": "grasp_focus_2x",
-          "task": "pick up the orange and place it on the plate"
-        },
-        {
-          "output_episode": 34,
-          "source_kind": "orange",
-          "source_episode": 8,
-          "source_start_frame": 55,
-          "source_stop_exclusive": 711,
-          "frames": 656,
-          "kind": "grasp_focus_2x",
-          "task": "pick up the orange and place it on the plate"
-        },
-        {
-          "output_episode": 35,
-          "source_kind": "orange",
-          "source_episode": 9,
-          "source_start_frame": 57,
-          "source_stop_exclusive": 461,
-          "frames": 404,
-          "kind": "grasp_focus_2x",
-          "task": "pick up the orange and place it on the plate"
-        },
-        {
-          "output_episode": 36,
-          "source_kind": "orange",
-          "source_episode": 10,
-          "source_start_frame": 55,
-          "source_stop_exclusive": 538,
-          "frames": 483,
-          "kind": "grasp_focus_2x",
-          "task": "pick up the orange and place it on the plate"
-        },
-        {
-          "output_episode": 37,
-          "source_kind": "orange",
-          "source_episode": 11,
-          "source_start_frame": 77,
-          "source_stop_exclusive": 523,
-          "frames": 446,
-          "kind": "grasp_focus_2x",
-          "task": "pick up the orange and place it on the plate"
-        },
-        {
-          "output_episode": 38,
-          "source_kind": "orange",
-          "source_episode": 12,
-          "source_start_frame": 60,
-          "source_stop_exclusive": 551,
-          "frames": 491,
-          "kind": "grasp_focus_2x",
-          "task": "pick up the orange and place it on the plate"
-        },
-        {
-          "output_episode": 39,
-          "source_kind": "orange",
-          "source_episode": 13,
-          "source_start_frame": 63,
-          "source_stop_exclusive": 444,
-          "frames": 381,
-          "kind": "grasp_focus_2x",
-          "task": "pick up the orange and place it on the plate"
-        },
-        {
-          "output_episode": 40,
-          "source_kind": "orange",
-          "source_episode": 14,
-          "source_start_frame": 61,
-          "source_stop_exclusive": 542,
-          "frames": 481,
-          "kind": "grasp_focus_2x",
-          "task": "pick up the orange and place it on the plate"
-        },
-        {
-          "output_episode": 41,
-          "source_kind": "orange",
-          "source_episode": 15,
-          "source_start_frame": 83,
-          "source_stop_exclusive": 491,
-          "frames": 408,
-          "kind": "grasp_focus_2x",
-          "task": "pick up the orange and place it on the plate"
-        },
-        {
-          "output_episode": 42,
-          "source_kind": "orange",
-          "source_episode": 16,
-          "source_start_frame": 58,
-          "source_stop_exclusive": 728,
-          "frames": 670,
-          "kind": "grasp_focus_2x",
-          "task": "pick up the orange and place it on the plate"
-        },
-        {
-          "output_episode": 43,
-          "source_kind": "orange",
-          "source_episode": 17,
-          "source_start_frame": 57,
-          "source_stop_exclusive": 685,
-          "frames": 628,
-          "kind": "grasp_focus_2x",
-          "task": "pick up the orange and place it on the plate"
-        },
-        {
-          "output_episode": 44,
-          "source_kind": "orange",
-          "source_episode": 19,
-          "source_start_frame": 65,
-          "source_stop_exclusive": 681,
-          "frames": 616,
-          "kind": "grasp_focus_2x",
-          "task": "pick up the orange and place it on the plate"
-        },
-        {
-          "output_episode": 45,
-          "source_kind": "orange",
-          "source_episode": 20,
-          "source_start_frame": 57,
-          "source_stop_exclusive": 779,
-          "frames": 722,
-          "kind": "grasp_focus_2x",
-          "task": "pick up the orange and place it on the plate"
-        },
-        {
-          "output_episode": 46,
-          "source_kind": "orange",
-          "source_episode": 21,
-          "source_start_frame": 68,
-          "source_stop_exclusive": 768,
-          "frames": 700,
-          "kind": "grasp_focus_2x",
-          "task": "pick up the orange and place it on the plate"
-        },
-        {
-          "output_episode": 47,
-          "source_kind": "orange",
-          "source_episode": 22,
-          "source_start_frame": 51,
-          "source_stop_exclusive": 787,
-          "frames": 736,
-          "kind": "grasp_focus_2x",
-          "task": "pick up the orange and place it on the plate"
-        },
-        {
-          "output_episode": 48,
-          "source_kind": "orange",
-          "source_episode": 23,
-          "source_start_frame": 52,
-          "source_stop_exclusive": 502,
-          "frames": 450,
-          "kind": "grasp_focus_2x",
-          "task": "pick up the orange and place it on the plate"
-        },
-        {
-          "output_episode": 49,
-          "source_kind": "orange",
-          "source_episode": 25,
-          "source_start_frame": 62,
-          "source_stop_exclusive": 669,
-          "frames": 607,
-          "kind": "grasp_focus_2x",
-          "task": "pick up the orange and place it on the plate"
-        },
-        {
-          "output_episode": 50,
-          "source_kind": "orange",
-          "source_episode": 26,
-          "source_start_frame": 57,
-          "source_stop_exclusive": 841,
-          "frames": 784,
-          "kind": "grasp_focus_2x",
-          "task": "pick up the orange and place it on the plate"
-        },
-        {
-          "output_episode": 51,
-          "source_kind": "orange",
-          "source_episode": 27,
-          "source_start_frame": 63,
-          "source_stop_exclusive": 460,
-          "frames": 397,
-          "kind": "grasp_focus_2x",
-          "task": "pick up the orange and place it on the plate"
-        },
-        {
-          "output_episode": 52,
-          "source_kind": "orange",
-          "source_episode": 28,
-          "source_start_frame": 61,
-          "source_stop_exclusive": 760,
-          "frames": 699,
-          "kind": "grasp_focus_2x",
-          "task": "pick up the orange and place it on the plate"
-        },
-        {
-          "output_episode": 53,
-          "source_kind": "orange",
-          "source_episode": 29,
-          "source_start_frame": 73,
-          "source_stop_exclusive": 667,
-          "frames": 594,
-          "kind": "grasp_focus_2x",
-          "task": "pick up the orange and place it on the plate"
         }
       ]
     },
     "validation": {
-      "root": "/home/gaikwad-prakash/ft4_reweighted_20261110/val6",
-      "repo_id": "local/ft4_trimmed_val6_20261110",
+      "root": "/home/gaikwad-prakash/ft4_corrected_20261110/val6",
+      "repo_id": "local/ft4_corrected_val6_20261110",
       "episodes": 6,
       "frames": 5907,
       "mapping": [

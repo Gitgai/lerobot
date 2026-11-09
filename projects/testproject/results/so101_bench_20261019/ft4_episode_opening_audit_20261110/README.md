@@ -87,8 +87,9 @@ Do not discard or rerecord all 35 episodes. Build a revised derived dataset from
 
 1. Trim the stationary opening prefix so the first start-like observations are paired with purposeful reach actions.
 2. Preserve the exact recorded orange sentence and use it unchanged during deployment.
-3. Upweight start-to-reach, centring, correction and retained-lift windows while retaining complete episodes for
-   transport and release.
+3. Do not create truncated phase-window episodes with the deployed PI05 trainer: its 50-action loss does not mask
+   episode-end padding. Use complete naturally ending episodes unless a padding-aware sampler or loss is implemented
+   and separately validated.
 4. Train for multiple effective passes, with checkpoints selected by frozen start-observation replay as well as
    held-out action error.
 5. Require high immediate-reach frequency on the saved deployment starts before another physical trial.
