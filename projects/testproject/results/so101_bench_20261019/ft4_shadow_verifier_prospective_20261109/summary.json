@@ -1,0 +1,19 @@
+{
+  "date": "2026-11-09",
+  "policy": "ft4_checkpoint_3000",
+  "condition": "small_orange_restored_overhead_camera_shadow_verifier",
+  "prospective_trial": 1,
+  "physical_result": "acquisition_failure",
+  "shadow_verdict": "acquisition_failure",
+  "agreement": true,
+  "close_attempts": 0,
+  "retained_lift": false,
+  "tray_check": "not_checked",
+  "chunks": 75,
+  "observations": 75,
+  "predictions": 75,
+  "actions_dispatched": 1500,
+  "camera_stale": {"front": 0, "wrist": 0},
+  "latency_ms": {"mean": 1169.5, "median": 1177.1, "maximum": 1213.9},
+  "phase_d_progress": "1/10"
+}

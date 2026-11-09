@@ -632,3 +632,8 @@ The combined verifier is now implemented as read-only bench-client instrumentati
 produced the five reviewed stage labels and took 11.79 ms per observation. This is same-row calibration evidence,
 so Phase D1 remains open: the next row must measure prospective shadow decisions while leaving policy execution
 unchanged.
+
+Phase D1 prospective trial 1 is complete. The policy never closed during its 75-request search; physical review and
+the shadow verifier both labelled acquisition failure. The trace contains all 75 verifier decisions with no stale
+camera frames. This covers the no-close path but provides no new retained-lift or release example, so Phase D1 is
+**1/10** and remains open.

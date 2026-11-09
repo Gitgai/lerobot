@@ -202,6 +202,12 @@ five saved trials at the correct stage and averaged 11.79 ms per observation. Be
 from these same trials, this is an implementation check rather than independent validation. Run the next controlled
 row prospectively with shadow logging enabled; do not enable a motor gate from the replay result.
 
+Prospective Phase D trial 1 then ran for the full 75-request cap. The policy searched with the gripper open and never
+issued a close, so both reviewed outcome and shadow verdict were acquisition failure. All 75 verifier records, 75
+predictions and 1,500 dispatched actions were captured with zero stale camera frames. This validates integration and
+the no-close path only; retained-lift and tray-release branches still require prospective examples. Evidence is in
+`results/so101_bench_20261019/ft4_shadow_verifier_prospective_20261109/`.
+
 ## Reproducible commands
 
 ```text
