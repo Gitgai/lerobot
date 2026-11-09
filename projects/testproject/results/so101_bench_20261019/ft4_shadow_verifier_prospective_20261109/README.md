@@ -1,6 +1,6 @@
 # FT4 checkpoint 3,000: prospective shadow-verifier trial
 
-Date: 2026-11-09  
+Date: 2026-11-09
 Result: **0/1; acquisition failure**
 
 This was the first new trial recorded after implementing the read-only three-stage verifier. The policy and dispatch
@@ -20,5 +20,6 @@ This trial validates prospective integration and the no-close path. It does not 
 branches because the policy never closed. Phase D1 therefore stands at **1/10 prospective trials**, with more watched
 stage coverage required before any motor gate can be considered.
 
-Raw trace: `/home/gaikwad-prakash/bench_trace_ft4_ckpt3000_shadow_prospective_20261109_t1`  
+Raw trace: `/home/gaikwad-prakash/bench_trace_ft4_ckpt3000_shadow_prospective_20261109_t1`
+
 Chunk log: `/home/gaikwad-prakash/bench_ft4_ckpt3000_shadow_prospective_20261109_t1.jsonl`
