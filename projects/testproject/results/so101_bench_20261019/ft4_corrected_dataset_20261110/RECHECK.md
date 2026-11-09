@@ -1,7 +1,7 @@
 # FT4B derivative recheck
 
 Date: 2026-11-10
-Status: corrected dataset passes; training not started
+Status: corrected dataset passes; 20-step smoke passed; full training not started
 
 ## What was rechecked
 
@@ -47,7 +47,21 @@ during acquisition, lift or transport.
 
 `pick up the orange and place it on the plate`
 
+## Smoke result
+
+The corrected training dataset completed a 20-step smoke on AI90 GPU 0 using batch 4 with two-step gradient
+accumulation, an effective batch of 8. It processed 160 samples, or 0.0056 of one dataset pass. Checkpoint `000020`
+was written successfully. Saved model, adapter and optimizer states contained zero non-finite tensors, and 656 of
+666 LoRA-B tensors were nonzero after optimization. No OOM or decode failure occurred. The logging interval was 25
+steps, so this 20-step run emitted no scalar loss line; the finite checkpoint and updated adapter tensors are the
+recorded smoke evidence.
+
+Remote output: `/home/kiran/lerobot_assets/training/ft4b_corrected_smoke20_20261110_02`.
+
+The planned 9,000-step run would process 72,000 samples, equivalent to 2.53 effective passes over the 28,494-frame
+training derivative. That full run has not started.
+
 ## Result
 
-The corrected derivative passed its alignment, split and deployed-loader audits with zero errors. No smoke test or
-full training is authorized or running.
+The corrected derivative passed its alignment, split, deployed-loader and pipeline-smoke checks with zero errors.
+No full training is running. Qwen was restored after the smoke and passed its local health check.

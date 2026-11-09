@@ -1,7 +1,7 @@
 # Fine-tune 4 execution plan
 
 Date: 2026-11-08
-Status: corrected FT4B 29-entry derivative prepared and audited; training explicitly paused
+Status: corrected FT4B 29-entry derivative audited; 20-step smoke passed; full training paused
 
 Post-run opening audit: the 35 accepted demonstrations remain valid complete-task examples. The original FT4 run
 processed only 0.7901 effective epoch and used a different orange sentence during physical deployment. The user has
@@ -10,7 +10,8 @@ and deployment. A separate derivative retains five frames before meaningful expe
 static or human object-placement setup. Original recordings remain unchanged. All 35 front-camera openings and
 representative wrist openings were visually reviewed. A proposed 25-window phase duplication was rejected before
 training after the deployed loader showed unmasked 50-action padding at shortened episode boundaries. The corrected
-derivative contains only naturally ending entries and passes its alignment audit. No FT4B training has started.
+derivative contains only naturally ending entries and passes its alignment audit. Only the 20-step pipeline smoke has
+run; the 9,000-step FT4B training run has not started.
 
 Current derivative:
 
@@ -23,6 +24,7 @@ instruction: pick up the orange and place it on the plate
 proposed steps: 9,000 (not started)
 effective batch: 8
 planned exposure: 72,000 samples / 28,494 frames = 2.53 effective passes
+smoke exposure:   160 samples / 28,494 frames = 0.0056 effective pass
 ```
 
 The 29 training entries comprise 25 orange episodes and four matchbox episodes. The visual opening review, manifest,
@@ -62,10 +64,10 @@ The automated audit passed all 35 accepted episodes. It checked:
 
 The first derived merge exposed a LeRobot codec mismatch: sliced files could be AV1 while their metadata still said
 H.264. That copy was discarded. The preparation script now normalizes every derived clip to H.264 before merging.
-The corrected datasets contain exactly 30,376 training frames and 6,284 validation frames in each camera stream.
+The corrected datasets contain exactly 28,494 training frames and 5,907 validation frames in each camera stream.
 Merged video files are capped at 30 MB so random frame access during training remains practical.
 
-## Dataset locations
+## Earlier FT4 dataset locations
 
 ```text
 local train: /home/gaikwad-prakash/ft4_datasets_20261108/train29
@@ -75,7 +77,7 @@ local val:   /home/gaikwad-prakash/ft4_datasets_20261108/val6
 The exact source audit, split, file hashes and training provenance are stored under
 `results/so101_bench_20261019/ft4_dataset_20261108/`.
 
-## Training configuration
+## Earlier FT4 training configuration
 
 The run continues from the frozen fine-tune 3 checkpoint with a fresh LoRA adapter:
 
@@ -97,18 +99,41 @@ The six validation episodes are never included in training.
 ## Execution gates
 
 1. Stage the train/validation datasets, configuration, audit and manifest on AI90.
-2. Load the training dataset and run a 20-step smoke test. Require finite loss, correct camera keys, correct task
-   strings, checkpoint writing and no decoding failure.
-3. Start the 3,000-step run only after the smoke test passes.
-4. Rank checkpoints 1,000, 2,000 and 3,000 using the six held-out episodes. This selected checkpoint 2,000 as the
-   first physical candidate. Validation only rejects broken or clearly weaker candidates; it cannot prove robot
-   success.
-5. Evaluate the selected candidates on the robot through watched 3, matched 10, development 50 and blind 100-trial
+2. Load the training dataset and run a 20-step smoke test. Require finite saved state, updated adapter tensors,
+   correct camera keys, correct task strings, checkpoint writing and no decoding failure.
+3. Start the corrected 9,000-step run only after the smoke test passes and the user authorizes full training. Save
+   checkpoints at 3,000, 6,000 and 9,000 steps.
+4. Rank checkpoints 3,000, 6,000 and 9,000 using the six held-out episodes. Validation only rejects broken or clearly
+   weaker candidates; it cannot prove robot success.
+5. Evaluate selected candidates on the robot through watched 3, matched 10, development 50 and blind 100-trial
    gates. The development target is at least 45/50; the release target is at least 90/100.
 6. Use the measured failure distribution to decide whether more demonstrations are needed. Resume auto-reset work
    only after acquisition is stable.
 
 ## Execution record
+
+### Corrected FT4B smoke, 2026-11-10
+
+The corrected 29-entry dataset completed a 20-step smoke on AI90 GPU 0 with batch 4 and two-step gradient
+accumulation (effective batch 8). It processed 160 samples, equal to 0.0056 of one 28,494-frame dataset pass. This is
+only a pipeline test and is too little exposure to improve the policy.
+
+The run loaded 29 episodes and 28,494 frames, wrote checkpoint `000020`, and ended normally without an OOM, decode
+error or non-finite tensor. The saved model, adapter and optimizer contained zero non-finite tensors; 656 of 666
+LoRA-B tensors were nonzero, confirming that optimizer updates occurred. The 20-step run did not print a scalar loss
+because its logging interval was 25 steps. Therefore its pass evidence is successful completion, finite saved state,
+updated adapter tensors and a valid checkpoint rather than a logged loss value.
+
+```text
+remote output: /home/kiran/lerobot_assets/training/ft4b_corrected_smoke20_20261110_02
+remote log:    /tmp/ft4b_corrected_smoke20_20261110_02.log
+full run:      not started
+planned full exposure: 9,000 steps x effective batch 8 / 28,494 frames = 2.53 passes
+```
+
+Qwen was restored after the smoke and passed its local health check. No FT4B training process remains running.
+
+### Earlier FT4 run, 2026-11-08
 
 The AI90 package passed remote hash verification and loaded through the deployed PyAV data path. A first batch-8
 smoke attempt reached the forward pass but exceeded the RTX 5090's 31.36 GiB capacity. The tested configuration used
