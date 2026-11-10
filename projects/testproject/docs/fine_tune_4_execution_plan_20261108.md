@@ -1,7 +1,7 @@
 # Fine-tune 4 execution plan
 
 Date: 2026-11-08
-Status: corrected FT4B 29-entry derivative audited; 20-step smoke passed; full training paused
+Status: corrected FT4B training completed at 9,000 steps; checkpoint comparison pending
 
 Post-run opening audit: the 35 accepted demonstrations remain valid complete-task examples. The original FT4 run
 processed only 0.7901 effective epoch and used a different orange sentence during physical deployment. The user has
@@ -10,8 +10,8 @@ and deployment. A separate derivative retains five frames before meaningful expe
 static or human object-placement setup. Original recordings remain unchanged. All 35 front-camera openings and
 representative wrist openings were visually reviewed. A proposed 25-window phase duplication was rejected before
 training after the deployed loader showed unmasked 50-action padding at shortened episode boundaries. The corrected
-derivative contains only naturally ending entries and passes its alignment audit. Only the 20-step pipeline smoke has
-run; the 9,000-step FT4B training run has not started.
+derivative contains only naturally ending entries and passes its alignment audit. The 20-step pipeline smoke and the
+full 9,000-step FT4B run completed successfully.
 
 Current derivative:
 
@@ -21,7 +21,7 @@ local val:   /home/gaikwad-prakash/ft4_corrected_20261110/val6
 train:       29 complete retained entries / 28,494 frames
 validation:  6 held-out complete episodes / 5,907 frames
 instruction: pick up the orange and place it on the plate
-proposed steps: 9,000 (not started)
+completed steps: 9,000
 effective batch: 8
 planned exposure: 72,000 samples / 28,494 frames = 2.53 effective passes
 smoke exposure:   160 samples / 28,494 frames = 0.0056 effective pass
@@ -131,7 +131,24 @@ full run:      not started
 planned full exposure: 9,000 steps x effective batch 8 / 28,494 frames = 2.53 passes
 ```
 
-Qwen was restored after the smoke and passed its local health check. No FT4B training process remains running.
+Qwen was restored after the smoke and passed its local health check.
+
+### Corrected FT4B full run, 2026-11-10
+
+The 9,000-step run completed normally on AI90 GPU 0. It processed 72,000 samples, equal to 2.53 effective passes over
+the 28,494-frame training derivative. Checkpoints `003000`, `006000` and `009000` were written. The final logged
+metric was loss 0.007, gradient norm 0.081 and learning rate 1.0e-6. The final training state records step 9,000,
+and the full model, LoRA adapter, optimizer, scheduler and RNG state files are present. No OOM, traceback or decode
+failure was recorded.
+
+```text
+remote output: /home/kiran/lerobot_assets/training/ft4b_orange_corrected_20261110
+remote log:    /tmp/ft4b_orange_corrected_20261110.log
+checkpoints:   003000, 006000, 009000
+```
+
+Qwen was restored after training and returned `{"status":"ok"}`. The next gate is offline comparison of the three
+checkpoints on the six held-out validation episodes; no robot trial should select a checkpoint before that check.
 
 ### Earlier FT4 run, 2026-11-08
 

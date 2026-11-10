@@ -1,7 +1,7 @@
 # FT4B derivative recheck
 
 Date: 2026-11-10
-Status: corrected dataset passes; 20-step smoke passed; full training not started
+Status: corrected dataset and smoke pass; 9,000-step training completed
 
 ## What was rechecked
 
@@ -58,10 +58,11 @@ recorded smoke evidence.
 
 Remote output: `/home/kiran/lerobot_assets/training/ft4b_corrected_smoke20_20261110_02`.
 
-The planned 9,000-step run would process 72,000 samples, equivalent to 2.53 effective passes over the 28,494-frame
-training derivative. That full run has not started.
+The 9,000-step run processed 72,000 samples, equivalent to 2.53 effective passes over the 28,494-frame training
+derivative. It completed normally with checkpoints at 3,000, 6,000 and 9,000 steps. Final logged loss was 0.007 and
+the final training state records step 9,000.
 
 ## Result
 
 The corrected derivative passed its alignment, split, deployed-loader and pipeline-smoke checks with zero errors.
-No full training is running. Qwen was restored after the smoke and passed its local health check.
+Full training completed without an OOM, traceback or decode failure. Qwen was restored and passed its health check.
