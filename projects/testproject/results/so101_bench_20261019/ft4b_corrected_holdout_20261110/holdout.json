@@ -1,0 +1,168 @@
+{
+  "dataset": "/home/kiran/lerobot_assets/datasets/ft4_corrected_20261110/val6",
+  "episodes": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "stride": 60,
+  "horizon": 10,
+  "ranking_by_mae": [
+    "ckpt9000",
+    "ckpt6000",
+    "ckpt3000"
+  ],
+  "results": {
+    "ckpt3000": {
+      "checkpoint": "/home/kiran/lerobot_assets/training/ft4b_orange_corrected_20261110/checkpoints/003000/pretrained_model",
+      "probes": 101,
+      "mae_per_joint": {
+        "shoulder_pan": 3.270900011062622,
+        "shoulder_lift": 4.8018999099731445,
+        "elbow_flex": 3.847599983215332,
+        "wrist_flex": 4.6946001052856445,
+        "wrist_roll": 1.2021000385284424,
+        "gripper": 1.710800051689148
+      },
+      "mae_arm_joints_mean": 3.5634,
+      "mae_gripper": 1.7108,
+      "mae_all": 3.2546,
+      "gripper_open_close_agreement_at_step10": 1.0,
+      "by_task": {
+        "pick up the matchbox and place it on the plate": {
+          "probes": 17,
+          "mae_per_joint": {
+            "shoulder_pan": 2.2808001041412354,
+            "shoulder_lift": 3.4437999725341797,
+            "elbow_flex": 3.1500000953674316,
+            "wrist_flex": 7.608099937438965,
+            "wrist_roll": 1.4889999628067017,
+            "gripper": 1.4730000495910645
+          },
+          "mae_arm_joints_mean": 3.5943,
+          "mae_gripper": 1.473,
+          "mae_all": 3.2408,
+          "gripper_open_close_agreement_at_step10": 1.0
+        },
+        "pick up the orange and place it on the plate": {
+          "probes": 84,
+          "mae_per_joint": {
+            "shoulder_pan": 3.4711999893188477,
+            "shoulder_lift": 5.076700210571289,
+            "elbow_flex": 3.988800048828125,
+            "wrist_flex": 4.104899883270264,
+            "wrist_roll": 1.1440000534057617,
+            "gripper": 1.7589000463485718
+          },
+          "mae_arm_joints_mean": 3.5571,
+          "mae_gripper": 1.7589,
+          "mae_all": 3.2574,
+          "gripper_open_close_agreement_at_step10": 1.0
+        }
+      },
+      "seconds": 8.98
+    },
+    "ckpt6000": {
+      "checkpoint": "/home/kiran/lerobot_assets/training/ft4b_orange_corrected_20261110/checkpoints/006000/pretrained_model",
+      "probes": 101,
+      "mae_per_joint": {
+        "shoulder_pan": 3.1194000244140625,
+        "shoulder_lift": 4.811999797821045,
+        "elbow_flex": 3.8678998947143555,
+        "wrist_flex": 4.5696001052856445,
+        "wrist_roll": 1.163100004196167,
+        "gripper": 1.6420999765396118
+      },
+      "mae_arm_joints_mean": 3.5064,
+      "mae_gripper": 1.6421,
+      "mae_all": 3.1957,
+      "gripper_open_close_agreement_at_step10": 1.0,
+      "by_task": {
+        "pick up the matchbox and place it on the plate": {
+          "probes": 17,
+          "mae_per_joint": {
+            "shoulder_pan": 2.240799903869629,
+            "shoulder_lift": 3.528700113296509,
+            "elbow_flex": 3.0824999809265137,
+            "wrist_flex": 7.820899963378906,
+            "wrist_roll": 1.6607999801635742,
+            "gripper": 1.4108999967575073
+          },
+          "mae_arm_joints_mean": 3.6667,
+          "mae_gripper": 1.4109,
+          "mae_all": 3.2908,
+          "gripper_open_close_agreement_at_step10": 1.0
+        },
+        "pick up the orange and place it on the plate": {
+          "probes": 84,
+          "mae_per_joint": {
+            "shoulder_pan": 3.2971999645233154,
+            "shoulder_lift": 5.071700096130371,
+            "elbow_flex": 4.026800155639648,
+            "wrist_flex": 3.911600112915039,
+            "wrist_roll": 1.062399983406067,
+            "gripper": 1.6888999938964844
+          },
+          "mae_arm_joints_mean": 3.4739,
+          "mae_gripper": 1.6889,
+          "mae_all": 3.1764,
+          "gripper_open_close_agreement_at_step10": 1.0
+        }
+      },
+      "seconds": 8.72
+    },
+    "ckpt9000": {
+      "checkpoint": "/home/kiran/lerobot_assets/training/ft4b_orange_corrected_20261110/checkpoints/009000/pretrained_model",
+      "probes": 101,
+      "mae_per_joint": {
+        "shoulder_pan": 3.08270001411438,
+        "shoulder_lift": 4.796000003814697,
+        "elbow_flex": 3.9870998859405518,
+        "wrist_flex": 4.534200191497803,
+        "wrist_roll": 1.0968999862670898,
+        "gripper": 1.6279000043869019
+      },
+      "mae_arm_joints_mean": 3.4994,
+      "mae_gripper": 1.6279,
+      "mae_all": 3.1875,
+      "gripper_open_close_agreement_at_step10": 1.0,
+      "by_task": {
+        "pick up the matchbox and place it on the plate": {
+          "probes": 17,
+          "mae_per_joint": {
+            "shoulder_pan": 2.225100040435791,
+            "shoulder_lift": 3.2880001068115234,
+            "elbow_flex": 3.2588000297546387,
+            "wrist_flex": 7.674200057983398,
+            "wrist_roll": 1.562399983406067,
+            "gripper": 1.430299997329712
+          },
+          "mae_arm_joints_mean": 3.6017,
+          "mae_gripper": 1.4303,
+          "mae_all": 3.2398,
+          "gripper_open_close_agreement_at_step10": 1.0
+        },
+        "pick up the orange and place it on the plate": {
+          "probes": 84,
+          "mae_per_joint": {
+            "shoulder_pan": 3.2562999725341797,
+            "shoulder_lift": 5.101200103759766,
+            "elbow_flex": 4.134500026702881,
+            "wrist_flex": 3.8987998962402344,
+            "wrist_roll": 1.0026999711990356,
+            "gripper": 1.6678999662399292
+          },
+          "mae_arm_joints_mean": 3.4787,
+          "mae_gripper": 1.6679,
+          "mae_all": 3.1769,
+          "gripper_open_close_agreement_at_step10": 1.0
+        }
+      },
+      "seconds": 8.65
+    }
+  },
+  "caution": "Offline action imitation is a candidate-screening metric; robot success must be measured physically."
+}

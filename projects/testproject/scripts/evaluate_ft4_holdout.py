@@ -32,15 +32,18 @@ def load_data(root: Path) -> pd.DataFrame:
     return data
 
 
-def decode_selected(path: Path, selected: set[int]) -> dict[int, np.ndarray]:
+def decode_selected(paths: list[Path], selected: set[int]) -> dict[int, np.ndarray]:
     output: dict[int, np.ndarray] = {}
-    with av.open(str(path)) as container:
-        for index, frame in enumerate(container.decode(video=0)):
-            if index in selected:
-                output[index] = frame.to_ndarray(format="rgb24")
+    global_index = 0
+    for path in paths:
+        with av.open(str(path)) as container:
+            for frame in container.decode(video=0):
+                if global_index in selected:
+                    output[global_index] = frame.to_ndarray(format="rgb24")
+                global_index += 1
     missing = selected - output.keys()
     if missing:
-        raise RuntimeError(f"Video {path} is missing selected frames: {sorted(missing)[:10]}")
+        raise RuntimeError(f"Camera videos are missing selected frames: {sorted(missing)[:10]}")
     return output
 
 
@@ -96,10 +99,12 @@ def main() -> int:
             probes.append((int(episode), index, task))
 
     selected = {index for _, index, _ in probes}
-    front_path = next((args.dataset / "videos/observation.images.front").glob("**/*.mp4"))
-    wrist_path = next((args.dataset / "videos/observation.images.wrist").glob("**/*.mp4"))
-    front = decode_selected(front_path, selected)
-    wrist = decode_selected(wrist_path, selected)
+    front_paths = sorted((args.dataset / "videos/observation.images.front").glob("**/*.mp4"))
+    wrist_paths = sorted((args.dataset / "videos/observation.images.wrist").glob("**/*.mp4"))
+    if not front_paths or not wrist_paths:
+        raise RuntimeError("Validation dataset is missing front or wrist videos")
+    front = decode_selected(front_paths, selected)
+    wrist = decode_selected(wrist_paths, selected)
     print(f"Loaded {len(probes)} probes from {data.episode_index.nunique()} held-out episodes", flush=True)
 
     results = {}
