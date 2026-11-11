@@ -166,6 +166,25 @@ The next gate is an offline camera-space and action-trace comparison between the
 demonstrations. Additional blind trials are paused until that comparison distinguishes deployed geometry mismatch,
 placement-coverage mismatch and learned targeting bias.
 
+### FT4B watched-gate offline diagnosis, 2026-11-11
+
+The offline comparison found that the watched gate did not reproduce the demonstration geometry. All 25 orange
+training starts placed the fruit centre in a tight front-image range of x=474.6–487.8 and y=329.4–352.2 pixels. The
+three gate starts were left of that range; trials 2 and 3 were also farther forward in the image. More decisively, all
+demonstrations started with wrist roll between −13.67° and −1.19° (median −7.34°), while the gate return pose used
++12.09° to +12.26°. The wrist camera and physical finger orientation therefore began roughly 19.5° from the learned
+median. The front-camera landmarks also changed relative to the saved demonstration view.
+
+A read-only replay of 12 saved gate observations through checkpoints 6,000 and 9,000 found only 0.448° mean action
+MAE between them with identical seeds. Checkpoint 9,000 remained slightly closer to the recorded gate chunks. There is
+no evidence that switching to checkpoint 6,000 would correct the systematic offset.
+
+The next physical gate keeps checkpoint 9,000 but restores the demonstrated median arm pose, matches both camera views
+to the saved reference montages, and places the fruit inside the demonstrated image region. Run exactly three watched
+trials. Advance to ten only if at least two acquire and retain the orange. If that matched gate still fails, collect
+corrective demonstrations from the standardized pose and train FT4C. Full measurements are in
+`results/so101_bench_20261019/ft4b_gate_offline_diagnostic_20261111/`.
+
 ### Earlier FT4 run, 2026-11-08
 
 The AI90 package passed remote hash verification and loaded through the deployed PyAV data path. A first batch-8

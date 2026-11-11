@@ -1,0 +1,1061 @@
+{
+  "method": "HSV orange segmentation in the fixed front-camera image; normalized Euclidean centre distance is an image-space coverage measure, not a world-coordinate calibration.",
+  "demonstrations_detected": 25,
+  "demonstrations_total": 25,
+  "demo_x_norm_range": [
+    0.74156,
+    0.76219
+  ],
+  "demo_y_norm_range": [
+    0.68625,
+    0.73375
+  ],
+  "gate_x_norm_range": [
+    0.71344,
+    0.72094
+  ],
+  "gate_y_norm_range": [
+    0.64375,
+    0.71625
+  ],
+  "nearest": [
+    {
+      "trial": 1,
+      "gate_orange": {
+        "x_px": 460.2,
+        "y_px": 343.8,
+        "radius_px": 39.44,
+        "bbox": [
+          421,
+          304,
+          79,
+          79
+        ],
+        "x_norm": 0.71906,
+        "y_norm": 0.71625,
+        "method": "hough_circle"
+      },
+      "nearest_demonstrations": [
+        {
+          "source_episode": 17,
+          "output_episode": 14,
+          "normalized_distance": 0.02372,
+          "orange": {
+            "x_px": 474.6,
+            "y_px": 340.2,
+            "radius_px": 44.48,
+            "bbox": [
+              430,
+              296,
+              89,
+              89
+            ],
+            "x_norm": 0.74156,
+            "y_norm": 0.70875,
+            "method": "hough_circle"
+          }
+        },
+        {
+          "source_episode": 14,
+          "output_episode": 11,
+          "normalized_distance": 0.02824,
+          "orange": {
+            "x_px": 478.2,
+            "y_px": 342.6,
+            "radius_px": 44.48,
+            "bbox": [
+              434,
+              298,
+              89,
+              89
+            ],
+            "x_norm": 0.74719,
+            "y_norm": 0.71375,
+            "method": "hough_circle"
+          }
+        },
+        {
+          "source_episode": 10,
+          "output_episode": 7,
+          "normalized_distance": 0.02857,
+          "orange": {
+            "x_px": 478.2,
+            "y_px": 341.4,
+            "radius_px": 45.68,
+            "bbox": [
+              433,
+              296,
+              91,
+              91
+            ],
+            "x_norm": 0.74719,
+            "y_norm": 0.71125,
+            "method": "hough_circle"
+          }
+        },
+        {
+          "source_episode": 5,
+          "output_episode": 3,
+          "normalized_distance": 0.02907,
+          "orange": {
+            "x_px": 477.0,
+            "y_px": 349.8,
+            "radius_px": 43.4,
+            "bbox": [
+              434,
+              306,
+              87,
+              87
+            ],
+            "x_norm": 0.74531,
+            "y_norm": 0.72875,
+            "method": "hough_circle"
+          }
+        },
+        {
+          "source_episode": 4,
+          "output_episode": 2,
+          "normalized_distance": 0.02911,
+          "orange": {
+            "x_px": 478.2,
+            "y_px": 347.4,
+            "radius_px": 46.16,
+            "bbox": [
+              432,
+              301,
+              92,
+              92
+            ],
+            "x_norm": 0.74719,
+            "y_norm": 0.72375,
+            "method": "hough_circle"
+          }
+        }
+      ]
+    },
+    {
+      "trial": 2,
+      "gate_orange": {
+        "x_px": 456.6,
+        "y_px": 309.0,
+        "radius_px": 38.0,
+        "bbox": [
+          419,
+          271,
+          76,
+          76
+        ],
+        "x_norm": 0.71344,
+        "y_norm": 0.64375,
+        "method": "hough_circle"
+      },
+      "nearest_demonstrations": [
+        {
+          "source_episode": 27,
+          "output_episode": 22,
+          "normalized_distance": 0.05427,
+          "orange": {
+            "x_px": 478.2,
+            "y_px": 329.4,
+            "radius_px": 49.04,
+            "bbox": [
+              429,
+              280,
+              98,
+              98
+            ],
+            "x_norm": 0.74719,
+            "y_norm": 0.68625,
+            "method": "hough_circle"
+          }
+        },
+        {
+          "source_episode": 13,
+          "output_episode": 10,
+          "normalized_distance": 0.05929,
+          "orange": {
+            "x_px": 477.0,
+            "y_px": 333.0,
+            "radius_px": 45.8,
+            "bbox": [
+              431,
+              287,
+              92,
+              92
+            ],
+            "x_norm": 0.74531,
+            "y_norm": 0.69375,
+            "method": "hough_circle"
+          }
+        },
+        {
+          "source_episode": 29,
+          "output_episode": 24,
+          "normalized_distance": 0.06232,
+          "orange": {
+            "x_px": 484.2,
+            "y_px": 330.6,
+            "radius_px": 41.72,
+            "bbox": [
+              442,
+              289,
+              83,
+              83
+            ],
+            "x_norm": 0.75656,
+            "y_norm": 0.68875,
+            "method": "hough_circle"
+          }
+        },
+        {
+          "source_episode": 21,
+          "output_episode": 17,
+          "normalized_distance": 0.0625,
+          "orange": {
+            "x_px": 480.6,
+            "y_px": 333.0,
+            "radius_px": 45.68,
+            "bbox": [
+              435,
+              287,
+              91,
+              91
+            ],
+            "x_norm": 0.75094,
+            "y_norm": 0.69375,
+            "method": "hough_circle"
+          }
+        },
+        {
+          "source_episode": 26,
+          "output_episode": 21,
+          "normalized_distance": 0.06543,
+          "orange": {
+            "x_px": 485.4,
+            "y_px": 331.8,
+            "radius_px": 46.04,
+            "bbox": [
+              439,
+              286,
+              92,
+              92
+            ],
+            "x_norm": 0.75844,
+            "y_norm": 0.69125,
+            "method": "hough_circle"
+          }
+        }
+      ]
+    },
+    {
+      "trial": 3,
+      "gate_orange": {
+        "x_px": 461.4,
+        "y_px": 317.4,
+        "radius_px": 39.92,
+        "bbox": [
+          421,
+          277,
+          80,
+          80
+        ],
+        "x_norm": 0.72094,
+        "y_norm": 0.66125,
+        "method": "hough_circle"
+      },
+      "nearest_demonstrations": [
+        {
+          "source_episode": 27,
+          "output_episode": 22,
+          "normalized_distance": 0.03625,
+          "orange": {
+            "x_px": 478.2,
+            "y_px": 329.4,
+            "radius_px": 49.04,
+            "bbox": [
+              429,
+              280,
+              98,
+              98
+            ],
+            "x_norm": 0.74719,
+            "y_norm": 0.68625,
+            "method": "hough_circle"
+          }
+        },
+        {
+          "source_episode": 13,
+          "output_episode": 10,
+          "normalized_distance": 0.04062,
+          "orange": {
+            "x_px": 477.0,
+            "y_px": 333.0,
+            "radius_px": 45.8,
+            "bbox": [
+              431,
+              287,
+              92,
+              92
+            ],
+            "x_norm": 0.74531,
+            "y_norm": 0.69375,
+            "method": "hough_circle"
+          }
+        },
+        {
+          "source_episode": 21,
+          "output_episode": 17,
+          "normalized_distance": 0.04423,
+          "orange": {
+            "x_px": 480.6,
+            "y_px": 333.0,
+            "radius_px": 45.68,
+            "bbox": [
+              435,
+              287,
+              91,
+              91
+            ],
+            "x_norm": 0.75094,
+            "y_norm": 0.69375,
+            "method": "hough_circle"
+          }
+        },
+        {
+          "source_episode": 29,
+          "output_episode": 24,
+          "normalized_distance": 0.045,
+          "orange": {
+            "x_px": 484.2,
+            "y_px": 330.6,
+            "radius_px": 41.72,
+            "bbox": [
+              442,
+              289,
+              83,
+              83
+            ],
+            "x_norm": 0.75656,
+            "y_norm": 0.68875,
+            "method": "hough_circle"
+          }
+        },
+        {
+          "source_episode": 26,
+          "output_episode": 21,
+          "normalized_distance": 0.04802,
+          "orange": {
+            "x_px": 485.4,
+            "y_px": 331.8,
+            "radius_px": 46.04,
+            "bbox": [
+              439,
+              286,
+              92,
+              92
+            ],
+            "x_norm": 0.75844,
+            "y_norm": 0.69125,
+            "method": "hough_circle"
+          }
+        }
+      ]
+    }
+  ],
+  "joint_names": [
+    "shoulder_pan",
+    "shoulder_lift",
+    "elbow_flex",
+    "wrist_flex",
+    "wrist_roll",
+    "gripper"
+  ],
+  "demo_start_state_min": [
+    -10.37363,
+    -105.23077,
+    96.39561,
+    77.45055,
+    -13.67033,
+    26.65755
+  ],
+  "demo_start_state_median": [
+    -5.36264,
+    -104.43956,
+    96.48351,
+    78.41758,
+    -7.34066,
+    58.50991
+  ],
+  "demo_start_state_max": [
+    -0.7033,
+    -102.50549,
+    96.65934,
+    78.85714,
+    -1.18681,
+    65.75529
+  ],
+  "demonstrations": [
+    {
+      "kind": "demo",
+      "output_episode": 0,
+      "source_episode": 2,
+      "image": "/home/gaikwad-prakash/ft4_corrected_20261110/train29/videos/observation.images.front/chunk-000/file-002.mp4",
+      "timestamp_s": 1.7333333333333334,
+      "orange": {
+        "x_px": 486.6,
+        "y_px": 349.8,
+        "radius_px": 43.16,
+        "bbox": [
+          443,
+          307,
+          86,
+          86
+        ],
+        "x_norm": 0.76031,
+        "y_norm": 0.72875,
+        "method": "hough_circle"
+      }
+    },
+    {
+      "kind": "demo",
+      "output_episode": 1,
+      "source_episode": 3,
+      "image": "/home/gaikwad-prakash/ft4_corrected_20261110/train29/videos/observation.images.front/chunk-000/file-003.mp4",
+      "timestamp_s": 1.9,
+      "orange": {
+        "x_px": 481.8,
+        "y_px": 339.0,
+        "radius_px": 46.28,
+        "bbox": [
+          436,
+          293,
+          93,
+          93
+        ],
+        "x_norm": 0.75281,
+        "y_norm": 0.70625,
+        "method": "hough_circle"
+      }
+    },
+    {
+      "kind": "demo",
+      "output_episode": 2,
+      "source_episode": 4,
+      "image": "/home/gaikwad-prakash/ft4_corrected_20261110/train29/videos/observation.images.front/chunk-000/file-003.mp4",
+      "timestamp_s": 36.93333333333333,
+      "orange": {
+        "x_px": 478.2,
+        "y_px": 347.4,
+        "radius_px": 46.16,
+        "bbox": [
+          432,
+          301,
+          92,
+          92
+        ],
+        "x_norm": 0.74719,
+        "y_norm": 0.72375,
+        "method": "hough_circle"
+      }
+    },
+    {
+      "kind": "demo",
+      "output_episode": 3,
+      "source_episode": 5,
+      "image": "/home/gaikwad-prakash/ft4_corrected_20261110/train29/videos/observation.images.front/chunk-000/file-003.mp4",
+      "timestamp_s": 72.39999999999999,
+      "orange": {
+        "x_px": 477.0,
+        "y_px": 349.8,
+        "radius_px": 43.4,
+        "bbox": [
+          434,
+          306,
+          87,
+          87
+        ],
+        "x_norm": 0.74531,
+        "y_norm": 0.72875,
+        "method": "hough_circle"
+      }
+    },
+    {
+      "kind": "demo",
+      "output_episode": 4,
+      "source_episode": 6,
+      "image": "/home/gaikwad-prakash/ft4_corrected_20261110/train29/videos/observation.images.front/chunk-000/file-004.mp4",
+      "timestamp_s": 4.233333333333333,
+      "orange": {
+        "x_px": 486.6,
+        "y_px": 339.0,
+        "radius_px": 44.72,
+        "bbox": [
+          442,
+          294,
+          89,
+          89
+        ],
+        "x_norm": 0.76031,
+        "y_norm": 0.70625,
+        "method": "hough_circle"
+      }
+    },
+    {
+      "kind": "demo",
+      "output_episode": 5,
+      "source_episode": 8,
+      "image": "/home/gaikwad-prakash/ft4_corrected_20261110/train29/videos/observation.images.front/chunk-000/file-004.mp4",
+      "timestamp_s": 71.66666666666666,
+      "orange": {
+        "x_px": 477.0,
+        "y_px": 352.2,
+        "radius_px": 44.48,
+        "bbox": [
+          433,
+          308,
+          89,
+          89
+        ],
+        "x_norm": 0.74531,
+        "y_norm": 0.73375,
+        "method": "hough_circle"
+      }
+    },
+    {
+      "kind": "demo",
+      "output_episode": 6,
+      "source_episode": 9,
+      "image": "/home/gaikwad-prakash/ft4_corrected_20261110/train29/videos/observation.images.front/chunk-000/file-004.mp4",
+      "timestamp_s": 106.66666666666666,
+      "orange": {
+        "x_px": 478.2,
+        "y_px": 339.0,
+        "radius_px": 46.04,
+        "bbox": [
+          432,
+          293,
+          92,
+          92
+        ],
+        "x_norm": 0.74719,
+        "y_norm": 0.70625,
+        "method": "hough_circle"
+      }
+    },
+    {
+      "kind": "demo",
+      "output_episode": 7,
+      "source_episode": 10,
+      "image": "/home/gaikwad-prakash/ft4_corrected_20261110/train29/videos/observation.images.front/chunk-000/file-004.mp4",
+      "timestamp_s": 141.53333333333333,
+      "orange": {
+        "x_px": 478.2,
+        "y_px": 341.4,
+        "radius_px": 45.68,
+        "bbox": [
+          433,
+          296,
+          91,
+          91
+        ],
+        "x_norm": 0.74719,
+        "y_norm": 0.71125,
+        "method": "hough_circle"
+      }
+    },
+    {
+      "kind": "demo",
+      "output_episode": 8,
+      "source_episode": 11,
+      "image": "/home/gaikwad-prakash/ft4_corrected_20261110/train29/videos/observation.images.front/chunk-000/file-005.mp4",
+      "timestamp_s": 2.566666666666667,
+      "orange": {
+        "x_px": 480.6,
+        "y_px": 348.6,
+        "radius_px": 43.52,
+        "bbox": [
+          437,
+          305,
+          87,
+          87
+        ],
+        "x_norm": 0.75094,
+        "y_norm": 0.72625,
+        "method": "hough_circle"
+      }
+    },
+    {
+      "kind": "demo",
+      "output_episode": 9,
+      "source_episode": 12,
+      "image": "/home/gaikwad-prakash/ft4_corrected_20261110/train29/videos/observation.images.front/chunk-000/file-005.mp4",
+      "timestamp_s": 36.93333333333333,
+      "orange": {
+        "x_px": 487.8,
+        "y_px": 343.8,
+        "radius_px": 44.48,
+        "bbox": [
+          443,
+          299,
+          89,
+          89
+        ],
+        "x_norm": 0.76219,
+        "y_norm": 0.71625,
+        "method": "hough_circle"
+      }
+    },
+    {
+      "kind": "demo",
+      "output_episode": 10,
+      "source_episode": 13,
+      "image": "/home/gaikwad-prakash/ft4_corrected_20261110/train29/videos/observation.images.front/chunk-000/file-005.mp4",
+      "timestamp_s": 71.93333333333332,
+      "orange": {
+        "x_px": 477.0,
+        "y_px": 333.0,
+        "radius_px": 45.8,
+        "bbox": [
+          431,
+          287,
+          92,
+          92
+        ],
+        "x_norm": 0.74531,
+        "y_norm": 0.69375,
+        "method": "hough_circle"
+      }
+    },
+    {
+      "kind": "demo",
+      "output_episode": 11,
+      "source_episode": 14,
+      "image": "/home/gaikwad-prakash/ft4_corrected_20261110/train29/videos/observation.images.front/chunk-000/file-005.mp4",
+      "timestamp_s": 106.76666666666665,
+      "orange": {
+        "x_px": 478.2,
+        "y_px": 342.6,
+        "radius_px": 44.48,
+        "bbox": [
+          434,
+          298,
+          89,
+          89
+        ],
+        "x_norm": 0.74719,
+        "y_norm": 0.71375,
+        "method": "hough_circle"
+      }
+    },
+    {
+      "kind": "demo",
+      "output_episode": 12,
+      "source_episode": 15,
+      "image": "/home/gaikwad-prakash/ft4_corrected_20261110/train29/videos/observation.images.front/chunk-000/file-005.mp4",
+      "timestamp_s": 142.4,
+      "orange": {
+        "x_px": 479.4,
+        "y_px": 336.6,
+        "radius_px": 45.56,
+        "bbox": [
+          434,
+          291,
+          91,
+          91
+        ],
+        "x_norm": 0.74906,
+        "y_norm": 0.70125,
+        "method": "hough_circle"
+      }
+    },
+    {
+      "kind": "demo",
+      "output_episode": 13,
+      "source_episode": 16,
+      "image": "/home/gaikwad-prakash/ft4_corrected_20261110/train29/videos/observation.images.front/chunk-000/file-006.mp4",
+      "timestamp_s": 1.9333333333333333,
+      "orange": {
+        "x_px": 481.8,
+        "y_px": 335.4,
+        "radius_px": 44.0,
+        "bbox": [
+          438,
+          291,
+          88,
+          88
+        ],
+        "x_norm": 0.75281,
+        "y_norm": 0.69875,
+        "method": "hough_circle"
+      }
+    },
+    {
+      "kind": "demo",
+      "output_episode": 14,
+      "source_episode": 17,
+      "image": "/home/gaikwad-prakash/ft4_corrected_20261110/train29/videos/observation.images.front/chunk-000/file-006.mp4",
+      "timestamp_s": 36.8,
+      "orange": {
+        "x_px": 474.6,
+        "y_px": 340.2,
+        "radius_px": 44.48,
+        "bbox": [
+          430,
+          296,
+          89,
+          89
+        ],
+        "x_norm": 0.74156,
+        "y_norm": 0.70875,
+        "method": "hough_circle"
+      }
+    },
+    {
+      "kind": "demo",
+      "output_episode": 15,
+      "source_episode": 19,
+      "image": "/home/gaikwad-prakash/ft4_corrected_20261110/train29/videos/observation.images.front/chunk-000/file-006.mp4",
+      "timestamp_s": 106.86666666666666,
+      "orange": {
+        "x_px": 484.2,
+        "y_px": 336.6,
+        "radius_px": 45.08,
+        "bbox": [
+          439,
+          292,
+          90,
+          90
+        ],
+        "x_norm": 0.75656,
+        "y_norm": 0.70125,
+        "method": "hough_circle"
+      }
+    },
+    {
+      "kind": "demo",
+      "output_episode": 16,
+      "source_episode": 20,
+      "image": "/home/gaikwad-prakash/ft4_corrected_20261110/train29/videos/observation.images.front/chunk-000/file-006.mp4",
+      "timestamp_s": 141.53333333333333,
+      "orange": {
+        "x_px": 485.4,
+        "y_px": 331.8,
+        "radius_px": 46.16,
+        "bbox": [
+          439,
+          286,
+          92,
+          92
+        ],
+        "x_norm": 0.75844,
+        "y_norm": 0.69125,
+        "method": "hough_circle"
+      }
+    },
+    {
+      "kind": "demo",
+      "output_episode": 17,
+      "source_episode": 21,
+      "image": "/home/gaikwad-prakash/ft4_corrected_20261110/train29/videos/observation.images.front/chunk-000/file-007.mp4",
+      "timestamp_s": 2.2666666666666666,
+      "orange": {
+        "x_px": 480.6,
+        "y_px": 333.0,
+        "radius_px": 45.68,
+        "bbox": [
+          435,
+          287,
+          91,
+          91
+        ],
+        "x_norm": 0.75094,
+        "y_norm": 0.69375,
+        "method": "hough_circle"
+      }
+    },
+    {
+      "kind": "demo",
+      "output_episode": 18,
+      "source_episode": 22,
+      "image": "/home/gaikwad-prakash/ft4_corrected_20261110/train29/videos/observation.images.front/chunk-000/file-007.mp4",
+      "timestamp_s": 36.63333333333333,
+      "orange": {
+        "x_px": 484.2,
+        "y_px": 336.6,
+        "radius_px": 45.56,
+        "bbox": [
+          439,
+          291,
+          91,
+          91
+        ],
+        "x_norm": 0.75656,
+        "y_norm": 0.70125,
+        "method": "hough_circle"
+      }
+    },
+    {
+      "kind": "demo",
+      "output_episode": 19,
+      "source_episode": 23,
+      "image": "/home/gaikwad-prakash/ft4_corrected_20261110/train29/videos/observation.images.front/chunk-000/file-007.mp4",
+      "timestamp_s": 71.56666666666666,
+      "orange": {
+        "x_px": 480.6,
+        "y_px": 336.6,
+        "radius_px": 45.92,
+        "bbox": [
+          435,
+          291,
+          92,
+          92
+        ],
+        "x_norm": 0.75094,
+        "y_norm": 0.70125,
+        "method": "hough_circle"
+      }
+    },
+    {
+      "kind": "demo",
+      "output_episode": 20,
+      "source_episode": 25,
+      "image": "/home/gaikwad-prakash/ft4_corrected_20261110/train29/videos/observation.images.front/chunk-000/file-007.mp4",
+      "timestamp_s": 141.73333333333332,
+      "orange": {
+        "x_px": 479.4,
+        "y_px": 340.2,
+        "radius_px": 45.44,
+        "bbox": [
+          434,
+          295,
+          91,
+          91
+        ],
+        "x_norm": 0.74906,
+        "y_norm": 0.70875,
+        "method": "hough_circle"
+      }
+    },
+    {
+      "kind": "demo",
+      "output_episode": 21,
+      "source_episode": 26,
+      "image": "/home/gaikwad-prakash/ft4_corrected_20261110/train29/videos/observation.images.front/chunk-000/file-008.mp4",
+      "timestamp_s": 1.9,
+      "orange": {
+        "x_px": 485.4,
+        "y_px": 331.8,
+        "radius_px": 46.04,
+        "bbox": [
+          439,
+          286,
+          92,
+          92
+        ],
+        "x_norm": 0.75844,
+        "y_norm": 0.69125,
+        "method": "hough_circle"
+      }
+    },
+    {
+      "kind": "demo",
+      "output_episode": 22,
+      "source_episode": 27,
+      "image": "/home/gaikwad-prakash/ft4_corrected_20261110/train29/videos/observation.images.front/chunk-000/file-008.mp4",
+      "timestamp_s": 37.03333333333333,
+      "orange": {
+        "x_px": 478.2,
+        "y_px": 329.4,
+        "radius_px": 49.04,
+        "bbox": [
+          429,
+          280,
+          98,
+          98
+        ],
+        "x_norm": 0.74719,
+        "y_norm": 0.68625,
+        "method": "hough_circle"
+      }
+    },
+    {
+      "kind": "demo",
+      "output_episode": 23,
+      "source_episode": 28,
+      "image": "/home/gaikwad-prakash/ft4_corrected_20261110/train29/videos/observation.images.front/chunk-000/file-008.mp4",
+      "timestamp_s": 71.86666666666666,
+      "orange": {
+        "x_px": 483.0,
+        "y_px": 336.6,
+        "radius_px": 45.68,
+        "bbox": [
+          437,
+          291,
+          91,
+          91
+        ],
+        "x_norm": 0.75469,
+        "y_norm": 0.70125,
+        "method": "hough_circle"
+      }
+    },
+    {
+      "kind": "demo",
+      "output_episode": 24,
+      "source_episode": 29,
+      "image": "/home/gaikwad-prakash/ft4_corrected_20261110/train29/videos/observation.images.front/chunk-000/file-008.mp4",
+      "timestamp_s": 107.16666666666666,
+      "orange": {
+        "x_px": 484.2,
+        "y_px": 330.6,
+        "radius_px": 41.72,
+        "bbox": [
+          442,
+          289,
+          83,
+          83
+        ],
+        "x_norm": 0.75656,
+        "y_norm": 0.68875,
+        "method": "hough_circle"
+      }
+    }
+  ],
+  "gates": [
+    {
+      "kind": "gate",
+      "trial": 1,
+      "image": "projects/testproject/results/so101_bench_20261019/ft4b_ckpt9000_watched3_20261110/trial1_trace_run4/frames/ep01_chunk001_front.jpg",
+      "orange": {
+        "x_px": 460.2,
+        "y_px": 343.8,
+        "radius_px": 39.44,
+        "bbox": [
+          421,
+          304,
+          79,
+          79
+        ],
+        "x_norm": 0.71906,
+        "y_norm": 0.71625,
+        "method": "hough_circle"
+      },
+      "start_state": [
+        -5.1868,
+        -103.1209,
+        96.6593,
+        79.2088,
+        12.2637,
+        50.3076
+      ],
+      "nearest_demo_state_output_episode": 24,
+      "nearest_demo_state": [
+        -4.74725,
+        -103.56044,
+        96.48351,
+        77.89011,
+        -6.1978,
+        48.46206
+      ],
+      "nearest_demo_state_abs_difference": [
+        0.43955,
+        0.43954,
+        0.17579,
+        1.3187,
+        18.4615,
+        1.84554
+      ],
+      "nearest_demo_state_mean_abs_difference_deg": 3.7801
+    },
+    {
+      "kind": "gate",
+      "trial": 2,
+      "image": "projects/testproject/results/so101_bench_20261019/ft4b_ckpt9000_watched3_20261110/trial2_trace/frames/ep01_chunk001_front.jpg",
+      "orange": {
+        "x_px": 456.6,
+        "y_px": 309.0,
+        "radius_px": 38.0,
+        "bbox": [
+          419,
+          271,
+          76,
+          76
+        ],
+        "x_norm": 0.71344,
+        "y_norm": 0.64375,
+        "method": "hough_circle"
+      },
+      "start_state": [
+        -5.2747,
+        -103.033,
+        96.6593,
+        79.2088,
+        12.2637,
+        50.3759
+      ],
+      "nearest_demo_state_output_episode": 24,
+      "nearest_demo_state": [
+        -4.74725,
+        -103.56044,
+        96.48351,
+        77.89011,
+        -6.1978,
+        48.46206
+      ],
+      "nearest_demo_state_abs_difference": [
+        0.52745,
+        0.52744,
+        0.17579,
+        1.3187,
+        18.4615,
+        1.91384
+      ],
+      "nearest_demo_state_mean_abs_difference_deg": 3.82079
+    },
+    {
+      "kind": "gate",
+      "trial": 3,
+      "image": "projects/testproject/results/so101_bench_20261019/ft4b_ckpt9000_watched3_20261110/trial3_trace/frames/ep01_chunk001_front.jpg",
+      "orange": {
+        "x_px": 461.4,
+        "y_px": 317.4,
+        "radius_px": 39.92,
+        "bbox": [
+          421,
+          277,
+          80,
+          80
+        ],
+        "x_norm": 0.72094,
+        "y_norm": 0.66125,
+        "method": "hough_circle"
+      },
+      "start_state": [
+        -5.2747,
+        -102.945,
+        96.8352,
+        79.2088,
+        12.0879,
+        50.1709
+      ],
+      "nearest_demo_state_output_episode": 24,
+      "nearest_demo_state": [
+        -4.74725,
+        -103.56044,
+        96.48351,
+        77.89011,
+        -6.1978,
+        48.46206
+      ],
+      "nearest_demo_state_abs_difference": [
+        0.52745,
+        0.61544,
+        0.35168,
+        1.3187,
+        18.2857,
+        1.70884
+      ],
+      "nearest_demo_state_mean_abs_difference_deg": 3.8013
+    }
+  ]
+}
