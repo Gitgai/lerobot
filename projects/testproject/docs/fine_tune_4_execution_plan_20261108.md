@@ -1,7 +1,7 @@
 # Fine-tune 4 execution plan
 
 Date: 2026-11-08
-Status: corrected FT4B training completed at 9,000 steps; checkpoint comparison pending
+Status: corrected FT4B checkpoint 9,000 failed watched physical gate at 0/3; blind expansion paused
 
 Post-run opening audit: the 35 accepted demonstrations remain valid complete-task examples. The original FT4 run
 processed only 0.7901 effective epoch and used a different orange sentence during physical deployment. The user has
@@ -149,6 +149,22 @@ checkpoints:   003000, 006000, 009000
 
 Qwen was restored after training and returned `{"status":"ok"}`. The next gate is offline comparison of the three
 checkpoints on the six held-out validation episodes; no robot trial should select a checkpoint before that check.
+
+### Corrected FT4B offline selection and watched gate
+
+The fixed held-out evaluation used 101 next-ten-action probes from all six validation episodes. Checkpoint 9,000
+ranked first overall (MAE 3.1875) and had the lowest gripper MAE (1.6279); checkpoint 6,000 remained a close backup.
+Checkpoint 9,000 was therefore selected for the three watched orange trials.
+
+The watched gate scored **0/3**. All three trials reached promptly, which removes the earlier checkpoint-3,000
+idle-start failure. All three then arrived laterally offset, leaving the orange outside the two-finger opening. No
+trial achieved a retained grasp, lift or transport. Median request latency was 1.143–1.184 seconds. The candidate
+does not advance to ten trials. Exact traces and the gate decision are under
+`results/so101_bench_20261019/ft4b_ckpt9000_watched3_20261110/`.
+
+The next gate is an offline camera-space and action-trace comparison between these three misses and the accepted
+demonstrations. Additional blind trials are paused until that comparison distinguishes deployed geometry mismatch,
+placement-coverage mismatch and learned targeting bias.
 
 ### Earlier FT4 run, 2026-11-08
 

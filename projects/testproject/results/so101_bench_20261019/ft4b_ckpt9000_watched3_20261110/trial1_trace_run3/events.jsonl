@@ -1,0 +1,2 @@
+{"kind":"trace_started","monotonic_ns":155024616514194,"unix_s":1794289656.6259212,"joints":["shoulder_pan","shoulder_lift","elbow_flex","wrist_flex","wrist_roll","gripper"]}
+{"kind":"session_config","monotonic_ns":155024616554778,"unix_s":1794289656.6259615,"server":"192.168.194.220:8081","task":"pick up the orange and place it on the plate","fps":30.0,"actions_per_chunk":20,"max_chunks":75,"near_actions":0,"episodes":1,"pause_between":30.0,"return_start":true,"dry_run":false,"no_robot":false,"shadow_grasp_verifier":false}

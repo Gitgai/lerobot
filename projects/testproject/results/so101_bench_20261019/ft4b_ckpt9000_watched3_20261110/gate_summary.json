@@ -1,0 +1,33 @@
+{
+  "checkpoint": "ft4b_orange_corrected_20261110/checkpoints/009000/pretrained_model",
+  "instruction": "pick up the orange and place it on the plate",
+  "actions_per_chunk": 20,
+  "max_chunks": 75,
+  "successes": 0,
+  "trials": 3,
+  "success_rate": 0.0,
+  "decision": "do_not_advance",
+  "trial_metrics": [
+    {
+      "trial": 1,
+      "result": "fail",
+      "median_latency_s": 1.184,
+      "minimum_gripper": 33.5,
+      "minimum_gripper_chunk": 47
+    },
+    {
+      "trial": 2,
+      "result": "fail",
+      "median_latency_s": 1.154,
+      "minimum_gripper": 36.6,
+      "minimum_gripper_chunk": 48
+    },
+    {
+      "trial": 3,
+      "result": "fail",
+      "median_latency_s": 1.143,
+      "minimum_gripper": 44.6,
+      "minimum_gripper_chunk": 55
+    }
+  ]
+}
