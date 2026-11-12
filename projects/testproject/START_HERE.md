@@ -1,6 +1,7 @@
 # Start here — our robotics project
 
 Updated: 2026-11-13. This is the main entry point for current work.
+For a continuation by another agent, read the [migration handoff](docs/AGENT_HANDOFF_NEW_MACHINE_20261113.md).
 
 ## Where we are
 
