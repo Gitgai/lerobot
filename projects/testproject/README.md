@@ -4,6 +4,9 @@ This project is for building a leader/follower robot arm setup and using LeRobot
 
 > **Current entry points — 2026-11-13**
 >
+> - [Start here — current status and next action](START_HERE.md)
+> - [Workstation organization plan](docs/WORKSTATION_PLAN_20261113.md)
+> - [SSD storage, compression and backup policy](docs/SSD_STORAGE_POLICY_20261113.md)
 > - [New workstation setup and migration](NEW_MACHINE_SETUP.md)
 > - [Preservation audit and remaining transfer work](docs/NEW_MACHINE_PRESERVATION_AUDIT_20261113.md)
 > - [Latest FT4B execution plan and November 11 diagnosis](docs/fine_tune_4_execution_plan_20261108.md)

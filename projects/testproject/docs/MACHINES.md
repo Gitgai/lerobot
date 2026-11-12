@@ -1,4 +1,4 @@
-> **2026-11-13 migration update:** A third workstation is now available (reported Ryzen 9 9950X / RTX PRO 5000 Blackwell 72 GB). Its hostname, address, OS and runtime remain unverified. See [new machine setup](../NEW_MACHINE_SETUP.md). The two-machine description below is a September record; addresses and services are not live checks.
+> **2026-11-13 update:** The new primary workstation is `ryzen9`, user `prakash-gaikwad`, reachable by SSH at `192.168.1.23` (ZeroTier `192.168.194.23`). Read-only inspection confirmed Ubuntu 26.04.1, Ryzen 9 9950X, RTX PRO 5000 Blackwell 72 GB and driver 595.99.02. Migration and runtime validation are pending. Follow [START_HERE](../START_HERE.md), [workstation plan](WORKSTATION_PLAN_20261113.md) and [setup guide](../NEW_MACHINE_SETUP.md). The two-machine description below is preserved September history; it does not describe the planned final layout.
 
 # The two machines — what lives where
 

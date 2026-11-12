@@ -1,3 +1,5 @@
+> **Follow-up:** The destination was subsequently inspected over SSH without changes. Its verified facts and the updated migration/storage plan are in [START_HERE](../START_HERE.md). The audit below preserves the state at the original inventory; statements that the login/profile were pending are historical. Transfer and runtime validation remain pending.
+
 # New-machine preservation audit — 2026-11-13
 
 This audit was performed on `gaikwad-prakash-Aspire-A14-52MT`. It prepares a

@@ -1,7 +1,9 @@
 # New machine setup — SO-101 project
 
-Updated: 2026-11-13. Preparation performed on the Acer; the new workstation has
-not yet been contacted or validated. This guide replaces the August RunPod setup.
+Updated: 2026-11-13. Read-only SSH inspection of ryzen9 completed; software migration
+and runtime validation are pending. This guide replaces the August RunPod setup.
+Start with [START_HERE](START_HERE.md), the [workstation plan](docs/WORKSTATION_PLAN_20261113.md)
+and [SSD policy](docs/SSD_STORAGE_POLICY_20261113.md).
 The original is retained in [history](docs/history/NEW_MACHINE_SETUP_before_20261113.md).
 
 ## 1. What we are moving, and what is still unknown
@@ -18,8 +20,22 @@ these parts; they are not a live hardware inspection:
 | Motherboard       | ASUS ProArt B850-CREATOR WIFI NEO         |
 | Additional camera | Luxonis OAK-D Lite AF                     |
 
-Ubuntu installation completion, release, username, hostname/IP, NVIDIA driver,
-free capacity, and whether the arms/cameras have moved remain unverified.
+Read-only SSH inspection confirmed:
+
+- Host `ryzen9`, user `prakash-gaikwad`, Wi-Fi `192.168.1.23`, ZeroTier `192.168.194.23`.
+- Ubuntu 26.04.1 LTS, kernel `7.0.0-43-generic`; Ryzen 9 9950X, 16 cores/32 threads.
+- RTX PRO 5000 Blackwell 72 GB, driver `595.99.02`; no compute jobs at inspection.
+- About 29 GiB usable RAM, 8 GiB swap; WD Blue SN5100 4 TB with about 3.4 TiB available.
+- C270 camera detected. No arm serial devices or wrist camera were detected.
+- Git and rsync installed; system Python 3.14.4. No uv/Python 3.12 found in inspected
+  standard locations; no torch/lerobot/cv2 in system Python. Calibration absent;
+  user not in dialout. The inspected `~/projects` directory was empty.
+
+No software, drivers, files or permissions were changed on ryzen9. GPU computation,
+checkpoint loading, camera capture and robot operation have not been tested.
+Motherboard/RAM-kit/OAK-D details in the reported-parts table were not independently
+verified by this inspection.
+
 Do not substitute the OAK-D for a trained front/wrist view during migration;
 that is a separate camera integration and validation task.
 
@@ -30,7 +46,7 @@ There are three machine roles:
 - **AI90 source:** historically `kiran@192.168.194.220`; GPU environments,
   model checkpoints and training data. Its connectivity and contents were not
   rechecked in this migration audit.
-- **New workstation:** destination; expected to support local GPU work, subject
+- **New workstation (ryzen9):** planned primary home for daily robotics work, subject
   to hardware, memory and runtime validation. A 72 GB GPU does not establish
   that the 32 GB system RAM can run every training recipe.
 
@@ -76,8 +92,8 @@ Use the migration branch, which starts from the November branch and adds this gu
 
 ```bash
 # On the new machine, in an unused destination directory:
-mkdir -p ~/projects
-cd ~/projects
+mkdir -p ~/Robotics
+cd ~/Robotics
 git clone --branch codex/new-machine-migration-20261113 \
   https://github.com/Gitgai/lerobot.git lerobot
 cd lerobot
@@ -91,7 +107,7 @@ merge those changes into the November runtime. The preservation audit identifies
 the separate refs and compares against both.
 
 The original checkouts have machine-specific runtime paths. A new checkout under
-`~/projects/lerobot` is a destination convention, not proof that old launchers will
+`~/Robotics/lerobot` is the planned destination, not proof that old launchers will
 work there. Many contain `/home/gaikwad-prakash` or `/home/kiran` paths.
 
 ## 4. Verify the new machine before choosing an install recipe
@@ -147,15 +163,17 @@ A checked local source/calibration snapshot was prepared on Acer; see the audit.
 It is on the **same disk** and excludes bulk evidence. It is not an independent
 backup and does not make source deletion safe.
 
-After the destination login and paths are confirmed, use a new staging directory
-and a resumable transfer. Example template, run on Acer after replacing the target:
+The destination login is verified; final paths follow the workstation plan. After
+reviewing the transfer manifest and space budget, use a new staging directory
+and a resumable transfer. The example below illustrates a dry-run copy; these
+commands have not been executed, and even its mkdir creates destination folders:
 
 ```bash
-DEST='USERNAME@NEW_MACHINE_IP'
-ssh "$DEST" 'mkdir -p ~/migration-incoming/acer-workspace'
+DEST='prakash-gaikwad@192.168.1.23'
+ssh "$DEST" 'mkdir -p ~/Robotics/archive/migration/acer-workspace'
 rsync -aHn --itemize-changes \
   "$HOME/Documents/ChatGPT/Lerobot/" \
-  "$DEST:migration-incoming/acer-workspace/"
+  "$DEST:Robotics/archive/migration/acer-workspace/"
 # Review the destination and capacity; then repeat without -n.
 ```
 
@@ -187,8 +205,8 @@ The current repository's `pyproject.toml` is not the historical VLASH environmen
 Blindly running a latest dependency install can produce an incompatible server.
 Keep bench, VLASH and optional OpenPI environments separate. On the new machine,
 verify imports resolve to the intended source, then test recorded observations
-without a robot connection. Exact installation commands remain pending the actual
-machine profile and the GPU environment capture; this document does not claim a
+without a robot connection. Exact installation commands remain pending the AI90
+GPU environment capture and compatibility checks; this document does not claim a
 rebuild has been tested.
 
 ## 7. Reconnect the existing rig
@@ -223,6 +241,7 @@ rebuild has been tested.
    is not proof that torque is off.
 
 **Current completion:** guide, local inventory and source/calibration snapshot
-prepared. Destination transfer, AI90 runtime capture, installation and hardware
+prepared, and destination hardware/OS inspected over SSH. Destination transfer,
+AI90 runtime capture, installation and hardware
 validation remain pending. No new model, server, training job or robot motion was
 started by this migration preparation.
