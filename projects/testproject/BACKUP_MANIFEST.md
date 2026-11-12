@@ -1,3 +1,5 @@
+> **2026-11-13:** This is the historical August manifest; its sizes and machine layout are not current. Use [the migration guide](NEW_MACHINE_SETUP.md) and [November preservation audit](docs/NEW_MACHINE_PRESERVATION_AUDIT_20261113.md) first. No complete new-machine backup has been verified.
+
 # Backup Manifest - what to take off this workstation
 
 Last updated: 2026-08-06. Audited against the live machine on that date.

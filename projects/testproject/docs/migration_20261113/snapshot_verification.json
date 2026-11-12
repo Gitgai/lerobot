@@ -1,0 +1,10 @@
+{
+  "archive": "/home/gaikwad-prakash/Documents/ChatGPT/migration-audit-20261113/source-and-calibration-snapshot.tar.gz",
+  "bytes": 4971242,
+  "sha256": "1b3023500801b239bf5225fc352684384b109f18912d8c25736e7722291303ec",
+  "files": 1292,
+  "workspace_files": 1214,
+  "home_scripts": 76,
+  "calibration_files": 2,
+  "verification": "All archived file bytes re-read and matched SHA-256. Local same-disk snapshot only; bulk evidence and environments excluded."
+}

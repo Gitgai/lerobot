@@ -1,3 +1,5 @@
+> **2026-11-13 migration update:** A third workstation is now available (reported Ryzen 9 9950X / RTX PRO 5000 Blackwell 72 GB). Its hostname, address, OS and runtime remain unverified. See [new machine setup](../NEW_MACHINE_SETUP.md). The two-machine description below is a September record; addresses and services are not live checks.
+
 # The two machines — what lives where
 
 Written 2026-09-15 after an agent running on the Acer searched for the project's
@@ -107,16 +109,16 @@ Run model work on the GPU box over SSH instead.
 
 ## Which machine for which task
 
-| Task | Machine | Why |
-|---|---|---|
-| Recording demonstrations | **Acer** | the arms and cameras are physically here |
-| Anything touching the arm | **Acer** | same |
-| Camera diagnosis | **Acer** | same |
-| Training / fine-tuning | **kiran-AI90** | the GPU and the weights are here |
-| Reading a checkpoint or its lineage | **kiran-AI90** | the weights are here |
-| Dataset conversion / merging | **kiran-AI90** | the datasets are here |
-| Analysing recorded video | **either** | copy the episode over; they are small |
-| Editing the repo and docs | **kiran-AI90** | the git repo is here |
+| Task                                | Machine        | Why                                      |
+| ----------------------------------- | -------------- | ---------------------------------------- |
+| Recording demonstrations            | **Acer**       | the arms and cameras are physically here |
+| Anything touching the arm           | **Acer**       | same                                     |
+| Camera diagnosis                    | **Acer**       | same                                     |
+| Training / fine-tuning              | **kiran-AI90** | the GPU and the weights are here         |
+| Reading a checkpoint or its lineage | **kiran-AI90** | the weights are here                     |
+| Dataset conversion / merging        | **kiran-AI90** | the datasets are here                    |
+| Analysing recorded video            | **either**     | copy the episode over; they are small    |
+| Editing the repo and docs           | **kiran-AI90** | the git repo is here                     |
 
 A recorded dataset is produced on the Acer and must be **copied to the GPU box**
 before it can be trained on. A few hundred MB, which the link handles.

@@ -1,0 +1,874 @@
+{
+  "workspace": "/home/gaikwad-prakash/Documents/ChatGPT/Lerobot",
+  "repository": "/home/gaikwad-prakash/Documents/ChatGPT/Lerobot-new-machine",
+  "revisions": {
+    "codex/record-row-n-20261030": "6ac0b1a216b62307b8ab9ec1d264ac198e410c28",
+    "codex/consolidate-fruit-openpi-20261024": "641123781ac61813f6f3840406cae9b42bcc3cf8",
+    "origin/main": "f8eb9ed574eb4d3b84b4bc9408d7181da429086c"
+  },
+  "scope": "Regular files inventoried except explicit skipped trees; selected suffixes <=8 MiB hashed. Symlinks not followed. No bulk evidence checksums or remote-host audit.",
+  "candidate_suffixes": [
+    ".css",
+    ".docx",
+    ".html",
+    ".ipynb",
+    ".js",
+    ".json",
+    ".md",
+    ".pdf",
+    ".py",
+    ".rst",
+    ".sh",
+    ".toml",
+    ".ts",
+    ".txt",
+    ".yaml",
+    ".yml"
+  ],
+  "candidate_max_bytes": 8388608,
+  "counts": {
+    "needs_review": 1169,
+    "exact_in_git": 45
+  },
+  "candidate_bytes": 33790409,
+  "groups": {
+    "(root files)": {
+      "files": 290,
+      "bytes": 5829915,
+      "candidates": 286
+    },
+    "LeRobot_SO101_Setup_Handoff_render": {
+      "files": 3,
+      "bytes": 1077662,
+      "candidates": 0
+    },
+    "camera_preview_mxixm4qx": {
+      "files": 2,
+      "bytes": 387565,
+      "candidates": 0
+    },
+    "front_check_9jorcd6p": {
+      "files": 1,
+      "bytes": 444921,
+      "candidates": 0
+    },
+    "front_warmup__tda8_9e": {
+      "files": 9,
+      "bytes": 2690752,
+      "candidates": 1
+    },
+    "fruit_20k_preflight_20261026": {
+      "files": 1,
+      "bytes": 2374,
+      "candidates": 1
+    },
+    "fruit_openpi_20k_client": {
+      "files": 52365,
+      "bytes": 48254107390,
+      "candidates": 106
+    },
+    "fruit_openpi_client": {
+      "files": 35006,
+      "bytes": 28389216092,
+      "candidates": 96
+    },
+    "fruit_real_preflight_20261021_PWDXx2": {
+      "files": 5,
+      "bytes": 24238,
+      "candidates": 5
+    },
+    "fruit_review_20261017": {
+      "files": 451,
+      "bytes": 82446931,
+      "candidates": 112
+    },
+    "fruit_sim_20261021": {
+      "files": 119,
+      "bytes": 52321227,
+      "candidates": 40
+    },
+    "fullft10k_deployment_20260924": {
+      "files": 37,
+      "bytes": 12831869,
+      "candidates": 8
+    },
+    "fullft10k_jpeg_audit_20260924_v2": {
+      "files": 7,
+      "bytes": 916634,
+      "candidates": 1
+    },
+    "fullft10k_poststop_GHj4JK": {
+      "files": 1,
+      "bytes": 2369,
+      "candidates": 1
+    },
+    "fullft10k_preflight_4xlLqg": {
+      "files": 1,
+      "bytes": 2368,
+      "candidates": 1
+    },
+    "fullft10k_raw_trial_20260924": {
+      "files": 6,
+      "bytes": 1780047,
+      "candidates": 2
+    },
+    "fullft10k_raw_trial_live_20260927": {
+      "files": 13,
+      "bytes": 10543297,
+      "candidates": 2
+    },
+    "fullft10k_raw_trial_live_20260927c": {
+      "files": 13,
+      "bytes": 9555813,
+      "candidates": 2
+    },
+    "fullft10k_raw_trial_live_20260927d": {
+      "files": 6,
+      "bytes": 1780327,
+      "candidates": 2
+    },
+    "fullft10k_raw_trial_live_20260927e": {
+      "files": 51,
+      "bytes": 54094400,
+      "candidates": 2
+    },
+    "fullft10k_raw_trial_live_20260927f": {
+      "files": 33,
+      "bytes": 32058660,
+      "candidates": 2
+    },
+    "fullft10k_raw_trial_live_20260927g": {
+      "files": 18,
+      "bytes": 15337908,
+      "candidates": 2
+    },
+    "fullft10k_raw_trial_rerun_20260927": {
+      "files": 2,
+      "bytes": 412,
+      "candidates": 1
+    },
+    "fullft10k_raw_trial_rerun_20260927b": {
+      "files": 4,
+      "bytes": 1779496,
+      "candidates": 1
+    },
+    "fullft_gate_evidence_20260922": {
+      "files": 9,
+      "bytes": 37484,
+      "candidates": 8
+    },
+    "hold_check_u2h9f733": {
+      "files": 6,
+      "bytes": 2303010,
+      "candidates": 2
+    },
+    "hold_check_xge0k3vt": {
+      "files": 2,
+      "bytes": 907272,
+      "candidates": 1
+    },
+    "home4_check_P87XTU": {
+      "files": 1,
+      "bytes": 2374,
+      "candidates": 1
+    },
+    "home_status_3rVfxS": {
+      "files": 1,
+      "bytes": 2372,
+      "candidates": 1
+    },
+    "jpeg_trial_20260930": {
+      "files": 438360,
+      "bytes": 211570288807,
+      "candidates": 87
+    },
+    "kiwi_poststop_7M7Bzp": {
+      "files": 1,
+      "bytes": 2357,
+      "candidates": 1
+    },
+    "kiwi_preflight_20261024_D60dsj": {
+      "files": 1,
+      "bytes": 2347,
+      "candidates": 1
+    },
+    "kiwi_trial02_preflight_U1CzBd": {
+      "files": 1,
+      "bytes": 2356,
+      "candidates": 1
+    },
+    "latest_trial_visualizer_20260921_mb7GHj": {
+      "files": 2,
+      "bytes": 189593081,
+      "candidates": 1
+    },
+    "libero_rerun_viewer_20261014": {
+      "files": 2,
+      "bytes": 1236234,
+      "candidates": 1
+    },
+    "live_view_preflight_hg0yAN": {
+      "files": 5,
+      "bytes": 941269,
+      "candidates": 3
+    },
+    "logs": {
+      "files": 57,
+      "bytes": 432896,
+      "candidates": 0
+    },
+    "official_client_061_preparation": {
+      "files": 2,
+      "bytes": 3780,
+      "candidates": 2
+    },
+    "offline_comparison_20260922": {
+      "files": 1,
+      "bytes": 2784006,
+      "candidates": 1
+    },
+    "offline_comparison_20260922_v2": {
+      "files": 5,
+      "bytes": 5240084,
+      "candidates": 2
+    },
+    "openpi_full_benchmark_20261016": {
+      "files": 670,
+      "bytes": 42931748,
+      "candidates": 10
+    },
+    "openpi_full_benchmark_20261016_recovery": {
+      "files": 23,
+      "bytes": 752527,
+      "candidates": 8
+    },
+    "openpi_full_benchmark_20261016_recovery2": {
+      "files": 1519,
+      "bytes": 147072808,
+      "candidates": 8
+    },
+    "openpi_libero_audit_20261012": {
+      "files": 4,
+      "bytes": 104504,
+      "candidates": 4
+    },
+    "openpi_lora_recheck_20261014": {
+      "files": 23,
+      "bytes": 20154816,
+      "candidates": 9
+    },
+    "openpi_lora_validation_20261013": {
+      "files": 17,
+      "bytes": 610684,
+      "candidates": 4
+    },
+    "openpi_split_validation_20261015": {
+      "files": 27,
+      "bytes": 787276,
+      "candidates": 11
+    },
+    "orange2_review_20261005": {
+      "files": 12,
+      "bytes": 25095049,
+      "candidates": 2
+    },
+    "orange3_startup_j3gsm4": {
+      "files": 2,
+      "bytes": 2664,
+      "candidates": 2
+    },
+    "orange45_comparison_20260924": {
+      "files": 16,
+      "bytes": 1011749,
+      "candidates": 10
+    },
+    "orange4_startup_xdpXAw": {
+      "files": 5,
+      "bytes": 933639,
+      "candidates": 3
+    },
+    "orange50_checkpoint_comparison_20260922": {
+      "files": 2,
+      "bytes": 678162,
+      "candidates": 1
+    },
+    "orange50_sequence_review_20260922": {
+      "files": 3,
+      "bytes": 443524,
+      "candidates": 0
+    },
+    "orange_baseline_preflight_ahvTZM": {
+      "files": 5,
+      "bytes": 880954,
+      "candidates": 3
+    },
+    "pi05_10k_preflight_pmkGzB": {
+      "files": 4,
+      "bytes": 919539,
+      "candidates": 2
+    },
+    "pi05_30k_deployment_check_20260922": {
+      "files": 103,
+      "bytes": 56718134,
+      "candidates": 21
+    },
+    "pi05_efg_review_c7qghb7d": {
+      "files": 17,
+      "bytes": 12159658,
+      "candidates": 2
+    },
+    "pi05_full_policy_lossless_brw1we20": {
+      "files": 8,
+      "bytes": 158418,
+      "candidates": 3
+    },
+    "pi05_official_trainer_probe_20260922": {
+      "files": 6,
+      "bytes": 50559,
+      "candidates": 3
+    },
+    "pi05_offline_eval_20260922_v2": {
+      "files": 47,
+      "bytes": 22676117,
+      "candidates": 2
+    },
+    "pi05_offline_followup_nv4wsfcy": {
+      "files": 10,
+      "bytes": 4529774,
+      "candidates": 5
+    },
+    "pi05_orange_boundaries_20260922_v2": {
+      "files": 7,
+      "bytes": 2479789,
+      "candidates": 1
+    },
+    "pi05_orange_review_20260922": {
+      "files": 11,
+      "bytes": 4372492,
+      "candidates": 1
+    },
+    "pi05_pose_predictions_233vl1bu": {
+      "files": 4,
+      "bytes": 1121,
+      "candidates": 1
+    },
+    "pi05_pose_predictions_yheqzxuq": {
+      "files": 7,
+      "bytes": 37408,
+      "candidates": 2
+    },
+    "pi05_preflight_20260922_Wfcp5F": {
+      "files": 4,
+      "bytes": 911704,
+      "candidates": 2
+    },
+    "pi05_quality_gate_20260923": {
+      "files": 188,
+      "bytes": 60620439,
+      "candidates": 27
+    },
+    "pi05_release_review_20260922": {
+      "files": 6,
+      "bytes": 2185326,
+      "candidates": 1
+    },
+    "pi05_rpc_overlap_sa6emvsx": {
+      "files": 9,
+      "bytes": 158525,
+      "candidates": 4
+    },
+    "pi05_split_proposal_20260922": {
+      "files": 5,
+      "bytes": 38182,
+      "candidates": 5
+    },
+    "pi05_traced_preflight_1f794Y": {
+      "files": 4,
+      "bytes": 899062,
+      "candidates": 2
+    },
+    "pi05_traced_preflight_Va8j6k": {
+      "files": 4,
+      "bytes": 911200,
+      "candidates": 2
+    },
+    "pi05_traced_validation_k4trn9": {
+      "files": 297,
+      "bytes": 268098258,
+      "candidates": 4
+    },
+    "pi05_training_recipe_20260922": {
+      "files": 9,
+      "bytes": 106452,
+      "candidates": 5
+    },
+    "pi05_trial_preflight_37OPOc": {
+      "files": 3,
+      "bytes": 3599,
+      "candidates": 3
+    },
+    "pi05_trial_recheck_DwluKZ": {
+      "files": 4,
+      "bytes": 934338,
+      "candidates": 2
+    },
+    "pi05_verify_20260928_816l2syt": {
+      "files": 4,
+      "bytes": 1858864,
+      "candidates": 1
+    },
+    "pi05_verify_20260928_8b_ld0x7": {
+      "files": 4,
+      "bytes": 1969518,
+      "candidates": 1
+    },
+    "pi05_verify_20260928_akzv19ni": {
+      "files": 1,
+      "bytes": 62,
+      "candidates": 1
+    },
+    "pi05_verify_20260928_zye9k8k2": {
+      "files": 4,
+      "bytes": 2023068,
+      "candidates": 1
+    },
+    "power_readonly_oqvc89ct": {
+      "files": 1,
+      "bytes": 174357,
+      "candidates": 1
+    },
+    "readiness_20260927_nhwXCS": {
+      "files": 14,
+      "bytes": 1652352,
+      "candidates": 3
+    },
+    "readonly_preflight_20261024_Ks2JwS": {
+      "files": 1,
+      "bytes": 2347,
+      "candidates": 1
+    },
+    "recording": {
+      "files": 2,
+      "bytes": 442,
+      "candidates": 1
+    },
+    "repo_preservation_20261024_PmnCuT": {
+      "files": 1,
+      "bytes": 29777,
+      "candidates": 0
+    },
+    "rig_preview_08hjxy97": {
+      "files": 3,
+      "bytes": 769730,
+      "candidates": 1
+    },
+    "rig_preview_1j2196cc": {
+      "files": 3,
+      "bytes": 862124,
+      "candidates": 1
+    },
+    "rig_preview_2dac3q5p": {
+      "files": 3,
+      "bytes": 782145,
+      "candidates": 1
+    },
+    "rig_preview_2zd532pn": {
+      "files": 3,
+      "bytes": 807447,
+      "candidates": 1
+    },
+    "rig_preview_6c16ra67": {
+      "files": 3,
+      "bytes": 820038,
+      "candidates": 1
+    },
+    "rig_preview_7e1uhumr": {
+      "files": 3,
+      "bytes": 775706,
+      "candidates": 1
+    },
+    "rig_preview_7z8nvfwk": {
+      "files": 3,
+      "bytes": 380751,
+      "candidates": 1
+    },
+    "rig_preview_9eza3r0y": {
+      "files": 3,
+      "bytes": 851412,
+      "candidates": 1
+    },
+    "rig_preview_9p8su6bc": {
+      "files": 3,
+      "bytes": 825986,
+      "candidates": 1
+    },
+    "rig_preview_9x9ub0xg": {
+      "files": 3,
+      "bytes": 846658,
+      "candidates": 1
+    },
+    "rig_preview_arm86lse": {
+      "files": 3,
+      "bytes": 777270,
+      "candidates": 1
+    },
+    "rig_preview_bm1f2k5n": {
+      "files": 3,
+      "bytes": 798171,
+      "candidates": 1
+    },
+    "rig_preview_capv_lxz": {
+      "files": 3,
+      "bytes": 797623,
+      "candidates": 1
+    },
+    "rig_preview_clfawmi2": {
+      "files": 3,
+      "bytes": 803124,
+      "candidates": 1
+    },
+    "rig_preview_dipvgbbv": {
+      "files": 3,
+      "bytes": 785205,
+      "candidates": 1
+    },
+    "rig_preview_dnvnrr11": {
+      "files": 3,
+      "bytes": 760216,
+      "candidates": 1
+    },
+    "rig_preview_eccjhfi9": {
+      "files": 3,
+      "bytes": 796962,
+      "candidates": 1
+    },
+    "rig_preview_ed6276l2": {
+      "files": 3,
+      "bytes": 800177,
+      "candidates": 1
+    },
+    "rig_preview_frp6fxre": {
+      "files": 3,
+      "bytes": 794051,
+      "candidates": 1
+    },
+    "rig_preview_ftq7zui3": {
+      "files": 3,
+      "bytes": 810868,
+      "candidates": 1
+    },
+    "rig_preview_k0l5e_ff": {
+      "files": 3,
+      "bytes": 825002,
+      "candidates": 1
+    },
+    "rig_preview_kun5fr_3": {
+      "files": 3,
+      "bytes": 776565,
+      "candidates": 1
+    },
+    "rig_preview_l95xa9st": {
+      "files": 3,
+      "bytes": 782559,
+      "candidates": 1
+    },
+    "rig_preview_m3vnuyki": {
+      "files": 3,
+      "bytes": 802299,
+      "candidates": 1
+    },
+    "rig_preview_m5jx_lp5": {
+      "files": 3,
+      "bytes": 759451,
+      "candidates": 1
+    },
+    "rig_preview_oahv4eoz": {
+      "files": 3,
+      "bytes": 793277,
+      "candidates": 1
+    },
+    "rig_preview_p025yzuf": {
+      "files": 3,
+      "bytes": 796805,
+      "candidates": 1
+    },
+    "rig_preview_p62r1tkd": {
+      "files": 3,
+      "bytes": 832221,
+      "candidates": 1
+    },
+    "rig_preview_p7sj50er": {
+      "files": 3,
+      "bytes": 795854,
+      "candidates": 1
+    },
+    "rig_preview_phs1j1as": {
+      "files": 3,
+      "bytes": 837758,
+      "candidates": 1
+    },
+    "rig_preview_qfehd8lt": {
+      "files": 3,
+      "bytes": 783485,
+      "candidates": 1
+    },
+    "rig_preview_qv1s34hc": {
+      "files": 3,
+      "bytes": 799898,
+      "candidates": 1
+    },
+    "rig_preview_r09tf0pc": {
+      "files": 3,
+      "bytes": 769856,
+      "candidates": 1
+    },
+    "rig_preview_r_l3sji0": {
+      "files": 3,
+      "bytes": 840620,
+      "candidates": 1
+    },
+    "rig_preview_rsw8gdjv": {
+      "files": 3,
+      "bytes": 686074,
+      "candidates": 1
+    },
+    "rig_preview_s9lch9mr": {
+      "files": 3,
+      "bytes": 829538,
+      "candidates": 1
+    },
+    "rig_preview_sb2bv5hc": {
+      "files": 3,
+      "bytes": 780972,
+      "candidates": 1
+    },
+    "rig_preview_tcczrvfa": {
+      "files": 3,
+      "bytes": 786708,
+      "candidates": 1
+    },
+    "rig_preview_tukea2g0": {
+      "files": 3,
+      "bytes": 801579,
+      "candidates": 1
+    },
+    "rig_preview_tx4dr2af": {
+      "files": 3,
+      "bytes": 818056,
+      "candidates": 1
+    },
+    "rig_preview_u8xrbrf5": {
+      "files": 3,
+      "bytes": 862542,
+      "candidates": 1
+    },
+    "rig_preview_unfr92tx": {
+      "files": 3,
+      "bytes": 813684,
+      "candidates": 1
+    },
+    "rig_preview_v3ixrwng": {
+      "files": 3,
+      "bytes": 814793,
+      "candidates": 1
+    },
+    "rig_preview_v963eetx": {
+      "files": 3,
+      "bytes": 790020,
+      "candidates": 1
+    },
+    "rig_preview_we8mtoh1": {
+      "files": 3,
+      "bytes": 787026,
+      "candidates": 1
+    },
+    "rig_preview_xeh2eow9": {
+      "files": 3,
+      "bytes": 804035,
+      "candidates": 1
+    },
+    "rig_preview_xhpsi2is": {
+      "files": 3,
+      "bytes": 767923,
+      "candidates": 1
+    },
+    "rig_preview_yh51l0lb": {
+      "files": 3,
+      "bytes": 803206,
+      "candidates": 1
+    },
+    "rig_preview_z2ruxx5u": {
+      "files": 3,
+      "bytes": 797105,
+      "candidates": 1
+    },
+    "rtc_isolated_probe_20260921": {
+      "files": 13,
+      "bytes": 1015532,
+      "candidates": 5
+    },
+    "rtc_remote_draft_20261007": {
+      "files": 100303,
+      "bytes": 47901880670,
+      "candidates": 83
+    },
+    "rtc_request_review_20260921": {
+      "files": 4,
+      "bytes": 213941054,
+      "candidates": 3
+    },
+    "rtc_training_input_audit_20260921": {
+      "files": 8,
+      "bytes": 1895527,
+      "candidates": 0
+    },
+    "so101_camera_preview_Fn0Lbf": {
+      "files": 3,
+      "bytes": 924430,
+      "candidates": 1
+    },
+    "so101_front_preview_OOsWGd": {
+      "files": 1,
+      "bytes": 451963,
+      "candidates": 0
+    },
+    "so101_motion_preflight_20260920_x0gwia": {
+      "files": 5,
+      "bytes": 941468,
+      "candidates": 3
+    },
+    "so101_preflight_20260920_CLrD4i": {
+      "files": 6,
+      "bytes": 938077,
+      "candidates": 4
+    },
+    "so101_recheck_20260920_ugkQs8": {
+      "files": 2,
+      "bytes": 3711,
+      "candidates": 2
+    },
+    "so101_resume_preflight_20260920_zC8nI4": {
+      "files": 5,
+      "bytes": 927088,
+      "candidates": 3
+    },
+    "so101_smooth_review_20260920_4pQjQB": {
+      "files": 4,
+      "bytes": 906212,
+      "candidates": 2
+    },
+    "startup_readonly_5n1bkw32": {
+      "files": 4,
+      "bytes": 4488037,
+      "candidates": 2
+    },
+    "startup_readonly_6qitenjw": {
+      "files": 4,
+      "bytes": 8362938,
+      "candidates": 2
+    },
+    "startup_readonly_7a7xrsvi": {
+      "files": 4,
+      "bytes": 8272759,
+      "candidates": 2
+    },
+    "startup_readonly_9ys01lkw": {
+      "files": 6,
+      "bytes": 6056971,
+      "candidates": 2
+    },
+    "startup_readonly_sm10jgrx": {
+      "files": 4,
+      "bytes": 1191,
+      "candidates": 2
+    },
+    "startup_recheck_6ez1uu": {
+      "files": 1,
+      "bytes": 596,
+      "candidates": 1
+    },
+    "startup_recheck_VTa4Y3": {
+      "files": 1,
+      "bytes": 2348,
+      "candidates": 1
+    },
+    "startup_recheck_YcX8DW": {
+      "files": 1,
+      "bytes": 2348,
+      "candidates": 1
+    },
+    "storage_maintenance": {
+      "files": 65,
+      "bytes": 373775345,
+      "candidates": 47
+    },
+    "tomato_launch_check_mMRrN5": {
+      "files": 1,
+      "bytes": 2371,
+      "candidates": 1
+    },
+    "tomato_preflight_T0Qvw5": {
+      "files": 1,
+      "bytes": 2370,
+      "candidates": 1
+    },
+    "tomato_training_audit_8w5AMO": {
+      "files": 9,
+      "bytes": 15848286,
+      "candidates": 0
+    },
+    "trial_results": {
+      "files": 20,
+      "bytes": 47568,
+      "candidates": 19
+    },
+    "visualization_orange_20261005": {
+      "files": 7,
+      "bytes": 972721764,
+      "candidates": 4
+    },
+    "voltage_read_path_sy00mr71": {
+      "files": 1,
+      "bytes": 30631,
+      "candidates": 1
+    },
+    "voltage_read_path_x9axqgw3": {
+      "files": 1,
+      "bytes": 30631,
+      "candidates": 1
+    }
+  },
+  "skipped_trees": [
+    ".git",
+    ".ruff_cache",
+    ".venv-official-client-061",
+    ".venv-visualization",
+    ".venv-visualization-312",
+    "__pycache__",
+    "fruit_openpi_20k_client/__pycache__",
+    "fruit_openpi_client/__pycache__",
+    "fruit_review_20261017/__pycache__",
+    "fruit_sim_20261021/__pycache__",
+    "jpeg_trial_20260930/__pycache__",
+    "openpi_full_benchmark_20261016/__pycache__",
+    "openpi_full_benchmark_20261016_recovery/__pycache__",
+    "openpi_full_benchmark_20261016_recovery2/__pycache__",
+    "openpi_split_validation_20261015/vendor",
+    "openpi_split_validation_20261015/venv",
+    "rtc_remote_draft_20261007/__pycache__",
+    "rtc_remote_draft_20261007/upstream",
+    "rtc_remote_draft_20261007/venv",
+    "storage_maintenance/compression_20261024/__pycache__"
+  ],
+  "symlinks": [
+    {
+      "path": "openpi_full_benchmark_20261016_recovery/libero_spatial",
+      "target": "../openpi_full_benchmark_20261016/libero_spatial"
+    },
+    {
+      "path": "openpi_full_benchmark_20261016_recovery2/libero_spatial",
+      "target": "../openpi_full_benchmark_20261016/libero_spatial"
+    }
+  ],
+  "errors": []
+}

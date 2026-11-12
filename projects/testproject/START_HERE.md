@@ -1,3 +1,5 @@
+> **Current entry points (2026-11-13):** [new machine setup](NEW_MACHINE_SETUP.md), [preservation audit](docs/NEW_MACHINE_PRESERVATION_AUDIT_20261113.md), and [FT4B plan](docs/fine_tune_4_execution_plan_20261108.md). All instructions and claims of “current” below are retained historical text.
+
 # START HERE — SO-101 Orange Pick Project (Handoff)
 
 > ## ⚠️ OUTDATED — do not follow this file (2026-08-03)

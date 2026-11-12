@@ -2,16 +2,14 @@
 
 This project is for building a leader/follower robot arm setup and using LeRobot to evaluate, collect, and train robot manipulation policies.
 
-> **Entry points (2026-08-03):**
+> **Current entry points — 2026-11-13**
 >
-> - **New machine?** → [`NEW_MACHINE_SETUP.md`](NEW_MACHINE_SETUP.md)
-> - **What is this project, what is proven, what is next?** →
->   [`docs/agent_handoff_pi05_20260803.md`](docs/agent_handoff_pi05_20260803.md)
-> - **Running log / current status banner** →
->   [`docs/pi05_active_work_tracker.md`](docs/pi05_active_work_tracker.md)
+> - [New workstation setup and migration](NEW_MACHINE_SETUP.md)
+> - [Preservation audit and remaining transfer work](docs/NEW_MACHINE_PRESERVATION_AUDIT_20261113.md)
+> - [Latest FT4B execution plan and November 11 diagnosis](docs/fine_tune_4_execution_plan_20261108.md)
 >
-> The sections below this banner are early-2026 history (LIBERO sim results,
-> the ACT era). The live work is SO-101 + Pi05 on real hardware.
+> The sections below are historical project background. They are not the current
+> installation recipe or evidence of present hardware readiness.
 
 ## Current Status
 
