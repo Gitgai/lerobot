@@ -1,7 +1,9 @@
 # New machine setup — SO-101 project
 
 Updated: 2026-11-13. Read-only SSH inspection of ryzen9 completed; software migration
-and runtime validation are pending. This guide replaces the August RunPod setup.
+and runtime validation are pending. This guide replaces the August RunPod setup. The receiving agent has since added
+a transfer inventory and AI90 package list; [the current handoff](docs/AGENT_HANDOFF_NEW_MACHINE_20261113.md)
+records their findings and unresolved decisions.
 Start with [START_HERE](START_HERE.md), the [workstation plan](docs/WORKSTATION_PLAN_20261113.md)
 and [SSD policy](docs/SSD_STORAGE_POLICY_20261113.md).
 The original is retained in [history](docs/history/NEW_MACHINE_SETUP_before_20261113.md).
@@ -31,7 +33,9 @@ Read-only SSH inspection confirmed:
   standard locations; no torch/lerobot/cv2 in system Python. Calibration absent;
   user not in dialout. The inspected `~/projects` directory was empty.
 
-No software, drivers, files or permissions were changed on ryzen9. GPU computation,
+No software, driver or permission changes were made on ryzen9 by this task.
+Handoff/reference documentation has been delivered; the receiving agent added
+its own manifest/package list. No bulk project data or installed runtime is implied. GPU computation,
 checkpoint loading, camera capture and robot operation have not been tested.
 Motherboard/RAM-kit/OAK-D details in the reported-parts table were not independently
 verified by this inspection.
@@ -45,7 +49,8 @@ There are three machine roles:
   demonstrations, local client environments and trial evidence.
 - **AI90 source:** historically `kiran@192.168.194.220`; GPU environments,
   model checkpoints and training data. Its connectivity and contents were not
-  rechecked in this migration audit.
+  rechecked directly by this originating task. The later receiving-agent manifest
+  reports a read-only inventory; distinguish that evidence from runtime validation.
 - **New workstation (ryzen9):** planned primary home for daily robotics work, subject
   to hardware, memory and runtime validation. A 72 GB GPU does not establish
   that the 32 GB system RAM can run every training recipe.
@@ -92,8 +97,8 @@ Use the migration branch, which starts from the November branch and adds this gu
 
 ```bash
 # On the new machine, in an unused destination directory:
-mkdir -p ~/Robotics
-cd ~/Robotics
+mkdir -p ~/projects/Robotics
+cd ~/projects/Robotics
 git clone --branch codex/new-machine-migration-20261113 \
   https://github.com/Gitgai/lerobot.git lerobot
 cd lerobot
@@ -107,7 +112,7 @@ merge those changes into the November runtime. The preservation audit identifies
 the separate refs and compares against both.
 
 The original checkouts have machine-specific runtime paths. A new checkout under
-`~/Robotics/lerobot` is the planned destination, not proof that old launchers will
+`~/projects/Robotics/lerobot` is the planned destination, not proof that old launchers will
 work there. Many contain `/home/gaikwad-prakash` or `/home/kiran` paths.
 
 ## 4. Verify the new machine before choosing an install recipe
@@ -170,10 +175,10 @@ commands have not been executed, and even its mkdir creates destination folders:
 
 ```bash
 DEST='prakash-gaikwad@192.168.1.23'
-ssh "$DEST" 'mkdir -p ~/Robotics/archive/migration/acer-workspace'
+ssh "$DEST" 'mkdir -p ~/projects/Robotics/archive/migration/acer-workspace'
 rsync -aHn --itemize-changes \
   "$HOME/Documents/ChatGPT/Lerobot/" \
-  "$DEST:Robotics/archive/migration/acer-workspace/"
+  "$DEST:projects/Robotics/archive/migration/acer-workspace/"
 # Review the destination and capacity; then repeat without -n.
 ```
 
@@ -189,24 +194,24 @@ Keep the source until evidence and runtime checks pass.
 
 Local metadata captured on November 13:
 
-| Role                  | Existing interpreter                                               | Measured packages                                                                                |
-| --------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
-| Acer bench/recording  | `~/PrakashProjects/lerobot/lerobot/.venv/bin/python`               | Python 3.12.13, LeRobot 0.5.2, torch 2.10.0, Rerun 0.26.2                                        |
-| Older official client | `~/Documents/ChatGPT/Lerobot/.venv-official-client-061/bin/python` | Python 3.12.13, LeRobot 0.6.1, torch 2.7.1+cpu                                                   |
-| November GPU policy   | AI90 `/home/kiran/sim/vlash-venv`                                  | Source header records LeRobot 0.4.1 + VLASH `22cbabfe` with patches; live versions not rechecked |
+| Role                  | Existing interpreter                                               | Measured packages                                                                           |
+| --------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------- |
+| Acer bench/recording  | `~/PrakashProjects/lerobot/lerobot/.venv/bin/python`               | Python 3.12.13, LeRobot 0.5.2, torch 2.10.0, Rerun 0.26.2                                   |
+| Older official client | `~/Documents/ChatGPT/Lerobot/.venv-official-client-061/bin/python` | Python 3.12.13, LeRobot 0.6.1, torch 2.7.1+cpu                                              |
+| November GPU policy   | AI90 `/home/kiran/sim/vlash-venv`                                  | Receiver reports Python 3.11.15, torch 2.7.1+cu128, LeRobot 0.4.1, patched VLASH `22cbabfe` |
 
 Package metadata is provenance, not a complete lockfile. The full local package
-lists are captured with this audit. Before rebuilding, collect the AI90 Python
-version, package versions, exact Git revisions, uncommitted patches and editable
-source locations. Preserve any patched dependency files inside the old environments.
+lists are captured with this audit. The receiving agent has now captured AI90
+Python/package metadata and source revision; preserve the identified uncommitted
+patches and verify the full dependency closure before rebuilding. Preserve any patched dependency files inside the old environments.
 Do not infer that a clean project Git checkout also covers those patches.
 
 The current repository's `pyproject.toml` is not the historical VLASH environment.
 Blindly running a latest dependency install can produce an incompatible server.
 Keep bench, VLASH and optional OpenPI environments separate. On the new machine,
 verify imports resolve to the intended source, then test recorded observations
-without a robot connection. Exact installation commands remain pending the AI90
-GPU environment capture and compatibility checks; this document does not claim a
+without a robot connection. Exact installation commands remain pending source-patch preservation,
+dependency reconstruction and compatibility checks; this document does not claim a
 rebuild has been tested.
 
 ## 7. Reconnect the existing rig
@@ -242,6 +247,6 @@ rebuild has been tested.
 
 **Current completion:** guide, local inventory and source/calibration snapshot
 prepared, and destination hardware/OS inspected over SSH. Destination transfer,
-AI90 runtime capture, installation and hardware
-validation remain pending. No new model, server, training job or robot motion was
+AI90 patch preservation, installation and hardware
+validation remain pending. The receiving-agent metadata inventory is available. No new model, server, training job or robot motion was
 started by this migration preparation.

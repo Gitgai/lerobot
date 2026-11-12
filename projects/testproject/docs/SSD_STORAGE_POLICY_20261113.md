@@ -1,6 +1,6 @@
 # SSD storage, compression and backup policy
 
-Updated: 2026-11-13. Applies to the planned `~/Robotics` workspace on ryzen9.
+Updated: 2026-11-13. Applies to the planned `~/projects/Robotics` workspace on ryzen9.
 This is a plan, not an installed monitor or authorization to delete data.
 No files were moved, compressed or deleted while writing it.
 
@@ -190,6 +190,8 @@ Proposed manual routine, not a scheduled automation:
 - **Periodically and before source retirement:** restore a representative dataset,
   checkpoint and run from backup and verify them against their manifests.
 
-The first storage action is a read-only full transfer inventory, including AI90.
+A receiving-agent transfer inventory is now available under the handoff folder.
+The next storage action is to reconcile its accessible-asset totals, missing-drive
+coverage, hardlinks and pending checksums; see the updated agent handoff.
 Then sample only unoptimized eligible data on copies. No urgent compression is
 needed on the nearly empty new SSD; correctness and an organized move come first.

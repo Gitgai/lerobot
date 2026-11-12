@@ -6,11 +6,13 @@ installation are pending. This revision changes documentation only.
 
 ## 1. One project home
 
-Use `/home/prakash-gaikwad/Robotics` on ryzen9. This supersedes the earlier proposed
-`~/projects/lerobot` destination; no existing repository has been relocated.
+The existing receiving folder is `/home/prakash-gaikwad/projects/Robotics/handoff`.
+Plan examples now follow its parent to avoid a second Robotics tree. Confirm the
+operational root in transfer-manifest decision D1 before cloning/installing; no
+existing repository has been relocated. Earlier `~/Robotics` examples are superseded.
 
 ```text
-~/Robotics/
+~/projects/Robotics/
 ├── lerobot/                 Git checkout: code, configuration, docs, small reviewed results
 │   └── projects/testproject/START_HERE.md
 ├── datasets/
@@ -28,7 +30,7 @@ Use `/home/prakash-gaikwad/Robotics` on ryzen9. This supersedes the earlier prop
 ```
 
 Environment directories and download caches are implementation details, kept outside
-Git under `~/Robotics/.envs` and `~/Robotics/.cache` where the relevant tools support
+Git under `~/projects/Robotics/.envs` and `~/projects/Robotics/.cache` where the relevant tools support
 explicit paths. Those locations are planned, not configured. Keep separate bench,
 VLASH and optional OpenPI environments. Do not move a live environment by renaming it.
 
@@ -53,14 +55,14 @@ capacity, checksums and restore behavior before counting it as protection.
 
 ## 3. Move in reviewable batches
 
-| Phase            | Work                                                                                                               | Completion evidence                                             | Current state                                                      |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------- | ------------------------------------------------------------------ |
-| A — inventory    | Enumerate required sources on Acer and AI90, branch refs, runtime patches, symlink targets, sizes and dependencies | Transfer manifest with every required item assigned             | Acer workspace audit done; AI90 and broader home inventory pending |
-| B — preserve     | Copy calibration, source snapshot, current code and essential datasets/checkpoints to staging                      | Content hashes match; originals retained                        | Pending                                                            |
-| C — organize     | Place verified files in final locations; retain unresolved variants in migration archive                           | Catalog resolves every active dataset/model/run to one location | Pending                                                            |
-| D — rebuild      | Recreate bench and VLASH environments using captured versions/patches                                              | Imports, GPU computation and saved-observation inference pass   | Pending                                                            |
-| E — validate rig | Verify calibration, devices, camera geometry and reviewed launch paths                                             | Documented readiness and supervised test evidence               | Pending                                                            |
-| F — handover     | Update working commands and current pointers; verify independent backup                                            | START_HERE matches actual paths and tested commands             | Pending                                                            |
+| Phase            | Work                                                                                                               | Completion evidence                                             | Current state                                                   |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------- | --------------------------------------------------------------- |
+| A — inventory    | Enumerate required sources on Acer and AI90, branch refs, runtime patches, symlink targets, sizes and dependencies | Transfer manifest with every required item assigned             | Receiver inventory exists; coverage/decisions/checksums pending |
+| B — preserve     | Copy calibration, source snapshot, current code and essential datasets/checkpoints to staging                      | Content hashes match; originals retained                        | Pending                                                         |
+| C — organize     | Place verified files in final locations; retain unresolved variants in migration archive                           | Catalog resolves every active dataset/model/run to one location | Pending                                                         |
+| D — rebuild      | Recreate bench and VLASH environments using captured versions/patches                                              | Imports, GPU computation and saved-observation inference pass   | Pending                                                         |
+| E — validate rig | Verify calibration, devices, camera geometry and reviewed launch paths                                             | Documented readiness and supervised test evidence               | Pending                                                         |
+| F — handover     | Update working commands and current pointers; verify independent backup                                            | START_HERE matches actual paths and tested commands             | Pending                                                         |
 
 Start with the current FT4B project. Then inventory and transfer remaining historical
 robotics assets in batches. “All work on ryzen9” does not require every old runtime
@@ -71,8 +73,9 @@ Each manifest entry must record: source host and absolute path, artifact role,
 logical/allocated size, required base model or dataset lineage, destination path,
 copy status, source/destination checksum results, and validation/backup status.
 Use states `inventoried`, `copied`, `checksum_verified`, `runtime_validated` and
-`backed_up`; do not conflate them. The manifest itself has not yet been populated
-for the complete project.
+`backed_up`; do not conflate them. The receiving agent has populated `TRANSFER_MANIFEST_20261113.md` under
+`~/projects/Robotics/handoff`; extend that record, keeping its unresolved coverage
+and pending checksum states. See the current handoff for newer findings.
 
 First required sources:
 
@@ -122,6 +125,10 @@ smaller copies; they never silently replace training data or exact evidence.
   changes. Avoid creating competing documents each claiming to be current.
 
 ## 6. Storage and readiness
+
+The receiving agent measured Python 3.11.15 for VLASH and captured its package list.
+Bench Python remains 3.12. Preserve the uncommitted runtime patches; package versions
+alone do not rebuild the working server. See [the handoff](AGENT_HANDOFF_NEW_MACHINE_20261113.md).
 
 Follow [the SSD storage policy](SSD_STORAGE_POLICY_20261113.md): keep working space
 available, test compression on copies, and verify an independent backup. Thresholds,

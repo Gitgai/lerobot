@@ -12,9 +12,11 @@ confirmed Ubuntu 26.04.1, Ryzen 9 9950X, RTX PRO 5000 Blackwell 72 GB, driver
 about 3.4 TiB available. The C270 camera was detected; the arm controllers and
 wrist camera were not. These are observations from the inspection, not continuous monitoring.
 
-**Migration is not complete.** The inspected `~/projects` folder was empty.
+**Migration is not complete.** The initial inspection found `~/projects` empty; the receiving agent now has
+a documentation folder at `~/projects/Robotics/handoff`.
 No project transfer, dependency installation, GPU inference or robot test has
-been performed on ryzen9 by this task. The new `~/Robotics` layout below is planned.
+been performed on ryzen9 by this task. Only the handoff folder is confirmed present; code/data/runtime directories
+are still planned, with final placement pending the manifest's D1 decision.
 Code and records are on GitHub and Acer; additional data/models and runtime
 provenance must be gathered from Acer and AI90.
 
@@ -44,11 +46,14 @@ not change that experiment or authorize an unattended physical run.
 
 ## Next action
 
-Prepare the **source-to-destination transfer manifest**, starting with the Acer
-calibration/source snapshot, the accepted FT4 demonstrations and derivatives, and
-the AI90 FT4B/base-model/runtime dependencies. Measure AI90 before promising that
-all historical assets fit. Copy and verify current essentials first; catalog older
-work for later transfer. Keep source copies until restoration is verified.
+Review the existing `~/projects/Robotics/handoff/TRANSFER_MANIFEST_20261113.md`
+and `AI90_VLASH_ENV_PACKAGES_20261113.txt` on ryzen9. They were created by the
+receiving agent and report read-only inventories of Acer and AI90. All bulk rows
+remain inventoried only; checksums and transfers are pending. The updated
+[migration handoff](docs/AGENT_HANDOFF_NEW_MACHINE_20261113.md) identifies newly
+found temporary logs, source patches, ignored artifacts, the absent AI90 drive,
+slow transport and open decisions. Propose the small log/patch/calibration
+preservation batch first, then obtain execution authorization before copying data.
 
 ## Everyday routine after migration
 

@@ -1,6 +1,6 @@
 # Agent handoff — move robotics work to ryzen9
 
-Prepared: 2026-11-13. Read this first, then [START_HERE](../START_HERE.md).
+Updated after gap review: 2026-11-13. Read this first, then [START_HERE](../START_HERE.md).
 This is a continuation handoff, not a claim that migration has been executed.
 
 ## 1. User objective and current authorization
@@ -14,13 +14,64 @@ now. check our new machine.”** We then performed read-only SSH inspection. Lat
 requests authorized creating/updating the plan documents and this handoff. Those
 documentation changes were made on Acer and published to the migration branch.
 
-**Current execution boundary:** continue read-only inventory and document preparation.
-No transfer, installation, directory creation on ryzen9, compression, deletion,
-service change, training or robot motion has been executed or newly authorized by
-the documentation requests. Before starting those steps, obtain the user's execution
-instruction unless their next message already gives it. Do not ask again for an
-action clearly authorized in a later message. Never treat historical run commands
-or earlier unrelated cleanup approvals as authorization for a new run.
+**Current execution boundary:** the user subsequently authorized sending the handoff
+to ryzen9 and checking it for gaps. Updating this handoff and delivering its supporting
+documentation is authorized. Read-only inventory and local documentation work may
+continue. That does not authorize bulk project/data transfer, software installation,
+compression/deletion, service changes, training or robot motion. Obtain an execution
+instruction for those steps unless a later user message already supplies it. Do not
+ask again for an already authorized action.
+
+**Important new state:** the receiving agent has already produced a transfer manifest
+and AI90 package inventory on ryzen9. The first inventory is no longer pending.
+Read those records and resolve their open decisions; do not redo them from memory.
+They were discovered during this gap review and are attributed below. Their presence
+is not evidence that any datasets, model weights or runtime patches were transferred.
+
+## 1a. Receiving-agent documents and location
+
+The handoff was originally copied to `~/Robotics/handoff`. It is now at:
+
+```text
+/home/prakash-gaikwad/projects/Robotics/handoff/
+  AGENT_HANDOFF_NEW_MACHINE_20261113.md
+  TRANSFER_MANIFEST_20261113.md
+  AI90_VLASH_ENV_PACKAGES_20261113.txt
+```
+
+The first two folder components are **projects/Robotics**, not the previous
+`~/Robotics`. We found the original handoff unchanged at this moved location;
+its cause of relocation is not established. Preserve this existing tree rather
+than creating a second project home. Final code/data placement is still decision
+D1 in the manifest; plan examples provisionally follow this existing parent.
+
+The refreshed delivery adds `README.md`, `reference/` and `delivery_manifest.json`
+next to these files. The root handoff remains the user-facing entry. In the delivery
+copy, Markdown links are adjusted to bundled references or commit-pinned GitHub
+pages. The manifest records source commit and source/delivery hashes. This packet
+is documentation, not an installed checkout or complete copy of cited trial assets.
+Verify the delivery manifest after copying; its contents are the packet's exact scope.
+
+The existing transfer manifest and package list are receiver-owned working records.
+Do not overwrite them with an older snapshot. Their inspected SHA-256 hashes were:
+
+```text
+TRANSFER_MANIFEST_20261113.md
+41bcc36217cdc47f43975abee0037ed8748afb385e95836b4bbaa11be9e8593f
+AI90_VLASH_ENV_PACKAGES_20261113.txt
+473aa4b58db7e0a8af726377e1a4c563fb7defc99001ae1264027e6495e5da5e
+```
+
+They contain source inventories/private paths and a warning about the public GitHub
+repository. Keep their raw contents local unless publication is explicitly requested.
+Only the continuation-relevant findings are summarized here; missing bulk checksums
+and unavailable assets must remain visible.
+
+For conflicting statements, use this gap review for current migration status and
+the receiver manifest for its detailed source rows. Its original “everything fits”,
+backup and cleanup-date conclusions remain provisional as explained in section 8.
+Its old Git commit is superseded by `delivery_manifest.json`; update the working
+manifest during the next review, without erasing the original observations.
 
 The user prefers short, concrete explanations. Distinguish “we planned it”, “we
 copied it”, “we verified it” and “it runs”. They were specifically confused about
@@ -33,7 +84,7 @@ whether the latest project was already on the new computer: **it was not**.
 | Git repository                              | `https://github.com/Gitgai/lerobot.git`                                 |
 | Active migration checkout on Acer           | `/home/gaikwad-prakash/Documents/ChatGPT/Lerobot-new-machine`           |
 | Active branch                               | `codex/new-machine-migration-20261113`                                  |
-| Latest published commit before this handoff | `39fb65c9e` — workstation organization and SSD policy                   |
+| Latest published commit before this handoff | `d47950f34` — original handoff; `39fb65c9e` — plans                     |
 | Earlier preparation commit                  | `7162c83bb` — migration guide and preservation audit                    |
 | November base branch                        | `codex/record-row-n-20261030`, last verified at `6ac0b1a21`             |
 | November checkout on Acer                   | `/home/gaikwad-prakash/Documents/ChatGPT/Lerobot-rowN-record`           |
@@ -42,8 +93,8 @@ whether the latest project was already on the new computer: **it was not**.
 | Legacy chat workspace                       | `/home/gaikwad-prakash/Documents/ChatGPT/Lerobot`                       |
 
 The migration checkout was clean and matched GitHub before writing this handoff.
-Inspect current Git status before edits; the handoff's own commit will follow the
-commit above. Read applicable `AGENTS.md` instructions in the checkout.
+Inspect current Git status before edits. The delivery manifest pins the exact
+revision of this updated packet; it supersedes the historical commit marker above. Read applicable `AGENTS.md` instructions in the checkout.
 
 The November branch was 153 commits ahead of GitHub main (`f8eb9ed57`) when checked.
 The October branch contains five commits absent from the November history. Both
@@ -84,26 +135,30 @@ Observed through read-only commands during this task:
 | Not found in inspected paths/environment | uv, Python 3.12, ffmpeg, v4l2-ctl; torch/lerobot/cv2 in system Python |
 | Rig                                      | C270 detected; no arm serial devices or wrist camera detected         |
 | Calibration / permissions                | Expected calibration directory absent; user not in dialout            |
-| Project state                            | `~/projects` existed and was empty; no project copied by this task    |
+| Project state at initial inspection      | `~/projects` existed and was empty; documentation arrived afterward   |
 
 These are dated observations, not a full software inventory or current health
 monitor. NVIDIA driver visibility is not a GPU computation or inference test.
-The new `~/Robotics` folders are planned, not created. No remote system changes
-were made by this task; SSH itself may generate ordinary system access logs.
+The existing `~/projects/Robotics/handoff` directory contains documentation only.
+No runtime installation or hardware-setting change was made by this task. The user
+authorized document delivery; SSH may also generate ordinary system access logs.
 
 ### Sources
 
 - **Acer:** `gaikwad-prakash-Aspire-A14-52MT`, user `gaikwad-prakash`. Holds local
   environments, calibration, source variants, demonstrations and trial evidence.
+  Current locally observed addresses: LAN `192.168.1.24`, ZeroTier `192.168.194.228`.
 - **AI90:** historical login `kiran@192.168.194.220`. Holds models, training data and
-  GPU runtimes. It was **not contacted or re-inventoried in this migration task**.
-  Recheck access and paths; do not claim its contents or services are currently ready.
+  GPU runtimes. This originating task has not inspected AI90 directly. The receiving
+  agent subsequently reports read-only access from ryzen9 and supplied the inventory
+  summarized below. Preserve that provenance; recheck volatile state before execution.
 
 ## 4. Planned final layout
 
 ```text
-/home/prakash-gaikwad/Robotics/
-├── lerobot/       Git checkout and project docs
+/home/prakash-gaikwad/projects/Robotics/
+├── handoff/       Existing documentation packet and receiving-agent inventory
+├── lerobot/       Planned Git checkout and project docs
 ├── datasets/      originals/ and derived/
 ├── models/        base/ and trained/
 ├── runs/          training/ and trials/
@@ -111,7 +166,9 @@ were made by this task; SSH itself may generate ordinary system access logs.
 ```
 
 Separate environments/caches may use `.envs/` and `.cache/` under Robotics.
-This supersedes the earlier proposed `~/projects/lerobot` path. Calibration stays
+This provisionally follows the observed handoff location; confirm manifest D1
+before creating the operational tree. It supersedes examples of `~/Robotics` or
+`~/projects/lerobot`, which would create competing locations. Calibration stays
 at the path expected by the validated loader, initially
 `~/.cache/huggingface/lerobot/calibration/`, with a separate private backup.
 Do not clear that directory as disposable cache. Audit all absolute Acer/AI90 paths
@@ -137,13 +194,56 @@ next experimental gate and reference views. Preserve:
   `/home/kiran/lerobot_assets/training/ft4b_orange_corrected_20261110`.
 - Base dependency:
   `/home/kiran/lerobot_assets/ckpt_mirror/row3_all169_conservative_010000`.
+- Tokenizer assets: receiving manifest identifies AI90 `~/hf-cache-recovered`
+  and `~/hf-cache-ft4`; resolve the actual files/config references before an
+  offline load. A model checkpoint alone is not the complete inference bundle.
+- Deployed server: AI90 `~/latency_probe/so101_base_policy_server.py`, reported
+  to differ from the repository copy by a comment. Preserve and compare it along
+  with launch arguments, environment variables and preprocessing configuration.
 - Runtime source/environment: `/home/kiran/sim/vlash` and
   `/home/kiran/sim/vlash-venv`. Source headers mention VLASH `22cbabfe` plus patches
-  and LeRobot 0.4.1; live versions and modifications still need capture.
+  and LeRobot 0.4.1. The receiving-agent inventory now records the measured Python
+  and package versions and identifies uncommitted patches; the patch files still
+  need preservation and checksums.
 
 The separate Acer bench environment was measured as Python 3.12.13, LeRobot 0.5.2,
 torch 2.10.0. An older official-client environment uses LeRobot 0.6.1 and torch
-2.7.1+cpu. Do not combine these into one blind latest-version installation.
+2.7.1+cpu. The receiving agent measured **Python 3.11.15 for VLASH**, torch
+2.7.1+cu128, torchvision 0.22.1+cu128, LeRobot 0.4.1 and peft 0.18.0. Transformers
+4.53.3 came from Git commit `dcddb970176382c0fcf4521b0c0e6fc15894dfe0`.
+VLASH was editable at `22cbabfee0f57874987c75a35a7dac129e695db0` plus local changes.
+The 122-entry package list is distribution metadata, not a tested reinstall lock.
+Only installed files for LeRobot/Transformers/PEFT were reported checked against
+package records; the other packages were not checked. Keep **bench Python 3.12**
+and **VLASH Python 3.11** separate. GPU compatibility still needs execution testing.
+
+Exact FT4B data identities from the experiment record:
+
+- Acer `~/ft4_corrected_20261110/train29`: 29 entries / 28,494 frames.
+- Acer `~/ft4_corrected_20261110/val6`: 6 held-out episodes / 5,907 frames.
+- The training set contains 25 orange and four matchbox episodes. Keep validation
+  held out; retain rejected original episodes outside training.
+- AI90 reportedly trained from `~/lerobot_assets/datasets/ft4_corrected_20261110`;
+  compare hashes before deciding that this equals the Acer derivative.
+- Preserve checkpoints 003000, 006000 and 009000 with optimizer, scheduler, RNG,
+  adapters, configs, base model and tokenizer assets. `checkpoints/last` is reportedly
+  a symlink; inventory its target and do not copy a broken pointer.
+
+Hardware identities: follower USB serial `5B14114209`, leader `5B14029688`;
+calibration IDs `my_so101_follower` and `my_so101_leader`. Mapping is front →
+`observation.images.base_0_rgb`, wrist → `observation.images.left_wrist_0_rgb`,
+third model slot masked. Recorded joint order is `shoulder_pan`, `shoulder_lift`,
+`elbow_flex`, `wrist_flex`, `wrist_roll`, `gripper`. Preserve angle/gripper normalization and the
+reviewed motor protection settings; device enumeration alone is not calibration.
+A crashed client does not establish torque-off. Hardware use remains separately supervised.
+
+The experiment's next gate, once separately authorized, is three watched checkpoint
+9,000 trials after matching demonstration pose/views/placement; expand to ten only
+if at least two acquire and retain the orange. The image-space bounds apply only
+to the restored 640×480 framing, not general physical coordinates. Consult
+[the geometry diagnosis](../results/so101_bench_20261019/ft4b_gate_offline_diagnostic_20261111/README.md)
+and its actual montage assets before moving hardware. Local inference changes
+transport timing relative to AI90; record it as a changed variable, not an identical trial.
 
 ## 6. Preservation already completed
 
@@ -207,31 +307,66 @@ a competing cleanup plan:
 - Identify an independent backup destination. The old external Acer backup was not
   fully reconciled and is not established as a current November restore point.
 
-## 8. Next agent's first deliverable
+## 8. Inventory findings, unresolved gaps and next deliverable
 
-Prepare a **complete source-to-destination transfer manifest**, using read-only
-inspection of Acer and, if reachable, AI90. Do useful inventory before asking for
-information already available in files or tools. If AI90 is unreachable, record
-that gap and continue the Acer inventory instead of treating the whole plan as blocked.
+**Continue the existing `TRANSFER_MANIFEST_20261113.md`.** Its rows are inventoried,
+not bulk-checksum-verified, copied, runtime-validated or backed up. The receiving
+agent's source observations below have not all been independently repeated here:
 
-For each required artifact record source host/path, role, size, checksum or pending
-checksum status, base dependencies, proposed final/staging path, copy/validation/
-backup state and retention notes. Keep states distinct: `inventoried`, `copied`,
-`checksum_verified`, `runtime_validated`, `backed_up`.
+| Finding                                                                                                                 | What it changes / remaining verification                                                                                                                                    |
+| ----------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| AI90 FT4B training, server, evaluation and smoke logs are reportedly in RAM-backed `/tmp` with age cleanup              | Make these small files the first preservation batch once authorized; treat them as ephemeral. Recheck existence/cleanup rules rather than promising an exact deletion date. |
+| VLASH has uncommitted changes in `modeling_pi05.py` and `run.py`, plus an upstream comparison copy                      | Preserve patches, originals, hashes and exact base revision before rebuilding; a package list alone is insufficient.                                                        |
+| AI90 LeRobot has 7 modified tracked and 55 untracked files; OpenPI has 2 local commits; GR00T/LeIsaac also have changes | Capture source diffs/untracked files and retain commits/refs before choosing exclusions. Do not push to unrelated upstream remotes.                                         |
+| The installed Acer checkout contains about 20.3 GiB of ignored artifacts and 0.2 GiB of ignored logs                    | Add these to migration coverage; clean Git status never covered them.                                                                                                       |
+| The November checkout contains about 179 MiB of ignored trial frames                                                    | Preserve alongside the committed report; raw evidence is not fully represented in Git.                                                                                      |
+| `ft4_reweighted_20261110` is now about 400 MiB                                                                          | Fresh independent check here measured 418,467,840 allocated bytes and 418,092,537 apparent bytes. Earlier 1.8 MiB figure is superseded; retain its rejected status.         |
+| Legacy workspace `.git` is reportedly about 46.3 GiB despite no commits                                                 | Snapshot refs/recovery objects exist. Excluding it from transfer is a proposal, not proof it is disposable or permission to delete it.                                      |
+| AI90 `/mnt/data4tb` is reportedly absent; checkpoint/probe/cache symlinks point into it                                 | Inventory is incomplete for those targets. Locate/reconnect the drive or explicitly record exclusions; do not claim all historical assets are accounted for.                |
+| AI90 transfer sample was 0.02–0.05 MiB/s; roughly 29 GiB of FT4B essentials                                             | Resolve the transport plan before bulk copying; relay diagnosis is unconfirmed. Do not change network settings from a guess.                                                |
+| Approximately 1.4 TiB of accessible robotics assets is reported                                                         | Provisional size only: account for overlap, hardlinks, missing drive, temp copies and verification space before accepting the fit.                                          |
+| Independent backup is not established                                                                                   | Historical Acer backup exists in records but is not a verified current restore point. Do not retire sources.                                                                |
 
-Order the eventual execution batches:
+Receiver-created manifest recommendations to skip virtual environments, snapshot
+objects or historical checkpoints are **not settled retention decisions**. The audit
+excluded environment trees, and only some installed packages were compared. Capture
+patched sources, lock/provenance data and unique recovery history before excluding
+anything. Full hashes are still pending for the bulk datasets and checkpoints.
+Do not duplicate every hardlinked/cached model blindly, and do not infer whole-file
+identity from partial hashes.
 
-1. Source/calibration snapshot, branch refs and current code.
-2. Accepted original FT4 demonstrations and exact train/validation derivatives.
-3. FT4B checkpoints and base dependencies, full resume state and runtime provenance.
-4. Latest trial evidence and geometry references.
-5. Remaining historical work in measured batches, preserving unresolved variants.
+Next deliverable: a reviewed manifest amendment and a concrete first-batch proposal:
 
-Present the concrete batch sizes/paths and unresolved dependencies to the user.
-Wait for an execution instruction before destination writes under the current
-boundary. Once authorized, transfer into a fresh staging area, verify content,
-rebuild environments, test saved observations, and only then plan supervised rig
-validation. Do not stop existing AI90 services or launch models just to inventory them.
+1. Reconcile source coverage with the new ignored-artifact, patch, log and missing-drive
+   findings. Preserve existing manifest rows/notes; avoid starting a competing inventory.
+2. Propose the small ephemeral-log/patch/calibration/source-snapshot batch first.
+   Source copying is still pending execution authorization; updating the handoff
+   packet does not authorize it.
+3. Resolve D1 (operational project root), D2 (AI90 transport), D3 (missing drive),
+   D4 (historical checkpoint retention), D5 (backup destination), D6 (large Acer
+   transfer connection) and D7 (agent-history retention/privacy) from the manifest.
+4. Confirm the frozen dataset/base/checkpoint dependency set and a byte budget.
+   Recheck changing paths, current branches and source writers immediately before copying.
+5. After execution authorization, copy to a fresh staging destination without deletion,
+   compare complete file hashes and metadata, preserve links/targets deliberately,
+   then run offline and supervised acceptance gates. Retain partial transfers and
+   report failures; do not overwrite source originals or stop unrelated AI90 workloads.
+
+Each row must retain source host/path, destination, provenance, exact units for size,
+checksum state, dependency/retention notes and the separate states `inventoried`,
+`copied`, `checksum_verified`, `runtime_validated`, `backed_up`.
+
+### Connectivity from the receiving agent
+
+Acer → ryzen9 key authentication was directly verified by this task. The receiving
+manifest reports ryzen9 → Acer and ryzen9 → AI90 inspection, but this task did not
+install reverse keys or test those sessions itself. From the relevant host, use
+existing authentication for `gaikwad-prakash@192.168.1.24` (or ZeroTier `.228`)
+and `kiran@192.168.194.220`; LAN addresses may change. Do not copy private keys,
+invent credentials or assume a known-host entry exists on a different host. If access
+fails, record the failure and continue independent local review. The GitHub repository
+is reported public by the receiving manifest; do not publish the private raw inventory,
+credentials or agent conversation histories merely to make them portable.
 
 ## 9. Navigation and validation
 
@@ -252,3 +387,18 @@ CI, destination runtime validation or model test is implied by those checks.
 Preserve historical documents as history. Update the existing current pages when
 facts change and leave a precise status at the end of each phase. The user should
 never need to search several conversations to understand what is actually ready.
+
+## 10. Handoff acceptance checklist
+
+- Correct receiving folder located; receiver-owned manifest and package inventory retained.
+- Current authorization distinguishes documentation delivery from bulk execution.
+- Bench and GPU Python versions separated; source patches and temporary logs identified.
+- Original data, ignored artifacts, recovery refs, symlink targets and backups covered explicitly.
+- Existing transfer manifest is the next agent's starting point; open decisions remain visible.
+- Bundled document links resolve, unbundled references use a pinned repository revision,
+  and remote bytes match the delivery manifest. The packet does not claim to contain
+  models, datasets, calibration secrets, the private source snapshot or all trial assets.
+
+Completeness here means the known gaps have owners and next checks. It is not a
+claim that missing drives, full checksums, network throughput, backups or model
+compatibility have already been resolved.
